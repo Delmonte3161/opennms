@@ -151,7 +151,6 @@ public class SyslogdLoadIT implements InitializingBean {
     private void startSyslogdNio() throws Exception {
         m_syslogd = new Syslogd();
         SyslogReceiverNioThreadPoolImpl receiver = new SyslogReceiverNioThreadPoolImpl(m_config);
-        receiver.setSyslogConnectionHandlers(new SyslogConnectionHandlerDefaultImpl());
         m_syslogd.setSyslogReceiver(receiver);
         m_syslogd.init();
         SyslogdTestUtils.startSyslogdGracefully(m_syslogd);
