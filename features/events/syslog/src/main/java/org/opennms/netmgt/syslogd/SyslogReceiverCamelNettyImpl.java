@@ -35,6 +35,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -50,12 +51,19 @@ import org.opennms.netmgt.config.SyslogdConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.ConsoleReporter;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+
 /**
  * @author Seth
  */
 public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
 
     private static final Logger LOG = LoggerFactory.getLogger(SyslogReceiverNioThreadPoolImpl.class);
+    
+    private static final MetricRegistry METRICS = new MetricRegistry();
 
     private static final int SOCKET_TIMEOUT = 500;
 
@@ -124,6 +132,17 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
     public void run() {
         // Get a log instance
         Logging.putPrefix(Syslogd.LOG4J_CATEGORY);
+        
+        ConsoleReporter reporter = ConsoleReporter.forRegistry(METRICS)
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .build();
+            reporter.start(1, TimeUnit.SECONDS);
+
+            // Create some metrics
+            Meter packetMeter = METRICS.meter(MetricRegistry.name(getClass(), "packets"));
+            Meter connectionMeter = METRICS.meter(MetricRegistry.name(getClass(), "connections"));
+            Histogram packetSizeHistogram = METRICS.histogram(MetricRegistry.name(getClass(), "packetSize"));
 
         SimpleRegistry registry = new SimpleRegistry();
 
@@ -153,9 +172,17 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                             // we are listening on an InetAddress, it will always be of type InetAddressSocket
                             InetSocketAddress source = (InetSocketAddress)exchange.getIn().getHeader(NettyConstants.NETTY_REMOTE_ADDRESS); 
                             // Syslog Handler Implementation to recieve message from syslogport and pass it on to handler
+                            
+                            // Increment the packet counter
+                            packetMeter.mark();
+                            
+                            // Create a metric for the syslog packet size
+                            packetSizeHistogram.update(buffer.toByteBuffer().capacity());
+                            
                             SyslogConnection connection = new SyslogConnection(source.getAddress(), source.getPort(), buffer.toByteBuffer(), m_config);
                             try {
                                 for (SyslogConnectionHandler handler : m_syslogConnectionHandlers) {
+                                	connectionMeter.mark();
                                     handler.handleSyslogConnection(connection);
                                 }
                             } catch (Throwable e) {
