@@ -35,7 +35,8 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
-import java.util.concurrent.CompletableFuture;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -111,6 +112,8 @@ public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
 
     private final ExecutorService m_socketReceivers;
     
+    private List<SyslogConnectionHandler> m_syslogConnectionHandlers = Collections.emptyList();
+
     public static DatagramChannel openChannel(SyslogdConfig config) throws SocketException, IOException {
         DatagramChannel channel = DatagramChannel.open();
         // Set SO_REUSEADDR so that we don't run into problems in
@@ -201,6 +204,15 @@ public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
         }
     }
     
+    //Getter and setter for syslog handler
+    public SyslogConnectionHandler getSyslogConnectionHandlers() {
+        return m_syslogConnectionHandlers.get(0);
+    }
+
+    public void setSyslogConnectionHandlers(SyslogConnectionHandler handler) {
+        m_syslogConnectionHandlers = Collections.singletonList(handler);
+    }
+
     /**
      * The execution context.
      */
@@ -274,15 +286,13 @@ public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
                         }
 
                         try {
-//                            if (!ioInterrupted) {
-//                                LOG.debug("Waiting on a datagram to arrive");
-//                            }
-                            
+                            if (!ioInterrupted) {
+                                LOG.debug("Waiting on a datagram to arrive");
+                            }
+
                             // Write the datagram into the ByteBuffer
-                            //changed since mchannel recieve used to return null
-                            InetSocketAddress source = new InetSocketAddress(m_config.getListenAddress(), m_config.getSyslogPort());
-                            m_channel.receive(buffer);
-                          
+                            InetSocketAddress source =  (InetSocketAddress)m_channel.receive(buffer);
+
                             // Increment the packet counter
                             packetMeter.mark();
                             
@@ -294,11 +304,17 @@ public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
                             
                             SyslogConnection connection = new SyslogConnection(SyslogConnection.copyPacket(source.getAddress(), source.getPort(), buffer), m_config);
 
-                            // Convert the syslog packet into an OpenNMS event
-                            CompletableFuture<SyslogProcessor> proc = CompletableFuture.supplyAsync(connection::call, m_socketReceivers);
-                           
-                            // Broadcast the event on the event channel
-                            proc.thenAcceptAsync(c -> c.call(), m_socketReceivers).thenRun(() -> connectionMeter.mark());
+                            try {
+                                for (SyslogConnectionHandler handler : m_syslogConnectionHandlers) {
+                                	connectionMeter.mark();
+                                    handler.handleSyslogConnection(connection);
+                                }
+                            } catch (Throwable e) {
+                                LOG.error("Handler execution failed in {}", this.getClass().getSimpleName(), e);
+                            }
+
+                            // Clear the buffer so that it's ready for writing again
+                            buffer.clear();
 
                             // reset the flag
                             ioInterrupted = false; 
@@ -308,10 +324,13 @@ public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
                         } catch (InterruptedIOException e) {
                             ioInterrupted = true;
                             continue;
-                        } catch (Exception e) {
+                        } catch (IOException e) {
+                            ioInterrupted = true;
+                            continue;
+                        } catch (Throwable e) {
                             LOG.error("Task execution failed in {}", this.getClass().getSimpleName(), e);
                             break;
-                        } 
+                        }
 
                     } // end while status OK
 

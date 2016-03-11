@@ -151,6 +151,7 @@ public class SyslogdLoadIT implements InitializingBean {
     private void startSyslogdNio() throws Exception {
         m_syslogd = new Syslogd();
         SyslogReceiverNioThreadPoolImpl receiver = new SyslogReceiverNioThreadPoolImpl(m_config);
+        receiver.setSyslogConnectionHandlers(new SyslogConnectionHandlerDefaultImpl());
         m_syslogd.setSyslogReceiver(receiver);
         m_syslogd.init();
         SyslogdTestUtils.startSyslogdGracefully(m_syslogd);
@@ -289,10 +290,9 @@ public class SyslogdLoadIT implements InitializingBean {
 
         long mid = System.currentTimeMillis();
         System.err.println(String.format("Sent %d packets in %d milliseconds", eventCount, mid - start));
-
+       
         m_eventCounter.waitForFinish(30000);
         long end = System.currentTimeMillis();
-
         System.err.println(String.format("Events expected: %d, events received: %d", eventCount, m_eventCounter.getCount()));
         final long total = (end - start);
         final double eventsPerSecond = (eventCount * 1000.0 / total);
