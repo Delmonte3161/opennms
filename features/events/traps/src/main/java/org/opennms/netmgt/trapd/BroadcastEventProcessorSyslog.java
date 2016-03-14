@@ -33,6 +33,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.opennms.netmgt.events.api.EventConstants;
 import org.opennms.netmgt.events.api.EventIpcManagerFactory;
 import org.opennms.netmgt.events.api.EventListener;
@@ -45,6 +46,11 @@ import org.opennms.netmgt.xml.event.Event;
  */
 final class BroadcastEventProcessorSyslog implements EventListener {
     private static final Logger LOG = LoggerFactory.getLogger(BroadcastEventProcessor.class);
+    
+    
+    @Autowired
+    private TrapdIpManagerDaoImpl trapdIpManagerDaoImpl;
+    
     /**
      * Create message selector to set to the subscription
      */
@@ -92,19 +98,19 @@ final class BroadcastEventProcessorSyslog implements EventListener {
         if (eventUei.equals(EventConstants.NODE_GAINED_INTERFACE_EVENT_UEI)) {
             // add to known nodes
             if (Long.toString(event.getNodeid()) != null && event.getInterface() != null) {
-                TrapdIpManagerDaoImpl.getInstance().setNodeId(event.getInterface(), event.getNodeid());
+            	trapdIpManagerDaoImpl.setNodeId(event.getInterface(), event.getNodeid());
             }
             LOG.debug("Added {} to known node list", event.getInterface());
         } else if (eventUei.equals(EventConstants.INTERFACE_DELETED_EVENT_UEI)) {
             // remove from known nodes
             if (event.getInterface() != null) {
-                TrapdIpManagerDaoImpl.getInstance().removeNodeId(event.getInterface());
+            	trapdIpManagerDaoImpl.removeNodeId(event.getInterface());
             }
             LOG.debug("Removed {} from known node list", event.getInterface());
         } else if (eventUei.equals(EventConstants.INTERFACE_REPARENTED_EVENT_UEI)) {
             // add to known nodes
             if (Long.toString(event.getNodeid()) != null && event.getInterface() != null) {
-                TrapdIpManagerDaoImpl.getInstance().setNodeId(event.getInterface(), event.getNodeid());
+            	trapdIpManagerDaoImpl.setNodeId(event.getInterface(), event.getNodeid());
             }
             LOG.debug("Reparented {} to known node list", event.getInterface());
         }
