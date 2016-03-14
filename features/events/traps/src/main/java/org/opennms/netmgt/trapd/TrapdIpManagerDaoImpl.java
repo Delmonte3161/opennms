@@ -134,12 +134,12 @@ public class TrapdIpManagerDaoImpl implements TrapdIpMgr {
         return longValue(m_knownips.remove(InetAddressUtils.getInetAddress(addr)));
     }
     
-    private static long longValue(Integer result) {
-        return (result == null ? -1 : result.longValue());
-    }
-
+    /*
+     * (non-Javadoc)
+     * @see org.opennms.netmgt.trapd.TrapdIpMgr#longValue(java.lang.Integer)
+     */
     @Override
-    public long longValue(final Long result) {
+    public long longValue(final Integer result) {
         return (result == null ? -1 : result);
     }
 

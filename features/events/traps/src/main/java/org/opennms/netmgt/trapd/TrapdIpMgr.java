@@ -79,6 +79,11 @@ public interface TrapdIpMgr {
      */
     long removeNodeId(String addr);
 
-    long longValue(Long result);
+    /**
+     * Method will check value for null. 
+     * @param result
+     * @return If result is null returns -1 else returns result itself 
+     */
+    long longValue(Integer result);
 
 }
