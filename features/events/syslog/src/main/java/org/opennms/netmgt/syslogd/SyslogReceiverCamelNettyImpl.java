@@ -33,6 +33,7 @@ import static org.opennms.core.utils.InetAddressUtils.addr;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -132,12 +133,6 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
     public void run() {
         // Get a log instance
         Logging.putPrefix(Syslogd.LOG4J_CATEGORY);
-        
-        ConsoleReporter reporter = ConsoleReporter.forRegistry(METRICS)
-                .convertRatesTo(TimeUnit.SECONDS)
-                .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .build();
-            reporter.start(1, TimeUnit.SECONDS);
 
             // Create some metrics
             Meter packetMeter = METRICS.meter(MetricRegistry.name(getClass(), "packets"));
@@ -173,13 +168,15 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                             InetSocketAddress source = (InetSocketAddress)exchange.getIn().getHeader(NettyConstants.NETTY_REMOTE_ADDRESS); 
                             // Syslog Handler Implementation to recieve message from syslogport and pass it on to handler
                             
+                            ByteBuffer byteBuffer = buffer.toByteBuffer();
+                            
                             // Increment the packet counter
                             packetMeter.mark();
                             
                             // Create a metric for the syslog packet size
-                            packetSizeHistogram.update(buffer.toByteBuffer().capacity());
+                            packetSizeHistogram.update(byteBuffer.capacity());
                             
-                            SyslogConnection connection = new SyslogConnection(source.getAddress(), source.getPort(), buffer.toByteBuffer(), m_config);
+                            SyslogConnection connection = new SyslogConnection(source.getAddress(), source.getPort(), byteBuffer, m_config);
                             try {
                                 for (SyslogConnectionHandler handler : m_syslogConnectionHandlers) {
                                 	connectionMeter.mark();

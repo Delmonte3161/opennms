@@ -48,7 +48,7 @@ final class BroadcastEventProcessor implements EventListener {
     private static final Logger LOG = LoggerFactory.getLogger(BroadcastEventProcessor.class);
     
     @Autowired
-    private SyslogdIPMgrDaoImpl syslogdIPMgrDaoImpl;
+    private SyslogdIPMgr syslogdIPMgrDaoImpl;
     /**
      * Create message selector to set to the subscription
      */
