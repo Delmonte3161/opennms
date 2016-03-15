@@ -30,9 +30,9 @@ package org.opennms.netmgt.trapd;
 
 import java.net.InetAddress;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.dao.api.IpInterfaceDao;
@@ -40,6 +40,7 @@ import org.opennms.netmgt.model.OnmsIpInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * This class represents a singular instance that is used to map trap IP
@@ -51,20 +52,16 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author <a href="http://www.opennms.org/">OpenNMS </a>
  */
 public class TrapdIpManagerDaoImpl implements TrapdIpMgr {
-	
-	private static final Logger LOG = LoggerFactory.getLogger(TrapdIpManagerDaoImpl.class);
-        
+
+    private static final Logger LOG = LoggerFactory.getLogger(TrapdIpManagerDaoImpl.class);
+
     @Autowired
     private IpInterfaceDao m_ipInterfaceDao;
 
     /**
      * A Map of IP addresses and node IDs
      */
-    protected Map<InetAddress, Integer> m_knownips = new HashMap<InetAddress, Integer>();
-    
-    public static TrapdIpMgr getInstance() {
-    	return new TrapdIpManagerDaoImpl();
-    }
+    protected Map<InetAddress, Integer> m_knownips = new ConcurrentHashMap<InetAddress, Integer>();
 
     /**
      * Clears and synchronizes the internal known IP address cache with the
@@ -76,6 +73,7 @@ public class TrapdIpManagerDaoImpl implements TrapdIpMgr {
      *             Thrown if the connection cannot be created or a database
      *             error occurs.
      */
+    @Transactional
     @Override
     public synchronized void dataSourceSync() throws SQLException {
     	
@@ -96,7 +94,7 @@ public class TrapdIpManagerDaoImpl implements TrapdIpMgr {
      */
     /** {@inheritDoc} */
     @Override
-    public synchronized long getNodeId(String addr) {
+    public synchronized int getNodeId(String addr) {
         if (addr == null) {
             return -1;
         }
@@ -108,18 +106,18 @@ public class TrapdIpManagerDaoImpl implements TrapdIpMgr {
      */
     /** {@inheritDoc} */
     @Override
-    public synchronized long setNodeId(String addr, long nodeid) {
+    public synchronized int setNodeId(String addr, int nodeid) {
         if (addr == null || nodeid == -1) {
             return -1;
         }
         // Only add the address if it doesn't exist on the map. If it exists, only replace the current one if the new address is primary.
         boolean add = true;
         if (m_knownips.containsKey(InetAddressUtils.getInetAddress(addr))) {
-            OnmsIpInterface intf = m_ipInterfaceDao.findByNodeIdAndIpAddress(Integer.valueOf((int) nodeid), addr);
+            OnmsIpInterface intf = m_ipInterfaceDao.findByNodeIdAndIpAddress(nodeid, addr);
             add = intf != null && intf.isPrimary();
             LOG.info("setNodeId: address found {}. Should be added? {}", intf, add);
         }
-        return add ? longValue(m_knownips.put(InetAddressUtils.getInetAddress(addr), Integer.valueOf((int) nodeid))) : -1;
+        return add ? longValue(m_knownips.put(InetAddressUtils.getInetAddress(addr), nodeid)) : -1;
     }
 
     /* (non-Javadoc)
@@ -127,11 +125,11 @@ public class TrapdIpManagerDaoImpl implements TrapdIpMgr {
      */
     /** {@inheritDoc} */
     @Override
-    public synchronized long removeNodeId(String addr) {
+    public synchronized int removeNodeId(String addr) {
         if (addr == null) {
             return -1;
         }
-        return longValue(m_knownips.remove(InetAddressUtils.getInetAddress(addr)));
+        return m_knownips.remove(InetAddressUtils.getInetAddress(addr));
     }
     
     /*
@@ -139,8 +137,8 @@ public class TrapdIpManagerDaoImpl implements TrapdIpMgr {
      * @see org.opennms.netmgt.trapd.TrapdIpMgr#longValue(java.lang.Integer)
      */
     @Override
-    public long longValue(final Integer result) {
+    public int longValue(final Integer result) {
         return (result == null ? -1 : result);
     }
 
-} // end SyslodIPMgr
+}
