@@ -46,10 +46,10 @@ import org.opennms.netmgt.xml.event.Event;
  */
 final class BroadcastEventProcessorSyslog implements EventListener {
     private static final Logger LOG = LoggerFactory.getLogger(BroadcastEventProcessor.class);
-    
-    
+
     @Autowired
-    private TrapdIpMgr trapdIpManagerDaoImpl;
+    private TrapdIpMgr trapdIpManager;
+
     /**
      * Create message selector to set to the subscription
      */
@@ -67,8 +67,6 @@ final class BroadcastEventProcessorSyslog implements EventListener {
         EventIpcManagerFactory.init();
         EventIpcManagerFactory.getIpcManager().addEventListener(this, ueiList);
     }
-
-
 
     /**
      * Unsubscribe from eventd
@@ -91,25 +89,24 @@ final class BroadcastEventProcessorSyslog implements EventListener {
         if (eventUei == null)
             return;
 
-
         LOG.debug("Received event: {}", eventUei);
 
         if (eventUei.equals(EventConstants.NODE_GAINED_INTERFACE_EVENT_UEI)) {
             // add to known nodes
             if (Long.toString(event.getNodeid()) != null && event.getInterface() != null) {
-            	trapdIpManagerDaoImpl.setNodeId(event.getInterface(), event.getNodeid());
+            	trapdIpManager.setNodeId(event.getInterface(), event.getNodeid());
             }
             LOG.debug("Added {} to known node list", event.getInterface());
         } else if (eventUei.equals(EventConstants.INTERFACE_DELETED_EVENT_UEI)) {
             // remove from known nodes
             if (event.getInterface() != null) {
-            	trapdIpManagerDaoImpl.removeNodeId(event.getInterface());
+            	trapdIpManager.removeNodeId(event.getInterface());
             }
             LOG.debug("Removed {} from known node list", event.getInterface());
         } else if (eventUei.equals(EventConstants.INTERFACE_REPARENTED_EVENT_UEI)) {
             // add to known nodes
             if (Long.toString(event.getNodeid()) != null && event.getInterface() != null) {
-            	trapdIpManagerDaoImpl.setNodeId(event.getInterface(), event.getNodeid());
+            	trapdIpManager.setNodeId(event.getInterface(), event.getNodeid());
             }
             LOG.debug("Reparented {} to known node list", event.getInterface());
         }
@@ -122,6 +119,6 @@ final class BroadcastEventProcessorSyslog implements EventListener {
      */
     @Override
     public String getName() {
-        return "Syslogd:BroadcastEventProcessor";
+        return "Trapd:BroadcastEventProcessor";
     }
 }
