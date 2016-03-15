@@ -50,7 +50,6 @@ final class BroadcastEventProcessorSyslog implements EventListener {
     
     @Autowired
     private TrapdIpMgr trapdIpManagerDaoImpl;
-    
     /**
      * Create message selector to set to the subscription
      */
