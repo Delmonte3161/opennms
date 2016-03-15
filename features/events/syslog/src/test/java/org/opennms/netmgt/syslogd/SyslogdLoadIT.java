@@ -290,10 +290,9 @@ public class SyslogdLoadIT implements InitializingBean {
 
         long mid = System.currentTimeMillis();
         System.err.println(String.format("Sent %d packets in %d milliseconds", eventCount, mid - start));
-
+       
         m_eventCounter.waitForFinish(30000);
         long end = System.currentTimeMillis();
-
         System.err.println(String.format("Events expected: %d, events received: %d", eventCount, m_eventCounter.getCount()));
         final long total = (end - start);
         final double eventsPerSecond = (eventCount * 1000.0 / total);

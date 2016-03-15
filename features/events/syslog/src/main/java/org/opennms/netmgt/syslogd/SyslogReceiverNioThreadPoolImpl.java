@@ -49,6 +49,10 @@ import org.opennms.netmgt.config.SyslogdConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+
 /**
  * @author Seth
  * @author <a href="mailto:weave@oculan.com">Brian Weaver</a>
@@ -58,6 +62,7 @@ import org.slf4j.LoggerFactory;
 public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
 
     private static final Logger LOG = LoggerFactory.getLogger(SyslogReceiverNioThreadPoolImpl.class);
+    private static final MetricRegistry METRICS = new MetricRegistry();
 
     private static final int SOCKET_TIMEOUT = 500;
 
@@ -72,6 +77,21 @@ public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
      * calls on the syslog port.
      */
     public static final int SOCKET_RECEIVER_COUNT = Runtime.getRuntime().availableProcessors() * 2;
+    
+    /**
+     * This is the number of threads that are used to parse syslog messages into
+     * OpenNMS events.
+     * 
+     * TODO: Make this configurable
+     */
+    public static final int EVENT_PARSER_THREADS = Runtime.getRuntime().availableProcessors();
+    
+    /**
+     * This is the number of threads that are used to broadcast the OpenNMS events.
+     * 
+     * TODO: Make this configurable
+     */
+    public static final int EVENT_SENDER_THREADS = Runtime.getRuntime().availableProcessors();
 
     /**
      * The Fiber's status.
@@ -86,6 +106,8 @@ public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
     private Thread m_context;
 
     private final SyslogdConfig m_config;
+
+    private final ExecutorService m_executor;
 
     private final ExecutorService m_socketReceivers;
     
@@ -121,6 +143,15 @@ public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
         m_stop = false;
         m_channel = null;
         m_config = config;
+        
+        m_executor = new ThreadPoolExecutor(
+            Runtime.getRuntime().availableProcessors() * 2,
+            Runtime.getRuntime().availableProcessors() * 2,
+            1000L,
+            TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(),
+            new LogPreservingThreadFactory(getClass().getSimpleName(), Integer.MAX_VALUE)
+        );
 
         // This thread pool is used to process {@link DatagramChannel#receive(ByteBuffer)} calls
         // on the syslog port. By using multiple threads, we can optimize the receipt of
@@ -152,6 +183,9 @@ public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
 
         // Shut down the thread pool that is processing DatagramChannel.receive() calls
         m_socketReceivers.shutdown();
+
+        // Shut down the thread pools that are executing SyslogConnection and SyslogProcessor tasks
+        m_executor.shutdown();
 
         try {
             m_channel.close();
@@ -188,6 +222,11 @@ public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
 
         // Get a log instance
         Logging.putPrefix(Syslogd.LOG4J_CATEGORY);
+
+        // Create some metrics
+        Meter packetMeter = METRICS.meter(MetricRegistry.name(getClass(), "packets"));
+        Meter connectionMeter = METRICS.meter(MetricRegistry.name(getClass(), "connections"));
+        Histogram packetSizeHistogram = METRICS.histogram(MetricRegistry.name(getClass(), "packetSize"));
 
         if (m_stop) {
             LOG.debug("Stop flag set before thread started, exiting");
@@ -247,13 +286,20 @@ public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
                             // Write the datagram into the ByteBuffer
                             InetSocketAddress source =  (InetSocketAddress)m_channel.receive(buffer);
 
+                            // Increment the packet counter
+                            packetMeter.mark();
+                            
                             // Flip the buffer from write to read mode
                             buffer.flip();
 
+                            // Create a metric for the syslog packet size
+                            packetSizeHistogram.update(buffer.remaining());
+                            
                             SyslogConnection connection = new SyslogConnection(SyslogConnection.copyPacket(source.getAddress(), source.getPort(), buffer), m_config);
 
                             try {
                                 for (SyslogConnectionHandler handler : m_syslogConnectionHandlers) {
+                                	connectionMeter.mark();
                                     handler.handleSyslogConnection(connection);
                                 }
                             } catch (Throwable e) {
