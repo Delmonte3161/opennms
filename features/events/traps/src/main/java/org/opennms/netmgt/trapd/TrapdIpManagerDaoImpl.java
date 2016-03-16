@@ -31,7 +31,6 @@ package org.opennms.netmgt.trapd;
 import java.net.InetAddress;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.opennms.core.utils.InetAddressUtils;
@@ -79,28 +78,21 @@ public class TrapdIpManagerDaoImpl implements TrapdIpMgr {
     @Override
     public synchronized void dataSourceSync() throws SQLException {
     	
-    	List<OnmsIpInterface> list = m_ipInterfaceDao.findAll();
-    	
-    	m_knownips.clear();
-    	for (OnmsIpInterface one: list) {
-    		if (one != null) {
-    			m_knownips.put(one.getIpAddress(), one.getId());
-    		}
-    		
-    	}
-    	
+    	m_knownips = m_ipInterfaceDao.getInterfacesForNodes();
     }
 
-    /* (non-Javadoc)
-     * @see org.opennms.netmgt.trapd.TrapdIpMgr#getNodeId(java.lang.String)
+    /**
+     * Returns the nodeid for the IP Address
+     *
+     * @param addr The IP Address to query.
+     * @return The node ID of the IP Address if known.
      */
-    /** {@inheritDoc} */
     @Override
     public synchronized long getNodeId(String addr) {
         if (addr == null) {
             return -1;
         }
-        return longValue(m_knownips.get(InetAddressUtils.getInetAddress(addr)));
+        return intValue(m_knownips.get(InetAddressUtils.getInetAddress(addr)));
     }
 
     /* (non-Javadoc)
@@ -119,19 +111,21 @@ public class TrapdIpManagerDaoImpl implements TrapdIpMgr {
             add = intf != null && intf.isPrimary();
             LOG.info("setNodeId: address found {}. Should be added? {}", intf, add);
         }
-        return add ? longValue(m_knownips.put(InetAddressUtils.getInetAddress(addr), Integer.valueOf((int) nodeid))) : -1;
+        return add ? intValue(m_knownips.put(InetAddressUtils.getInetAddress(addr), Integer.valueOf((int) nodeid))) : -1;
     }
 
-    /* (non-Javadoc)
-     * @see org.opennms.netmgt.trapd.TrapdIpMgr#removeNodeId(java.lang.String)
+    /**
+     * Removes an address from the node ID map.
+     *
+     * @param addr The address to remove from the node ID map.
+     * @return The nodeid that was in the map.
      */
-    /** {@inheritDoc} */
     @Override
     public synchronized long removeNodeId(String addr) {
         if (addr == null) {
             return -1;
         }
-        return longValue(m_knownips.remove(InetAddressUtils.getInetAddress(addr)));
+        return intValue(m_knownips.remove(InetAddressUtils.getInetAddress(addr)));
     }
     
     /*
@@ -139,7 +133,7 @@ public class TrapdIpManagerDaoImpl implements TrapdIpMgr {
      * @see org.opennms.netmgt.trapd.TrapdIpMgr#longValue(java.lang.Integer)
      */
     @Override
-    public long longValue(final Integer result) {
+    public int intValue(final Integer result) {
         return (result == null ? -1 : result);
     }
 

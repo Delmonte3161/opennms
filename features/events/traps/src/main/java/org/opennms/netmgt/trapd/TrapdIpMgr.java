@@ -84,6 +84,6 @@ public interface TrapdIpMgr {
      * @param result
      * @return If result is null returns -1 else returns result itself 
      */
-    long longValue(Integer result);
+    int intValue(Integer result);
 
 }
