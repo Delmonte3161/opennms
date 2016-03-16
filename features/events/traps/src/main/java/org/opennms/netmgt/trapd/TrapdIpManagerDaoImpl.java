@@ -32,6 +32,7 @@ import java.net.InetAddress;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.dao.api.IpInterfaceDao;
@@ -59,7 +60,7 @@ public class TrapdIpManagerDaoImpl implements TrapdIpMgr {
     /**
      * A Map of IP addresses and node IDs
      */
-    protected Map<InetAddress, Integer> m_knownips = new HashMap<InetAddress, Integer>();
+    protected Map<InetAddress, Integer> m_knownips = new ConcurrentHashMap<InetAddress, Integer>();
     
     public static TrapdIpMgr getInstance() {
     	return new TrapdIpManagerDaoImpl();
