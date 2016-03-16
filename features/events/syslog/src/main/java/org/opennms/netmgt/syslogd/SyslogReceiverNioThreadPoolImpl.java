@@ -77,7 +77,7 @@ public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
      * calls on the syslog port.
      */
     public static final int SOCKET_RECEIVER_COUNT = Runtime.getRuntime().availableProcessors() * 2;
-    
+
     /**
      * The Fiber's status.
      */
@@ -126,7 +126,7 @@ public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
         m_stop = false;
         m_channel = null;
         m_config = config;
-        
+
         // This thread pool is used to process {@link DatagramChannel#receive(ByteBuffer)} calls
         // on the syslog port. By using multiple threads, we can optimize the receipt of
         // packet data from the syslog port and avoid discarding UDP syslog packets.
