@@ -79,21 +79,6 @@ public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
     public static final int SOCKET_RECEIVER_COUNT = Runtime.getRuntime().availableProcessors() * 2;
     
     /**
-     * This is the number of threads that are used to parse syslog messages into
-     * OpenNMS events.
-     * 
-     * TODO: Make this configurable
-     */
-    public static final int EVENT_PARSER_THREADS = Runtime.getRuntime().availableProcessors();
-    
-    /**
-     * This is the number of threads that are used to broadcast the OpenNMS events.
-     * 
-     * TODO: Make this configurable
-     */
-    public static final int EVENT_SENDER_THREADS = Runtime.getRuntime().availableProcessors();
-
-    /**
      * The Fiber's status.
      */
     private volatile boolean m_stop;
@@ -106,8 +91,6 @@ public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
     private Thread m_context;
 
     private final SyslogdConfig m_config;
-
-    private final ExecutorService m_executor;
 
     private final ExecutorService m_socketReceivers;
     
@@ -144,15 +127,6 @@ public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
         m_channel = null;
         m_config = config;
         
-        m_executor = new ThreadPoolExecutor(
-            Runtime.getRuntime().availableProcessors() * 2,
-            Runtime.getRuntime().availableProcessors() * 2,
-            1000L,
-            TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<Runnable>(),
-            new LogPreservingThreadFactory(getClass().getSimpleName(), Integer.MAX_VALUE)
-        );
-
         // This thread pool is used to process {@link DatagramChannel#receive(ByteBuffer)} calls
         // on the syslog port. By using multiple threads, we can optimize the receipt of
         // packet data from the syslog port and avoid discarding UDP syslog packets.
@@ -183,9 +157,6 @@ public class SyslogReceiverNioThreadPoolImpl implements SyslogReceiver {
 
         // Shut down the thread pool that is processing DatagramChannel.receive() calls
         m_socketReceivers.shutdown();
-
-        // Shut down the thread pools that are executing SyslogConnection and SyslogProcessor tasks
-        m_executor.shutdown();
 
         try {
             m_channel.close();

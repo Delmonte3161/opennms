@@ -174,7 +174,7 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                             packetMeter.mark();
                             
                             // Create a metric for the syslog packet size
-                            packetSizeHistogram.update(byteBuffer.capacity());
+                            packetSizeHistogram.update(byteBuffer.remaining());
                             
                             SyslogConnection connection = new SyslogConnection(source.getAddress(), source.getPort(), byteBuffer, m_config);
                             try {
