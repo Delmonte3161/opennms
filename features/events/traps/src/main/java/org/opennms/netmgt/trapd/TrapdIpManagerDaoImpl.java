@@ -89,7 +89,7 @@ public class TrapdIpManagerDaoImpl implements TrapdIpMgr {
      * @return The node ID of the IP Address if known.
      */
     @Override
-    public synchronized long getNodeId(String addr) {
+    public synchronized int getNodeId(String addr) {
         if (addr == null) {
             return -1;
         }
@@ -101,7 +101,7 @@ public class TrapdIpManagerDaoImpl implements TrapdIpMgr {
      */
     /** {@inheritDoc} */
     @Override
-    public synchronized long setNodeId(String addr, long nodeid) {
+    public synchronized int setNodeId(String addr, int nodeid) {
         if (addr == null || nodeid == -1) {
             return -1;
         }
@@ -122,7 +122,7 @@ public class TrapdIpManagerDaoImpl implements TrapdIpMgr {
      * @return The nodeid that was in the map.
      */
     @Override
-    public synchronized long removeNodeId(String addr) {
+    public synchronized int removeNodeId(String addr) {
         if (addr == null) {
             return -1;
         }

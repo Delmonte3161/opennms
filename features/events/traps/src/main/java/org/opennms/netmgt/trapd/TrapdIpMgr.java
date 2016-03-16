@@ -57,7 +57,7 @@ public interface TrapdIpMgr {
      *            The IP Address to query.
      * @return The node ID of the IP Address if known.
      */
-    long getNodeId(String addr);
+    int getNodeId(String addr);
 
     /**
      * Sets the IP Address and Node ID in the Map.
@@ -68,7 +68,7 @@ public interface TrapdIpMgr {
      *            The Node ID to add.
      * @return The nodeid if it existed in the map.
      */
-    long setNodeId(String addr, long nodeid);
+    int setNodeId(String addr, int nodeid);
 
     /**
      * Removes an address from the node ID map.
@@ -77,7 +77,7 @@ public interface TrapdIpMgr {
      *            The address to remove from the node ID map.
      * @return The nodeid that was in the map.
      */
-    long removeNodeId(String addr);
+    int removeNodeId(String addr);
 
     /**
      * Method will check value for null. 
