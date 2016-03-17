@@ -32,7 +32,7 @@ package org.opennms.netmgt.trapd;
 /**
  * @author Seth
  */
-public interface TrapReceiver extends Runnable {
+public interface TrapReceiver {
 
 	void start();
 

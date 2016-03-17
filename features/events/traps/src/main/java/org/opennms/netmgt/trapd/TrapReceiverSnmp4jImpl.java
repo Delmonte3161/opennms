@@ -126,13 +126,6 @@ public class TrapReceiverSnmp4jImpl implements TrapReceiver, TrapNotificationLis
         m_trapNotificationHandlers = Collections.singletonList(handler);
     }
 
-    /**
-     * The execution context.
-     */
-    @Override
-    public void run() {
-    }
-
 	@Override
 	public void trapReceived(TrapNotification trapNotification) {
 		try {
