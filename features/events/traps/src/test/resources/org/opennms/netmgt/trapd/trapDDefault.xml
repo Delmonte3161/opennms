@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:onmsgi="http://xmlns.opennms.org/xsd/spring/onms-osgi"
+	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+       http://xmlns.opennms.org/xsd/spring/onms-osgi http://xmlns.opennms.org/xsd/spring/onms-osgi.xsd 
+      ">
+
+	<!-- <bean id="trapdIpMgr" class="org.opennms.netmgt.trapd.MockTrapdIpMgr"/> -->
+
+	<bean id="processorFactory" class="org.opennms.netmgt.trapd.TrapQueueProcessorFactory">
+		<property name="eventManager" ref="eventIpcManager" />
+	</bean>
+
+	<bean id="newSuspectOnTrap" class="java.lang.Boolean">
+		<constructor-arg>
+			<value>true</value>
+		</constructor-arg>
+	</bean>
+
+	<!-- <bean id="snmpTrapPort" class="java.lang.Integer"> -->
+	<!-- <constructor-arg><value>10000</value></constructor-arg> -->
+	<!-- </bean> -->
+
+	<bean id="eventConfDao" class="org.opennms.netmgt.config.DefaultEventConfDao"
+		init-method="reload">
+		<property name="configResource">
+			<value>classpath:/org/opennms/netmgt/trapd/eventconf.xml</value>
+		</property>
+	</bean>
+
+	<onmsgi:reference id="eventIpcManager"
+		interface="org.opennms.netmgt.events.api.EventIpcManager" />
+
+	<bean id="serviceRegistry" class="org.opennms.core.soa.support.DefaultServiceRegistry" />
+
+	<!-- Make the tx:annotation-driven element in applicationContext-trapDaemon 
+		happy -->
+	<!-- <bean id="transactionManager" class="org.opennms.core.test.MockPlatformTransactionManager"/> -->
+</beans>

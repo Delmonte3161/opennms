@@ -52,10 +52,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 
 @RunWith(OpenNMSJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:/META-INF/opennms/emptyContext.xml" })
+@ContextConfiguration(locations = {
+		"classpath:/META-INF/opennms/emptyContext.xml",
+		"classpath:/org/opennms/netmgt/trapd/trapDDefault.xml"})
 public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 
-	private static final Logger LOG = LoggerFactory.getLogger(TrapdHandlerDefaultIT.class);
+	private static final Logger LOG = LoggerFactory
+			.getLogger(TrapdHandlerDefaultIT.class);
 
 	private static BrokerService m_broker = null;
 
@@ -67,8 +70,10 @@ public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 	 */
 	@Override
 	public void doPreSetup() throws Exception {
-		System.setProperty("org.apache.aries.blueprint.synchronous", Boolean.TRUE.toString());
-		System.setProperty("de.kalpatec.pojosr.framework.events.sync", Boolean.TRUE.toString());
+		System.setProperty("org.apache.aries.blueprint.synchronous",
+				Boolean.TRUE.toString());
+		System.setProperty("de.kalpatec.pojosr.framework.events.sync",
+				Boolean.TRUE.toString());
 	}
 
 	@Override
@@ -89,14 +94,17 @@ public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	protected void addServicesOnStartup(Map<String, KeyValueHolder<Object, Dictionary>> services) {
+	protected void addServicesOnStartup(
+			Map<String, KeyValueHolder<Object, Dictionary>> services) {
 		// Create a mock SyslogdConfig
 		TrapdConfigBean config = new TrapdConfigBean();
 		config.setSnmpTrapPort(10514);
 		config.setSnmpTrapAddress("127.0.0.1");
 		config.setM_newSuspectOnTrap(false);
 
-		services.put(TrapdConfig.class.getName(), new KeyValueHolder<Object, Dictionary>(config, new Properties()));
+		services.put(
+				TrapdConfig.class.getName(),
+				new KeyValueHolder<Object, Dictionary>(config, new Properties()));
 	}
 
 	// The location of our Blueprint XML files to be used for testing
@@ -121,11 +129,14 @@ public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 
 	@Test
 	public void testSyslogd() throws Exception {
-		// Expect one SyslogConnection message to be broadcast on the messaging channel
-		MockEndpoint broadcastSyslog = getMockEndpoint("mock:activemq:broadcastTrap", false);
+		// Expect one SyslogConnection message to be broadcast on the messaging
+		// channel
+		MockEndpoint broadcastSyslog = getMockEndpoint(
+				"mock:activemq:broadcastTrap", false);
 		broadcastSyslog.setExpectedMessageCount(1);
 
-		MockEndpoint trapHandler = getMockEndpoint("mock:seda:trapHandler", false);
+		MockEndpoint trapHandler = getMockEndpoint("mock:seda:trapHandler",
+				false);
 		trapHandler.setExpectedMessageCount(1);
 
 		// Create a mock SyslogdConfig
@@ -134,52 +145,56 @@ public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 		config.setSnmpTrapAddress("127.0.0.1");
 		config.setM_newSuspectOnTrap(false);
 
-		// Leave a bunch of config that won't be available on the Minion side blank
-		//config.setParser("org.opennms.netmgt.syslogd.CustomSyslogParser");
-		//config.setForwardingRegexp("^.*\\s(19|20)\\d\\d([-/.])(0[1-9]|1[012])\\2(0[1-9]|[12][0-9]|3[01])(\\s+)(\\S+)(\\s)(\\S.+)");
-		//config.setMatchingGroupHost(6);
-		//config.setMatchingGroupMessage(8);
-		//config.setDiscardUei("DISCARD-MATCHING-MESSAGES");
+		// Leave a bunch of config that won't be available on the Minion side
+		// blank
+		// config.setParser("org.opennms.netmgt.syslogd.CustomSyslogParser");
+		// config.setForwardingRegexp("^.*\\s(19|20)\\d\\d([-/.])(0[1-9]|1[012])\\2(0[1-9]|[12][0-9]|3[01])(\\s+)(\\S+)(\\s)(\\S.+)");
+		// config.setMatchingGroupHost(6);
+		// config.setMatchingGroupMessage(8);
+		// config.setDiscardUei("DISCARD-MATCHING-MESSAGES");
 
-		byte[] messageBytes = "<34>main: 2010-08-19 localhost foo0: load test 0 on tty1\0".getBytes("US-ASCII");
+		byte[] messageBytes = "<34>main: 2010-08-19 localhost foo0: load test 0 on tty1\0"
+				.getBytes("US-ASCII");
 
-//		try
-//		{
-			
-			
-			TrapQueueProcessor connection=new TrapQueueProcessor();
-//			TrapProcessor trapProcess = new TrapProcessorImpl();
-//			trapProcess.setAgentAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
-//			trapProcess.setCommunity("comm");
-//			trapProcess.setTimeStamp(System.currentTimeMillis());
-//			trapProcess.setTrapAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
-//			
-//			
-//			connection.setTrapNotification(new TrapNotificationImpl(trapProcess));
-			// Send a SyslogConnection
-			template.sendBody(
-				"activemq:broadcastTrap",new TrapQueueProcessor()
-				//JaxbUtils.marshal(new TrapdConfigProcessor(config).process(connection))
-			);
-//		}catch(Exception e)
-//		{
-//			e.printStackTrace();
-//		}
+		// try
+		// {
+
+		TrapQueueProcessor connection = new TrapQueueProcessor();
+		// TrapProcessor trapProcess = new TrapProcessorImpl();
+		// trapProcess.setAgentAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
+		// trapProcess.setCommunity("comm");
+		// trapProcess.setTimeStamp(System.currentTimeMillis());
+		// trapProcess.setTrapAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
+		//
+		//
+		// connection.setTrapNotification(new
+		// TrapNotificationImpl(trapProcess));
+		// Send a SyslogConnection
+		template.sendBody("activemq:broadcastTrap", new TrapQueueProcessor()
+		// JaxbUtils.marshal(new
+		// TrapdConfigProcessor(config).process(connection))
+		);
+		// }catch(Exception e)
+		// {
+		// e.printStackTrace();
+		// }
 
 		assertMockEndpointsSatisfied();
 
 		// Check that the input for the seda:syslogHandler endpoint matches
 		// the SyslogConnection that we simulated via ActiveMQ
-		//TrapQueueProcessor result = trapHandler.getReceivedExchanges().get(0).getIn().getBody(TrapQueueProcessor.class);
-		//System.out.println("Result ++++:"+result);
-//		assertEquals(InetAddressUtils.ONE_TWENTY_SEVEN, result.);
-//		assertEquals(2000, result.getPort());
-//		assertTrue(Arrays.equals(result.getBytes(), messageBytes));
-//
-//		// Assert that the SyslogdConfig has been updated to the local copy
-//		// that has been provided as an OSGi service
-//		assertEquals("DISCARD-MATCHING-MESSAGES", result.getConfig().getDiscardUei());
-//		assertEquals(4, result.getConfig().getMatchingGroupHost());
-//		assertEquals(7, result.getConfig().getMatchingGroupMessage());
+		// TrapQueueProcessor result =
+		// trapHandler.getReceivedExchanges().get(0).getIn().getBody(TrapQueueProcessor.class);
+		// System.out.println("Result ++++:"+result);
+		// assertEquals(InetAddressUtils.ONE_TWENTY_SEVEN, result.);
+		// assertEquals(2000, result.getPort());
+		// assertTrue(Arrays.equals(result.getBytes(), messageBytes));
+		//
+		// // Assert that the SyslogdConfig has been updated to the local copy
+		// // that has been provided as an OSGi service
+		// assertEquals("DISCARD-MATCHING-MESSAGES",
+		// result.getConfig().getDiscardUei());
+		// assertEquals(4, result.getConfig().getMatchingGroupHost());
+		// assertEquals(7, result.getConfig().getMatchingGroupMessage());
 	}
 }

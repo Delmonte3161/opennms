@@ -28,7 +28,11 @@
 
 package org.opennms.netmgt.trapd;
 
+import org.opennms.core.utils.InetAddressUtils;
+import org.opennms.netmgt.config.SyslogdConfig;
 import org.opennms.netmgt.config.TrapdConfig;
+import org.opennms.netmgt.snmp.TrapNotification;
+import org.opennms.netmgt.snmp.TrapProcessor;
 
 /**
  * This processor will update the {@link SyslogdConfig} on a
@@ -45,11 +49,25 @@ public class TrapdConfigProcessor {
 		m_config = config;
 	}
 
-	public TrapQueueProcessor process(TrapQueueProcessor connection) {
+	public TrapNotification process(TrapQueueProcessor connection) {
 		System.out.println("------------------------------------------------");
 		if(connection == null)
 			connection = new TrapQueueProcessor();
-		connection.setNewSuspect(false);;
-		return connection;
+		
+		/**
+		 * This as done just for testing purpose. Need to remove once testing is complete
+		 */
+		
+		TrapProcessor trapProcess = new TrapProcessorImpl();
+		trapProcess.setAgentAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
+		trapProcess.setCommunity("comm");
+		trapProcess.setTimeStamp(System.currentTimeMillis());
+		trapProcess.setTrapAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
+		
+		
+		connection.setTrapNotification(new TrapNotificationImpl(trapProcess));
+		
+		connection.setNewSuspect(false);
+		return connection.getTrapNotification();
 	}
 }
