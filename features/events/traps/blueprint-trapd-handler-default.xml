@@ -23,20 +23,6 @@
 	<bean id="trapConnectionHandlerDefault"
 		class="org.opennms.netmgt.trapd.TrapNotificationHandlerDefaultImpl" />
 
-<!-- 	<bean id="processorFactory" class="org.opennms.netmgt.trapd.TrapQueueProcessorFactory"> -->
-<!-- 		<property name="eventManager" ref="eventIpcManager" /> -->
-<!-- 	</bean> -->
-
-
-	<!-- Don't register this as a service: we're only using it internally -->
-	<!-- <service interface="org.opennms.netmgt.trapd.SyslogConnectionHandler" 
-		ref="trapConnectionHandlerDefault"/> -->
-
-	<!-- Camel Event marshalling processor -->
-	<!-- <bean id="unmarshaller" class="org.opennms.core.camel.JaxbUtilsUnmarshalProcessor"> -->
-	<!-- <argument value="org.opennms.netmgt.trapd.SyslogConnection" /> -->
-	<!-- </bean> -->
-
 	<reference id="trapdConfig" interface="org.opennms.netmgt.config.TrapdConfig" />
 
 	<bean id="trapdConfigProcessor" class="org.opennms.netmgt.trapd.TrapdConfigProcessor">

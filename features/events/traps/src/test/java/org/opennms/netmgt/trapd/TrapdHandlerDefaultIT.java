@@ -42,11 +42,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
+import org.opennms.core.test.db.annotations.JUnitTemporaryDatabase;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.core.xml.JaxbUtils;
 import org.opennms.netmgt.config.TrapdConfig;
 import org.opennms.netmgt.snmp.TrapNotification;
 import org.opennms.netmgt.snmp.TrapProcessor;
+import org.opennms.test.JUnitConfigurationEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
@@ -55,6 +57,9 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration(locations = {
 		"classpath:/META-INF/opennms/emptyContext.xml",
 		"classpath:/org/opennms/netmgt/trapd/trapDDefault.xml"})
+
+@JUnitConfigurationEnvironment
+@JUnitTemporaryDatabase
 public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 
 	private static final Logger LOG = LoggerFactory
@@ -128,12 +133,12 @@ public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 	}
 
 	@Test
-	public void testSyslogd() throws Exception {
+	public void testTrapd() throws Exception {
 		// Expect one SyslogConnection message to be broadcast on the messaging
 		// channel
-		MockEndpoint broadcastSyslog = getMockEndpoint(
+		MockEndpoint broadcastTrapd = getMockEndpoint(
 				"mock:activemq:broadcastTrap", false);
-		broadcastSyslog.setExpectedMessageCount(1);
+		broadcastTrapd.setExpectedMessageCount(1);
 
 		MockEndpoint trapHandler = getMockEndpoint("mock:seda:trapHandler",
 				false);

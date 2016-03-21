@@ -10,10 +10,6 @@
 
 	<!-- <bean id="trapdIpMgr" class="org.opennms.netmgt.trapd.MockTrapdIpMgr"/> -->
 
-	<bean id="processorFactory" class="org.opennms.netmgt.trapd.TrapQueueProcessorFactory">
-		<property name="eventManager" ref="eventIpcManager" />
-	</bean>
-
 	<bean id="newSuspectOnTrap" class="java.lang.Boolean">
 		<constructor-arg>
 			<value>true</value>
@@ -35,6 +31,10 @@
 		interface="org.opennms.netmgt.events.api.EventIpcManager" />
 
 	<bean id="serviceRegistry" class="org.opennms.core.soa.support.DefaultServiceRegistry" />
+	
+	<bean id="processorFactory" class="org.opennms.netmgt.trapd.TrapQueueProcessorFactory">
+		<property name="eventManager" ref="eventIpcManager" />
+	</bean>
 
 	<!-- Make the tx:annotation-driven element in applicationContext-trapDaemon 
 		happy -->
