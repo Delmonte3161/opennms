@@ -62,13 +62,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class TrapReceiverSnmp4jImpl implements TrapReceiver, TrapNotificationListener,TrapProcessorFactory {
     private static final Logger LOG = LoggerFactory.getLogger(TrapReceiverSnmp4jImpl.class);
-
-
-    /**
-     * The queue processing thread
-     */
-    @Autowired
-    private TrapQueueProcessorFactory m_processorFactory;
     
     @Resource(name="snmpTrapAddress")
     private String m_snmpTrapAddress;
@@ -183,15 +176,6 @@ public class TrapReceiverSnmp4jImpl implements TrapReceiver, TrapNotificationLis
         } catch (final IllegalStateException e) {
             LOG.debug("stop: The SNMP session was already closed", e);
         }
-	}
-	
-
-	public TrapQueueProcessorFactory getM_processorFactory() {
-		return m_processorFactory;
-	}
-
-	public void setM_processorFactory(TrapQueueProcessorFactory m_processorFactory) {
-		this.m_processorFactory = m_processorFactory;
 	}
 
 	private InetAddress getInetAddress() {
