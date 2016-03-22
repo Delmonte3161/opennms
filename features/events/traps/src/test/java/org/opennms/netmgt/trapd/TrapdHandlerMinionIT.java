@@ -28,7 +28,6 @@
 
 package org.opennms.netmgt.trapd;
 
-import java.nio.ByteBuffer;
 import java.util.Dictionary;
 import java.util.Map;
 
@@ -42,9 +41,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.utils.InetAddressUtils;
-import org.opennms.netmgt.snmp.TrapNotification;
 import org.opennms.netmgt.snmp.TrapProcessor;
-import org.opennms.netmgt.xml.event.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
@@ -113,16 +110,10 @@ public class TrapdHandlerMinionIT extends CamelBlueprintTestSupport {
 
 	@Test
 	public void testSyslogd() throws Exception {
-		//try {
-		// Expect one Trapnotifcation message to be broadcast on the messaging channel
+		
 		MockEndpoint broadcasTrap = getMockEndpoint("mock:activemq:broadcastTrap", false);
 		broadcasTrap.setExpectedMessageCount(1);
 
-		// Create a mock TrapConfig
-		TrapdConfigBean config = new TrapdConfigBean();
-		config.setSnmpTrapPort(10514);
-		config.setM_newSuspectOnTrap(false);
-		config.setSnmpTrapAddress("127.0.0.1");
 
 		TrapQueueProcessor trap=new TrapQueueProcessor();
 		trap.setNewSuspect(false);
@@ -136,10 +127,6 @@ public class TrapdHandlerMinionIT extends CamelBlueprintTestSupport {
 		template.requestBody("seda:handleMessage", trap.call());
 
 		assertMockEndpointsSatisfied();
-		//			} catch (Exception e) {
-		//				// TODO Auto-generated catch block
-		//				e.printStackTrace();
-		//	}
 
 	}
 }
