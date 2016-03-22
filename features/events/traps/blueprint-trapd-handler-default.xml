@@ -48,7 +48,7 @@
 			<convertBodyTo type="org.opennms.netmgt.snmp.TrapNotification" />
 			<!-- <bean ref="unmarshaller"/> -->
 			<!-- Update the TrapdConfig on the message to the local config value -->
-			<bean ref="trapdConfigProcessor" />
+<!-- 			<bean ref="trapdConfigProcessor" /> -->
 			<to uri="seda:trapHandler" />
 		</route>
 

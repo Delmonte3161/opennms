@@ -12,43 +12,39 @@ public final class TrapdConfigBean implements TrapdConfig {
 	private boolean m_newSuspectOnTrap;
 	private List<SnmpV3User> m_snmpV3Users;
 
-	public void setSnmpTrapAddress(String m_snmpTrapAddress) {
-		this.m_snmpTrapAddress = m_snmpTrapAddress;
+	public void setSnmpTrapAddress(String snmpTrapAddress) {
+		this.m_snmpTrapAddress = snmpTrapAddress;
 	}
 
-	public void setSnmpTrapPort(int m_snmpTrapPort) {
-		this.m_snmpTrapPort = m_snmpTrapPort;
+	public void setSnmpTrapPort(int snmpTrapPort) {
+		this.m_snmpTrapPort = snmpTrapPort;
 	}
 
-	public void setM_newSuspectOnTrap(boolean m_newSuspectOnTrap) {
-		this.m_newSuspectOnTrap = m_newSuspectOnTrap;
+	public void setNewSuspectOnTrap(boolean newSuspectOnTrap) {
+		this.m_newSuspectOnTrap = newSuspectOnTrap;
 	}
 
-	public void setSnmpV3Users(List<SnmpV3User> m_snmpV3Users) {
-		this.m_snmpV3Users = m_snmpV3Users;
+	public void setSnmpV3Users(List<SnmpV3User> snmpV3Users) {
+		this.m_snmpV3Users = snmpV3Users;
 	}
 
 	@Override
 	public String getSnmpTrapAddress() {
-		// TODO Auto-generated method stub
 		return m_snmpTrapAddress;
 	}
 
 	@Override
 	public int getSnmpTrapPort() {
-		// TODO Auto-generated method stub
 		return m_snmpTrapPort;
 	}
 
 	@Override
 	public boolean getNewSuspectOnTrap() {
-		// TODO Auto-generated method stub
 		return m_newSuspectOnTrap;
 	}
 
 	@Override
 	public List<SnmpV3User> getSnmpV3Users() {
-		// TODO Auto-generated method stub
 		return m_snmpV3Users;
 	}
 

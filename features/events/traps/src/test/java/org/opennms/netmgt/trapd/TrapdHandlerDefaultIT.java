@@ -44,9 +44,10 @@ import org.junit.runner.RunWith;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.test.db.annotations.JUnitTemporaryDatabase;
 import org.opennms.core.utils.InetAddressUtils;
-import org.opennms.core.xml.JaxbUtils;
 import org.opennms.netmgt.config.TrapdConfig;
-import org.opennms.netmgt.snmp.TrapNotification;
+import org.opennms.netmgt.snmp.SnmpObjId;
+import org.opennms.netmgt.snmp.SnmpValue;
+import org.opennms.netmgt.snmp.TrapIdentity;
 import org.opennms.netmgt.snmp.TrapProcessor;
 import org.opennms.test.JUnitConfigurationEnvironment;
 import org.slf4j.Logger;
@@ -55,9 +56,7 @@ import org.springframework.test.context.ContextConfiguration;
 
 @RunWith(OpenNMSJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {
-		"classpath:/META-INF/opennms/emptyContext.xml",
-		//"classpath:/META-INF/opennms/applicationContext-trapDaemon.xml",
-		"classpath:/org/opennms/netmgt/trapd/trapDDefault.xml"})
+		"classpath:/META-INF/opennms/emptyContext.xml"})
 
 @JUnitConfigurationEnvironment
 @JUnitTemporaryDatabase
@@ -106,7 +105,7 @@ public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 		TrapdConfigBean config = new TrapdConfigBean();
 		config.setSnmpTrapPort(10514);
 		config.setSnmpTrapAddress("127.0.0.1");
-		config.setM_newSuspectOnTrap(false);
+		config.setNewSuspectOnTrap(false);
 
 		services.put(
 				TrapdConfig.class.getName(),
@@ -149,18 +148,7 @@ public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 		TrapdConfigBean config = new TrapdConfigBean();
 		config.setSnmpTrapPort(10514);
 		config.setSnmpTrapAddress("127.0.0.1");
-		config.setM_newSuspectOnTrap(false);
-
-		// Leave a bunch of config that won't be available on the Minion side
-		// blank
-		// config.setParser("org.opennms.netmgt.syslogd.CustomSyslogParser");
-		// config.setForwardingRegexp("^.*\\s(19|20)\\d\\d([-/.])(0[1-9]|1[012])\\2(0[1-9]|[12][0-9]|3[01])(\\s+)(\\S+)(\\s)(\\S.+)");
-		// config.setMatchingGroupHost(6);
-		// config.setMatchingGroupMessage(8);
-		// config.setDiscardUei("DISCARD-MATCHING-MESSAGES");
-
-		byte[] messageBytes = "<34>main: 2010-08-19 localhost foo0: load test 0 on tty1\0"
-				.getBytes("US-ASCII");
+		config.setNewSuspectOnTrap(false);
 
 		// try
 		// {
@@ -173,7 +161,13 @@ public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 		 trapProcess.setTrapAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
 		//
 		//
-		trapQProcessor.setTrapNotification(new TrapNotificationImpl(trapProcess));
+		 /**
+		  * Create new Trap notification class as suggested, check with Pradeep
+		  */
+		//trapQProcessor.setTrapNotification(new TrapNotificationImpl(trapProcess));
+		 /**
+		  * Send the trap notification
+		  */
 		// Send a SyslogConnection
 		template.sendBody("activemq:broadcastTrap", trapQProcessor
 		// JaxbUtils.marshal(new
@@ -201,5 +195,91 @@ public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 		// result.getConfig().getDiscardUei());
 		// assertEquals(4, result.getConfig().getMatchingGroupHost());
 		// assertEquals(7, result.getConfig().getMatchingGroupMessage());
+	}
+	
+	private class TrapProcessorImpl implements TrapProcessor{
+		
+		private String community;
+		
+		private long timeStamp;
+		
+		private String version;
+		
+		private InetAddress agentAddress;
+		
+		private String varBind;
+		
+		private InetAddress trapAddress;
+		
+		private TrapIdentity trapIdentity;
+		
+		private SnmpObjId name;
+		
+		private SnmpValue value;
+
+		public String getCommunity() {
+			return community;
+		}
+
+		@Override
+		public void setCommunity(String community) {
+			this.community = community;
+		}
+
+		public long getTimeStamp() {
+			return timeStamp;
+		}
+
+		@Override
+		public void setTimeStamp(long timeStamp) {
+			this.timeStamp = timeStamp;
+		}
+
+		public String getVersion() {
+			return version;
+		}
+
+		@Override
+		public void setVersion(String version) {
+			this.version = version;
+		}
+
+		public InetAddress getAgentAddress() {
+			return agentAddress;
+		}
+
+		@Override
+		public void setAgentAddress(InetAddress agentAddress) {
+			this.agentAddress = agentAddress;
+		}
+
+		public String getVarBind() {
+			return varBind;
+		}
+
+		public InetAddress getTrapAddress() {
+			return trapAddress;
+		}
+
+		@Override
+		public void setTrapAddress(InetAddress trapAddress) {
+			this.trapAddress = trapAddress;
+		}
+
+		public TrapIdentity getTrapIdentity() {
+			return trapIdentity;
+		}
+
+		@Override
+		public void setTrapIdentity(TrapIdentity trapIdentity) {
+			this.trapIdentity = trapIdentity;
+		}
+
+		@Override
+		public void processVarBind(SnmpObjId name, SnmpValue value) {
+			this.name = name;
+			this.value = value;
+			
+		}
 	}
 }

@@ -46,13 +46,8 @@ public class TrapdConfigProcessor {
 		m_config = config;
 	}
 
-	public TrapNotification process(TrapQueueProcessor connection) {
-		System.out.println("------------------------------------------------");
+	public TrapNotification process(TrapNotification trapNotification) {
 		
-		//I don't know y this connection is coming as null
-		if(connection == null)
-			connection = new TrapQueueProcessor();
-		
-		return connection.getTrapNotification();
+		return trapNotification;
 	}
 }
