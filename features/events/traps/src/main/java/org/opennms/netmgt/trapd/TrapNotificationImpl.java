@@ -13,15 +13,16 @@ import org.opennms.netmgt.snmp.TrapProcessor;
 public class TrapNotificationImpl implements TrapNotification{
 	
 	
-	public TrapNotificationImpl(TrapProcessor processor) {
-		// TODO Auto-generated constructor stub
+	private TrapProcessor trapProcessor;
+
+	public TrapNotificationImpl(TrapProcessor trapProcess) {
+		this.trapProcessor=trapProcess;
 	}
 
 	@Override
 	public TrapProcessor getTrapProcessor() {
-		TrapProcessor processor = new TrapProcessorImpl();
+		 return trapProcessor;
 		
-		return processor;
 	}
 
 }
