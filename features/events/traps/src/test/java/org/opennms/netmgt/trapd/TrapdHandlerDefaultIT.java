@@ -56,6 +56,7 @@ import org.springframework.test.context.ContextConfiguration;
 @RunWith(OpenNMSJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {
 		"classpath:/META-INF/opennms/emptyContext.xml",
+		//"classpath:/META-INF/opennms/applicationContext-trapDaemon.xml",
 		"classpath:/org/opennms/netmgt/trapd/trapDDefault.xml"})
 
 @JUnitConfigurationEnvironment
@@ -164,18 +165,17 @@ public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 		// try
 		// {
 
-		TrapQueueProcessor connection = new TrapQueueProcessor();
-		// TrapProcessor trapProcess = new TrapProcessorImpl();
-		// trapProcess.setAgentAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
-		// trapProcess.setCommunity("comm");
-		// trapProcess.setTimeStamp(System.currentTimeMillis());
-		// trapProcess.setTrapAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
+		TrapQueueProcessor trapQProcessor = new TrapQueueProcessor();
+		 TrapProcessor trapProcess = new TrapProcessorImpl();
+		 trapProcess.setAgentAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
+		 trapProcess.setCommunity("comm");
+		 trapProcess.setTimeStamp(System.currentTimeMillis());
+		 trapProcess.setTrapAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
 		//
 		//
-		// connection.setTrapNotification(new
-		// TrapNotificationImpl(trapProcess));
+		trapQProcessor.setTrapNotification(new TrapNotificationImpl(trapProcess));
 		// Send a SyslogConnection
-		template.sendBody("activemq:broadcastTrap", new TrapQueueProcessor()
+		template.sendBody("activemq:broadcastTrap", trapQProcessor
 		// JaxbUtils.marshal(new
 		// TrapdConfigProcessor(config).process(connection))
 		);
