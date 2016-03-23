@@ -100,6 +100,10 @@ public class TrapReceiverSnmp4jImpl implements TrapReceiver, TrapNotificationLis
         }
 
         m_config = config;
+        m_snmpTrapPort = config.getSnmpTrapPort();
+        m_snmpTrapAddress = config.getSnmpTrapAddress();
+        m_snmpV3Users = config.getSnmpV3Users();
+
 
         m_executor = new ThreadPoolExecutor(
             Runtime.getRuntime().availableProcessors() * 2,
@@ -111,11 +115,11 @@ public class TrapReceiverSnmp4jImpl implements TrapReceiver, TrapNotificationLis
         );
     }
 
-    public TrapNotificationHandler getSyslogConnectionHandlers() {
+    public TrapNotificationHandler getTrapNotificationHandlers() {
         return m_trapNotificationHandlers.get(0);
     }
 
-    public void setSyslogConnectionHandlers(TrapNotificationHandler handler) {
+    public void setTrapNotificationHandlers(TrapNotificationHandler handler) {
         m_trapNotificationHandlers = Collections.singletonList(handler);
     }
 
