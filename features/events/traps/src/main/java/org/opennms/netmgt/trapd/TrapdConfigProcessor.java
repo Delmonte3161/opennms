@@ -1,8 +1,8 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2002-2014 The OpenNMS Group, Inc.
- * OpenNMS(R) is Copyright (C) 1999-2014 The OpenNMS Group, Inc.
+ * Copyright (C) 2015-2016 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2016 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
  *
@@ -28,12 +28,26 @@
 
 package org.opennms.netmgt.trapd;
 
+import org.opennms.netmgt.config.TrapdConfig;
+import org.opennms.netmgt.snmp.TrapNotification;
+
 /**
+ * This processor will update the {@link TrapdConfig} on a
+ * {@link TrapQueueProcessor} so that it can be processed according
+ * to the new configuration.
+ * 
  * @author Seth
  */
-public interface TrapReceiver {
+public class TrapdConfigProcessor {
 
-    void start();
+	private final TrapdConfig m_config;
 
-    void stop();
+	public TrapdConfigProcessor(TrapdConfig config) {
+		m_config = config;
+	}
+
+	public TrapNotification process(TrapNotification trapNotification) {
+		
+		return trapNotification;
+	}
 }
