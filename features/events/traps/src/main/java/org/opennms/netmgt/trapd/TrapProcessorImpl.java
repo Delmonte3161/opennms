@@ -15,23 +15,23 @@ import org.opennms.netmgt.snmp.TrapProcessor;
  *
  */
 public class TrapProcessorImpl implements TrapProcessor{
-	
+
 	private String community;
-	
+
 	private long timeStamp;
-	
+
 	private String version;
-	
+
 	private InetAddress agentAddress;
-	
+
 	private String varBind;
-	
+
 	private InetAddress trapAddress;
-	
+
 	private TrapIdentity trapIdentity;
-	
+
 	private SnmpObjId name;
-	
+
 	private SnmpValue value;
 
 	public String getCommunity() {
@@ -96,8 +96,5 @@ public class TrapProcessorImpl implements TrapProcessor{
 	public void processVarBind(SnmpObjId name, SnmpValue value) {
 		this.name = name;
 		this.value = value;
-		
 	}
-
-	
 }

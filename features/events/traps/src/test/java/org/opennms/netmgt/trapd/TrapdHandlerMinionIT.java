@@ -28,7 +28,6 @@
 
 package org.opennms.netmgt.trapd;
 
-import java.sql.Date;
 import java.util.Dictionary;
 import java.util.Map;
 
@@ -44,7 +43,6 @@ import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.snmp.TrapNotification;
 import org.opennms.netmgt.snmp.TrapProcessor;
-import org.opennms.netmgt.snmp.joesnmp.V2TrapInformation;
 import org.opennms.netmgt.snmp.snmp4j.Snmp4JTrapNotifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
