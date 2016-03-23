@@ -41,31 +41,44 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.test.db.annotations.JUnitTemporaryDatabase;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.config.TrapdConfig;
+import org.opennms.netmgt.config.api.EventConfDao;
 import org.opennms.netmgt.snmp.SnmpObjId;
 import org.opennms.netmgt.snmp.SnmpValue;
 import org.opennms.netmgt.snmp.TrapIdentity;
+import org.opennms.netmgt.snmp.TrapNotification;
 import org.opennms.netmgt.snmp.TrapProcessor;
+import org.opennms.netmgt.snmp.snmp4j.Snmp4JTrapNotifier;
 import org.opennms.test.JUnitConfigurationEnvironment;
+import org.opennms.test.mock.EasyMockUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.snmp4j.PDU;
+import org.snmp4j.smi.OID;
+import org.snmp4j.smi.OctetString;
+import org.snmp4j.smi.VariableBinding;
 import org.springframework.test.context.ContextConfiguration;
 
 @RunWith(OpenNMSJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {
-		"classpath:/META-INF/opennms/emptyContext.xml"})
-
+@ContextConfiguration(locations = { "classpath:/META-INF/opennms/emptyContext.xml" })
 @JUnitConfigurationEnvironment
 @JUnitTemporaryDatabase
 public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
+
+	private boolean mockInitialized = false;
 
 	private static final Logger LOG = LoggerFactory
 			.getLogger(TrapdHandlerDefaultIT.class);
 
 	private static BrokerService m_broker = null;
+	
+	private EasyMockUtils m_mocks = new EasyMockUtils();
+    
+    private EventConfDao m_eventConfDao = m_mocks.createMock(EventConfDao.class);
 
 	/**
 	 * Use Aries Blueprint synchronous mode to avoid a blueprint deadlock bug.
@@ -79,6 +92,11 @@ public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 				Boolean.TRUE.toString());
 		System.setProperty("de.kalpatec.pojosr.framework.events.sync",
 				Boolean.TRUE.toString());
+
+		if (!mockInitialized) {
+			MockitoAnnotations.initMocks(this);
+			mockInitialized = true;
+		}
 	}
 
 	@Override
@@ -150,71 +168,63 @@ public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 		config.setSnmpTrapAddress("127.0.0.1");
 		config.setNewSuspectOnTrap(false);
 
-		// try
-		// {
 
 		TrapQueueProcessor trapQProcessor = new TrapQueueProcessor();
-		 TrapProcessor trapProcess = new TrapProcessorImpl();
-		 trapProcess.setAgentAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
-		 trapProcess.setCommunity("comm");
-		 trapProcess.setTimeStamp(System.currentTimeMillis());
-		 trapProcess.setTrapAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
-		//
-		//
-		 /**
-		  * Create new Trap notification class as suggested, check with Pradeep
-		  */
-		//trapQProcessor.setTrapNotification(new TrapNotificationImpl(trapProcess));
-		 /**
-		  * Send the trap notification
-		  */
-		// Send a SyslogConnection
-		template.sendBody("activemq:broadcastTrap", trapQProcessor
-		// JaxbUtils.marshal(new
-		// TrapdConfigProcessor(config).process(connection))
-		);
-		// }catch(Exception e)
-		// {
-		// e.printStackTrace();
-		// }
+		TrapProcessor trapProcess = new TrapProcessorImpl();
+		trapProcess.setAgentAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
+		trapProcess.setCommunity("comm");
+		trapProcess.setTimeStamp(System.currentTimeMillis());
+		trapProcess.setTrapAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
+		
+		// create instance of snmp4JV2cTrap
+		PDU snmp4JV2cTrapPdu = new PDU();
+		snmp4JV2cTrapPdu.setType(PDU.TRAP);
+		snmp4JV2cTrapPdu.add(new VariableBinding(new OID(".1.3.6.1.2.1.1.3.0"),
+				new OctetString("mockhost")));
+//		snmp4JV2cTrapPdu.add(new VariableBinding(new OID(".1.3.6.1.2.1.1.3"),
+//				new OctetString("mockhost")));
+		snmp4JV2cTrapPdu.add(new VariableBinding(new OID(
+				".1.3.6.1.6.3.1.1.4.1.0"), new OctetString("mockhost")));
+		
+		TrapNotification snmp4JV2cTrap = new Snmp4JTrapNotifier.Snmp4JV2TrapInformation(
+				InetAddressUtils.ONE_TWENTY_SEVEN, new String("public"),
+				snmp4JV2cTrapPdu, trapProcess);
+		
+		trapQProcessor.setTrapNotification(snmp4JV2cTrap);
+		
+		
+		trapQProcessor.setEventConfDao(m_eventConfDao);
+		
+		// Send a TrapQProcessor
+		template.sendBody("activemq:broadcastTrap", trapQProcessor.call());
 
 		assertMockEndpointsSatisfied();
 
-		// Check that the input for the seda:syslogHandler endpoint matches
-		// the SyslogConnection that we simulated via ActiveMQ
-		// TrapQueueProcessor result =
-		// trapHandler.getReceivedExchanges().get(0).getIn().getBody(TrapQueueProcessor.class);
-		// System.out.println("Result ++++:"+result);
-		// assertEquals(InetAddressUtils.ONE_TWENTY_SEVEN, result.);
-		// assertEquals(2000, result.getPort());
-		// assertTrue(Arrays.equals(result.getBytes(), messageBytes));
-		//
-		// // Assert that the SyslogdConfig has been updated to the local copy
-		// // that has been provided as an OSGi service
-		// assertEquals("DISCARD-MATCHING-MESSAGES",
-		// result.getConfig().getDiscardUei());
-		// assertEquals(4, result.getConfig().getMatchingGroupHost());
-		// assertEquals(7, result.getConfig().getMatchingGroupMessage());
+		// Check that the input for the seda:trapHandler endpoint matches
+		// the TrapQProcessor that we simulated via ActiveMQ
+		TrapQueueProcessor result = trapHandler.getReceivedExchanges().get(0)
+				.getIn().getBody(TrapQueueProcessor.class);
+		System.out.println("Result ++++:" + result);
 	}
-	
-	private class TrapProcessorImpl implements TrapProcessor{
-		
+
+	private class TrapProcessorImpl implements TrapProcessor {
+
 		private String community;
-		
+
 		private long timeStamp;
-		
+
 		private String version;
-		
+
 		private InetAddress agentAddress;
-		
+
 		private String varBind;
-		
+
 		private InetAddress trapAddress;
-		
+
 		private TrapIdentity trapIdentity;
-		
+
 		private SnmpObjId name;
-		
+
 		private SnmpValue value;
 
 		public String getCommunity() {
@@ -279,7 +289,7 @@ public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 		public void processVarBind(SnmpObjId name, SnmpValue value) {
 			this.name = name;
 			this.value = value;
-			
+
 		}
 	}
 }

@@ -34,8 +34,6 @@
 		<!-- TODO: HZN-490 Add configurable ActiveMQ URI -->
 		<property name="brokerURL" value="${brokerUri}" />
 		<!-- TODO: HZN-490 Add configurable authentication -->
-		<!-- <property name="userName" value="karaf" /> <property name="password" 
-			value="karaf" /> -->
 	</bean>
 
 	<camelContext id="trapConnectionHandlerDefaultContext"
@@ -45,7 +43,6 @@
 
 		<route id="receiveTrapConnection">
 			<from uri="activemq:broadcastTrap" />
-			<convertBodyTo type="org.opennms.netmgt.snmp.TrapNotification" />
 			<!-- <bean ref="unmarshaller"/> -->
 			<!-- Update the TrapdConfig on the message to the local config value -->
 <!-- 			<bean ref="trapdConfigProcessor" /> -->
