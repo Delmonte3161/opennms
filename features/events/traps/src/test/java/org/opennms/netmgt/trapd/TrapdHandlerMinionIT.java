@@ -28,6 +28,7 @@
 
 package org.opennms.netmgt.trapd;
 
+import java.sql.Date;
 import java.util.Dictionary;
 import java.util.Map;
 
@@ -41,9 +42,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.utils.InetAddressUtils;
+import org.opennms.netmgt.snmp.TrapNotification;
 import org.opennms.netmgt.snmp.TrapProcessor;
+import org.opennms.netmgt.snmp.joesnmp.V2TrapInformation;
+import org.opennms.netmgt.snmp.snmp4j.Snmp4JTrapNotifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.snmp4j.PDU;
+import org.snmp4j.smi.OID;
+import org.snmp4j.smi.OctetString;
+import org.snmp4j.smi.TimeTicks;
+import org.snmp4j.smi.VariableBinding;
 import org.springframework.test.context.ContextConfiguration;
 
 @RunWith(OpenNMSJUnit4ClassRunner.class)
@@ -109,7 +118,7 @@ public class TrapdHandlerMinionIT extends CamelBlueprintTestSupport {
 	}
 
 	@Test
-	public void testSyslogd() throws Exception {
+	public void testTrapd() throws Exception {
 		
 		MockEndpoint broadcasTrap = getMockEndpoint("mock:activemq:broadcastTrap", false);
 		broadcasTrap.setExpectedMessageCount(1);
@@ -120,9 +129,26 @@ public class TrapdHandlerMinionIT extends CamelBlueprintTestSupport {
 		TrapProcessor trapProcess = new TrapProcessorImpl();
 		trapProcess.setAgentAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
 		trapProcess.setCommunity("comm");
-		trapProcess.setTimeStamp(System.currentTimeMillis());
 		trapProcess.setTrapAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
-		trap.setTrapNotification(new TrapNotificationImpl(trapProcess));
+		
+		//create instance of snmp4JV2cTrap
+
+		PDU snmp4JV2cTrapPdu = new PDU();
+		
+		snmp4JV2cTrapPdu.setType(PDU.TRAP);
+		snmp4JV2cTrapPdu.add(new VariableBinding(new OID(".1.3.6.1.2.1.1.3.0"),
+				new OctetString("mockhost")));
+		snmp4JV2cTrapPdu.add(new VariableBinding(new OID(".1.3.6.1.6.3.1.1.4.1.0"),
+				new OctetString("mockhost")));
+		
+		
+
+
+		TrapNotification snmp4JV2cTrap = new Snmp4JTrapNotifier.Snmp4JV2TrapInformation(
+				InetAddressUtils.ONE_TWENTY_SEVEN, new String("public"),
+				snmp4JV2cTrapPdu, trapProcess);
+		trap.setTrapNotification(snmp4JV2cTrap);
+
 
 		template.requestBody("seda:handleMessage", trap.call());
 
