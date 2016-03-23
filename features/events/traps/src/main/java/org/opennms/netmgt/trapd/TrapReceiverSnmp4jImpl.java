@@ -34,14 +34,9 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
-import org.opennms.core.concurrent.LogPreservingThreadFactory;
 import org.opennms.core.logging.Logging;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.config.TrapdConfig;
@@ -60,9 +55,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author <a href="http://www.oculan.com">Oculan Corporation</a>
  * @fiddler joed
  */
-public class TrapReceiverSnmp4jImpl implements TrapReceiver, TrapNotificationListener,TrapProcessorFactory {
+public class TrapReceiverSnmp4jImpl implements TrapReceiver, TrapNotificationListener, TrapProcessorFactory {
     private static final Logger LOG = LoggerFactory.getLogger(TrapReceiverSnmp4jImpl.class);
-    
+
     @Resource(name="snmpTrapAddress")
     private String m_snmpTrapAddress;
 
@@ -71,20 +66,19 @@ public class TrapReceiverSnmp4jImpl implements TrapReceiver, TrapNotificationLis
 
     @Resource(name="snmpV3Users")
     private List<SnmpV3User> m_snmpV3Users;
-    
+
     private boolean m_registeredForTraps;
-    
+
     /**
      * Trapd IP manager.  Contains IP address -> node ID mapping.
+     * 
+     * TODO: Get rid of the requirement to have this here by creating a different
+     * TrapProcessorFactory.
      */
     @Autowired
     private TrapdIpMgr m_trapdIpMgr;
 
-    private final TrapdConfig m_config;
-
     private List<TrapNotificationHandler> m_trapNotificationHandlers = Collections.emptyList();
-
-    private final ExecutorService m_executor;
 
     /**
      * construct a new receiver
@@ -99,20 +93,9 @@ public class TrapReceiverSnmp4jImpl implements TrapReceiver, TrapNotificationLis
             throw new IllegalArgumentException("Config cannot be null");
         }
 
-        m_config = config;
         m_snmpTrapPort = config.getSnmpTrapPort();
         m_snmpTrapAddress = config.getSnmpTrapAddress();
         m_snmpV3Users = config.getSnmpV3Users();
-
-
-        m_executor = new ThreadPoolExecutor(
-            Runtime.getRuntime().availableProcessors() * 2,
-            Runtime.getRuntime().availableProcessors() * 2,
-            1000L,
-            TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<Runnable>(),
-            new LogPreservingThreadFactory(getClass().getSimpleName(), Integer.MAX_VALUE)
-        );
     }
 
     public TrapNotificationHandler getTrapNotificationHandlers() {
@@ -123,27 +106,27 @@ public class TrapReceiverSnmp4jImpl implements TrapReceiver, TrapNotificationLis
         m_trapNotificationHandlers = Collections.singletonList(handler);
     }
 
-	@Override
-	public void trapReceived(TrapNotification trapNotification) {
-		try {
-			  for (TrapNotificationHandler handler : m_trapNotificationHandlers) {
-			    handler.handleTrapNotification(trapNotification);
-			  }
-			} catch (Throwable e) {
-			  LOG.error("Handler execution failed in {}", this.getClass().getSimpleName(), e);
-			}
-	}
-
-	@Override
-	public void trapError(int error, String msg) {
-      LOG.warn("Error Processing Received Trap: error = {} {}", error, (msg != null ? ", ref = " + msg : ""));
-	}
-	
-	@Override
-	public void start(){
+    @Override
+    public void trapReceived(TrapNotification trapNotification) {
         try {
-        	InetAddress address = getInetAddress();
-        	LOG.info("Listening on {}:{}", address == null ? "[all interfaces]" : InetAddressUtils.str(address), m_snmpTrapPort);
+            for (TrapNotificationHandler handler : m_trapNotificationHandlers) {
+                handler.handleTrapNotification(trapNotification);
+            }
+        } catch (Throwable e) {
+            LOG.error("Handler execution failed in {}", this.getClass().getSimpleName(), e);
+        }
+    }
+
+    @Override
+    public void trapError(int error, String msg) {
+      LOG.warn("Error Processing Received Trap: error = {} {}", error, (msg != null ? ", ref = " + msg : ""));
+    }
+
+    @Override
+    public void start(){
+        try {
+            InetAddress address = getInetAddress();
+            LOG.info("Listening on {}:{}", address == null ? "[all interfaces]" : InetAddressUtils.str(address), m_snmpTrapPort);
             SnmpUtils.registerForTraps(this, this, address, m_snmpTrapPort, m_snmpV3Users); // Need to clarify 
             m_registeredForTraps = true;
             
@@ -162,10 +145,10 @@ public class TrapReceiverSnmp4jImpl implements TrapReceiver, TrapNotificationLis
             }
             throw new UndeclaredThrowableException(e);
         }
-	}
-	
-	@Override
-	public void stop(){
+    }
+
+    @Override
+    public void stop() {
         try {
             if (m_registeredForTraps) {
                 LOG.debug("stop: Closing SNMP trap session.");
@@ -180,18 +163,22 @@ public class TrapReceiverSnmp4jImpl implements TrapReceiver, TrapNotificationLis
         } catch (final IllegalStateException e) {
             LOG.debug("stop: The SNMP session was already closed", e);
         }
-	}
-
-	private InetAddress getInetAddress() {
-    	if (m_snmpTrapAddress.equals("*")) {
-    		return null;
-    	}
-		return InetAddressUtils.addr(m_snmpTrapAddress);
     }
 
-	@Override
-	public TrapProcessor createTrapProcessor() {
+    private InetAddress getInetAddress() {
+        if (m_snmpTrapAddress.equals("*")) {
+            return null;
+        }
+        return InetAddressUtils.addr(m_snmpTrapAddress);
+    }
+
+    /**
+     * TODO: Get rid of the requirement to have this here by creating a different
+     * TrapProcessorFactory.
+     */
+    @Override
+    public TrapProcessor createTrapProcessor() {
         return new EventCreator(m_trapdIpMgr);
-	}
-	
+    }
+
 }

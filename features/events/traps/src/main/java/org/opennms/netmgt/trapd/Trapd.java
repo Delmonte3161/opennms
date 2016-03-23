@@ -29,7 +29,6 @@
 package org.opennms.netmgt.trapd;
 
 import java.lang.reflect.UndeclaredThrowableException;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -89,7 +88,13 @@ public class Trapd extends AbstractServiceDaemon implements TrapProcessorFactory
      */
     @Autowired
     private BroadcastEventProcessor m_eventReader;
-    
+
+    /**
+     * The class instance used to receive new events from for the system.
+     */
+    @Autowired
+    private TrapReceiver m_trapReceiver;
+
     /**
      * Trapd IP manager.  Contains IP address -> node ID mapping.
      */
@@ -120,6 +125,16 @@ public class Trapd extends AbstractServiceDaemon implements TrapProcessorFactory
     }
 
     /**
+     * <p>createTrapProcessor</p>
+     *
+     * @return a {@link org.opennms.netmgt.snmp.TrapProcessor} object.
+     */
+    @Override
+    public TrapProcessor createTrapProcessor() {
+        return new EventCreator(m_trapdIpMgr);
+    }
+
+    /**
      * <p>onInit</p>
      */
     @Override
@@ -129,6 +144,7 @@ public class Trapd extends AbstractServiceDaemon implements TrapProcessorFactory
         m_trapdIpMgr.dataSourceSync();
 
         try {
+            // Start the event listener
             m_eventReader.open();
         } catch (final Throwable e) {
             LOG.error("init: Failed to open event reader", e);
@@ -149,11 +165,13 @@ public class Trapd extends AbstractServiceDaemon implements TrapProcessorFactory
     public synchronized void onStart() {
         m_status = STARTING;
 
-        LOG.debug("start: Initializing the trapd config factory");
+        LOG.debug("start: Initializing the Trapd receiver");
+
+        m_trapReceiver.start();
 
         m_status = RUNNING;
 
-        LOG.debug("start: Trapd ready to receive traps");
+        LOG.debug("start: Trapd is ready to receive traps");
     }
 
     /**
@@ -166,8 +184,9 @@ public class Trapd extends AbstractServiceDaemon implements TrapProcessorFactory
         }
 
         m_status = PAUSE_PENDING;
-        
-        LOG.debug("pause: Calling pause on processor");
+
+        LOG.debug("pause: Calling pause on trap receiver");
+        m_trapReceiver.stop();
 
         m_status = PAUSED;
 
@@ -185,7 +204,8 @@ public class Trapd extends AbstractServiceDaemon implements TrapProcessorFactory
 
         m_status = RESUME_PENDING;
 
-        LOG.debug("resume: Calling resume on processor");
+        LOG.debug("resume: Calling resume on trap receiver");
+        m_trapReceiver.start();
 
         m_status = RUNNING;
 
@@ -201,9 +221,14 @@ public class Trapd extends AbstractServiceDaemon implements TrapProcessorFactory
         m_status = STOP_PENDING;
 
         // shutdown and wait on the background processing thread to exit.
-        LOG.debug("stop: closing communication paths.");
+        LOG.debug("stop: Closing communication paths");
 
-        LOG.debug("stop: Stopping queue processor.");
+        m_trapReceiver.stop();
+
+        // TODO: Should we do this? m_eventReader is launched in onInit()
+        // but it should probably be launched in onStart() so that it
+        // follows the lifecycle of this class.
+        LOG.debug("stop: Stopping event processor");
 
         m_eventReader.close();
 
@@ -263,9 +288,4 @@ public class Trapd extends AbstractServiceDaemon implements TrapProcessorFactory
     public long getTrapsErrored() {
         return TrapQueueProcessor.getTrapsErrored();
     }
-
-	@Override
-	public TrapProcessor createTrapProcessor() {
-        return new EventCreator(m_trapdIpMgr);
-	}
 }

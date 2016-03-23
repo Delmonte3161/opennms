@@ -28,13 +28,12 @@
 
 package org.opennms.netmgt.trapd;
 
-
 /**
  * @author Seth
  */
 public interface TrapReceiver {
 
-	void start();
+    void start();
 
-    void stop() throws InterruptedException;
+    void stop();
 }
