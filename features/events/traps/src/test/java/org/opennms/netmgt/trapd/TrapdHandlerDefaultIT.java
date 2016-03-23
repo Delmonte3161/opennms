@@ -29,7 +29,6 @@
 package org.opennms.netmgt.trapd;
 
 import java.net.InetAddress;
-import java.util.Date;
 import java.util.Dictionary;
 import java.util.Map;
 import java.util.Properties;
@@ -75,8 +74,7 @@ public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 
 	private boolean mockInitialized = false;
 
-	private static final Logger LOG = LoggerFactory
-			.getLogger(TrapdHandlerDefaultIT.class);
+	private static final Logger LOG = LoggerFactory.getLogger(TrapdHandlerDefaultIT.class);
 
 	private static BrokerService m_broker = null;
 
@@ -212,7 +210,7 @@ public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 		System.out.println("Result ++++:" + result);
 	}
 
-	private class TrapProcessorImpl implements TrapProcessor {
+	private static class TrapProcessorImpl implements TrapProcessor {
 
 		private String community;
 
