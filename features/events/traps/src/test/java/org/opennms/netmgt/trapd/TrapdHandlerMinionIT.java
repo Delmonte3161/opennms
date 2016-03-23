@@ -49,6 +49,8 @@ import org.opennms.netmgt.snmp.snmp4j.Snmp4JTrapNotifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snmp4j.PDU;
+import org.snmp4j.mp.SnmpConstants;
+import org.snmp4j.smi.IpAddress;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.TimeTicks;
@@ -131,22 +133,21 @@ public class TrapdHandlerMinionIT extends CamelBlueprintTestSupport {
 		trapProcess.setCommunity("comm");
 		trapProcess.setTrapAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
 		
-		//create instance of snmp4JV2cTrap
-
 		PDU snmp4JV2cTrapPdu = new PDU();
 		
-		snmp4JV2cTrapPdu.setType(PDU.TRAP);
-		snmp4JV2cTrapPdu.add(new VariableBinding(new OID(".1.3.6.1.2.1.1.3.0"),
-				new OctetString("mockhost")));
-		snmp4JV2cTrapPdu.add(new VariableBinding(new OID(".1.3.6.1.6.3.1.1.4.1.0"),
-				new OctetString("mockhost")));
-		
-		
+		OID oid = new OID(".1.3.6.1.2.1.1.3.0");
+		snmp4JV2cTrapPdu.add(new VariableBinding(SnmpConstants.sysUpTime, new TimeTicks(5000)));
+		snmp4JV2cTrapPdu.add(new VariableBinding(SnmpConstants.snmpTrapOID, new OID(oid)));
+		snmp4JV2cTrapPdu.add(new VariableBinding(SnmpConstants.snmpTrapAddress,
+				new IpAddress("127.0.0.1")));
 
+		snmp4JV2cTrapPdu.add(new VariableBinding(new OID(oid), new OctetString("Major")));
+		snmp4JV2cTrapPdu.setType(PDU.NOTIFICATION);
 
 		TrapNotification snmp4JV2cTrap = new Snmp4JTrapNotifier.Snmp4JV2TrapInformation(
 				InetAddressUtils.ONE_TWENTY_SEVEN, new String("public"),
 				snmp4JV2cTrapPdu, trapProcess);
+		
 		trap.setTrapNotification(snmp4JV2cTrap);
 
 
