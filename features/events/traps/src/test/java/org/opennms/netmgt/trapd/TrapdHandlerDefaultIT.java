@@ -29,6 +29,7 @@
 package org.opennms.netmgt.trapd;
 
 import java.net.InetAddress;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.Map;
 import java.util.Properties;
@@ -58,8 +59,11 @@ import org.opennms.test.mock.EasyMockUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snmp4j.PDU;
+import org.snmp4j.mp.SnmpConstants;
+import org.snmp4j.smi.IpAddress;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
+import org.snmp4j.smi.TimeTicks;
 import org.snmp4j.smi.VariableBinding;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -75,10 +79,11 @@ public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 			.getLogger(TrapdHandlerDefaultIT.class);
 
 	private static BrokerService m_broker = null;
-	
+
 	private EasyMockUtils m_mocks = new EasyMockUtils();
-    
-    private EventConfDao m_eventConfDao = m_mocks.createMock(EventConfDao.class);
+
+	private EventConfDao m_eventConfDao = m_mocks
+			.createMock(EventConfDao.class);
 
 	/**
 	 * Use Aries Blueprint synchronous mode to avoid a blueprint deadlock bug.
@@ -168,33 +173,33 @@ public class TrapdHandlerDefaultIT extends CamelBlueprintTestSupport {
 		config.setSnmpTrapAddress("127.0.0.1");
 		config.setNewSuspectOnTrap(false);
 
-
 		TrapQueueProcessor trapQProcessor = new TrapQueueProcessor();
 		TrapProcessor trapProcess = new TrapProcessorImpl();
 		trapProcess.setAgentAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
 		trapProcess.setCommunity("comm");
 		trapProcess.setTimeStamp(System.currentTimeMillis());
 		trapProcess.setTrapAddress(InetAddressUtils.ONE_TWENTY_SEVEN);
-		
+
 		// create instance of snmp4JV2cTrap
 		PDU snmp4JV2cTrapPdu = new PDU();
-		snmp4JV2cTrapPdu.setType(PDU.TRAP);
-		snmp4JV2cTrapPdu.add(new VariableBinding(new OID(".1.3.6.1.2.1.1.3.0"),
-				new OctetString("mockhost")));
-//		snmp4JV2cTrapPdu.add(new VariableBinding(new OID(".1.3.6.1.2.1.1.3"),
-//				new OctetString("mockhost")));
-		snmp4JV2cTrapPdu.add(new VariableBinding(new OID(
-				".1.3.6.1.6.3.1.1.4.1.0"), new OctetString("mockhost")));
 		
+		OID oid = new OID(".1.3.6.1.2.1.1.3.0");
+		snmp4JV2cTrapPdu.add(new VariableBinding(SnmpConstants.sysUpTime, new TimeTicks(5000)));
+		snmp4JV2cTrapPdu.add(new VariableBinding(SnmpConstants.snmpTrapOID, new OID(oid)));
+		snmp4JV2cTrapPdu.add(new VariableBinding(SnmpConstants.snmpTrapAddress,
+				new IpAddress("127.0.0.1")));
+
+		snmp4JV2cTrapPdu.add(new VariableBinding(new OID(oid), new OctetString("Major")));
+		snmp4JV2cTrapPdu.setType(PDU.NOTIFICATION);
+
 		TrapNotification snmp4JV2cTrap = new Snmp4JTrapNotifier.Snmp4JV2TrapInformation(
 				InetAddressUtils.ONE_TWENTY_SEVEN, new String("public"),
 				snmp4JV2cTrapPdu, trapProcess);
-		
+
 		trapQProcessor.setTrapNotification(snmp4JV2cTrap);
-		
-		
+
 		trapQProcessor.setEventConfDao(m_eventConfDao);
-		
+
 		// Send a TrapQProcessor
 		template.sendBody("activemq:broadcastTrap", trapQProcessor.call());
 
