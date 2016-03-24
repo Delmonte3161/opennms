@@ -63,7 +63,7 @@
 	</bean>
     
     <bean name="trapd-configuration.xml" class="org.opennms.core.config.impl.JaxbResourceConfiguration">
-        <constructor-arg value="org.opennms.netmgt.config.TrapdConfig" />
+        <constructor-arg value="org.opennms.netmgt.config.trapd.TrapdConfiguration" />
         <constructor-arg value="file:${opennms.home}/etc/trapd-configuration.xml" />
     </bean>
 
