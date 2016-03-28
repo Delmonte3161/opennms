@@ -38,7 +38,7 @@ import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.ValidationException;
 import org.opennms.core.utils.ConfigFileConstants;
 import org.opennms.core.xml.CastorUtils;
-
+import org.opennms.netmgt.config.trapd.Snmpv3User;
 import org.opennms.netmgt.config.trapd.TrapdConfiguration;
 import org.opennms.netmgt.snmp.SnmpV3User;
 import org.springframework.core.io.FileSystemResource;
@@ -196,14 +196,14 @@ public final class TrapdConfigFactory implements TrapdConfig {
     @Override
     public synchronized List<SnmpV3User> getSnmpV3Users() {
         List<SnmpV3User> snmpUsers = new ArrayList<SnmpV3User>();
-        for (SnmpV3User user : m_config.getSnmpv3UserCollection()) {
+        for (Snmpv3User user : m_config.getSnmpv3UserCollection()) {
             snmpUsers.add(new SnmpV3User(
                     user.getEngineId(),
                     user.getSecurityName(),
                     user.getAuthProtocol(),
-                    user.getAuthPassPhrase(),
-                    user.getAuthProtocol(),
-                    user.getAuthPassPhrase()));
+                    user.getAuthPassphrase(),
+                    user.getPrivacyProtocol(),
+                    user.getPrivacyPassphrase()));
         }
         return snmpUsers;
     }
