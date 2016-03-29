@@ -14,6 +14,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.opennms.netmgt.config.snmp.Configuration;
+
 
 
   //---------------------------------/
@@ -41,7 +43,7 @@ public class TrapdConfiguration implements java.io.Serializable {
      *  If "" is specified, trapd will bind to all addresses. The
      * default is .
      */
-	@XmlAttribute(name="snmpTrapAddress")
+	@XmlAttribute(name="snmp-trap-address")
     private java.lang.String _snmpTrapAddress = "*";
 
     /**
@@ -73,7 +75,7 @@ public class TrapdConfiguration implements java.io.Serializable {
     /**
      * SNMPv3 configuration.
      */
-    @XmlElement(name="snmpV3User")
+	@XmlElement(name="snmpv3Users")
     private java.util.List<Snmpv3User> _snmpv3UserList;
 
 
@@ -87,6 +89,13 @@ public class TrapdConfiguration implements java.io.Serializable {
         this._snmpv3UserList = new java.util.ArrayList<Snmpv3User>();
     }
 
+    //for junit
+    public TrapdConfiguration(int _snmpTrapPort,String snmpTrapAddress) {
+        super();
+        setSnmpTrapAddress(snmpTrapAddress);
+        this._snmpTrapPort = _snmpTrapPort;
+        this._snmpv3UserList = new java.util.ArrayList<Snmpv3User>();
+    }
 
       //-----------/
      //- Methods -/
