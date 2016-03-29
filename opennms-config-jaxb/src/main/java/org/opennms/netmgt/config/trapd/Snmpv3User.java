@@ -23,19 +23,19 @@ import javax.xml.bind.annotation.XmlTransient;
     /**
      * SNMPv3 Application Engine ID
      */
-	@XmlAttribute(name="engineId")
+	@XmlAttribute(name="engine-id")
     private java.lang.String _engineId;
 
     /**
      * SNMPv3 Security Name (User Name)
      */
-	@XmlAttribute(name="securityName")
+	@XmlAttribute(name="security-name")
     private java.lang.String _securityName;
 
     /**
      * SNMPv3 Security Level (noAuthNoPriv, authNoPriv, authPriv)
      */
-	@XmlAttribute(name="securityLevel")
+	@XmlAttribute(name="security-level")
     private int _securityLevel;
 
     /**
@@ -47,13 +47,13 @@ import javax.xml.bind.annotation.XmlTransient;
     /**
      * SNMPv3 Authentication Protocol
      */
-	@XmlAttribute(name="authProtocol")
+	@XmlAttribute(name="auth-protocol")
     private java.lang.String _authProtocol;
 
     /**
      * SNMPv3 Authentication Password Phrase
      */
-	@XmlAttribute(name="authPassphrase")
+	@XmlAttribute(name="auth-passphrase")
     private java.lang.String _authPassphrase;
 
     /**
