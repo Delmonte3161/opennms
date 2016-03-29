@@ -7,12 +7,18 @@
 
 package org.opennms.netmgt.config.trapd;
 
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlTransient;
+
+
+
   //---------------------------------/
  //- Imported classes and packages -/
 //---------------------------------/
-
-import org.exolab.castor.xml.Marshaller;
-import org.exolab.castor.xml.Unmarshaller;
 
 /**
  * Top-level element for the trapd-configuration.xml
@@ -20,8 +26,10 @@ import org.exolab.castor.xml.Unmarshaller;
  * 
  * @version $Revision$ $Date$
  */
-
-@SuppressWarnings("all") public class TrapdConfiguration implements java.io.Serializable {
+@XmlRootElement(name = "trapd-configuration")
+@XmlAccessorType(XmlAccessType.NONE)
+@SuppressWarnings("all") 
+public class TrapdConfiguration implements java.io.Serializable {
 
 
       //--------------------------/
@@ -33,34 +41,40 @@ import org.exolab.castor.xml.Unmarshaller;
      *  If "" is specified, trapd will bind to all addresses. The
      * default is .
      */
+	@XmlAttribute(name="snmpTrapAddress")
     private java.lang.String _snmpTrapAddress = "*";
 
     /**
      * The port on which trapd listens for SNMP traps. The
      *  standard port is 162.
      */
-    private int _snmpTrapPort;
+	@XmlAttribute(name="snmp-trap-port")
+    private Integer _snmpTrapPort;
 
     /**
      * keeps track of state for field: _snmpTrapPort
      */
+	@XmlTransient
     private boolean _has_snmpTrapPort;
 
     /**
      * Whether traps from devices unknown to OpenNMS should
      *  generate newSuspect events.
      */
+	@XmlAttribute(name="new-suspect-on-trap")
     private boolean _newSuspectOnTrap;
 
     /**
      * keeps track of state for field: _newSuspectOnTrap
      */
+	@XmlTransient
     private boolean _has_newSuspectOnTrap;
 
     /**
      * SNMPv3 configuration.
      */
-    private java.util.List<org.opennms.netmgt.config.trapd.Snmpv3User> _snmpv3UserList;
+    @XmlElement(name="snmpV3User")
+    private java.util.List<Snmpv3User> _snmpv3UserList;
 
 
       //----------------/
@@ -70,7 +84,7 @@ import org.exolab.castor.xml.Unmarshaller;
     public TrapdConfiguration() {
         super();
         setSnmpTrapAddress("*");
-        this._snmpv3UserList = new java.util.ArrayList<org.opennms.netmgt.config.trapd.Snmpv3User>();
+        this._snmpv3UserList = new java.util.ArrayList<Snmpv3User>();
     }
 
 
@@ -86,7 +100,7 @@ import org.exolab.castor.xml.Unmarshaller;
      * given is outside the bounds of the collection
      */
     public void addSnmpv3User(
-            final org.opennms.netmgt.config.trapd.Snmpv3User vSnmpv3User)
+            final Snmpv3User vSnmpv3User)
     throws java.lang.IndexOutOfBoundsException {
         this._snmpv3UserList.add(vSnmpv3User);
     }
@@ -101,7 +115,7 @@ import org.exolab.castor.xml.Unmarshaller;
      */
     public void addSnmpv3User(
             final int index,
-            final org.opennms.netmgt.config.trapd.Snmpv3User vSnmpv3User)
+            final Snmpv3User vSnmpv3User)
     throws java.lang.IndexOutOfBoundsException {
         this._snmpv3UserList.add(index, vSnmpv3User);
     }
@@ -126,7 +140,7 @@ import org.exolab.castor.xml.Unmarshaller;
      * @return an Enumeration over all possible elements of this
      * collection
      */
-    public java.util.Enumeration<org.opennms.netmgt.config.trapd.Snmpv3User> enumerateSnmpv3User(
+    public java.util.Enumeration<Snmpv3User> enumerateSnmpv3User(
     ) {
         return java.util.Collections.enumeration(this._snmpv3UserList);
     }
@@ -210,7 +224,7 @@ import org.exolab.castor.xml.Unmarshaller;
      */
     public int getSnmpTrapPort(
     ) {
-        return this._snmpTrapPort;
+    	return this._snmpTrapPort == null? 0 : this._snmpTrapPort;
     }
 
     /**
@@ -220,9 +234,9 @@ import org.exolab.castor.xml.Unmarshaller;
      * @throws java.lang.IndexOutOfBoundsException if the index
      * given is outside the bounds of the collection
      * @return the value of the
-     * org.opennms.netmgt.config.trapd.Snmpv3User at the given index
+     * Snmpv3User at the given index
      */
-    public org.opennms.netmgt.config.trapd.Snmpv3User getSnmpv3User(
+    public Snmpv3User getSnmpv3User(
             final int index)
     throws java.lang.IndexOutOfBoundsException {
         // check bounds for index
@@ -230,7 +244,7 @@ import org.exolab.castor.xml.Unmarshaller;
             throw new IndexOutOfBoundsException("getSnmpv3User: Index value '" + index + "' not in range [0.." + (this._snmpv3UserList.size() - 1) + "]");
         }
         
-        return (org.opennms.netmgt.config.trapd.Snmpv3User) _snmpv3UserList.get(index);
+        return (Snmpv3User) _snmpv3UserList.get(index);
     }
 
     /**
@@ -242,10 +256,10 @@ import org.exolab.castor.xml.Unmarshaller;
      * 
      * @return this collection as an Array
      */
-    public org.opennms.netmgt.config.trapd.Snmpv3User[] getSnmpv3User(
+    public Snmpv3User[] getSnmpv3User(
     ) {
-        org.opennms.netmgt.config.trapd.Snmpv3User[] array = new org.opennms.netmgt.config.trapd.Snmpv3User[0];
-        return (org.opennms.netmgt.config.trapd.Snmpv3User[]) this._snmpv3UserList.toArray(array);
+        Snmpv3User[] array = new Snmpv3User[0];
+        return (Snmpv3User[]) this._snmpv3UserList.toArray(array);
     }
 
     /**
@@ -255,7 +269,7 @@ import org.exolab.castor.xml.Unmarshaller;
      * 
      * @return a reference to the Vector backing this class
      */
-    public java.util.List<org.opennms.netmgt.config.trapd.Snmpv3User> getSnmpv3UserCollection(
+    public java.util.List<Snmpv3User> getSnmpv3UserCollection(
     ) {
         return this._snmpv3UserList;
     }
@@ -328,20 +342,6 @@ import org.exolab.castor.xml.Unmarshaller;
         return this._newSuspectOnTrap;
     }
 
-    /**
-     * Method isValid.
-     * 
-     * @return true if this object is valid according to the schema
-     */
-    public boolean isValid(
-    ) {
-        try {
-            validate();
-        } catch (org.exolab.castor.xml.ValidationException vex) {
-            return false;
-        }
-        return true;
-    }
 
     /**
      * Method iterateSnmpv3User.
@@ -349,41 +349,9 @@ import org.exolab.castor.xml.Unmarshaller;
      * @return an Iterator over all possible elements in this
      * collection
      */
-    public java.util.Iterator<org.opennms.netmgt.config.trapd.Snmpv3User> iterateSnmpv3User(
+    public java.util.Iterator<Snmpv3User> iterateSnmpv3User(
     ) {
         return this._snmpv3UserList.iterator();
-    }
-
-    /**
-     * 
-     * 
-     * @param out
-     * @throws org.exolab.castor.xml.MarshalException if object is
-     * null or if any SAXException is thrown during marshaling
-     * @throws org.exolab.castor.xml.ValidationException if this
-     * object is an invalid instance according to the schema
-     */
-    public void marshal(
-            final java.io.Writer out)
-    throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException {
-        Marshaller.marshal(this, out);
-    }
-
-    /**
-     * 
-     * 
-     * @param handler
-     * @throws java.io.IOException if an IOException occurs during
-     * marshaling
-     * @throws org.exolab.castor.xml.ValidationException if this
-     * object is an invalid instance according to the schema
-     * @throws org.exolab.castor.xml.MarshalException if object is
-     * null or if any SAXException is thrown during marshaling
-     */
-    public void marshal(
-            final org.xml.sax.ContentHandler handler)
-    throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException {
-        Marshaller.marshal(this, handler);
     }
 
     /**
@@ -400,7 +368,7 @@ import org.exolab.castor.xml.Unmarshaller;
      * @return true if the object was removed from the collection.
      */
     public boolean removeSnmpv3User(
-            final org.opennms.netmgt.config.trapd.Snmpv3User vSnmpv3User) {
+            final Snmpv3User vSnmpv3User) {
         boolean removed = _snmpv3UserList.remove(vSnmpv3User);
         return removed;
     }
@@ -411,10 +379,10 @@ import org.exolab.castor.xml.Unmarshaller;
      * @param index
      * @return the element removed from the collection
      */
-    public org.opennms.netmgt.config.trapd.Snmpv3User removeSnmpv3UserAt(
+    public Snmpv3User removeSnmpv3UserAt(
             final int index) {
         java.lang.Object obj = this._snmpv3UserList.remove(index);
-        return (org.opennms.netmgt.config.trapd.Snmpv3User) obj;
+        return (Snmpv3User) obj;
     }
 
     /**
@@ -469,7 +437,7 @@ import org.exolab.castor.xml.Unmarshaller;
      */
     public void setSnmpv3User(
             final int index,
-            final org.opennms.netmgt.config.trapd.Snmpv3User vSnmpv3User)
+            final Snmpv3User vSnmpv3User)
     throws java.lang.IndexOutOfBoundsException {
         // check bounds for index
         if (index < 0 || index >= this._snmpv3UserList.size()) {
@@ -485,7 +453,7 @@ import org.exolab.castor.xml.Unmarshaller;
      * @param vSnmpv3UserArray
      */
     public void setSnmpv3User(
-            final org.opennms.netmgt.config.trapd.Snmpv3User[] vSnmpv3UserArray) {
+            final Snmpv3User[] vSnmpv3UserArray) {
         //-- copy array
         _snmpv3UserList.clear();
         
@@ -501,7 +469,7 @@ import org.exolab.castor.xml.Unmarshaller;
      * @param vSnmpv3UserList the Vector to copy.
      */
     public void setSnmpv3User(
-            final java.util.List<org.opennms.netmgt.config.trapd.Snmpv3User> vSnmpv3UserList) {
+            final java.util.List<Snmpv3User> vSnmpv3UserList) {
         // copy vector
         this._snmpv3UserList.clear();
         
@@ -516,38 +484,9 @@ import org.exolab.castor.xml.Unmarshaller;
      * @param snmpv3UserList the Vector to set.
      */
     public void setSnmpv3UserCollection(
-            final java.util.List<org.opennms.netmgt.config.trapd.Snmpv3User> snmpv3UserList) {
+            final java.util.List<Snmpv3User> snmpv3UserList) {
         this._snmpv3UserList = snmpv3UserList;
     }
-
-    /**
-     * Method unmarshal.
-     * 
-     * @param reader
-     * @throws org.exolab.castor.xml.MarshalException if object is
-     * null or if any SAXException is thrown during marshaling
-     * @throws org.exolab.castor.xml.ValidationException if this
-     * object is an invalid instance according to the schema
-     * @return the unmarshaled
-     * org.opennms.netmgt.config.trapd.TrapdConfiguration
-     */
-    public static org.opennms.netmgt.config.trapd.TrapdConfiguration unmarshal(
-            final java.io.Reader reader)
-    throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException {
-        return (org.opennms.netmgt.config.trapd.TrapdConfiguration) Unmarshaller.unmarshal(org.opennms.netmgt.config.trapd.TrapdConfiguration.class, reader);
-    }
-
-    /**
-     * 
-     * 
-     * @throws org.exolab.castor.xml.ValidationException if this
-     * object is an invalid instance according to the schema
-     */
-    public void validate(
-    )
-    throws org.exolab.castor.xml.ValidationException {
-        org.exolab.castor.xml.Validator validator = new org.exolab.castor.xml.Validator();
-        validator.validate(this);
-    }
+    
 
 }
