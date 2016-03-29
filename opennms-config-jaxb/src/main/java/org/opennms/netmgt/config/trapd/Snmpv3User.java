@@ -59,13 +59,13 @@ import javax.xml.bind.annotation.XmlTransient;
     /**
      * SNMPv3 Privacy Protocol
      */
-	@XmlAttribute(name="privacyProtocol")
+	@XmlAttribute(name="privacy-protocol")
     private java.lang.String _privacyProtocol;
 
     /**
      * SNMPv3 Privacy Password Phrase
      */
-	@XmlAttribute(name="privacyPassphrase")
+	@XmlAttribute(name="privacy-passphrase")
     private java.lang.String _privacyPassphrase;
 
 
