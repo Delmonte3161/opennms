@@ -46,10 +46,10 @@ import org.opennms.netmgt.xml.event.Event;
  */
 final class BroadcastEventProcessor implements EventListener {
     private static final Logger LOG = LoggerFactory.getLogger(BroadcastEventProcessor.class);
-
+    
     @Autowired
     private SyslogdIPMgr m_syslogdIPMgr;
-
+ 
     /**
      * Create message selector to set to the subscription
      */
