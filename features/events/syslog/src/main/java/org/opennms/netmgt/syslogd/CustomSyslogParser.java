@@ -63,7 +63,6 @@ public class CustomSyslogParser extends SyslogParser {
 
     @Override
     public SyslogMessage parse() throws SyslogParserException {
-        LOG.info("Message Parse start");
         final SyslogMessage syslogMessage = new SyslogMessage();
         syslogMessage.setParserClass(getClass());
 
@@ -192,7 +191,6 @@ public class CustomSyslogParser extends SyslogParser {
         syslogMessage.setProcessName(processName);
         syslogMessage.setMessage(message.trim());
 
-        LOG.info("Message Parse End");
         return syslogMessage;
     }
 

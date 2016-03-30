@@ -213,7 +213,7 @@ public class ConvertToEvent {
                                                   containsIgnoreCase(uei.getSeverityCollection(), priorityTxt) &&
                                                   matchProcess(uei.getProcessMatch(), message.getProcessName()) && 
                                                   matchHostname(uei.getHostnameMatch(), message.getHostName()) &&
-                                                  matchHostAddr(uei.getHostaddrMatch(), message.getHostAddress());
+                                                  matchHostAddr(uei.getHostaddrMatch(), hostAddress);
 
                 // Single boolean check is added instead of performing multiple
                 // boolean check for both if and else if which causes a extra time

@@ -31,6 +31,9 @@ package org.opennms.netmgt.syslogd;
 import java.lang.reflect.Constructor;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -141,9 +144,12 @@ public class SyslogParser {
             // Date pattern has been crearted and checked inside if loop instead of 
             // parsing date inside the exception class.
             if (dateString.matches(datePattern)) {
-                final DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT);
-                df.setTimeZone(TimeZone.getTimeZone("UTC"));
-                return df.parse(dateString);
+            	
+              LocalDate date = LocalDate.parse(dateString);
+              DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd",Locale.ROOT);
+              date.format(df);
+              return Date.from(date.atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
+              
             } else {
                 final DateFormat df = new SimpleDateFormat("MMM dd HH:mm:ss", Locale.ROOT);
                 df.setTimeZone(TimeZone.getTimeZone("UTC"));
