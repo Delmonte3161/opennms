@@ -51,7 +51,7 @@ public class TrapdConfiguration implements java.io.Serializable {
      *  standard port is 162.
      */
 	@XmlAttribute(name="snmp-trap-port")
-    private Integer _snmpTrapPort;
+    private int _snmpTrapPort;
 
     /**
      * keeps track of state for field: _snmpTrapPort
@@ -233,7 +233,7 @@ public class TrapdConfiguration implements java.io.Serializable {
      */
     public int getSnmpTrapPort(
     ) {
-    	return this._snmpTrapPort == null? 0 : this._snmpTrapPort;
+    	return this._snmpTrapPort;
     }
 
     /**
