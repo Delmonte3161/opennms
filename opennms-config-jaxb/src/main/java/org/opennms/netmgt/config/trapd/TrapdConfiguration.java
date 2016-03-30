@@ -7,12 +7,16 @@
 
 package org.opennms.netmgt.config.trapd;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlTransient;
+
+import org.opennms.netmgt.config.snmp.Configuration;
 
 
 
@@ -27,29 +31,29 @@ import javax.xml.bind.annotation.XmlTransient;
  * @version $Revision$ $Date$
  */
 @XmlRootElement(name = "trapd-configuration")
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 @SuppressWarnings("all") 
-public class TrapdConfiguration implements java.io.Serializable {
-
+public class TrapdConfiguration implements  Serializable {
+	private static final long serialVersionUID = -3548367130814097723L;
 
       //--------------------------/
      //- Class/Member Variables -/
     //--------------------------/
 
-    /**
+	/**
      * The IP address on which trapd listens for connections.
      *  If "" is specified, trapd will bind to all addresses. The
      * default is .
      */
-	@XmlAttribute(name="snmpTrapAddress")
+	@XmlAttribute(name="snmp-trap-address")
     private java.lang.String _snmpTrapAddress = "*";
 
     /**
      * The port on which trapd listens for SNMP traps. The
      *  standard port is 162.
      */
-	@XmlAttribute(name="snmpTrapPort")
-    private Integer _snmpTrapPort;
+	@XmlAttribute(name="snmp-trap-port")
+    private int _snmpTrapPort;
 
     /**
      * keeps track of state for field: _snmpTrapPort
@@ -61,7 +65,7 @@ public class TrapdConfiguration implements java.io.Serializable {
      * Whether traps from devices unknown to OpenNMS should
      *  generate newSuspect events.
      */
-	@XmlAttribute(name="newSuspectOnTrap")
+	@XmlAttribute(name="new-suspect-on-trap")
     private boolean _newSuspectOnTrap;
 
     /**
@@ -73,7 +77,7 @@ public class TrapdConfiguration implements java.io.Serializable {
     /**
      * SNMPv3 configuration.
      */
-    @XmlElement(name="snmpV3User")
+	@XmlElement(name="snmpv3Users")
     private java.util.List<Snmpv3User> _snmpv3UserList;
 
 
@@ -86,7 +90,16 @@ public class TrapdConfiguration implements java.io.Serializable {
         setSnmpTrapAddress("*");
         this._snmpv3UserList = new java.util.ArrayList<Snmpv3User>();
     }
-
+    
+    /*
+     * This constructor is used only for junit
+     */
+    public TrapdConfiguration(int _snmpTrapPort,String snmpTrapAddress) {
+        super();
+        setSnmpTrapAddress(snmpTrapAddress);
+        this._snmpTrapPort = _snmpTrapPort;
+        this._snmpv3UserList = new java.util.ArrayList<Snmpv3User>();
+    }
 
       //-----------/
      //- Methods -/
@@ -224,7 +237,7 @@ public class TrapdConfiguration implements java.io.Serializable {
      */
     public int getSnmpTrapPort(
     ) {
-    	return this._snmpTrapPort == null? 0 : this._snmpTrapPort;
+    	return this._snmpTrapPort;
     }
 
     /**
