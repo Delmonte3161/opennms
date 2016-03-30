@@ -13,14 +13,16 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @XmlRootElement(name = "snmpv3-user")
 @XmlAccessorType(XmlAccessType.NONE)
-@SuppressWarnings("all") public class Snmpv3User implements java.io.Serializable {
-
+@SuppressWarnings("all") 
+public class Snmpv3User implements java.io.Serializable {
+	private static final long serialVersionUID = 61220221955256341L;
 
       //--------------------------/
      //- Class/Member Variables -/
     //--------------------------/
+	
 
-    /**
+	/**
      * SNMPv3 Application Engine ID
      */
 	@XmlAttribute(name="engine-id")

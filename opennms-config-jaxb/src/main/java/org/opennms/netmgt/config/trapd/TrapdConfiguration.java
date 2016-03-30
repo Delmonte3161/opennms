@@ -7,6 +7,8 @@
 
 package org.opennms.netmgt.config.trapd;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -31,14 +33,14 @@ import org.opennms.netmgt.config.snmp.Configuration;
 @XmlRootElement(name = "trapd-configuration")
 @XmlAccessorType(XmlAccessType.NONE)
 @SuppressWarnings("all") 
-public class TrapdConfiguration implements java.io.Serializable {
-
+public class TrapdConfiguration implements  Serializable {
+	private static final long serialVersionUID = -3548367130814097723L;
 
       //--------------------------/
      //- Class/Member Variables -/
     //--------------------------/
 
-    /**
+	/**
      * The IP address on which trapd listens for connections.
      *  If "" is specified, trapd will bind to all addresses. The
      * default is .
@@ -88,8 +90,10 @@ public class TrapdConfiguration implements java.io.Serializable {
         setSnmpTrapAddress("*");
         this._snmpv3UserList = new java.util.ArrayList<Snmpv3User>();
     }
-
-    //for junit
+    
+    /*
+     * This constructor is used only for junit
+     */
     public TrapdConfiguration(int _snmpTrapPort,String snmpTrapAddress) {
         super();
         setSnmpTrapAddress(snmpTrapAddress);
