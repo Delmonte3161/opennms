@@ -70,7 +70,6 @@ public class TrapdConfigurationResourceIT extends AbstractSpringJerseyRestTestCa
     @Test
     public void testAgentConfig() throws Exception {
         String xml = sendRequest(GET, "/config/trapd", 200);
-        System.out.println(xml);
         assertTrue(xml.contains("trapd-configuration"));
     }
 }
