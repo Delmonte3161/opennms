@@ -68,19 +68,6 @@ public class PassiveServiceMonitor implements ServiceMonitor {
     }
 
     /* (non-Javadoc)
-     * @see org.opennms.netmgt.poller.ServiceMonitor#initialize(org.opennms.netmgt.poller.MonitoredService)
-     */
-    /**
-     * <p>initialize</p>
-     *
-     * @param svc a {@link org.opennms.netmgt.poller.MonitoredService} object.
-     */
-    @Override
-    public void initialize(MonitoredService svc) {
-        return;
-    }
-
-    /* (non-Javadoc)
      * @see org.opennms.netmgt.poller.ServiceMonitor#release(org.opennms.netmgt.poller.MonitoredService)
      */
     /** {@inheritDoc} */

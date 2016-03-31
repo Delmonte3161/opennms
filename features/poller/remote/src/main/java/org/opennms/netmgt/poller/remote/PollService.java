@@ -47,14 +47,7 @@ public interface PollService {
      * @param locators a {@link java.util.Collection} object.
      */
     public void setServiceMonitorLocators(Collection<ServiceMonitorLocator> locators);
-    
-    /**
-     * <p>initialize</p>
-     *
-     * @param polledService a {@link org.opennms.netmgt.poller.remote.PolledService} object.
-     */
-    public void initialize(PolledService polledService);
-	
+
 	/**
 	 * <p>poll</p>
 	 *

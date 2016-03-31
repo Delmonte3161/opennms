@@ -106,27 +106,6 @@ public interface ServiceMonitor {
 
     /**
      * <P>
-     * This method is called whenever a new interface that supports the plug-in
-     * service is added to the scheduling system. The plug-in has the option to
-     * load and/or associate configuration information with the interface before
-     * the framework begins scheduling the new device.
-     * </P>
-     *
-     * <P>
-     * Should a monitor exception be thrown during an initialization call then
-     * the framework will log an error and discard the interface from
-     * scheduling.
-     * </P>
-     *
-     * @param svc TODO
-     * @exception java.lang.RuntimeException
-     *                Thrown if an unrecoverable error occurs that prevents the
-     *                interface from being monitored.
-     */
-    public void initialize(MonitoredService svc);
-
-    /**
-     * <P>
      * This method is the called whenever an interface is being removed from the
      * scheduler. For example, if a service is determined as being no longer
      * supported then this method will be invoked to cleanup any information

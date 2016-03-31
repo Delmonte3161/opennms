@@ -101,18 +101,6 @@ final public class OmsaStorageMonitor extends SnmpMonitorStrategy {
         return;
     }
 
-
-    /**
-     * <p>initialize</p>
-     *
-     * @param svc a {@link org.opennms.netmgt.poller.MonitoredService} object.
-     */
-    @Override
-    public void initialize(MonitoredService svc) {
-        super.initialize(svc);
-        return;
-    }
-
     /** {@inheritDoc} */
     @Override
     public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {

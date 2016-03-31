@@ -166,24 +166,6 @@ final public class BgpSessionMonitor extends SnmpMonitorStrategy {
     }
 
     /**
-     * <P>
-     * Called by the poller framework when an interface is being added to the
-     * scheduler. Here we perform any necessary initialization to prepare the
-     * NetworkInterface object for polling.
-     * </P>
-     *
-     * @exception RuntimeException
-     *                Thrown if an unrecoverable error occurs that prevents the
-     *                interface from being monitored.
-     * @param svc a {@link org.opennms.netmgt.poller.MonitoredService} object.
-     */
-    @Override
-    public void initialize(MonitoredService svc) {
-        super.initialize(svc);
-        return;
-    }
-
-    /**
      * {@inheritDoc}
      *
      * <P>

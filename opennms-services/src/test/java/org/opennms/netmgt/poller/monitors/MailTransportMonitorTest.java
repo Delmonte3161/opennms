@@ -203,10 +203,6 @@ public class MailTransportMonitorTest {
     }
     
     protected MonitoredService getMailService(String hostname, InetAddress ip) throws Exception {
-        MonitoredService svc = new MockMonitoredService(1, hostname, ip, "MAIL");
-        m_monitor.initialize(svc);
-        return svc;
+        return new MockMonitoredService(1, hostname, ip, "MAIL");
     }
-
-
 }

@@ -82,9 +82,7 @@ public class PageSequenceMonitorOpenNMSTest {
     }
 
     protected MonitoredService getHttpService(String hostname, InetAddress inetAddress) throws Exception {
-        MonitoredService svc = new MockMonitoredService(1, hostname, inetAddress, "HTTP");
-        m_monitor.initialize(svc);
-        return svc;
+        return new MockMonitoredService(1, hostname, inetAddress, "HTTP");
     }
 
 

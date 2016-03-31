@@ -67,12 +67,6 @@ public class DNSResolutionMonitorTest {
         DNSResolutionMonitor monitor = new DNSResolutionMonitor();
         monitor.initialize(Collections.<String, Object>emptyMap());
         
-        monitor.initialize(dual);
-        monitor.initialize(v4only);
-        monitor.initialize(v6only);
-        monitor.initialize(neither);
-        
-        
         Map<String, Object> v4Parms = Collections.<String, Object>singletonMap(PARM_RESOLUTION_TYPE,
                                                                                PARM_RESOLUTION_TYPE_V4);
         Map<String, Object> v6Parms = Collections.<String, Object>singletonMap(PARM_RESOLUTION_TYPE,

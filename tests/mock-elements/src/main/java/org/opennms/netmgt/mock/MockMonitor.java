@@ -68,10 +68,6 @@ public class MockMonitor implements ServiceMonitor {
     }
 
     @Override
-    public void initialize(MonitoredService svc) {
-    }
-
-    @Override
     public void initialize(Map<String, Object> parameters) {
     }
 

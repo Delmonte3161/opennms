@@ -85,9 +85,6 @@ public class PollableServiceConfig implements PollConfig, ScheduleInterval {
         m_configService = findService(pkg);
         m_persisterFactory = persisterFactory;
         m_resourceStorageDao = resourceStorageDao;
-
-        ServiceMonitor monitor = getServiceMonitor();
-        monitor.initialize(m_service);
     }
 
     /**

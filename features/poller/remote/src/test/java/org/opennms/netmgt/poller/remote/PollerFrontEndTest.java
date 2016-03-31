@@ -29,8 +29,6 @@
 package org.opennms.netmgt.poller.remote;
 
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.isA;
 import static org.springframework.util.ObjectUtils.nullSafeEquals;
 
 import java.beans.PropertyChangeEvent;
@@ -455,7 +453,6 @@ public class PollerFrontEndTest extends TestCase {
         anticipatePollServiceSetMonitorLocators();
         anticipateGetMonitorId();
         anticipateGetConfiguration();
-        anticipatePolledServicesInitialized();
         anticipateFireConfigurationChangeEvent();
     }
 
@@ -548,11 +545,6 @@ public class PollerFrontEndTest extends TestCase {
     }
 
     private void anticipateGetServicePollState() {
-    }
-
-    private void anticipatePolledServicesInitialized() {
-        m_pollService.initialize(isA(PolledService.class));
-        expectLastCall().times(pollConfig().getPolledServices().length);
     }
 
     private void anticipatePollerCheckingIn() {

@@ -59,15 +59,6 @@ public class AvailabilityMonitor extends AbstractServiceMonitor {
     public void initialize(Map<String, Object> parameters) {
     }
 
-    /**
-     * <p>initialize</p>
-     *
-     * @param svc a {@link org.opennms.netmgt.poller.MonitoredService} object.
-     */
-    @Override
-    public void initialize(MonitoredService svc) {
-    }
-
     /** {@inheritDoc} */
     @Override
     public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {

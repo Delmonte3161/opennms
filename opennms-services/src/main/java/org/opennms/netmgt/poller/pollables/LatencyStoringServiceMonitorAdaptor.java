@@ -102,16 +102,6 @@ public class LatencyStoringServiceMonitorAdaptor implements ServiceMonitor {
         m_serviceMonitor.initialize(parameters);
     }
 
-    /**
-     * <p>initialize</p>
-     *
-     * @param svc a {@link org.opennms.netmgt.poller.MonitoredService} object.
-     */
-    @Override
-    public void initialize(MonitoredService svc) {
-        m_serviceMonitor.initialize(svc);
-    }
-
     /** {@inheritDoc} */
     @Override
     public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {

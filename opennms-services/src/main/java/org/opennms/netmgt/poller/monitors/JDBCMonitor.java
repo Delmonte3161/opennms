@@ -115,24 +115,7 @@ public class JDBCMonitor extends AbstractServiceMonitor {
 	 */
         @Override
 	public void release() {
-		LOG.debug("Shuting down plugin");
-	}
-
-	/**
-	 * This method is called when an interface that support the service is added
-	 * to the scheduling service.
-	 *
-	 * @throws java.lang.RuntimeException
-	 *             Thrown if an unrecoverable error occurs that prevents the
-	 *             interface from being monitored.
-	 * @throws org.opennms.netmgt.poller.NetworkInterfaceNotSupportedException
-	 *             Thrown if the passed interface is invalid for this monitor.
-	 * @param svc a {@link org.opennms.netmgt.poller.MonitoredService} object.
-	 */
-        @Override
-	public void initialize(MonitoredService svc) {
-		super.initialize(svc);
-		LOG.debug("initialize");
+		LOG.debug("Shutting down plugin");
 	}
 
 	/**
@@ -144,7 +127,7 @@ public class JDBCMonitor extends AbstractServiceMonitor {
 	 */
         @Override
 	public void release(MonitoredService svc) {
-		LOG.debug("Shuting down plugin");
+		LOG.debug("Shutting down plugin");
 	}
 
 	/**

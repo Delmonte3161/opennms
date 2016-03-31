@@ -165,9 +165,6 @@ public class LatencyStoringServiceMonitorAdaptorPersistenceTest {
         public void release() {}
 
         @Override
-        public void initialize(MonitoredService svc) {}
-
-        @Override
         public void release(MonitoredService svc) {}
 
         @Override
