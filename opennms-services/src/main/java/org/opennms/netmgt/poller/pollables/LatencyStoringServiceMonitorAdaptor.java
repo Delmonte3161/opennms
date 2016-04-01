@@ -98,12 +98,6 @@ public class LatencyStoringServiceMonitorAdaptor implements ServiceMonitor {
 
     /** {@inheritDoc} */
     @Override
-    public void initialize(Map<String, Object> parameters) {
-        m_serviceMonitor.initialize(parameters);
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
         PollStatus status = m_serviceMonitor.poll(svc, parameters);
 

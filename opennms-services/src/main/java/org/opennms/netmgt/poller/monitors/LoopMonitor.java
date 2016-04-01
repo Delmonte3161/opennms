@@ -40,19 +40,9 @@ import org.opennms.netmgt.poller.ServiceMonitor;
  * <p>LoopMonitor class.</p>
  *
  * @author david
- * @version $Id: $
  */
-
 @Distributable
 public class LoopMonitor implements ServiceMonitor {
-
-    /* (non-Javadoc)
-     * @see org.opennms.netmgt.poller.ServiceMonitor#initialize(org.opennms.netmgt.config.PollerConfig, java.util.Map)
-     */
-    /** {@inheritDoc} */
-    @Override
-    public void initialize(Map<String, Object> parameters) {
-    }
 
     /**
      * <p>close</p>

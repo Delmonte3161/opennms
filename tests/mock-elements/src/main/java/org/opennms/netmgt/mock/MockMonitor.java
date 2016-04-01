@@ -68,10 +68,6 @@ public class MockMonitor implements ServiceMonitor {
     }
 
     @Override
-    public void initialize(Map<String, Object> parameters) {
-    }
-
-    @Override
     public PollStatus poll(MonitoredService monSvc, Map<String, Object> parameters) {
         synchronized(m_network) {
             int nodeId = monSvc.getNodeId();

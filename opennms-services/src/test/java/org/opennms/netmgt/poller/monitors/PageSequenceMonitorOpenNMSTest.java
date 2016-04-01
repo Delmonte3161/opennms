@@ -69,8 +69,6 @@ public class PageSequenceMonitorOpenNMSTest {
         MockLogAppender.setupLogging();
 
         m_monitor = new PageSequenceMonitor();
-        m_monitor.initialize(Collections.<String, Object>emptyMap());
-
         m_params = new HashMap<String, Object>();
         m_params.put("timeout", "8000");
         m_params.put("retries", "1");

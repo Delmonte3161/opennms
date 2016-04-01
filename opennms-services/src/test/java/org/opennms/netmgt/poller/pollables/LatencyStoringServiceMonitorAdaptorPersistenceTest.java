@@ -159,9 +159,6 @@ public class LatencyStoringServiceMonitorAdaptorPersistenceTest {
         }
 
         @Override
-        public void initialize(Map<String, Object> parameters) {}
-
-        @Override
         public void close() {}
 
         @Override

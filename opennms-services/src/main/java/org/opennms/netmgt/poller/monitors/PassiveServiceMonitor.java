@@ -48,15 +48,6 @@ import org.opennms.netmgt.poller.ServiceMonitor;
 public class PassiveServiceMonitor implements ServiceMonitor {
 
     /* (non-Javadoc)
-     * @see org.opennms.netmgt.poller.ServiceMonitor#initialize(org.opennms.netmgt.config.PollerConfig, java.util.Map)
-     */
-    /** {@inheritDoc} */
-    @Override
-    public void initialize(Map<String, Object> parameters) {
-        return;
-    }
-
-    /* (non-Javadoc)
      * @see org.opennms.netmgt.poller.ServiceMonitor#release()
      */
     /**
@@ -72,7 +63,7 @@ public class PassiveServiceMonitor implements ServiceMonitor {
     /** {@inheritDoc} */
     @Override
     public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
-    	PollStatus status = PassiveStatusKeeper.getInstance().getStatus(svc.getNodeLabel(), svc.getIpAddr(), svc.getSvcName());
+        PollStatus status = PassiveStatusKeeper.getInstance().getStatus(svc.getNodeLabel(), svc.getIpAddr(), svc.getSvcName());
         return status;
     }
 

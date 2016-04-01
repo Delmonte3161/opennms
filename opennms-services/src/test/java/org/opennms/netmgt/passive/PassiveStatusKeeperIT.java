@@ -250,7 +250,6 @@ public class PassiveStatusKeeperIT {
         MockMonitoredService svc = new MockMonitoredService(1, "Router", InetAddressUtils.addr("192.168.1.1"), "ICMP" );
         
         ServiceMonitor m = new PassiveServiceMonitor();
-        m.initialize((Map<String,Object>)null);
         PollStatus ps2 = m.poll(svc, null);
         m.close();
         

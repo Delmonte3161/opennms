@@ -74,9 +74,7 @@ public class DefaultServiceMonitorLocator implements ServiceMonitorLocator, Seri
     @Override
     public ServiceMonitor getServiceMonitor() {
         try {
-            ServiceMonitor mon = m_serviceClass.newInstance();
-            mon.initialize((Map<String,Object>)null);
-            return mon;
+            return m_serviceClass.newInstance();
         } catch (InstantiationException e) {
             throw new ConfigObjectRetrievalFailureException("Unable to instantiate monitor for service "
                     +m_serviceName+" with class-name "+m_serviceClass.getName(), e);

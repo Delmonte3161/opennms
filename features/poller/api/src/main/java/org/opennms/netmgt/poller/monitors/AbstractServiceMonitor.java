@@ -52,30 +52,6 @@ public abstract class AbstractServiceMonitor implements ServiceMonitor {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractServiceMonitor.class);
 
     /**
-     * {@inheritDoc}
-     *
-     * <P>
-     * This method is called after the framework creates an instance of the
-     * plug-in. The framework passes the object a proxy object that can be used
-     * to retrieve configuration information specific to the plug-in.
-     * Additionally, any parameters for the plug-in from the package definition
-     * are passed using the parameters element.
-     * </P>
-     *
-     * <P>
-     * If there is a critical error, like missing service libraries, the
-     * monitor may throw a ServiceMonitorException. If the plug-in throws an
-     * exception then the plug-in will be disabled in the framework.
-     * </P>
-     * @exception java.lang.RuntimeException
-     *                Thrown if an unrecoverable error occurs that prevents the
-     *                plug-in from functioning.
-     */
-    @Override
-    public void initialize(Map<String, Object> parameters) {
-    }
-
-    /**
      * <P>
      * This method is called whenever the plug-in is being unloaded, normally
      * during framework exit. During this time the framework may release any

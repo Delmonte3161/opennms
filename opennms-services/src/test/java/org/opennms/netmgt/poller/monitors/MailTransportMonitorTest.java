@@ -73,8 +73,6 @@ public class MailTransportMonitorTest {
         System.setProperty("opennms.home", homeDir.getAbsolutePath());
 
         m_monitor = new MailTransportMonitor();
-        m_monitor.initialize(new HashMap<String,Object>());
-
         m_params = new HashMap<String, Object>();
         m_params.put("timeout", "3000");
         m_params.put("retries", "1");
