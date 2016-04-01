@@ -74,7 +74,16 @@ public class WsManMonitor extends AbstractServiceMonitor {
     /**
      * TODO: Inject this field
      */
-    private WSManConfigDao m_wsManConfigDao = BeanUtils.getBean("daoContext", "wsManConfigDao", WSManConfigDao.class);
+    private WSManConfigDao m_wsManConfigDao = getContextWSManConfigDao();
+
+    private static WSManConfigDao getContextWSManConfigDao() {
+        try {
+            return BeanUtils.getBean("daoContext", "wsManConfigDao", WSManConfigDao.class);
+        } catch (Throwable e) {
+            LOG.warn("Cannot get WSManConfigDao instance from context, returning null");
+            return null;
+        }
+    }
 
     @Override
     public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
