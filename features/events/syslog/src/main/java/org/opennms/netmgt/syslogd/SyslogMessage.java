@@ -38,6 +38,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.opennms.core.utils.InetAddressUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 public class SyslogMessage {
     private static final Logger LOG = LoggerFactory.getLogger(SyslogMessage.class);
@@ -147,7 +148,7 @@ public class SyslogMessage {
         if (m_hostname != null) {
             try {
                 final InetAddress address = InetAddressUtils.addr(m_hostname);
-                return InetAddressUtils.str(address).replace("/", "");
+                return StringUtils.replace(InetAddressUtils.str(address),"/", "");
             } catch (final IllegalArgumentException e) {
                 LOG.debug("Unable to resolve hostname '{}' in syslog message.", m_hostname, e);
                 return null;

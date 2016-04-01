@@ -146,8 +146,6 @@ public class SyslogParser {
             if (dateString.matches(datePattern)) {
             	
               LocalDate date = LocalDate.parse(dateString);
-              DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd",Locale.ROOT);
-              date.format(df);
               return Date.from(date.atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
               
             } else {
