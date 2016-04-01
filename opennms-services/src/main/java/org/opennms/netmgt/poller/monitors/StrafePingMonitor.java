@@ -62,7 +62,7 @@ import org.opennms.netmgt.poller.PollStatus;
  * @author <A HREF="http://www.opennms.org/">OpenNMS</A>
  */
 @Distributable
-final public class StrafePingMonitor extends AbstractServiceMonitor {
+public class StrafePingMonitor extends AbstractServiceMonitor {
     private static final Logger LOG = LoggerFactory.getLogger(StrafePingMonitor.class);
     private static final int DEFAULT_MULTI_PING_COUNT = 20;
     private static final long DEFAULT_PING_INTERVAL = 50;

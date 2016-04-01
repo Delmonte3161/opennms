@@ -64,7 +64,7 @@ import org.slf4j.LoggerFactory;
  */
 
 @Distributable
-final public class Pop3Monitor extends AbstractServiceMonitor {
+public class Pop3Monitor extends AbstractServiceMonitor {
     
     public static final Logger LOG = LoggerFactory.getLogger(Pop3Monitor.class);
 

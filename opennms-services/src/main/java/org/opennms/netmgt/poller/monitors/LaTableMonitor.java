@@ -64,7 +64,8 @@ import org.slf4j.LoggerFactory;
  */
 
 @Distributable(DistributionContext.DAEMON)
-final public class LaTableMonitor extends SnmpMonitorStrategy {
+public class LaTableMonitor extends SnmpMonitorStrategy {
+
     public static final Logger LOG = LoggerFactory.getLogger(LaTableMonitor.class);
 
     private static final String m_serviceName = "La-Table";

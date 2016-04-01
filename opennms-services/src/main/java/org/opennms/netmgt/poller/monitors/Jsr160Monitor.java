@@ -29,6 +29,8 @@
 package org.opennms.netmgt.poller.monitors;
 
 import org.opennms.netmgt.jmx.connection.JmxConnectors;
+import org.opennms.netmgt.poller.Distributable;
+import org.opennms.netmgt.poller.DistributionContext;
 
 /**
  * The class is responsible for getting the connection to the rmote jmx server.  The
@@ -38,6 +40,7 @@ import org.opennms.netmgt.jmx.connection.JmxConnectors;
  * @author <A HREF="mailto:mike@opennms.org">Mike Jamison </A>
  * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
  */
+@Distributable(DistributionContext.DAEMON)
 public class Jsr160Monitor extends JMXMonitor {
 
     @Override

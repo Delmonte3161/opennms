@@ -176,7 +176,7 @@ public class WebMonitor extends AbstractServiceMonitor {
         return pollStatus;
     }
 
-    private boolean inRange(String range,Integer val){
+    private static boolean inRange(String range,Integer val) {
         String[] boundries = range.split("-");
         if(val < Integer.valueOf(boundries[0]) || val > Integer.valueOf(boundries[1]))
             return false;

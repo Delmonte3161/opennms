@@ -39,28 +39,21 @@ import org.opennms.netmgt.poller.ServiceMonitor;
 /**
  * <p>PassiveServiceMonitor class.</p>
  *
+ * <p>
+ * This retrieves data from the {@link PassiveStatusKeeper} daemon 
+ * so it is not distributable.
+ * </p>
+ * 
  * @author <a href="mailto:david@opennms.org">David Hustace</a>
  * @version $Id: $
  */
-
-// this retrieves data from the deamon so it is not Distribuable
 @Distributable(DistributionContext.DAEMON)
 public class PassiveServiceMonitor implements ServiceMonitor {
 
-    /* (non-Javadoc)
-     * @see org.opennms.netmgt.poller.ServiceMonitor#release()
-     */
-    /**
-     * <p>release</p>
-     */
     @Override
     public void close() {
     }
 
-    /* (non-Javadoc)
-     * @see org.opennms.netmgt.poller.ServiceMonitor#poll(org.opennms.netmgt.poller.MonitoredService, java.util.Map, org.opennms.netmgt.config.poller.Package)
-     */
-    /** {@inheritDoc} */
     @Override
     public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
         PollStatus status = PassiveStatusKeeper.getInstance().getStatus(svc.getNodeLabel(), svc.getIpAddr(), svc.getSvcName());

@@ -30,20 +30,29 @@ package org.opennms.netmgt.poller.monitors;
 
 import java.net.InetAddress;
 import java.util.Map;
+
+import javax.management.MalformedObjectNameException;
+
 import org.jolokia.client.J4pClient;
 import org.jolokia.client.J4pClientBuilder;
-import org.jolokia.client.request.*;
-import org.jolokia.client.exception.*;
-
-import org.opennms.netmgt.poller.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.jolokia.client.exception.J4pConnectException;
+import org.jolokia.client.exception.J4pException;
+import org.jolokia.client.exception.J4pRemoteException;
+import org.jolokia.client.request.J4pExecRequest;
+import org.jolokia.client.request.J4pExecResponse;
+import org.jolokia.client.request.J4pReadRequest;
+import org.jolokia.client.request.J4pReadResponse;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.core.utils.ParameterMap;
 import org.opennms.core.utils.TimeoutTracker;
-
-import javax.management.MalformedObjectNameException;
+import org.opennms.netmgt.poller.Distributable;
+import org.opennms.netmgt.poller.DistributionContext;
+import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.NetworkInterface;
+import org.opennms.netmgt.poller.NetworkInterfaceNotSupportedException;
+import org.opennms.netmgt.poller.PollStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is designed to be used by the service poller framework to test the
@@ -54,8 +63,8 @@ import javax.management.MalformedObjectNameException;
  * @author <A HREF="mailto:cliles@capario.com">Chris Liles</A>
  * @author <A HREF="http://www.opennms.org/">OpenNMS</a>
  */
-@Distributable(DistributionContext.DAEMON)
-final public class JolokiaBeanMonitor extends AbstractServiceMonitor {
+@Distributable
+public class JolokiaBeanMonitor extends AbstractServiceMonitor {
 
     /**
      * Default port.
@@ -88,6 +97,7 @@ final public class JolokiaBeanMonitor extends AbstractServiceMonitor {
 
     public static final String DEFAULT_URL = "http://${ipaddr}:${port}/jolokia";
     private static final Logger LOGGER = LoggerFactory.getLogger(JolokiaBeanMonitor.class);
+
     /**
      * {@inheritDoc}
      *

@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="mailto:ronald.roskens@gmail.com">Ronald Roskens</a>
  */
 @Distributable(DistributionContext.DAEMON)
-final public class DiskUsageMonitor extends SnmpMonitorStrategy {
+public class DiskUsageMonitor extends SnmpMonitorStrategy {
 
     public static final Logger LOG = LoggerFactory.getLogger(DiskUsageMonitor.class);
 

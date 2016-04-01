@@ -46,7 +46,7 @@ import org.opennms.netmgt.poller.Distributable;
  * @author <A HREF="mailto:jason@opennms.org">Jason </A>
  */
 @Distributable
-final public class HttpsMonitor extends HttpMonitor {
+public class HttpsMonitor extends HttpMonitor {
 
     /**
      * Default HTTPS ports.

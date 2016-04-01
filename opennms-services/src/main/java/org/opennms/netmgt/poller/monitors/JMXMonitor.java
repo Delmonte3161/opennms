@@ -48,6 +48,7 @@ import org.opennms.netmgt.jmx.connection.JmxServerConnectionException;
 import org.opennms.netmgt.jmx.connection.JmxServerConnectionWrapper;
 import org.opennms.netmgt.jmx.impl.connection.connectors.DefaultConnectionManager;
 import org.opennms.netmgt.poller.Distributable;
+import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.NetworkInterface;
 import org.opennms.netmgt.poller.PollStatus;
@@ -58,15 +59,15 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
 
-@Distributable
 /**
  * This class computes the response time of making a connection to
- * the remote server.  If the connection is successful the reponse time
+ * the remote server.  If the connection is successful the response time
  * RRD is updated.
  *
  * @author <A HREF="mailto:mike@opennms.org">Mike Jamison </A>
  * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
  */
+@Distributable(DistributionContext.DAEMON)
 public abstract class JMXMonitor extends AbstractServiceMonitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(JMXMonitor.class);

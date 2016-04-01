@@ -60,12 +60,13 @@ import org.slf4j.LoggerFactory;
  *
  * @author <A HREF="mailto:cliles@capario.com">Chris Liles</A>
  * @author <A HREF="http://www.opennms.org/">OpenNMS</a>
- * @version $Id: $
  */
 
 @Distributable(DistributionContext.DAEMON)
-final public class PrTableMonitor extends SnmpMonitorStrategy {
+public class PrTableMonitor extends SnmpMonitorStrategy {
+
     public static final Logger LOG = LoggerFactory.getLogger(PrTableMonitor.class);
+
     private static final String m_serviceName = "Pr-Table";
 
     private static final String prTableErrorFlag = "1.3.6.1.4.1.2021.2.1.100";

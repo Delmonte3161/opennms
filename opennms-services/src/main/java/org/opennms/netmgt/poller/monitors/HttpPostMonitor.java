@@ -46,7 +46,6 @@ import org.opennms.core.utils.ParameterMap;
 import org.opennms.core.utils.TimeoutTracker;
 import org.opennms.core.web.HttpClientWrapper;
 import org.opennms.netmgt.poller.Distributable;
-import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.NetworkInterface;
 import org.opennms.netmgt.poller.NetworkInterfaceNotSupportedException;
@@ -56,17 +55,16 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is designed to be used by the service poller framework to test the
- * availability of a url by posting a generic payload and evaulating the http response code and banner. The class
- * implements the ServiceMonitor interface that allows it to be used along with
- * other plug-ins by the service poller framework.
+ * availability of a URL by posting a generic payload and evaluating the HTTP response
+ * code and banner. The class implements the ServiceMonitor interface that allows it 
+ * to be used along with other plug-ins by the service poller framework.
  * 
  * @author <A HREF="mailto:jeffg@opennms.org">Jeff Gehlbach</A>
  * @author <A HREF="mailto:cliles@capario.com">Chris Liles</A>
  * @author <A HREF="http://www.opennms.org/">OpenNMS</a>
  */
-
-@Distributable(DistributionContext.DAEMON)
-final public class HttpPostMonitor extends AbstractServiceMonitor {
+@Distributable
+public class HttpPostMonitor extends AbstractServiceMonitor {
 
     /**
      * Default port.

@@ -66,7 +66,11 @@ import java.util.Map;
 /**
  * The Class VmwareCimMonitor
  * <p/>
- * This class represents a monitor for Vmware Cim related queries
+ * This class represents a monitor for Vmware CIM related queries.
+ * 
+ * <p>
+ * This monitor is not distributable because it relies on the {@link NodeDao}.
+ * </p>
  *
  * @author Christian Pape <Christian.Pape@informatik.hs-fulda.de>
  */
@@ -87,7 +91,7 @@ public class VmwareCimMonitor extends AbstractServiceMonitor {
      * healthStates map
      */
 
-    private static Map<Integer, String> m_healthStates;
+    private static final Map<Integer, String> m_healthStates = new HashMap<>();
 
     /*
      * default retries
@@ -103,8 +107,6 @@ public class VmwareCimMonitor extends AbstractServiceMonitor {
      * defining the health states
      */
     static {
-        m_healthStates = new HashMap<Integer, String>();
-
         m_healthStates.put(0, "Unknown");
         m_healthStates.put(5, "OK");
         m_healthStates.put(10, "Degraded/Warning");
@@ -128,7 +130,7 @@ public class VmwareCimMonitor extends AbstractServiceMonitor {
             m_nodeDao = BeanUtils.getBean("daoContext", "nodeDao", NodeDao.class);
 
             if (m_nodeDao == null) {
-                logger.error("Node dao should be a non-null value.");
+                logger.error("Node DAO should be a non-null value.");
                 return PollStatus.unknown();
             }
         }

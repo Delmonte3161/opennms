@@ -58,6 +58,10 @@ import java.util.Map;
  * <p/>
  * This class represents a monitor for Vmware related queries
  *
+ * <p>
+ * This monitor is not distributable because it relies on the {@link NodeDao}.
+ * </p>
+ *
  * @author Christian Pape <Christian.Pape@informatik.hs-fulda.de>
  */
 @Distributable(DistributionContext.DAEMON)

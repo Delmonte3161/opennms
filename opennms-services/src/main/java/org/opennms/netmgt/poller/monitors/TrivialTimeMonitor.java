@@ -63,9 +63,8 @@ import org.slf4j.LoggerFactory;
  * @author <A HREF="mailto:jeffg@opennms.org">Jeff Gehlbach</A>
  * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
  */
-
 @Distributable
-final public class TrivialTimeMonitor extends AbstractServiceMonitor {
+public class TrivialTimeMonitor extends AbstractServiceMonitor {
     private static final Logger LOG = LoggerFactory.getLogger(TrivialTimeMonitor.class);
 
     /**

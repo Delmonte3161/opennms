@@ -30,14 +30,15 @@ package org.opennms.netmgt.poller.monitors;
 
 import org.opennms.netmgt.jmx.connection.JmxConnectors;
 import org.opennms.netmgt.poller.Distributable;
+import org.opennms.netmgt.poller.DistributionContext;
 
-@Distributable
 /**
  * <p>JMXSecureMonitor class.</p>
  *
  * @author ranger
  * @version $Id: $
  */
+@Distributable(DistributionContext.DAEMON)
 public class JMXSecureMonitor extends JMXMonitor {
 
     @Override

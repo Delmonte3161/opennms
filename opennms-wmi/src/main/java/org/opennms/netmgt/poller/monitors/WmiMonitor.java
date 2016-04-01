@@ -38,6 +38,7 @@ import org.opennms.core.utils.TimeoutTracker;
 import org.opennms.netmgt.config.WmiPeerFactory;
 import org.opennms.netmgt.config.wmi.WmiAgentConfig;
 import org.opennms.netmgt.poller.Distributable;
+import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.NetworkInterface;
 import org.opennms.netmgt.poller.NetworkInterfaceNotSupportedException;
@@ -54,16 +55,19 @@ import org.slf4j.LoggerFactory;
  * the availability of WMI services on remote interfaces. The class
  * implements the IPv4Monitor interface that allows it to be used along
  * with other plug-ins by the service poller framework.
+ * 
+ * <p>
+ * This monitor is not distributable because it relies on the {@link WmiPeerFactory}.
+ * </p>
  *
  * @author <A HREF="mailto:matt.raykowski@gmail.com">Matt Raykowski</A>
  * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
  */
 
-@Distributable
+@Distributable(DistributionContext.DAEMON)
 public class WmiMonitor extends AbstractServiceMonitor {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(WmiMonitor.class);
-
 
 	private static final String DEFAULT_WMI_CLASS = "Win32_ComputerSystem";
 	private static final String DEFAULT_WMI_OBJECT = "Status";

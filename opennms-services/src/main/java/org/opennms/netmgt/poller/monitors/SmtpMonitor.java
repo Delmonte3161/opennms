@@ -66,7 +66,7 @@ import org.slf4j.LoggerFactory;
  * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
  */
 @Distributable
-public final class SmtpMonitor extends AbstractServiceMonitor {
+public class SmtpMonitor extends AbstractServiceMonitor {
 
     public static final Logger LOG = LoggerFactory.getLogger(SmtpMonitor.class);
 

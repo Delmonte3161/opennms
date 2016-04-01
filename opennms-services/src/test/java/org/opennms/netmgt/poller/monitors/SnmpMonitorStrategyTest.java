@@ -40,6 +40,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opennms.core.test.MockLogAppender;
 import org.opennms.core.utils.InetAddressUtils;
+import org.opennms.netmgt.poller.Distributable;
+import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.snmp.SnmpObjId;
@@ -53,6 +55,7 @@ import org.opennms.test.ThrowableAnticipator;
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
+@Distributable(DistributionContext.DAEMON)
 public class SnmpMonitorStrategyTest {
 
     private SnmpMonitorStrategy monitor = new SnmpMonitorStrategy() {

@@ -61,7 +61,7 @@ import org.opennms.netmgt.poller.PollStatus;
  * @author <A HREF="weave@oculan.com">Weave </A>
  */
 @Distributable
-final public class DominoIIOPMonitor extends AbstractServiceMonitor {
+public class DominoIIOPMonitor extends AbstractServiceMonitor {
     private static final Logger LOG = LoggerFactory.getLogger(DominoIIOPMonitor.class);
 
     /**

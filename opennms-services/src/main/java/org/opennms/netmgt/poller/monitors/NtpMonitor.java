@@ -59,9 +59,8 @@ import org.opennms.protocols.ntp.NtpMessage;
  * @author <A HREF="mailto:tarus@opennms.org">Tarus Balog </A>
  * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
  */
-
 @Distributable
-final public class NtpMonitor extends AbstractServiceMonitor {
+public class NtpMonitor extends AbstractServiceMonitor {
     private static final Logger LOG = LoggerFactory.getLogger(NtpMonitor.class);
     /**
      * Default NTP port.

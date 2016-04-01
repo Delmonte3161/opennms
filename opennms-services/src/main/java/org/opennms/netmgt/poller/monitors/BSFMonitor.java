@@ -50,11 +50,6 @@ import org.opennms.netmgt.poller.PollStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
-// This might actually be usable in the remote poller with some work
-@Distributable(DistributionContext.DAEMON)
-
 /**
  * <P>
  * This <code>ServiceMonitor</code> is designed to enable the evaluation
@@ -130,7 +125,8 @@ import org.slf4j.LoggerFactory;
  * @author <A HREF="mailto:dschlenk@converge-one.com</A>
  * @author <A HREF="http://www.opennms.org">OpenNMS</A>
  */
-
+//This might actually be usable in the remote poller with some work
+@Distributable(DistributionContext.DAEMON)
 public class BSFMonitor extends AbstractServiceMonitor {
     private static final Logger LOG = LoggerFactory.getLogger(BSFMonitor.class);
 

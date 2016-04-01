@@ -34,6 +34,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.opennms.core.utils.ParameterMap;
+import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.PollStatus;
 
 /**
@@ -51,17 +52,8 @@ import org.opennms.netmgt.poller.PollStatus;
  * @since 0.1
  * @version $Id: $
  */
-final public class JDBCStoredProcedureMonitor extends JDBCMonitor
-{
-   /**
-    * Class constructor.
-    *
-    * @throws java.lang.ClassNotFoundException if any.
-    * @throws java.lang.InstantiationException if any.
-    * @throws java.lang.IllegalAccessException if any.
-    */
-   public JDBCStoredProcedureMonitor() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-   }
+@Distributable
+public class JDBCStoredProcedureMonitor extends JDBCMonitor {
 
    /** {@inheritDoc} */
    @Override
@@ -109,5 +101,3 @@ final public class JDBCStoredProcedureMonitor extends JDBCMonitor
       return status;
    }
 } // End of class
-
-

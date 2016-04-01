@@ -42,8 +42,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-@Distributable(DistributionContext.ALL)
-final public class SystemExecuteMonitor extends AbstractServiceMonitor {
+@Distributable
+public class SystemExecuteMonitor extends AbstractServiceMonitor {
     private static final Logger LOGGER = LoggerFactory.getLogger(SystemExecuteMonitor.class);
 
     private static final int DEFAULT_RETRY = 0;

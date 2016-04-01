@@ -64,8 +64,7 @@ import org.slf4j.LoggerFactory;
  * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
  */
 @Distributable(DistributionContext.DAEMON)
-final public class PercMonitor extends SnmpMonitorStrategy {
-    
+public class PercMonitor extends SnmpMonitorStrategy {
     
     public static final Logger LOG = LoggerFactory.getLogger(PercMonitor.class);
     

@@ -64,7 +64,8 @@ import org.slf4j.LoggerFactory;
  */
 
 @Distributable(DistributionContext.DAEMON)
-final public class LogMatchTableMonitor extends SnmpMonitorStrategy {
+public class LogMatchTableMonitor extends SnmpMonitorStrategy {
+
     public static final Logger LOG = LoggerFactory.getLogger(LogMatchTableMonitor.class);
 
     private static final String m_serviceName = "LogMatch-Table";

@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  * @author <A HREF="mailto:ranger@opennms.org">Benjamin Reed</A>
  */
 @Distributable
-final public class MemcachedMonitor extends AbstractServiceMonitor {
+public class MemcachedMonitor extends AbstractServiceMonitor {
     
     
     public static final Logger LOG = LoggerFactory.getLogger(MemcachedMonitor.class);

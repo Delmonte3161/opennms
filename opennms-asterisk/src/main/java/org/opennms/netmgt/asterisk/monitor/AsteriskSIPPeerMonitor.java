@@ -42,13 +42,14 @@ import org.asteriskjava.manager.response.ManagerResponse;
 import org.opennms.core.utils.ParameterMap;
 import org.opennms.core.utils.TimeoutTracker;
 import org.opennms.netmgt.config.AmiPeerFactory;
-import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.config.ami.AmiAgentConfig;
+import org.opennms.netmgt.poller.Distributable;
+import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.NetworkInterface;
 import org.opennms.netmgt.poller.NetworkInterfaceNotSupportedException;
+import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.monitors.AbstractServiceMonitor;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +64,7 @@ import org.slf4j.LoggerFactory;
  * @author <A HREF="mailto:michael.batz@nethinks.com">Michael Batz</A>
  * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
  */
+@Distributable(DistributionContext.DAEMON)
 public class AsteriskSIPPeerMonitor extends AbstractServiceMonitor {
 	private static final Logger LOG = LoggerFactory.getLogger(AsteriskSIPPeerMonitor.class);
 

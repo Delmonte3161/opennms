@@ -43,6 +43,8 @@ import org.opennms.core.wsman.utils.ResponseHandlingUtils;
 import org.opennms.core.wsman.utils.RetryNTimesLoop;
 import org.opennms.netmgt.config.wsman.WsmanAgentConfig;
 import org.opennms.netmgt.dao.WSManConfigDao;
+import org.opennms.netmgt.poller.Distributable;
+import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.PollStatus;
 import org.slf4j.Logger;
@@ -60,6 +62,7 @@ import com.google.common.collect.Maps;
  *
  * @author jwhite
  */
+@Distributable(DistributionContext.DAEMON)
 public class WsManMonitor extends AbstractServiceMonitor {
     private static final Logger LOG = LoggerFactory.getLogger(WsManMonitor.class);
 

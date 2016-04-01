@@ -64,7 +64,8 @@ import org.slf4j.LoggerFactory;
  */
 
 @Distributable(DistributionContext.DAEMON)
-final public class DskTableMonitor extends SnmpMonitorStrategy {
+public class DskTableMonitor extends SnmpMonitorStrategy {
+
     public static final Logger LOG = LoggerFactory.getLogger(DskTableMonitor.class);
 
     private static final String m_serviceName = "Dsk-Table";

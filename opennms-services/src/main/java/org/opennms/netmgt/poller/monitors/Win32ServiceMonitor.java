@@ -31,6 +31,8 @@ package org.opennms.netmgt.poller.monitors;
 import java.util.Map;
 
 import org.opennms.core.utils.ParameterMap;
+import org.opennms.netmgt.poller.Distributable;
+import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.PollStatus;
 import org.slf4j.Logger;
@@ -42,13 +44,14 @@ import org.slf4j.LoggerFactory;
  * @author <a href="mailto:jeffg@opennms.org">Jeff Gehlbach</a>
  * @version $Id: $
  */
+@Distributable(DistributionContext.DAEMON)
 public class Win32ServiceMonitor extends SnmpMonitor {
     private static final Logger LOG = LoggerFactory.getLogger(Win32ServiceMonitor.class);
 	private static final String SV_SVC_OPERATING_STATE_OID = ".1.3.6.1.4.1.77.1.2.3.1.3";
 	private static final String DEFAULT_SERVICE_NAME = "Server";
 	
 	/** {@inheritDoc} */
-        @Override
+	@Override
 	public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
 		String serviceName = ParameterMap.getKeyedString(parameters, "service-name", DEFAULT_SERVICE_NAME);
 		int snLength = serviceName.length();

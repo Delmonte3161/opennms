@@ -48,7 +48,7 @@ import com.novell.ldap.LDAPConnection;
  * @author <A HREF="mailto:jason@opennms.org">Jason </A>
  */
 @Distributable
-final public class LdapsMonitor extends LdapMonitor {
+public class LdapsMonitor extends LdapMonitor {
 
     @Override
     protected int determinePort(Map<String, Object> parameters) {

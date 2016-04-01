@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
  * @author <A HREF="mailto:jason@opennms.org">Jason </A>
  */
 @Distributable
-final public class CitrixMonitor extends AbstractServiceMonitor {
+public class CitrixMonitor extends AbstractServiceMonitor {
     
     
     public static final Logger LOG = LoggerFactory.getLogger(CitrixMonitor.class);

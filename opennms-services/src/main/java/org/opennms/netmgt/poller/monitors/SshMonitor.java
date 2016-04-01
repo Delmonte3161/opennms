@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="http://www.opennms.org/">OpenNMS</a>
  */
 @Distributable
-public final class SshMonitor extends AbstractServiceMonitor {
+public class SshMonitor extends AbstractServiceMonitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(SshMonitor.class);
 

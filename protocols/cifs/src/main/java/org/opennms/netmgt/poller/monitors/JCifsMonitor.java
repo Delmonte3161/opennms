@@ -32,7 +32,10 @@ import jcifs.smb.NtlmPasswordAuthentication;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFilenameFilter;
+
 import org.opennms.core.utils.TimeoutTracker;
+import org.opennms.netmgt.poller.Distributable;
+import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.PollStatus;
 import org.slf4j.Logger;
@@ -47,9 +50,14 @@ import java.util.Map;
  * the ServiceMonitor interface that allows it to be used along with other plug-ins by the service
  * poller framework.
  *
+ * <p>
+ * NOTE: This monitor requires a jcifs.properties file so we can't distribute it now.
+ * </p>
+ * 
  * @author <a mailto:christian.pape@informatik.hs-fulda.de>Christian Pape</a>
  * @version 1.10.9
  */
+@Distributable(DistributionContext.DAEMON)
 public class JCifsMonitor extends AbstractServiceMonitor {
 
     /*

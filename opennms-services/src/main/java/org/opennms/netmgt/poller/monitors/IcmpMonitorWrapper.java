@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="mailto:agalue@opennms.org">Alejandro Galue</a>
  */
-@Distributable(DistributionContext.DAEMON)
+@Distributable
 public class IcmpMonitorWrapper extends AbstractServiceMonitor {
 
     /** The Constant LOG. */

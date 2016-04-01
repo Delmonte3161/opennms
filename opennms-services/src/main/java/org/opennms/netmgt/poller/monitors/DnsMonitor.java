@@ -68,7 +68,7 @@ import org.xbill.DNS.Type;
  * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
  */
 @Distributable
-final public class DnsMonitor extends AbstractServiceMonitor {
+public class DnsMonitor extends AbstractServiceMonitor {
     private static final Logger LOG = LoggerFactory.getLogger(DnsMonitor.class);
     /**
      * Default DNS port.

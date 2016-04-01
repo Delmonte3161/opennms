@@ -51,22 +51,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class implements a basic JDBC monitoring framework; The idea is than
+ * <p>This class implements a basic JDBC monitoring framework; The idea is than
  * these tests doesn't take too long (or too much resources to run) and provide
- * the basic healt information about the polled server. See
+ * the basic health information about the polled server. See
  * <code>src/services/org/opennms/netmgt/poller</code> OpenNMS plugin
  * information at <a
  * href="http://www.opennms.org/users/docs/docs/html/devref.html">OpenNMS
- * developer site </a>
+ * developer site</a>.</p>
  *
+ * <p>NOTE: This requires that the JDBC Drivers for the databases be included 
+ * with the remote poller.</p>
+ * 
  * @author Jose Vicente Nunez Zuleta (josevnz@users.sourceforge.net) - RHCE,
  *         SJCD, SJCP version 0.1 - 07/23/2002 * version 0.2 - 08/05/2002 --
  *         Added retry logic, input validations to poller.
  * @since 0.1
- * @version $Id: $
  */
-
-// NOTE: This requires that the JDBC Drivers for the dbs be included with the remote poller
 @Distributable
 public class JDBCMonitor extends AbstractServiceMonitor {
     
@@ -83,17 +83,6 @@ public class JDBCMonitor extends AbstractServiceMonitor {
 	 * Default number of times to retry a test
 	 */
 	public static final int DEFAULT_RETRY = 0;
-
-	/**
-	 * Class constructor.
-	 *
-	 * @throws java.lang.ClassNotFoundException if any.
-	 * @throws java.lang.InstantiationException if any.
-	 * @throws java.lang.IllegalAccessException if any.
-	 */
-	public JDBCMonitor() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-		LOG.info("JDBCmonitor class loaded");
-	}
 
 	/**
 	 * {@inheritDoc}

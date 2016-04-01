@@ -35,15 +35,14 @@ import java.util.Map;
 import org.opennms.core.utils.ExecRunner;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.core.utils.ParameterMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.opennms.core.utils.TimeoutTracker;
 import org.opennms.netmgt.poller.Distributable;
-import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.NetworkInterface;
 import org.opennms.netmgt.poller.NetworkInterfaceNotSupportedException;
 import org.opennms.netmgt.poller.PollStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is designed to be used by the service poller framework to test the
@@ -52,20 +51,15 @@ import org.opennms.netmgt.poller.PollStatus;
  * address of the host to be polled, and --timeout, the timeout in seconds.
  * Additional options or arguments can be specified in the poller configuration.
  *
+ * @deprecated Use the SystemExecuteMonitor instead
+ *
  * @author <A HREF="mailto:tarus@opennms.org">Tarus Balog </A>
  * @author <A HREF="mike@opennms.org">Mike </A>
  * @author <A HREF="mailto:ayres@net.orst.edu">Bill Ayres </A>
  */
-
-// this is marked not distributable because it relieds on the dhcpd deamon of opennms
-@Distributable(DistributionContext.DAEMON)
-
-/**
- *
- * @deprecated Use the SystemExecuteMonitor instead
- */
+@Distributable
 @Deprecated
-final public class GpMonitor extends AbstractServiceMonitor {
+public class GpMonitor extends AbstractServiceMonitor {
     private static final Logger LOG = LoggerFactory.getLogger(GpMonitor.class);
     /**
      * Default retries.

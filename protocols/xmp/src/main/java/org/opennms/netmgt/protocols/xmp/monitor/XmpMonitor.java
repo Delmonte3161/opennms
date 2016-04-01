@@ -45,6 +45,8 @@ import org.krupczak.xmp.Xmp;
 import org.krupczak.xmp.XmpSession;
 import org.opennms.core.utils.ParameterMap;
 import org.opennms.netmgt.config.xmpConfig.XmpConfig;
+import org.opennms.netmgt.poller.Distributable;
+import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.NetworkInterface;
 import org.opennms.netmgt.poller.PollStatus;
@@ -55,13 +57,16 @@ import org.opennms.netmgt.protocols.xmp.config.XmpConfigFactory;
 
 /**
  * <p>XmpMonitor class.</p>
+ * 
+ * <p>
+ * This monitor is not distributable because it relies on the
+ * {@link XmpConfigFactory}.
+ * </p>
  *
  * @author jeffg
- * @version $Id: $
  */
+@Distributable(DistributionContext.DAEMON)
 public class XmpMonitor extends AbstractServiceMonitor {
-
-
 
     /**
      * The default port to use for XMP

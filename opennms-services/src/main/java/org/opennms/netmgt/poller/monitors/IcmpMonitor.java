@@ -54,9 +54,8 @@ import org.opennms.netmgt.poller.PollStatus;
  * @author <A HREF="mailto:tarus@opennms.org">Tarus Balog</A>
  * @author <A HREF="http://www.opennms.org/">OpenNMS</A>
  */
-
 @Distributable
-final public class IcmpMonitor extends AbstractServiceMonitor {
+public class IcmpMonitor extends AbstractServiceMonitor {
     private static final Logger LOG = LoggerFactory.getLogger(IcmpMonitor.class);
     /**
      * Constructs a new monitor.

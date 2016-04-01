@@ -28,19 +28,18 @@
 
 package org.opennms.netmgt.poller.monitors;
 
-import java.sql.Statement;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.ResultSet;
-import java.util.Map;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.opennms.core.utils.ParameterMap;
+import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.PollStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
 
 /**
  * <p>JDBCQueryMonitor class.</p>
@@ -48,9 +47,9 @@ import org.slf4j.LoggerFactory;
  * @author ranger
  * @version $Id: $
  */
-public final class JDBCQueryMonitor extends JDBCMonitor {
-    
-    
+@Distributable
+public class JDBCQueryMonitor extends JDBCMonitor {
+
     public static final Logger LOG = LoggerFactory.getLogger(JDBCQueryMonitor.class);
 
     private static final int OPERATOR_MAP_EQUALS = 0;
@@ -65,20 +64,10 @@ public final class JDBCQueryMonitor extends JDBCMonitor {
     private static final int QUERY_ACTION_COMPARE_INT = 2;
     private static final int QUERY_ACTION_COMPARE_BOOLEAN = 3;
     
-    private static  Map <String,Integer>operatorMap = new HashMap<String, Integer>();
-    private static  Map<String, Integer> actionMap = new HashMap<String, Integer>();
-
-    /**
-     * <p>Constructor for JDBCQueryMonitor.</p>
-     *
-     * @throws java.lang.ClassNotFoundException if any.
-     * @throws java.lang.InstantiationException if any.
-     * @throws java.lang.IllegalAccessException if any.
-     */
-    public JDBCQueryMonitor() throws ClassNotFoundException,
-            InstantiationException, IllegalAccessException {
-        
-        super();
+    private static final Map <String,Integer>operatorMap = new HashMap<String, Integer>();
+    private static final Map<String, Integer> actionMap = new HashMap<String, Integer>();
+    
+    static {
         operatorMap.put("=", OPERATOR_MAP_EQUALS);
         operatorMap.put("<", OPERATOR_MAP_LESS_THAN);
         operatorMap.put(">", OPERATOR_MAP_GREATER_THAN);
@@ -90,10 +79,8 @@ public final class JDBCQueryMonitor extends JDBCMonitor {
         actionMap.put( "compare_string", QUERY_ACTION_COMPARE_STRING);
         actionMap.put( "compare_int",    QUERY_ACTION_COMPARE_INT);
         actionMap.put( "compare_bool",   QUERY_ACTION_COMPARE_BOOLEAN);
-           
-               
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public PollStatus checkDatabaseStatus(Connection con, Map<String, Object> parameters) {
