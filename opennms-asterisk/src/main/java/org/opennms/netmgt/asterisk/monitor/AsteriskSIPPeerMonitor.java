@@ -82,20 +82,8 @@ public class AsteriskSIPPeerMonitor extends AbstractServiceMonitor {
 	  */
 	private static final String DEFAULT_SIPPEER = ""; 
 
-	/**
-	  * {@inheritDoc}
-	  *
-	  * <P>
-	  * Initialize the service monitor.
-	  * </P>
-	  * @exception RuntimeException
-	  *		Thrown if an unrecoverable error occurs that prevents the
-	  *		plug-in from functioning.
-	  */
-	public void initialize(Map<String, Object> parameters) 
-	{
-		try
-		{
+	static {
+		try {
 			AmiPeerFactory.init();
 		}
 		catch(Exception e)
@@ -103,7 +91,6 @@ public class AsteriskSIPPeerMonitor extends AbstractServiceMonitor {
 			LOG.error("Initalize: Failed to load AMI configuration", e);
 			throw new UndeclaredThrowableException(e);
 		}
-		return;
 	}
 
 	/**

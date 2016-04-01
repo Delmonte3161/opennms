@@ -59,7 +59,7 @@ import java.util.Map;
  * @author <A HREF="mailto:weave@oculan.com">Brian Weaver </A>
  * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
  */
-public interface ServiceMonitor {
+public interface ServiceMonitor extends AutoCloseable {
 	
     /**
      * <P>
@@ -82,7 +82,7 @@ public interface ServiceMonitor {
      *                Thrown if an unrecoverable error occurs that prevents the
      *                plug-in from functioning.
      */
-    public void initialize(Map<String, Object> parameters);
+    void initialize(Map<String, Object> parameters);
 
     /**
      * <P>
@@ -102,28 +102,8 @@ public interface ServiceMonitor {
      * @exception java.lang.RuntimeException
      *                Thrown if an error occurs during deallocation.
      */
-    public void release();
-
-    /**
-     * <P>
-     * This method is the called whenever an interface is being removed from the
-     * scheduler. For example, if a service is determined as being no longer
-     * supported then this method will be invoked to cleanup any information
-     * associated with this device. This gives the implementor of the interface
-     * the ability to serialize any data prior to the interface being discarded.
-     * </P>
-     *
-     * <P>
-     * If an exception is thrown during the release the exception will be
-     * logged, but the interface will still be discarded for garbage collection.
-     * </P>
-     *
-     * @param svc TODO
-     * @exception java.lang.RuntimeException
-     *                Thrown if an unrecoverable error occurs that prevents the
-     *                interface from being monitored.
-     */
-    public void release(MonitoredService svc);
+    @Override
+    void close();
 
     /**
      * <P>
@@ -154,5 +134,5 @@ public interface ServiceMonitor {
      * @see PollStatus#SERVICE_AVAILABLE
      * @see PollStatus#SERVICE_UNAVAILABLE
      */
-    public PollStatus poll(MonitoredService svc, Map<String, Object> parameters);
+    PollStatus poll(MonitoredService svc, Map<String, Object> parameters);
 }

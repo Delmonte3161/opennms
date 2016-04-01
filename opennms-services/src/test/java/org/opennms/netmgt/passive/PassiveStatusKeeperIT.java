@@ -252,8 +252,7 @@ public class PassiveStatusKeeperIT {
         ServiceMonitor m = new PassiveServiceMonitor();
         m.initialize((Map<String,Object>)null);
         PollStatus ps2 = m.poll(svc, null);
-        m.release(svc);
-        m.release();
+        m.close();
         
         assertEquals(ps, ps2);
     }

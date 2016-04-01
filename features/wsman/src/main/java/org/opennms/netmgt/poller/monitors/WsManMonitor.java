@@ -71,14 +71,10 @@ public class WsManMonitor extends AbstractServiceMonitor {
 
     private WSManClientFactory m_factory = new CXFWSManClientFactory();
 
-    private WSManConfigDao m_wsManConfigDao;
-
-    @Override
-    public void initialize(Map<String, Object> parameters) {
-        LOG.debug("initialize({})", parameters);
-        // Retrieve the configuration DAO
-        m_wsManConfigDao = BeanUtils.getBean("daoContext", "wsManConfigDao", WSManConfigDao.class);
-    }
+    /**
+     * TODO: Inject this field
+     */
+    private WSManConfigDao m_wsManConfigDao = BeanUtils.getBean("daoContext", "wsManConfigDao", WSManConfigDao.class);
 
     @Override
     public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {

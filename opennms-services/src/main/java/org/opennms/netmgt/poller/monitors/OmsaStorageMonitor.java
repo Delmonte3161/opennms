@@ -88,17 +88,13 @@ final public class OmsaStorageMonitor extends SnmpMonitorStrategy {
         return m_serviceName;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void initialize(Map<String, Object> parameters) {
+    static {
         try {
             SnmpPeerFactory.init();
         } catch (IOException ex) {
-        	LOG.error("initialize: Failed to load SNMP configuration", ex);
+            LOG.error("initialize: Failed to load SNMP configuration", ex);
             throw new UndeclaredThrowableException(ex);
         }
-
-        return;
     }
 
     /** {@inheritDoc} */

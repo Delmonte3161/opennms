@@ -1078,7 +1078,7 @@ abstract public class PollerConfigManager implements PollerConfig {
     		Iterator<ServiceMonitor> iter = getServiceMonitors().values().iterator();
     	    while (iter.hasNext()) {
     	        ServiceMonitor sm = iter.next();
-    	        sm.release();
+    	        sm.close();
     	    }
 	    } finally {
 	        getWriteLock().unlock();

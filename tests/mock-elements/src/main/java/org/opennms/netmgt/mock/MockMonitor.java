@@ -90,11 +90,7 @@ public class MockMonitor implements ServiceMonitor {
     }
 
     @Override
-    public void release() {
-    }
-
-    @Override
-    public void release(MonitoredService svc) {
+    public void close() {
     }
 
 }

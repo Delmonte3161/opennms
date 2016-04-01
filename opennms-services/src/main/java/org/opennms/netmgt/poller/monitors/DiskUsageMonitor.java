@@ -97,18 +97,7 @@ final public class DiskUsageMonitor extends SnmpMonitorStrategy {
         return m_serviceName;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * Initialize the service monitor.
-     * <p>
-     * @param parameters
-     * @exception RuntimeException
-     *                             Thrown if an unrecoverable error occurs that prevents the
-     *                             plug-in from functioning.
-     */
-    @Override
-    public void initialize(final Map<String, Object> parameters) {
+    static {
         // Initialize the SnmpPeerFactory
         //
         try {

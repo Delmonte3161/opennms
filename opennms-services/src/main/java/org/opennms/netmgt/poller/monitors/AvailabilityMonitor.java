@@ -56,11 +56,6 @@ public class AvailabilityMonitor extends AbstractServiceMonitor {
 
     /** {@inheritDoc} */
     @Override
-    public void initialize(Map<String, Object> parameters) {
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
         
         TimeoutTracker timeoutTracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
@@ -80,17 +75,4 @@ public class AvailabilityMonitor extends AbstractServiceMonitor {
         LOG.debug(reason);
         return PollStatus.unavailable(reason);
     }
-
-    /**
-     * <p>release</p>
-     */
-    @Override
-    public void release() {
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void release(MonitoredService svc) {
-    }
-
 }

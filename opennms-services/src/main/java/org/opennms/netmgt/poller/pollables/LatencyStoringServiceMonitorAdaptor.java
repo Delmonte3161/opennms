@@ -212,14 +212,8 @@ public class LatencyStoringServiceMonitorAdaptor implements ServiceMonitor {
      * <p>release</p>
      */
     @Override
-    public void release() {
-        m_serviceMonitor.release();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void release(MonitoredService svc) {
-        m_serviceMonitor.release(svc);
+    public void close() {
+        m_serviceMonitor.close();
     }
 
     /**

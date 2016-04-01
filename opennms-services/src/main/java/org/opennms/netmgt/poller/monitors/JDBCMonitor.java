@@ -98,41 +98,6 @@ public class JDBCMonitor extends AbstractServiceMonitor {
 	/**
 	 * {@inheritDoc}
 	 *
-	 * This method is called after the framework loads the plugin.
-	 */
-        @Override
-	public void initialize(Map<String, Object> parameters) {
-		super.initialize(parameters);
-		LOG.debug("Calling init");
-	}
-
-	/**
-	 * Release any used services by the plugin,normally during framework exit
-	 * For now this method is just an 'adaptor', does nothing
-	 *
-	 * @throws java.lang.RuntimeException
-	 *             Thrown if an error occurs during deallocation.
-	 */
-        @Override
-	public void release() {
-		LOG.debug("Shutting down plugin");
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <P>
-	 * This method is the called whenever an interface is being removed from the
-	 * scheduler. For now this method is just an 'adaptor', does nothing
-	 */
-        @Override
-	public void release(MonitoredService svc) {
-		LOG.debug("Shutting down plugin");
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
 	 * Network interface to poll for a given service. Make sure you're using the
 	 * latest (at least 5.5) <a
 	 * href="http://www.sybase.com/detail_list/1,6902,2912,00.html">JConnect

@@ -94,30 +94,7 @@ public abstract class AbstractServiceMonitor implements ServiceMonitor {
      *                Thrown if an error occurs during deallocation.
      */
     @Override
-    public void release() {
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * <P>
-     * This method is the called whenever an interface is being removed from the
-     * scheduler. For example, if a service is determined as being no longer
-     * supported then this method will be invoked to cleanup any information
-     * associated with this device. This gives the implementor of the interface
-     * the ability to serialize any data prior to the interface being discarded.
-     * </P>
-     *
-     * <P>
-     * If an exception is thrown during the release the exception will be
-     * logged, but the interface will still be discarded for garbage collection.
-     * </P>
-     * @exception java.lang.RuntimeException
-     *                Thrown if an unrecoverable error occurs that prevents the
-     *                interface from being monitored.
-     */
-    @Override
-    public void release(MonitoredService svc) {
+    public void close() {
     }
 
     /** {@inheritDoc} */

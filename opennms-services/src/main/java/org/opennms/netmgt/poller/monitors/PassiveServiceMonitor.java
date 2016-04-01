@@ -63,17 +63,7 @@ public class PassiveServiceMonitor implements ServiceMonitor {
      * <p>release</p>
      */
     @Override
-    public void release() {
-        return;
-    }
-
-    /* (non-Javadoc)
-     * @see org.opennms.netmgt.poller.ServiceMonitor#release(org.opennms.netmgt.poller.MonitoredService)
-     */
-    /** {@inheritDoc} */
-    @Override
-    public void release(MonitoredService svc) {
-        return;
+    public void close() {
     }
 
     /* (non-Javadoc)

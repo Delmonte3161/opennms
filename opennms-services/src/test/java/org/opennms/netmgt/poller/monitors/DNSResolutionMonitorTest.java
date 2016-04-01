@@ -97,12 +97,7 @@ public class DNSResolutionMonitorTest {
         assertEquals(PollStatus.unavailable(), monitor.poll(neither, bothParms));
         assertEquals(PollStatus.unavailable(), monitor.poll(neither, eitherParms));
         
-        monitor.release(dual);
-        monitor.release(v4only);
-        monitor.release(v6only);
-        monitor.release(neither);
-        
-        monitor.release();
+        monitor.close();
 
     }
 

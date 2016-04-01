@@ -162,10 +162,7 @@ public class LatencyStoringServiceMonitorAdaptorPersistenceTest {
         public void initialize(Map<String, Object> parameters) {}
 
         @Override
-        public void release() {}
-
-        @Override
-        public void release(MonitoredService svc) {}
+        public void close() {}
 
         @Override
         public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {

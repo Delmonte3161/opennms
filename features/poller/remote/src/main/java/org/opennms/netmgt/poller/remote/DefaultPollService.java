@@ -93,6 +93,6 @@ public class DefaultPollService implements PollService {
     @Override
     public void release(PolledService polledService) {
         ServiceMonitor monitor = getServiceMonitor(polledService);
-        monitor.release(polledService);
+        monitor.close();
     }
 }

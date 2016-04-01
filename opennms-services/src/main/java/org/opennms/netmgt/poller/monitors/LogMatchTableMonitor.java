@@ -85,17 +85,7 @@ final public class LogMatchTableMonitor extends SnmpMonitorStrategy {
         return m_serviceName;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <P>
-     * Initialize the service monitor.
-     * </P>
-     * @exception RuntimeException
-     *                Thrown if an unrecoverable error occurs that prevents the
-     *                plug-in from functioning.
-     */
-    public void initialize(Map<String, Object> parameters) {
+    static {
         // Initialize the SnmpPeerFactory
         //
         try {
@@ -104,8 +94,6 @@ final public class LogMatchTableMonitor extends SnmpMonitorStrategy {
             LOG.error("initialize: Failed to load SNMP configuration", ex);
             throw new UndeclaredThrowableException(ex);
         }
-
-        return;
     }
 
     /**
