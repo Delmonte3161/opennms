@@ -28,6 +28,7 @@
 
 package org.opennms.netmgt.model.discovery;
 
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Iterator;
@@ -71,6 +72,11 @@ public class IPAddrRangeTest extends TestCase {
         assertTrue(it.hasNext());
         assertEquals(addr2.toInetAddress(), it.next());
         assertFalse(it.hasNext());
+    }
+    
+    public void testGetSizeOfIpAddrRange(){
+    	assertEquals(small.getSizeOfIpAddrRange(),new BigInteger("2"));
+    	assertEquals(singleton.getSizeOfIpAddrRange(),new BigInteger("0"));
     }
 
 }

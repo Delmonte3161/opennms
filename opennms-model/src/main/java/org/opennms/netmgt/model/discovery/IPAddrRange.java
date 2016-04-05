@@ -343,4 +343,14 @@ public final class IPAddrRange implements Iterable<InetAddress>, Serializable {
             .append("end", InetAddressUtils.getInetAddress(m_end))
             .toString();
     }
+    
+    /**
+     * <P>
+     * Returns the difference of ip address range.
+     * </P>
+     */
+    public BigInteger getSizeOfIpAddrRange(){
+    	return InetAddressUtils.difference(InetAddressUtils.getInetAddress(m_end) , InetAddressUtils.getInetAddress(m_begin));
+    }
+    
 }
