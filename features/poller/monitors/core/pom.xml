@@ -21,7 +21,9 @@
             <Bundle-RequiredExecutionEnvironment>JavaSE-1.8</Bundle-RequiredExecutionEnvironment>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Version>${project.version}</Bundle-Version>
-            <Export-Package>org.opennms.netmgt.poller.monitors.*;version="${project.version}"</Export-Package>
+            <Import-Package>com.novell.ldap.*;resolution:=optional,*</Import-Package>
+            <Private-Package>org.opennms.netmgt.poller.monitors.*;version="${project.version}";org.opennms.netmgt.poller.*;version="${project.version}"</Private-Package>
+            <Export-Package>org.opennms.netmgt.poller.monitors.*;version="${project.version}";org.opennms.netmgt.poller.*;version="${project.version}"</Export-Package>
           </instructions>
         </configuration>
       </plugin>
