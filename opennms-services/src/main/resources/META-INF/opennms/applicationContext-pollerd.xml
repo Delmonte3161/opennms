@@ -40,4 +40,13 @@
       <property name="eventIpcManager" ref="eventIpcManager"/>
     </bean>
     
+    <bean id="defaultServiceMonitor" class="org.opennms.netmgt.config.DefaultServiceMonitorLocator" factory-method=getServiceMonitor/>
+
+	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitorLocator" ref="defaultServiceMonitor"/>
+	
+	<!-- For  ContextServiceMonitorLocator-->
+	<bean id="contextServiceMonitor" class="org.opennms.netmgt.config.ContextServiceMonitorLocator" factory-method=getServiceMonitor/>
+
+	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitorLocator" ref="contextServiceMonitor"/>
+    
 </beans>
