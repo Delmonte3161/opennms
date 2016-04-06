@@ -83,10 +83,8 @@ public class TrapdListenerBlueprintIT extends CamelBlueprintTestSupport {
 	@Override
 	protected String useOverridePropertiesWithConfigAdmin(Dictionary props)
 			throws Exception {
-		
 		props.put(PORT_NAME, 10514);
 		return PERSISTANCE_ID;
-		
 	}
 
 	@SuppressWarnings("rawtypes")
