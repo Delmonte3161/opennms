@@ -59,6 +59,8 @@ public final class IPAddrRange implements Iterable<InetAddress>, Serializable {
     private static final long serialVersionUID = -106414771861377679L;
 
     private static final Logger LOG = LoggerFactory.getLogger(IPAddrRange.class);
+    
+    public static final String FUDGE_FACTOR = "2";
 
     /**
      * The starting address for the object.

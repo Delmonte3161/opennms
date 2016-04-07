@@ -46,6 +46,13 @@
     <property name="ipAddressFilter" ref="unmanagedInterfaceFilter"/>
   </bean>
 
+  <bean id="discoveryJobs" class="org.opennms.netmgt.discovery.messages.DiscoveryJob"/>
+  
+  <!-- This processor generates a list of DiscoveryJobs from a DiscoveryConfiguration -->
+  <bean id="calculateJmsTimeout" class="org.apache.camel.Processor">
+    <property name="exchange" ref="discoveryJobs"/>
+  </bean>
+
   <!-- This processor performs ICMP pings and reports the results -->
   <bean id="discoverer" class="org.opennms.netmgt.discovery.actors.Discoverer">
     <constructor-arg ref="pinger" />
@@ -92,15 +99,23 @@
 
     <route id="submitDiscoveryTask">
       <from uri="direct:submitDiscoveryTask" />
+
       <!-- 
         Make sure that this exchange is using an InOut exchange so that the output
         of each to: endpoint is passed to the next to: endpoint
       -->
       <setExchangePattern pattern="InOut"/>
       <bean ref="rangeChunker" />
+
       <split>
+
         <!-- Split the DiscoveryJobs -->
         <simple>${body}</simple>
+        <setHeader headerName="CamelJmsRequestTimeout">
+  			<simple>${body.calculateTaskTimeout}</simple>
+		</setHeader>
+        <bean ref="calculateJmsTimeout"/>
+
         <!-- Use recipientList so that we can have a dynamic to: URI -->
         <recipientList>
           <simple>activemq:Location-${body.location}</simple>

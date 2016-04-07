@@ -29,11 +29,13 @@
 package org.opennms.netmgt.discovery.messages;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.opennms.core.utils.IteratorIterator;
+import org.opennms.netmgt.model.discovery.IPAddrRange;
 import org.opennms.netmgt.model.discovery.IPPollAddress;
 import org.opennms.netmgt.model.discovery.IPPollRange;
 
@@ -98,4 +100,22 @@ public class DiscoveryJob implements Serializable {
                  .add("ranges", m_ranges)
                  .toString();
     }
+    
+    /**
+     * <P>
+     * Returns int : the total task timeout for all ip ranges
+     * </P>
+     */
+    public int calculateTaskTimeout(){
+    	BigInteger taskTimeOut = new BigInteger("0");
+        for(final IPPollRange range : m_ranges) {
+        	BigInteger retries = new BigInteger(Integer.toString(range.getRetries()));
+        	BigInteger sizeOfIpAddrRange = range.getAddressRange().getSizeOfIpAddrRange(); 
+        	BigInteger timeOut = new BigInteger(Long.toString(range.getTimeout()));
+        	BigInteger fudgeFactor = new BigInteger(IPAddrRange.FUDGE_FACTOR);
+        	taskTimeOut = taskTimeOut.add((retries.add(new BigInteger("1"))).multiply(sizeOfIpAddrRange.multiply(timeOut)).multiply(fudgeFactor));
+        }
+        return taskTimeOut.intValue();
+    }
+
 }
