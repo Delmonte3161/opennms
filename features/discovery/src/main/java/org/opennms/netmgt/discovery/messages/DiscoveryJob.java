@@ -29,6 +29,7 @@
 package org.opennms.netmgt.discovery.messages;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -111,9 +112,12 @@ public class DiscoveryJob implements Serializable {
         for(final IPPollRange range : m_ranges) {
         	BigInteger retries = new BigInteger(Integer.toString(range.getRetries()));
         	BigInteger sizeOfIpAddrRange = range.getAddressRange().getSizeOfIpAddrRange(); 
-        	BigInteger timeOut = new BigInteger(Long.toString(range.getTimeout()));
-        	BigInteger fudgeFactor = new BigInteger(IPAddrRange.FUDGE_FACTOR);
-        	taskTimeOut = taskTimeOut.add((retries.add(new BigInteger("1"))).multiply(sizeOfIpAddrRange.multiply(timeOut)).multiply(fudgeFactor));
+        	BigInteger timeOut = new BigInteger(Long.toString(range.getTimeout()));    
+        	
+        	BigInteger temp = ((retries.add(new BigInteger("1"))).multiply(sizeOfIpAddrRange.multiply(timeOut)));
+        	BigDecimal bd = new BigDecimal(temp);
+        	
+        	taskTimeOut = taskTimeOut.add(bd.multiply(BigDecimal.valueOf(IPAddrRange.FUDGE_FACTOR)).toBigInteger());
         }
         return taskTimeOut.intValue();
     }

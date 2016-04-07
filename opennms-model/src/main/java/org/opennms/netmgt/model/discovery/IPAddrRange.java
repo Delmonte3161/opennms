@@ -60,7 +60,7 @@ public final class IPAddrRange implements Iterable<InetAddress>, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(IPAddrRange.class);
     
-    public static final String FUDGE_FACTOR = "2";
+    public static final double FUDGE_FACTOR = 1.5;
 
     /**
      * The starting address for the object.
