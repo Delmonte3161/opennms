@@ -46,15 +46,6 @@
     <property name="ipAddressFilter" ref="unmanagedInterfaceFilter"/>
   </bean>
 
-  <bean id="discoveryJobs" class="org.opennms.netmgt.discovery.messages.DiscoveryJob">
-	<!-- DiscoveryJob constructor is expecting List<IPPollRange> ranges, String foreignSource, String location, need to confirm from where I can get these values -->
-  </bean>
-  
-  <!-- This processor generates a list of DiscoveryJobs from a DiscoveryConfiguration -->
-  <bean id="calculateJmsTimeout" class="org.apache.camel.Processor">
-    <property name="exchange" ref="discoveryJobs"/>
-  </bean>
-
   <!-- This processor performs ICMP pings and reports the results -->
   <bean id="discoverer" class="org.opennms.netmgt.discovery.actors.Discoverer">
     <constructor-arg ref="pinger" />
@@ -116,7 +107,6 @@
         <setHeader headerName="CamelJmsRequestTimeout">
   			<simple>${body.calculateTaskTimeout}</simple>
 		</setHeader>
-        <bean ref="calculateJmsTimeout"/>
 
         <!-- Use recipientList so that we can have a dynamic to: URI -->
         <recipientList>
