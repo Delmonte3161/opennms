@@ -51,7 +51,7 @@
   </bean>
   
   <!-- This processor generates a list of DiscoveryJobs from a DiscoveryConfiguration -->
-  <bean id="calculateJmsTimeout" class="org.opennms.netmgt.discovery.DiscoveryJobCamelProcessor">
+  <bean id="calculateJmsTimeout" class="org.apache.camel.Processor">
     <property name="exchange" ref="discoveryJobs"/>
   </bean>
 

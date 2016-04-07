@@ -75,9 +75,9 @@ public class IPAddrRangeTest extends TestCase {
     }
     
     public void testGetSizeOfIpAddrRange(){
-    	assertEquals(small.getSizeOfIpAddrRange(),new BigInteger("2"));
-    	assertEquals(singleton.getSizeOfIpAddrRange(),new BigInteger("0"));
-    	assertFalse(small.getSizeOfIpAddrRange().intValue() < 1);
+    	assertEquals(small.getSizeOfIpAddrRange(),BigInteger.valueOf(3)); 
+    	assertEquals(singleton.getSizeOfIpAddrRange(), BigInteger.ONE);
+    	assertFalse(small.getSizeOfIpAddrRange().intValue() < 0);
     	assertFalse(small.getSizeOfIpAddrRange().intValue() > Integer.MAX_VALUE);
     }
 
