@@ -19,7 +19,6 @@ public class ServiceMonitorCamelImpl extends DefaultDispatcher implements Servic
 	
 	public ServiceMonitorCamelImpl(String endpointUri) {
 		super(endpointUri);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -29,8 +28,7 @@ public class ServiceMonitorCamelImpl extends DefaultDispatcher implements Servic
 
 	@Override
 	public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
-		PollStatus status = PassiveStatusKeeper.getInstance().getStatus(svc.getNodeLabel(), svc.getIpAddr(), svc.getSvcName());
-        return status;
+		return serviceMonitor.poll(svc, parameters);
 	}
 
 }
