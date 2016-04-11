@@ -307,6 +307,9 @@
                 <feature>opennms-discoverer</feature>
                 <feature>opennms-discovery-distPollerDaoMinion</feature>
                 <feature>opennms-events-traps</feature>
+                <feature>opennms-trapd-handler-default</feature>
+                <feature>opennms-trapd-handler-minion</feature>
+                <feature>opennms-trapd-listener"</feature>
 
               </features>
               <repository>target/features-repo</repository>
