@@ -75,4 +75,10 @@ public class MinionFeatureKarafIT extends KarafTestCase {
 		installFeature("opennms-discovery-distPollerDaoMinion");
 		System.out.println(executeCommand("features:list -i"));
 	}
+	
+	@Test
+	public void testInstallFeatureOpennmsTrapsDaemon() {
+		installFeature("opennms-events-traps");
+		System.out.println(executeCommand("features:list -i"));
+	}
 }
