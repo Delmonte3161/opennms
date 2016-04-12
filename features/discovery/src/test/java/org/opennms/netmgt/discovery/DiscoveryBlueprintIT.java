@@ -275,8 +275,8 @@ public class DiscoveryBlueprintIT extends CamelBlueprintTestSupport {
                         String foreignSource = job.getForeignSource();
                         String location = job.getLocation();
 
-                        // Sleep to trigger a timeout
-                        Thread.sleep(21000);
+                        // Sleep to trigger a timeout, make this greater than the timeout calculated below
+                        Thread.sleep(15000);
 
                         Message out = exchange.getOut();
                         DiscoveryResults results = new DiscoveryResults(
@@ -306,6 +306,8 @@ public class DiscoveryBlueprintIT extends CamelBlueprintTestSupport {
         config.setTimeout( 3000 );
         config.setRetries( 2 );
         config.setLocation( location );
+
+        // Timeout should be 1 * 3000 * (2 + 1) * 1.5 = 13500ms
 
         // Execute the job
         try {
