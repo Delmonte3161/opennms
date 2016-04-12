@@ -287,8 +287,8 @@ public class DiscoveryBlueprintIT extends CamelBlueprintTestSupport {
                         DiscoveryJob job = exchange.getIn().getBody(DiscoveryJob.class);
                         String foreignSource = job.getForeignSource();
                         String location = job.getLocation();
-
                         Message out = exchange.getOut();
+                        //Thread.sleep( 21000 );
                         DiscoveryResults results = new DiscoveryResults(
                             Collections.singletonMap(InetAddressUtils.addr("4.2.2.2"), 1000L),
                             foreignSource,
@@ -329,9 +329,12 @@ public class DiscoveryBlueprintIT extends CamelBlueprintTestSupport {
         config.setLocation( location );
 
         // Execute the job
-        template.requestBody( "direct:submitDiscoveryTask", config );
-
-        Thread.sleep( 1000 );
+        try{
+        	template.requestBody( "direct:submitDiscoveryTask", config );
+        }catch(Exception e){
+        	e.printStackTrace();
+        }
+        Thread.sleep( 9000 );
         anticipator.verifyAnticipated();
 
         mockDiscoverer.stop();
@@ -340,6 +343,6 @@ public class DiscoveryBlueprintIT extends CamelBlueprintTestSupport {
     @Test
     public void testCalculateTaskTimeout() {
     	DiscoveryJob discoveryJob = new DiscoveryJob(m_ranges, "Bogus FS", LOCATION);
-    	assertTrue(discoveryJob.calculateTaskTimeout() == 2250);
+    	assertTrue(discoveryJob.calculateTaskTimeout() == 2250); // Each task is taking 750 ms so totalTaskTimeout = 750 ms * 3 (no of tasks) = 2250 ms
     }
 }
