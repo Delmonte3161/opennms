@@ -45,7 +45,7 @@
 		ref="availabilityMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.AvailabilityMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -54,7 +54,7 @@
 		ref="citrixMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.CitrixMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -63,7 +63,7 @@
 		ref="dnsMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.DnsMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -72,7 +72,7 @@
 		ref="dnsResolutionMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.DNSResolutionMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -81,7 +81,7 @@
 		ref="dominoIIOPMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.DominoIIOPMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -90,7 +90,7 @@
 		ref="ftpMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.FtpMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -99,7 +99,7 @@
 		ref="gpMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.GpMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -108,7 +108,7 @@
 		ref="httpMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.HttpMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -117,7 +117,7 @@
 		ref="httpPostMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.HttpPostMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -126,7 +126,7 @@
 		ref="httpsMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.HttpsMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -135,7 +135,7 @@
 		ref="icmpMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.IcmpMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -144,7 +144,7 @@
 		ref="imapMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.ImapMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -153,7 +153,7 @@
 		ref="jdbcMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.JDBCMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -162,7 +162,7 @@
 		ref="jdbcQueryMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.JDBCQueryMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -171,7 +171,7 @@
 		ref="jdbcStoredProcedureMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.JDBCStoredProcedureMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -180,7 +180,7 @@
 		ref="jolokiaBeanMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.JolokiaBeanMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -189,7 +189,7 @@
 		ref="jschSshMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.JschSshMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -198,7 +198,7 @@
 		ref="ldapMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.LdapMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -207,7 +207,7 @@
 		ref="ldapsMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.LdapsMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -216,7 +216,7 @@
 		ref="loopMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.LoopMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -225,7 +225,7 @@
 		ref="memcachedMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.MemcachedMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -234,7 +234,7 @@
 		ref="nrpeMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.NrpeMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -243,7 +243,7 @@
 		ref="ntpMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.NtpMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -252,7 +252,7 @@
 		ref="pop3Monitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.Pop3Monitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -261,7 +261,7 @@
 		ref="smtpMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.SmtpMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -270,7 +270,7 @@
 		ref="sshMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.SshMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -279,7 +279,7 @@
 		ref="sslCertMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.SSLCertMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -288,7 +288,7 @@
 		ref="strafePingMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.StrafePingMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -297,7 +297,7 @@
 		ref="systemExecuteMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.SystemExecuteMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -306,7 +306,7 @@
 		ref="tcpMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.TcpMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -315,7 +315,7 @@
 		ref="trivialTimeMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.TrivialTimeMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
 	
@@ -324,7 +324,7 @@
 		ref="webMonitor">
 		<onmsgi:service-properties>
 			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.WebMonitor" />
+				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
     
