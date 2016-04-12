@@ -392,6 +392,7 @@
       <feature>jolokia-client-java</feature>
       <feature>json-simple</feature>
       <feature>hibernate36</feature>
+      <feature>opennms-poller-api</feature>
       <bundle>mvn:org.opennms.features.poller.monitors/org.opennms.features.poller.monitors.core/${project.version}</bundle>
     </feature>
 
