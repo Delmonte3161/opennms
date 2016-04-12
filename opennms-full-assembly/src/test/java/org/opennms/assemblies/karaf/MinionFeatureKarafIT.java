@@ -78,7 +78,7 @@ public class MinionFeatureKarafIT extends KarafTestCase {
 	
 	@Test
 	public void testInstallFeatureOpennmsTrapsDaemon() {
-		installFeature("opennms-events-traps");
+		installFeature("opennms-trapd-handler-minion");
 		System.out.println(executeCommand("features:list -i"));
 	}
 }
