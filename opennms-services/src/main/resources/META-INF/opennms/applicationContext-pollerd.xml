@@ -14,10 +14,23 @@
   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
   http://xmlns.opennms.org/xsd/spring/onms-osgi http://xmlns.opennms.org/xsd/spring/onms-osgi.xsd
+  http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
 ">
 
     <aop:aspectj-autoproxy proxy-target-class="true"/>
     <context:annotation-config />
+    
+    <context:property-placeholder properties-ref="pollerProperties"/>
+
+	<bean id="pollerProperties"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+	<property name="properties">
+		<props>
+			<prop key="restartSleepTime">100000</prop>
+			<prop key="initialSleepTime">100000</prop>
+		</props>
+	</property>
+	</bean>
 
     <bean name="pollerQueryManager" class="org.opennms.netmgt.poller.QueryManagerDaoImpl"/>
 
@@ -327,5 +340,36 @@
 				value="org.opennms.netmgt.poller.ServiceMonitorCamelImpl" />
 		</onmsgi:service-properties>
 	</onmsgi:service>
+	
+	<!-- Active MQ -->
+    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+    <property name="brokerURL" value="tcp://localhost:61616" />
+    </bean>
+    
+    <bean id="poller" class="org.opennms.netmgt.poller.remote.Poller"/>
+    
+    <camelContext id="pollerCamelContext" xmlns="http://camel.apache.org/schema/spring">
+    
+        <!-- Bootstrap timer -->
+    <route id="startAvailabilityMonitorPollerTimer">
+      <from uri="timer:availabilityMonitorPollerTimer?period=${restartSleepTime}&amp;delay=${initialSleepTime}&amp;fixedRate=true&amp;daemon=true" />
+      <to uri="bean:availabilityMonitor?method=poll" />
+      <split>
+        <simple>${body}</simple>
+        <recipientList>
+          <simple>activemq:Location-availabilityMonitor</simple>
+        </recipientList>
+      </split>
+    </route>
+     
+    <!-- Default localhost location queue -->
+    <route id="localhostLocationPollerRoute">
+      <from uri="activemq:Location-localhost" />
+      <log loggingLevel="INFO" message="applicationContext-pollerd.xml: Executing Poller Job" />
+      <log loggingLevel="INFO" message="applicationContext-pollerd.xml: ${body}" />
+      <bean ref="poller" />
+    </route>
+    
+    </camelContext>
     
 </beans>
