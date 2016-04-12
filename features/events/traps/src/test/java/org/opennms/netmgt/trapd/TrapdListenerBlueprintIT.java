@@ -80,6 +80,10 @@ public class TrapdListenerBlueprintIT extends CamelBlueprintTestSupport {
 		return "*";
 	}
 	
+	
+	/* (non-Javadoc)
+	 * This method overrides the blueprint property and sets port to 10154 instead of 162
+	 */
 	@Override
 	protected String useOverridePropertiesWithConfigAdmin(Dictionary props)
 			throws Exception {
