@@ -92,22 +92,19 @@
 
     <route id="submitDiscoveryTask">
       <from uri="direct:submitDiscoveryTask" />
-
       <!-- 
         Make sure that this exchange is using an InOut exchange so that the output
         of each to: endpoint is passed to the next to: endpoint
       -->
       <setExchangePattern pattern="InOut"/>
       <bean ref="rangeChunker" />
-
       <split>
-
         <!-- Split the DiscoveryJobs -->
         <simple>${body}</simple>
+        <!-- Calculate an appropriate JMS timeout based on the task -->
         <setHeader headerName="CamelJmsRequestTimeout">
-  			<simple>${body.calculateTaskTimeout}</simple>
-		</setHeader>
-
+          <simple>${body.calculateTaskTimeout}</simple>
+        </setHeader>
         <!-- Use recipientList so that we can have a dynamic to: URI -->
         <recipientList>
           <simple>activemq:Location-${body.location}</simple>

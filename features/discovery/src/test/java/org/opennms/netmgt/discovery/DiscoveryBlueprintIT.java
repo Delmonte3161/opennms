@@ -29,7 +29,6 @@
 package org.opennms.netmgt.discovery;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -37,12 +36,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import junit.framework.TestCase;
-
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
+import org.apache.camel.CamelExecutionException;
 import org.apache.camel.Exchange;
+import org.apache.camel.ExchangeTimedOutException;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
@@ -54,7 +53,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.opennms.core.network.IPAddress;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.config.DiscoveryConfigFactory;
@@ -72,35 +70,24 @@ import org.opennms.netmgt.events.api.EventForwarder;
 import org.opennms.netmgt.events.api.EventIpcManager;
 import org.opennms.netmgt.icmp.Pinger;
 import org.opennms.netmgt.model.OnmsDistPoller;
-import org.opennms.netmgt.model.discovery.IPAddrRange;
 import org.opennms.netmgt.model.discovery.IPPollRange;
 import org.opennms.netmgt.model.events.EventBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 
-@RunWith( OpenNMSJUnit4ClassRunner.class )
+@RunWith(OpenNMSJUnit4ClassRunner.class)
 @ContextConfiguration( locations = { "classpath:/META-INF/opennms/emptyContext.xml" } )
 public class DiscoveryBlueprintIT extends CamelBlueprintTestSupport {
 
     private static final Logger LOG = LoggerFactory.getLogger(DiscoveryBlueprintIT.class );
+
     private static final MockEventIpcManager IPC_MANAGER_INSTANCE = new MockEventIpcManager();
 
     private static final String LOCATION = "RDU";
 
     private static BrokerService m_broker = null;
 
-    private static final List<IPPollRange> m_ranges = new ArrayList<IPPollRange>();
-    private static IPPollRange ipPollRange;
-    
-    @BeforeClass
-    public static void setup() throws UnknownHostException{
-    	for(int i=1 ; i<12; i+=5){
-    		ipPollRange = new IPPollRange("127.0.1."+i, "127.0.1."+(i+4), 50, 2);
-    		m_ranges.add(ipPollRange);
-    	}
-    }
-    
     /**
      * Use Aries Blueprint synchronous mode to avoid a blueprint deadlock bug.
      * 
@@ -287,8 +274,11 @@ public class DiscoveryBlueprintIT extends CamelBlueprintTestSupport {
                         DiscoveryJob job = exchange.getIn().getBody(DiscoveryJob.class);
                         String foreignSource = job.getForeignSource();
                         String location = job.getLocation();
+
+                        // Sleep to trigger a timeout
+                        Thread.sleep(21000);
+
                         Message out = exchange.getOut();
-                        //Thread.sleep( 21000 );
                         DiscoveryResults results = new DiscoveryResults(
                             Collections.singletonMap(InetAddressUtils.addr("4.2.2.2"), 1000L),
                             foreignSource,
@@ -306,17 +296,6 @@ public class DiscoveryBlueprintIT extends CamelBlueprintTestSupport {
         final String foreignSource = "Bogus FS";
         final String location = LOCATION;
 
-        EventAnticipator anticipator = IPC_MANAGER_INSTANCE.getEventAnticipator();
-
-        EventBuilder eb = new EventBuilder( EventConstants.NEW_SUSPECT_INTERFACE_EVENT_UEI, "OpenNMS.Discovery" );
-        eb.setInterface( InetAddress.getByName( ipAddress ) );
-        eb.setHost( InetAddressUtils.getLocalHostName() );
-
-        eb.addParam( "RTT", 0 );
-        eb.addParam( "foreignSource", foreignSource );
-
-        anticipator.anticipateEvent( eb.getEvent() );
-
         // Create the config aka job
         Specific specific = new Specific();
         specific.setContent( ipAddress );
@@ -329,21 +308,15 @@ public class DiscoveryBlueprintIT extends CamelBlueprintTestSupport {
         config.setLocation( location );
 
         // Execute the job
-        try{
-        	template.requestBody( "direct:submitDiscoveryTask", config );
-        }catch(Exception e){
-        	e.printStackTrace();
+        try {
+            template.requestBody( "direct:submitDiscoveryTask", config );
+        } catch(CamelExecutionException e) {
+            // Expected failure exception
+            assertEquals(ExchangeTimedOutException.class, e.getCause().getClass());
+            return;
+        } finally {
+            mockDiscoverer.stop();
         }
-        Thread.sleep( 9000 );
-        anticipator.verifyAnticipated();
-
-        mockDiscoverer.stop();
-    }
-  
-    @Test
-    public void testCalculateTaskTimeout() {
-    	DiscoveryJob discoveryJob = new DiscoveryJob(m_ranges, "Bogus FS", LOCATION);
-    	assertTrue(discoveryJob.calculateTaskTimeout() == 2250); // Each task is taking 750 ms so totalTaskTimeout = 750 ms * 3 (no of tasks) = 2250 ms
-    	assertFalse(discoveryJob.calculateTaskTimeout() > Integer.MAX_VALUE);
+        fail("A timeout exception should be thrown from the exchange");
     }
 }

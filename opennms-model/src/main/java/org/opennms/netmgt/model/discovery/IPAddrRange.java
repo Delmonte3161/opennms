@@ -60,7 +60,7 @@ public final class IPAddrRange implements Iterable<InetAddress>, Serializable {
     private static final long serialVersionUID = -106414771861377679L;
 
     private static final Logger LOG = LoggerFactory.getLogger(IPAddrRange.class);
-    
+
     /**
      * The starting address for the object.
      */
@@ -344,14 +344,14 @@ public final class IPAddrRange implements Iterable<InetAddress>, Serializable {
             .append("end", InetAddressUtils.getInetAddress(m_end))
             .toString();
     }
-    
+
     /**
      * <P>
-     * Returns the difference of ip address range.
+     * Returns the size of this range.
      * </P>
      */
-    public BigInteger getSizeOfIpAddrRange(){
-    	return InetAddressUtils.difference(InetAddressUtils.getInetAddress(m_end) , InetAddressUtils.getInetAddress(m_begin)).add(BigInteger.ONE);
+    public BigInteger size() {
+        return InetAddressUtils.difference(InetAddressUtils.getInetAddress(m_end) , InetAddressUtils.getInetAddress(m_begin)).add(BigInteger.ONE);
     }
-    
+
 }

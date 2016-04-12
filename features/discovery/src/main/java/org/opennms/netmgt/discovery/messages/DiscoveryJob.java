@@ -30,13 +30,11 @@ package org.opennms.netmgt.discovery.messages;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.opennms.core.utils.IteratorIterator;
-import org.opennms.netmgt.model.discovery.IPAddrRange;
 import org.opennms.netmgt.model.discovery.IPPollAddress;
 import org.opennms.netmgt.model.discovery.IPPollRange;
 
@@ -49,7 +47,8 @@ public class DiscoveryJob implements Serializable {
     private final String m_foreignSource;
     private final String m_location;
 
-    public static final BigDecimal FUDGE_FACTOR = BigDecimal.ONE;
+    // TODO: Make this configurable?
+    public static final BigDecimal FUDGE_FACTOR = BigDecimal.valueOf(1.5);
 
     public DiscoveryJob(List<IPPollRange> ranges, String foreignSource, String location) {
         m_ranges = Preconditions.checkNotNull(ranges, "ranges argument");
@@ -103,18 +102,30 @@ public class DiscoveryJob implements Serializable {
                  .add("ranges", m_ranges)
                  .toString();
     }
-  
+
     /**
      * <P>
-     * Returns int : the total task timeout for all ip ranges
+     * Returns the total task timeout in milliseconds for all IP ranges.
      * </P>
      */
-    public int calculateTaskTimeout(){
-    	BigDecimal taskTimeOut = BigDecimal.ZERO;
-        for(final IPPollRange range : m_ranges) {        	
-        	taskTimeOut = taskTimeOut.add((BigDecimal.valueOf(range.getRetries()).add(BigDecimal.ONE)).multiply(new BigDecimal(range.getAddressRange().getSizeOfIpAddrRange())).multiply(BigDecimal.valueOf(range.getTimeout())).multiply(FUDGE_FACTOR));
+    public int calculateTaskTimeout() {
+        BigDecimal taskTimeOut = BigDecimal.ZERO;
+        for(final IPPollRange range : m_ranges) {
+            taskTimeOut = taskTimeOut.add(
+                // Take the number of retries
+                BigDecimal.valueOf(range.getRetries())
+                // Add 1 for the original request
+                .add(BigDecimal.ONE)
+                // Multiply by the number of addresses
+                .multiply(new BigDecimal(range.getAddressRange().size()))
+                // Multiply by the timeout per retry
+                .multiply(BigDecimal.valueOf(range.getTimeout()))
+                // Multiply by the fudge factor
+                .multiply(FUDGE_FACTOR)
+            );
         }
-        return taskTimeOut.compareTo(BigDecimal.valueOf(Integer.MAX_VALUE))>0 ? Integer.MAX_VALUE : taskTimeOut.intValue();
+        // If the timeout is greater than Integer.MAX_VALUE, just return Integer.MAX_VALUE
+        return taskTimeOut.compareTo(BigDecimal.valueOf(Integer.MAX_VALUE)) >= 0 ? Integer.MAX_VALUE : taskTimeOut.intValue();
     }
 
 }
