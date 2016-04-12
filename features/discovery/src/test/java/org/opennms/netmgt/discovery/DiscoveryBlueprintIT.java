@@ -29,10 +29,15 @@
 package org.opennms.netmgt.discovery;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import junit.framework.TestCase;
 
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.camel.component.ActiveMQComponent;
@@ -49,6 +54,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.opennms.core.network.IPAddress;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.config.DiscoveryConfigFactory;
@@ -66,6 +72,8 @@ import org.opennms.netmgt.events.api.EventForwarder;
 import org.opennms.netmgt.events.api.EventIpcManager;
 import org.opennms.netmgt.icmp.Pinger;
 import org.opennms.netmgt.model.OnmsDistPoller;
+import org.opennms.netmgt.model.discovery.IPAddrRange;
+import org.opennms.netmgt.model.discovery.IPPollRange;
 import org.opennms.netmgt.model.events.EventBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +90,17 @@ public class DiscoveryBlueprintIT extends CamelBlueprintTestSupport {
 
     private static BrokerService m_broker = null;
 
+    private static final List<IPPollRange> m_ranges = new ArrayList<IPPollRange>();
+    private static IPPollRange ipPollRange;
+    
+    @BeforeClass
+    public static void setup() throws UnknownHostException{
+    	for(int i=1 ; i<12; i+=5){
+    		ipPollRange = new IPPollRange("127.0.1."+i, "127.0.1."+(i+4), 50, 2);
+    		m_ranges.add(ipPollRange);
+    	}
+    }
+    
     /**
      * Use Aries Blueprint synchronous mode to avoid a blueprint deadlock bug.
      * 
@@ -244,5 +263,83 @@ public class DiscoveryBlueprintIT extends CamelBlueprintTestSupport {
         anticipator.verifyAnticipated();
 
         mockDiscoverer.stop();
+    }
+    
+    @Test
+    public void testDiscoverToTestTimeout() throws Exception {
+
+        /*
+         * Create a Camel listener for the location queue that will respond with
+         * {@link DiscoveryResult} objects.
+         */
+        SimpleRegistry registry = new SimpleRegistry();
+        CamelContext mockDiscoverer = new DefaultCamelContext(registry);
+        mockDiscoverer.addComponent("activemq", ActiveMQComponent.activeMQComponent("tcp://127.0.0.1:61616"));
+        mockDiscoverer.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                String from = String.format("activemq:Location-%s", LOCATION);
+
+                from(from)
+                .process(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        DiscoveryJob job = exchange.getIn().getBody(DiscoveryJob.class);
+                        String foreignSource = job.getForeignSource();
+                        String location = job.getLocation();
+
+                        Message out = exchange.getOut();
+                        DiscoveryResults results = new DiscoveryResults(
+                            Collections.singletonMap(InetAddressUtils.addr("4.2.2.2"), 1000L),
+                            foreignSource,
+                            location
+                        );
+                        out.setBody(results);
+                    }
+                });
+            }
+        });
+
+        mockDiscoverer.start();
+
+        final String ipAddress = "4.2.2.2";
+        final String foreignSource = "Bogus FS";
+        final String location = LOCATION;
+
+        EventAnticipator anticipator = IPC_MANAGER_INSTANCE.getEventAnticipator();
+
+        EventBuilder eb = new EventBuilder( EventConstants.NEW_SUSPECT_INTERFACE_EVENT_UEI, "OpenNMS.Discovery" );
+        eb.setInterface( InetAddress.getByName( ipAddress ) );
+        eb.setHost( InetAddressUtils.getLocalHostName() );
+
+        eb.addParam( "RTT", 0 );
+        eb.addParam( "foreignSource", foreignSource );
+
+        anticipator.anticipateEvent( eb.getEvent() );
+
+        // Create the config aka job
+        Specific specific = new Specific();
+        specific.setContent( ipAddress );
+
+        DiscoveryConfiguration config = new DiscoveryConfiguration();
+        config.addSpecific( specific );
+        config.setForeignSource( foreignSource );
+        config.setTimeout( 3000 );
+        config.setRetries( 2 );
+        config.setLocation( location );
+
+        // Execute the job
+        template.requestBody( "direct:submitDiscoveryTask", config );
+
+        Thread.sleep( 1000 );
+        anticipator.verifyAnticipated();
+
+        mockDiscoverer.stop();
+    }
+  
+    @Test
+    public void testCalculateTaskTimeout() {
+    	DiscoveryJob discoveryJob = new DiscoveryJob(m_ranges, "Bogus FS", LOCATION);
+    	assertTrue(discoveryJob.calculateTaskTimeout() == 2250);
     }
 }

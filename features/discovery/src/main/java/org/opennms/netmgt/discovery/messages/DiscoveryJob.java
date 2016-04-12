@@ -49,7 +49,7 @@ public class DiscoveryJob implements Serializable {
     private final String m_foreignSource;
     private final String m_location;
 
-    public static final BigDecimal FUDGE_FACTOR = BigDecimal.valueOf(1.5);
+    public static final BigDecimal FUDGE_FACTOR = BigDecimal.ONE;
 
     public DiscoveryJob(List<IPPollRange> ranges, String foreignSource, String location) {
         m_ranges = Preconditions.checkNotNull(ranges, "ranges argument");
@@ -103,18 +103,18 @@ public class DiscoveryJob implements Serializable {
                  .add("ranges", m_ranges)
                  .toString();
     }
-    
+  
     /**
      * <P>
      * Returns int : the total task timeout for all ip ranges
      * </P>
      */
     public int calculateTaskTimeout(){
-    	BigInteger taskTimeOut = BigInteger.ZERO;
+    	BigDecimal taskTimeOut = BigDecimal.ZERO;
         for(final IPPollRange range : m_ranges) {        	
-        	taskTimeOut = taskTimeOut.add((BigInteger.valueOf(range.getRetries()).add(BigInteger.ONE)).multiply(range.getAddressRange().getSizeOfIpAddrRange()).multiply(BigInteger.valueOf(range.getTimeout())).multiply(FUDGE_FACTOR.toBigInteger()));
+        	taskTimeOut = taskTimeOut.add((BigDecimal.valueOf(range.getRetries()).add(BigDecimal.ONE)).multiply(new BigDecimal(range.getAddressRange().getSizeOfIpAddrRange())).multiply(BigDecimal.valueOf(range.getTimeout())).multiply(FUDGE_FACTOR));
         }
-        return taskTimeOut.intValue() > Integer.MAX_VALUE ? Integer.MAX_VALUE : taskTimeOut.intValue();
+        return taskTimeOut.compareTo(BigDecimal.valueOf(Integer.MAX_VALUE))>0 ? Integer.MAX_VALUE : taskTimeOut.intValue();
     }
 
 }
