@@ -344,5 +344,6 @@ public class DiscoveryBlueprintIT extends CamelBlueprintTestSupport {
     public void testCalculateTaskTimeout() {
     	DiscoveryJob discoveryJob = new DiscoveryJob(m_ranges, "Bogus FS", LOCATION);
     	assertTrue(discoveryJob.calculateTaskTimeout() == 2250); // Each task is taking 750 ms so totalTaskTimeout = 750 ms * 3 (no of tasks) = 2250 ms
+    	assertFalse(discoveryJob.calculateTaskTimeout() > Integer.MAX_VALUE);
     }
 }
