@@ -166,4 +166,15 @@
 
   <onmsgi:service interface="org.opennms.netmgt.config.api.ResourceTypesDao" ref="resourceTypesDao" />
 
+	<bean id="contextServiceMonitorLocator" class="org.opennms.netmgt.config.ContextServiceMonitorLocator">
+		<constructor-arg value="java.lang.String" />
+		<constructor-arg value="org.opennms.netmgt.poller.ServiceMonitorLocator" />
+	</bean>
+
+	<onmsgi:list id="contextServiceMonitor"
+		interface="org.opennms.netmgt.poller.ServiceMonitorLocator">
+		<onmsgi:listener ref="contextServiceMonitorLocator"
+			bind-method="onServiceMonitorRegistered" />
+	</onmsgi:list>
+	
 </beans>
