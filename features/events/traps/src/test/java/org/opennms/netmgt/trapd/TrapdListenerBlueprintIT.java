@@ -91,6 +91,16 @@ public class TrapdListenerBlueprintIT extends CamelBlueprintTestSupport {
 		return PERSISTANCE_ID;
 	}
 
+	/**
+	 * This method overrides the blueprint property and sets port to 10154 instead of 162
+	 */
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	@Override
+	protected String useOverridePropertiesWithConfigAdmin(Dictionary props) throws Exception {
+		props.put(PORT_NAME, 10514);
+		return PERSISTANCE_ID;
+	}
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected void addServicesOnStartup(Map<String, KeyValueHolder<Object, Dictionary>> services) {
