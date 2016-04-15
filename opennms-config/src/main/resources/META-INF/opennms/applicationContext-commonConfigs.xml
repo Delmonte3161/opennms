@@ -174,7 +174,7 @@
 	<onmsgi:list id="contextServiceMonitor"
 		interface="org.opennms.netmgt.poller.ServiceMonitorLocator">
 		<onmsgi:listener ref="contextServiceMonitorLocator"
-			bind-method="onServiceMonitorRegistered" />
+			bind-method="onServiceMonitorRegistered" unbind-method="onServiceMonitorUnRegistered"/>
 	</onmsgi:list>
 	
 </beans>
