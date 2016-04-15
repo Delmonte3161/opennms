@@ -25,13 +25,8 @@
 	<service interface="org.opennms.netmgt.trapd.TrapNotificationHandler" ref="trapdNotificationHandlerCamel" />
 
 
-	<bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
-		<!-- TODO: HZN-490 Add configurable ActiveMQ URI -->
-		<property name="brokerURL" value="${brokerUri}" />
-		<!-- TODO: HZN-490 Add configurable authentication -->
-		<!-- <property name="userName" value="karaf" /> <property name="password" 
-			value="karaf" /> -->
-	</bean>
+	<!-- ActiveMQ component provided by minion-core -->
+    <reference id="activemq" interface="org.apache.camel.Component"/>
 
 	<camelContext id="trapdNotificationHandlerMinion"
 		xmlns="http://camel.apache.org/schema/blueprint">
