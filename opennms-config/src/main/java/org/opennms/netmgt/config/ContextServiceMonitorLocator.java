@@ -105,10 +105,12 @@ public class ContextServiceMonitorLocator implements ServiceMonitorLocator, Seri
     }
     
     public void onServiceMonitorRegistered(final ServiceMonitorLocator serviceMonitor, final Map<String,String> properties) {
+    	if(serviceMonitor!=null)
     	serviceMonitor.getServiceMonitor();
     }
     
     public void onServiceMonitorUnRegistered(final ServiceMonitorLocator serviceMonitor, final Map<String,String> properties) {
+    	if(serviceMonitor!=null)
     	serviceMonitor.getServiceMonitor().close();
     }
 }
