@@ -438,6 +438,12 @@
       <artifactId>org.opennms.features.measurements.impl</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.opennms.dependencies</groupId>
+      <artifactId>camel-test-dependencies</artifactId>
+      <type>pom</type>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <repositories>
