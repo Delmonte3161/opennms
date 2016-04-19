@@ -28,7 +28,6 @@ public class PollerRoutingTest extends CamelTestSupport {
 
         registry.bind( "availabilityMonitor", new AvailabilityMonitor() );
         registry.bind( "availabilityMonitorCamel", new ServiceMonitorCamelImpl("direct:pollAvailabilityMonitor") );
-        registry.findByTypeWithName(ServiceMonitor.class);
 
         return registry;
     }
@@ -59,7 +58,7 @@ public class PollerRoutingTest extends CamelTestSupport {
                 onException( IOException.class ).handled( true ).logStackTrace( true ).stop();
 
                 from( "direct:pollAvailabilityMonitor" ).setHeader("CamelJmsRequestTimeout", simple("40000",Long.class)).to( "bean:availabilityMonitorCamel" ).split( body() ).recipientList(
-                                simple( "seda:Location-${body.location}.Poller.AvailabilityMonitor" ) ).setTimeout((long) 40000);
+                                simple( "seda:Location-${body.location}.Poller.AvailabilityMonitor" ) );
 
                 from( "seda:Location-localhost.Poller.AvailabilityMonitor" ).to( "bean:availabilityMonitor" );
             }
