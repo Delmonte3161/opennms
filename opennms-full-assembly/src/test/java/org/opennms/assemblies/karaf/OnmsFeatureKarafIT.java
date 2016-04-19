@@ -435,4 +435,10 @@ public class OnmsFeatureKarafIT extends KarafTestCase {
 		installFeature("spring-webflow");
 		System.out.println(executeCommand("features:list -i"));
 	}
+	
+	@Test
+	public void testInstallFeatureOpennmsPollerMonitersCore() {
+		installFeature("opennms-poller-monitors-core");
+		System.out.println(executeCommand("features:list -i"));
+	}
 }
