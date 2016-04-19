@@ -27,7 +27,7 @@
 
 	<!-- ActiveMQ component provided by minion-core -->
     <reference id="queuingservice" interface="org.apache.camel.Component" filter="(alias=opennms.broker)"/>
-
+    
 	<camelContext id="trapdNotificationHandlerMinion"
 		xmlns="http://camel.apache.org/schema/blueprint">
 		<propertyPlaceholder id="properties" location="blueprint:trapdNotificationHandlerMinionProperties" />
