@@ -23,6 +23,13 @@
             <Bundle-Version>${project.version}</Bundle-Version>
             <Export-Package>org.opennms.netmgt.poller.monitors.*;version="${project.version}"</Export-Package>
           </instructions>
+          <artifacts>
+                <artifact>
+                  <file>blueprint-poller.xml</file>
+                  <type>xml</type>
+                  <classifier>blueprint-poller</classifier>
+                </artifact>  
+          </artifacts>  
         </configuration>
       </plugin>
     </plugins>
