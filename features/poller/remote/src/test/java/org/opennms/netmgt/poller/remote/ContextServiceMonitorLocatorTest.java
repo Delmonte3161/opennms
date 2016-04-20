@@ -5,17 +5,31 @@ package org.opennms.netmgt.poller.remote;
 
 import static org.easymock.EasyMock.expect;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListMap;
 
+import org.apache.camel.test.junit4.CamelTestSupport;
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.opennms.core.soa.ServiceRegistry;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.test.db.MockDatabase;
 import org.opennms.core.test.db.annotations.JUnitTemporaryDatabase;
+import org.opennms.netmgt.config.ContextServiceMonitorLocator;
+import org.opennms.netmgt.config.PollerConfigManager;
 import org.opennms.netmgt.poller.DistributionContext;
+import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.PollStatus;
+import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.poller.ServiceMonitorLocator;
+import org.opennms.netmgt.poller.remote.support.DefaultPollerBackEnd;
 import org.opennms.test.JUnitConfigurationEnvironment;
 import org.opennms.test.mock.EasyMockUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,30 +47,51 @@ import org.springframework.test.context.ContextConfiguration;
 })
 @JUnitConfigurationEnvironment
 @JUnitTemporaryDatabase(dirtiesContext=false,tempDbClass=MockDatabase.class,reuseDatabase=false)
-public class ContextServiceMonitorLocatorTest {
+public class ContextServiceMonitorLocatorTest extends CamelTestSupport {
 	private EasyMockUtils m_mock = new EasyMockUtils(); 
 
 	@Autowired
-	ServiceMonitorLocator locator;
+	ServiceRegistry m_serviceregistry;
 	
-	private PollerBackEnd m_backEnd;
-	private PollService m_pollService;
-
+	@Autowired
+	PollerConfigManager m_pollerConfig;
+	
+	MockServiceMonitor m_mockServiceMonitor=null;
+	
 	@Before
 	public void setUp() throws Exception {
-		m_backEnd = m_mock.createMock(PollerBackEnd.class);
-		m_pollService = m_mock.createMock(PollService.class);
 	}
-
+	
 	@Test
-	public void testToRegisterServiceMonitor() {
+	public void testToCheckForContextServiceMonitorLocator() {
 		
-		Set<ServiceMonitorLocator> locators = Collections.singleton(locator);
-		expect(
-				m_backEnd
-				.getServiceMonitorLocators(DistributionContext.REMOTE_MONITOR))
-				.andReturn(locators);
-		m_pollService.setServiceMonitorLocators(locators);
+		Map<String, String> properties =new ConcurrentSkipListMap<String, String>();
+		properties.put("implementation", "org.opennms.netmgt.poller.monitors.VmwareMonitor");
+		
+		m_mockServiceMonitor=new MockServiceMonitor();
+		m_serviceregistry.register(m_mockServiceMonitor, properties,ServiceMonitor.class);
+		
+		ContextServiceMonitorLocator context=new ContextServiceMonitorLocator("VMware-ManagedEntity", m_mockServiceMonitor.getClass());
+		Collection<ServiceMonitorLocator> locators = new ArrayList<ServiceMonitorLocator>();
+		locators.add(context);
+		
+		
+		m_pollerConfig.getServiceMonitorLocators(DistributionContext.REMOTE_MONITOR);
+		assertTrue(m_pollerConfig.getServiceMonitorLocators(DistributionContext.REMOTE_MONITOR).equals(locators));
 	}
+	
+	public class MockServiceMonitor implements ServiceMonitor
+	{
 
+		@Override
+		public void close() {
+		}
+
+		@Override
+		public PollStatus poll(MonitoredService svc,
+				Map<String, Object> parameters) {
+					return null;
+		}
+		
+	}
 }

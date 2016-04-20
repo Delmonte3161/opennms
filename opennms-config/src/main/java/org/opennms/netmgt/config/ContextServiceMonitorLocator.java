@@ -113,4 +113,15 @@ public class ContextServiceMonitorLocator implements ServiceMonitorLocator, Seri
     	if(serviceMonitor!=null)
     	serviceMonitor.getServiceMonitor().close();
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+    	if (obj instanceof ContextServiceMonitorLocator) 
+    	{
+    		ContextServiceMonitorLocator c = (ContextServiceMonitorLocator) obj;
+    		if ( this.getServiceLocatorKey().equals(c.getServiceLocatorKey()) ) 
+    			return true;
+    	}
+    	return false;
+    }
 }
