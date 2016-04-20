@@ -30,7 +30,7 @@
     </feature>
     
     <feature name="opennms-poller-monitors-core" description="OpenNMS :: Poller :: Monitors :: Core" version="${project.version}">
-<!--       <feature>opennms-poller-api</feature> -->
+      <!-- <feature>opennms-poller-api</feature> -->
       <bundle>blueprint:mvn:org.opennms.features.poller.monitors/org.opennms.features.poller.monitors.core/${project.version}/xml/blueprint-poller</bundle>
     </feature>
     
