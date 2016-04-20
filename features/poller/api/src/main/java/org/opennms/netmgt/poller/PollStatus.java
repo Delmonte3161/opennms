@@ -550,4 +550,9 @@ public class PollStatus implements Serializable {
     public String getStatusName() {
         return s_statusNames[m_statusCode];
     }
+    
+    @Transient
+    public String location() {
+        return "localhost";
+    }
 }

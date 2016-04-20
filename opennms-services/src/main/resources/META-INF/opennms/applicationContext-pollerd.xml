@@ -19,20 +19,8 @@
 
     <aop:aspectj-autoproxy proxy-target-class="true"/>
     <context:annotation-config />
-    
-    <context:property-placeholder properties-ref="pollerProperties"/>
-
-	<bean id="pollerProperties"
-		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-	<property name="properties">
-		<props>
-			<prop key="restartSleepTime">100000</prop>
-			<prop key="initialSleepTime">100000</prop>
-		</props>
-	</property>
-	</bean>
 	
-    <bean name="pollerQueryManager" class="org.opennms.netmgt.poller.QueryManagerDaoImpl"/>
+   <bean name="pollerQueryManager" class="org.opennms.netmgt.poller.QueryManagerDaoImpl"/>
 
     <bean name="pollContext" class="org.opennms.netmgt.poller.DefaultPollContext">
       <property name="eventManager" ref="eventIpcManager" />
@@ -442,9 +430,9 @@
     <property name="brokerURL" value="tcp://localhost:61616" />
     </bean>
     
-    <bean id="poller" class="org.opennms.netmgt.poller.remote.Poller"/>
+    <bean id="poller" class="org.opennms.netmgt.poller.Poller"/>
     
-	<camelContext id="pollerCamelContext" xmlns="http://camel.apache.org/schema/spring">
+	<camelContext id="pollerMonitorsCoreMinionContext" xmlns="http://camel.apache.org/schema/spring">
 	
 	<!-- Avaliability Monitor -->
     	<route id="pollAvailabilityMonitor">
@@ -1207,31 +1195,6 @@
       <!--
         Use recipientList so that we can have a dynamic 'to:' URI.
         
-      -->
-      		<setExchangePattern pattern="InOut"/>
-      		<recipientList>
-        	<!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
-        		<simple>activemq:Location-${body.location}.Poller.WebMonitor</simple>
-      		</recipientList>
-    	</route>
-
-
-     <route id="locationLocalhostWebMonitorRoute">
-      	<from uri="activemq:Location-localhost.Poller.WebMonitor" />
-      	<bean ref="webMonitor" />
-     </route>
-     
-     
-     <!-- Web Monitor -->
-     
-     <route id="pollWebMonitor">
-      		<from uri="direct:pollWebMonitor" />
-      	<!-- Calculate an appropriate JMS timeout based on the task -->
-      		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>40000</simple>
-      		</setHeader>
-      <!--
-        Use recipientList so that we can have a dynamic 'to:' URI.
       -->
       		<setExchangePattern pattern="InOut"/>
       		<recipientList>

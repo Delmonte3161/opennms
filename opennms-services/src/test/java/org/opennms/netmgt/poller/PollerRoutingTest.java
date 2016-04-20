@@ -8,19 +8,39 @@ import java.util.HashMap;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.JndiRegistry;
+import org.apache.camel.model.ModelCamelContext;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
+import org.opennms.core.test.db.MockDatabase;
+import org.opennms.core.test.db.annotations.JUnitTemporaryDatabase;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
 import org.opennms.netmgt.poller.monitors.AvailabilityMonitor;
+import org.opennms.test.JUnitConfigurationEnvironment;
 import org.springframework.test.context.ContextConfiguration;
 
 @RunWith( OpenNMSJUnit4ClassRunner.class )
-@ContextConfiguration( locations = { "classpath:/META-INF/opennms/emptyContext.xml" } )
+@ContextConfiguration( locations = { 
+		"classpath:/META-INF/opennms/applicationContext-soa.xml",
+		"classpath:/META-INF/opennms/applicationContext-pollerd.xml",
+        "classpath:/META-INF/opennms/applicationContext-dao.xml",
+        "classpath:/META-INF/opennms/applicationContext-minimal-conf.xml",
+        "classpath*:/META-INF/opennms/component-dao.xml",
+        "classpath*:/META-INF/opennms/component-service.xml",
+        "classpath:/META-INF/opennms/applicationContext-daemon.xml",
+        "classpath:/META-INF/opennms/applicationContext-eventUtil.xml",
+        "classpath:/META-INF/opennms/mockEventIpcManager.xml",
+        "classpath:/META-INF/opennms/applicationContext-commonConfigs.xml"
+		} )
+
+@JUnitConfigurationEnvironment 
+@JUnitTemporaryDatabase(tempDbClass=MockDatabase.class,reuseDatabase=false)
 public class PollerRoutingTest extends CamelTestSupport {
 	
+	protected volatile ModelCamelContext context;
+		
 	@Override
     protected JndiRegistry createRegistry() throws Exception
     {
@@ -28,9 +48,10 @@ public class PollerRoutingTest extends CamelTestSupport {
 
         registry.bind( "availabilityMonitor", new AvailabilityMonitor() );
         registry.bind( "availabilityMonitorCamel", new ServiceMonitorCamelImpl("direct:pollAvailabilityMonitor") );
-
+       
         return registry;
     }
+	
 	
 	/**
      * Delay calling context.start() so that you can attach an {@link AdviceWithRouteBuilder} to the
