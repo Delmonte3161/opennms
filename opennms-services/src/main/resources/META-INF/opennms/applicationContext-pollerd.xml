@@ -430,8 +430,6 @@
     <property name="brokerURL" value="tcp://localhost:61616" />
     </bean>
     
-    <bean id="poller" class="org.opennms.netmgt.poller.Poller"/>
-    
 	<camelContext id="pollerMonitorsCoreMinionContext" xmlns="http://camel.apache.org/schema/spring">
 	
 	<!-- Avaliability Monitor -->
