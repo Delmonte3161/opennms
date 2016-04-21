@@ -2,23 +2,22 @@ package org.opennms.netmgt.poller;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.camel.builder.AdviceWithRouteBuilder;
+import org.apache.camel.CamelContext;
+import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.impl.JndiRegistry;
-import org.apache.camel.model.ModelCamelContext;
-import org.apache.camel.model.RouteDefinition;
-import org.apache.camel.test.junit4.CamelTestSupport;
+import org.apache.camel.spring.SpringCamelContext;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.test.db.MockDatabase;
 import org.opennms.core.test.db.annotations.JUnitTemporaryDatabase;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
-import org.opennms.netmgt.poller.monitors.AvailabilityMonitor;
 import org.opennms.test.JUnitConfigurationEnvironment;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 
 @RunWith( OpenNMSJUnit4ClassRunner.class )
@@ -38,79 +37,55 @@ import org.springframework.test.context.ContextConfiguration;
 
 @JUnitConfigurationEnvironment 
 @JUnitTemporaryDatabase(tempDbClass=MockDatabase.class,reuseDatabase=false)
-public class PollerRoutingTest extends CamelTestSupport {
+public class PollerRoutingTest extends RouteBuilder {
+
+	@Autowired
+	ApplicationContext context;
 	
-	protected volatile ModelCamelContext context;
+	
+	@Before
+	public void configure() throws Exception {
+		 {
+             // Add exception handlers
+             onException( IOException.class ).handled( true ).logStackTrace( true ).stop();
+
+             from( "direct:pollAvailabilityMonitor" ).setHeader("CamelJmsRequestTimeout", simple("40000",Long.class)).to( "bean:availabilityMonitorCamel" ).split( body() ).recipientList(
+                             simple( "seda:Location-${body.location}.Poller.AvailabilityMonitor" ) );
+
+             from( "seda:Location-localhost.Poller.AvailabilityMonitor" ).to( "bean:availabilityMonitor?method=poll" );
+             
+         }
 		
-	@Override
-    protected JndiRegistry createRegistry() throws Exception
-    {
-        JndiRegistry registry = super.createRegistry();
-
-        registry.bind( "availabilityMonitor", new AvailabilityMonitor() );
-        registry.bind( "availabilityMonitorCamel", new ServiceMonitorCamelImpl("direct:pollAvailabilityMonitor") );
-       
-        return registry;
-    }
+	}
 	
-	
-	/**
-     * Delay calling context.start() so that you can attach an {@link AdviceWithRouteBuilder} to the
-     * context before it starts.
-     */
-    @Override
-    public boolean isUseAdviceWith()
-    {
-        return true;
-    }
-    
-    
-    /**
-     * Build the route for all of the config parsing messages.
-     */
-    @Override
-    protected RouteBuilder createRouteBuilder() throws Exception
-    {
-        return new RouteBuilder() {
+	@Test
+	public void testPoller() throws Exception{
+		CamelContext camelContext = null;
+	       try {
+			camelContext = SpringCamelContext.springCamelContext(
 
-            @Override
-            public void configure() throws Exception
-            {
-                // Add exception handlers
-                onException( IOException.class ).handled( true ).logStackTrace( true ).stop();
+					   context, false);
 
-                from( "direct:pollAvailabilityMonitor" ).setHeader("CamelJmsRequestTimeout", simple("40000",Long.class)).to( "bean:availabilityMonitorCamel" ).split( body() ).recipientList(
-                                simple( "seda:Location-${body.location}.Poller.AvailabilityMonitor" ) );
 
-                from( "seda:Location-localhost.Poller.AvailabilityMonitor" ).to( "bean:availabilityMonitor" );
-            }
-        };
-    }
-    
+		            camelContext.start();
 
-    @Test
-    public void testPoller() throws Exception
-    {
-        for ( RouteDefinition route : new ArrayList<RouteDefinition>( context.getRouteDefinitions() ) )
-        {
-            route.adviceWith( context, new AdviceWithRouteBuilder() {
-                @Override
-                public void configure() throws Exception
-                {
-                    mockEndpoints();
-                }
-            } );
-        }
-        context.start();
+		            ProducerTemplate template = camelContext.createProducerTemplate();
 
-        MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
-        monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
-        monitoredServiceTask.setParameters(new HashMap<String, Object>());
+		            MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
+		            monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
+		            monitoredServiceTask.setParameters(new HashMap<String, Object>());
 
-        // Execute the job
-        template.requestBody( "direct:pollAvailabilityMonitor", monitoredServiceTask );
+		            template.sendBody( "direct:pollAvailabilityMonitor", monitoredServiceTask);
 
-        assertMockEndpointsSatisfied();
-    }
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	       finally {
+	            camelContext.stop();
+
+	        }
+
+	}
 
 }
