@@ -1,7 +1,6 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
 	xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.1.0"
-	xmlns:onmsgi="http://xmlns.opennms.org/xsd/spring/onms-osgi"
 	xsi:schemaLocation="
 		http://www.osgi.org/xmlns/blueprint/v1.0.0 
 		http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
@@ -9,296 +8,295 @@
 		http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.1.0.xsd
 		http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.1.0
 		http://aries.apache.org/schemas/blueprint-ext/blueprint-ext-1.1.xsd
-		http://xmlns.opennms.org/xsd/spring/onms-osgi http://xmlns.opennms.org/xsd/spring/onms-osgi.xsd
 ">
 
 	<!-- Exposed all the service monitors  -->
 	<bean id="availabilityMonitor" class="org.opennms.netmgt.poller.monitors.AvailabilityMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="availabilityMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.AvailabilityMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="citrixMonitor" class="org.opennms.netmgt.poller.monitors.CitrixMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="citrixMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.CitrixMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="dnsMonitor" class="org.opennms.netmgt.poller.monitors.DnsMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="dnsMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.DnsMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="dnsResolutionMonitor" class="org.opennms.netmgt.poller.monitors.DNSResolutionMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="dnsResolutionMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.DNSResolutionMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="dominoIIOPMonitor" class="org.opennms.netmgt.poller.monitors.DominoIIOPMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="dominoIIOPMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.DominoIIOPMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="ftpMonitor" class="org.opennms.netmgt.poller.monitors.FtpMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="ftpMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.FtpMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="gpMonitor" class="org.opennms.netmgt.poller.monitors.GpMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="gpMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.GpMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="httpMonitor" class="org.opennms.netmgt.poller.monitors.HttpMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="httpMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.HttpMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="httpPostMonitor" class="org.opennms.netmgt.poller.monitors.HttpPostMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="httpPostMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.HttpPostMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="httpsMonitor" class="org.opennms.netmgt.poller.monitors.HttpsMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="httpsMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.HttpsMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="icmpMonitor" class="org.opennms.netmgt.poller.monitors.IcmpMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="icmpMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.IcmpMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="imapMonitor" class="org.opennms.netmgt.poller.monitors.ImapMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="imapMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.ImapMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="jdbcMonitor" class="org.opennms.netmgt.poller.monitors.JDBCMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="jdbcMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.JDBCMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="jdbcQueryMonitor" class="org.opennms.netmgt.poller.monitors.JDBCQueryMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="jdbcQueryMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.JDBCQueryMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="jdbcStoredProcedureMonitor" class="org.opennms.netmgt.poller.monitors.JDBCStoredProcedureMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="jdbcStoredProcedureMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.JDBCStoredProcedureMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="jolokiaBeanMonitor" class="org.opennms.netmgt.poller.monitors.JolokiaBeanMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="jolokiaBeanMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.JolokiaBeanMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="jschSshMonitor" class="org.opennms.netmgt.poller.monitors.JschSshMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="jschSshMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.JschSshMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="ldapMonitor" class="org.opennms.netmgt.poller.monitors.LdapMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="ldapMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.LdapMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="ldapsMonitor" class="org.opennms.netmgt.poller.monitors.LdapsMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="ldapsMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.LdapsMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="loopMonitor" class="org.opennms.netmgt.poller.monitors.LoopMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="loopMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.LoopMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="memcachedMonitor" class="org.opennms.netmgt.poller.monitors.MemcachedMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="memcachedMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.MemcachedMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="nrpeMonitor" class="org.opennms.netmgt.poller.monitors.NrpeMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="nrpeMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.NrpeMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="ntpMonitor" class="org.opennms.netmgt.poller.monitors.NtpMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="ntpMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.NtpMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="pop3Monitor" class="org.opennms.netmgt.poller.monitors.Pop3Monitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="pop3Monitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.Pop3Monitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="smtpMonitor" class="org.opennms.netmgt.poller.monitors.SmtpMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="smtpMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.SmtpMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="sshMonitor" class="org.opennms.netmgt.poller.monitors.SshMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="sshMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.SshMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="sslCertMonitor" class="org.opennms.netmgt.poller.monitors.SSLCertMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="sslCertMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.SSLCertMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="strafePingMonitor" class="org.opennms.netmgt.poller.monitors.StrafePingMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="strafePingMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.StrafePingMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="systemExecuteMonitor" class="org.opennms.netmgt.poller.monitors.SystemExecuteMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="systemExecuteMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.SystemExecuteMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="tcpMonitor" class="org.opennms.netmgt.poller.monitors.TcpMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="tcpMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.TcpMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="trivialTimeMonitor" class="org.opennms.netmgt.poller.monitors.TrivialTimeMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="trivialTimeMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.TrivialTimeMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 	<bean id="webMonitor" class="org.opennms.netmgt.poller.monitors.WebMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
+	<service interface="org.opennms.netmgt.poller.ServiceMonitor"
 		ref="webMonitor">
-		<onmsgi:service-properties>
+		<service-properties>
 			<entry key="implementation"
 				value="org.opennms.netmgt.poller.monitors.WebMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
+		</service-properties>
+	</service>
 	
 </blueprint>
