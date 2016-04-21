@@ -70,14 +70,8 @@ public class ContextServiceMonitorLocatorTest extends CamelTestSupport {
 		
 		m_mockServiceMonitor=new MockServiceMonitor();
 		m_serviceregistry.register(m_mockServiceMonitor, properties,ServiceMonitor.class);
-		
-		ContextServiceMonitorLocator context=new ContextServiceMonitorLocator("VMware-ManagedEntity", m_mockServiceMonitor.getClass());
-		Collection<ServiceMonitorLocator> locators = new ArrayList<ServiceMonitorLocator>();
-		locators.add(context);
-		
-		
-		m_pollerConfig.getServiceMonitorLocators(DistributionContext.REMOTE_MONITOR);
-		assertTrue(m_pollerConfig.getServiceMonitorLocators(DistributionContext.REMOTE_MONITOR).equals(locators));
+
+		assertIsInstanceOf(ContextServiceMonitorLocator.class ,m_pollerConfig.getServiceMonitorLocators(DistributionContext.REMOTE_MONITOR).iterator().next());
 	}
 	
 	public class MockServiceMonitor implements ServiceMonitor
