@@ -1094,11 +1094,11 @@ abstract public class PollerConfigManager implements PollerConfig {
 	    }
 	}
     
-    public void onBind(final ServiceMonitor monitor, final Map<String,String> properties) {
+    public void onServiceMonitorBind(final ServiceMonitor monitor, final Map<String,String> properties) {
     	m_onmsgiServices.put(properties.get("implementation"), monitor);
     }
 
-    public void unBind(final ServiceMonitor monitor, final Map<String,String> properties) {
-    	m_onmsgiServices.remove(properties.get("implementation"));;
+    public void onServiceMonitorUnbind(final ServiceMonitor monitor, final Map<String,String> properties) {
+    	m_onmsgiServices.clear();
     }
 }

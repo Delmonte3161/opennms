@@ -232,11 +232,11 @@ public final class PollerConfigFactory extends PollerConfigManager {
         }
     }
     
-    public void onBind(ServiceMonitor monitor, Map<String, String> properties) {
-    	super.onBind(monitor, properties);
+    public void onServiceMonitorBind(ServiceMonitor monitor, Map<String, String> properties) {
+    	super.onServiceMonitorBind(monitor, properties);
     }
     
-    public void unBind(ServiceMonitor monitor, Map<String, String> properties) {
-    	super.unBind(monitor, properties);
+    public void onServiceMonitorUnbind(ServiceMonitor monitor, Map<String, String> properties) {
+    	super.onServiceMonitorUnbind(monitor, properties);
     }
 }

@@ -169,7 +169,7 @@
   <onmsgi:list id="contextServiceMonitor"
 	 interface="org.opennms.netmgt.poller.ServiceMonitor">
 	  <onmsgi:listener ref="pollerConfig"
-		bind-method="onBind" unbind-method="unBind"/>
+		bind-method="onServiceMonitorBind" unbind-method="onServiceMonitorUnbind"/>
 	</onmsgi:list>
 	
 </beans>
