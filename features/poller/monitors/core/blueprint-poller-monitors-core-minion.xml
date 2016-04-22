@@ -1,0 +1,301 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+	xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.1.0"
+	xsi:schemaLocation="
+		http://www.osgi.org/xmlns/blueprint/v1.0.0 
+		http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+		http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0
+		http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.1.0.xsd
+		http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.1.0
+		http://aries.apache.org/schemas/blueprint-ext/blueprint-ext-1.1.xsd
+">
+	
+	<!-- DistPollerDao -->
+	<reference id="distPollerDao" interface="org.opennms.netmgt.dao.api.DistPollerDao"/>
+
+	<!-- Get the current OnmsDistPoller for this system -->
+	<bean id="distPoller" factory-ref="distPollerDao" factory-method="whoami"/>
+
+	<!-- Configuration properties -->
+	<!-- 
+		update-strategy="reload" causes unit test failures because the Blueprint context
+		can be destroyed and recreated by CM properties updates while the Camel context
+		is initializing:
+
+		https://issues.apache.org/jira/browse/ARIES-961
+	-->
+	<cm:property-placeholder id="pollerMonitorsCoreMinionProperties" persistent-id="org.opennms.netmgt.poller.monitors.core.minion" update-strategy="none" placeholder-prefix="$[" placeholder-suffix="]">
+		<cm:default-properties>
+			<!-- Get the location name of the current monitoring system -->
+			<cm:property name="monitoringLocationName">
+				<bean factory-ref="distPoller" factory-method="getLocation"/>
+			</cm:property>
+		</cm:default-properties>
+	</cm:property-placeholder>
+
+	<reference id="availabilityMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="availabilityMonitor"/>
+	<reference id="citrixMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="citrixMonitor"/>
+	<reference id="dnsMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="dnsMonitor"/>
+	<reference id="dnsResolutionMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="dnsResolutionMonitor"/>
+	<reference id="dominoIIOPMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="dominoIIOPMonitor"/>
+	<reference id="ftpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="ftpMonitor"/>
+	<reference id="gpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="gpMonitor"/>
+	<reference id="httpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="httpMonitor"/>
+	<reference id="httpPostMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="httpPostMonitor"/>
+	<reference id="httpsMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="availabilityMonitor"/>
+	<reference id="icmpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="icmpMonitor"/>
+	<reference id="imapMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="imapMonitor"/>
+	<reference id="jdbcMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="jdbcMonitor"/>
+	<reference id="jdbcQueryMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="jdbcQueryMonitor"/>
+	<reference id="jdbcStoredProcedureMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="jdbcStoredProcedureMonitor"/>
+	<reference id="jolokiaBeanMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="jolokiaBeanMonitor"/>
+	<reference id="jschSshMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="jschSshMonitor"/>
+	<reference id="ldapMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="ldapMonitor"/>
+	<reference id="ldapsMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="ldapsMonitor"/>
+	<reference id="loopMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="loopMonitor"/>
+	<reference id="memcachedMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="memcachedMonitor"/>
+	<reference id="nrpeMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="nrpeMonitor"/>
+	<reference id="ntpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="ntpMonitor"/>
+	<reference id="pop3Monitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="pop3Monitor"/>
+	<reference id="smtpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="smtpMonitor"/>
+	<reference id="sshMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="sshMonitor"/>
+	<reference id="sslCertMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="sslCertMonitor"/>
+	<reference id="strafePingMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="strafePingMonitor"/>
+	<reference id="systemExecuteMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="systemExecuteMonitor"/>
+	<reference id="tcpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="tcpMonitor"/>
+	<reference id="trivialTimeMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="trivialTimeMonitor"/>
+	<reference id="webMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="webMonitor"/>
+
+	<!-- ActiveMQ component provided by minion-core -->
+	<reference id="queuingservice" interface="org.apache.camel.Component" filter="(alias=opennms.broker)"/>
+
+	<camelContext id="pollerMonitorsCoreMinionContext" xmlns="http://camel.apache.org/schema/blueprint">
+		<propertyPlaceholder id="properties" location="blueprint:pollerMonitorsCoreMinionProperties" />
+
+		<!-- Availability Monitor -->
+		<route id="pollAvailabilityMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.AvailabilityMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="availabilityMonitor" />
+		</route>
+		
+		<!-- Citrix Monitor -->
+		<route id="pollCitrixMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.CitrixMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="citrixMonitor" />
+		</route>
+		
+		<!-- Dns Monitor -->
+		<route id="pollDnsMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.DnsMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="dnsMonitor" />
+		</route>
+		
+		<!-- DNSResolution Monitor -->
+		<route id="pollDNSResolutionMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.DNSResolutionMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="dnsResolutionMonitor" />
+		</route>
+		
+		<!-- DominoIIOP Monitor -->
+		<route id="pollDominoIIOPMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.DominoIIOPMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="dominoIIOPMonitor" />
+		</route>
+		
+		<!-- Ftp Monitor -->
+		<route id="pollFtpMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.FtpMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="ftpMonitor" />
+		</route>
+		
+		<!-- Gp Monitor -->
+		<route id="pollGpMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.GpMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="gpMonitor" />
+		</route>
+		
+		<!-- Http Monitor -->
+		<route id="pollHttpMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.HttpMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="httpMonitor" />
+		</route>
+		
+		<!-- HttpPost Monitor -->
+		<route id="pollHttpPostMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.HttpPostMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="httpPostMonitor" />
+		</route>
+		
+		<!-- Https Monitor -->
+		<route id="pollHttpsMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.HttpsMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="httpsMonitor" />
+		</route>
+		
+		<!-- Icmp Monitor -->
+		<route id="pollIcmpMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.IcmpMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="icmpMonitor" />
+		</route>
+		
+		<!-- Imap Monitor -->
+		<route id="pollImapMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.ImapMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="imapMonitor" />
+		</route>
+		
+		<!-- JDBC Monitor -->
+		<route id="pollAvailabilityMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.JDBCMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="jdbcMonitor" />
+		</route>
+		
+		<!-- JDBCQuery Monitor -->
+		<route id="pollJDBCQueryMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.JDBCQueryMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="jdbcQueryMonitor" />
+		</route>
+		
+		<!-- JDBCStoredProcedure Monitor -->
+		<route id="pollJDBCStoredProcedureMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.JDBCStoredProcedureMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="jdbcStoredProcedureMonitor" />
+		</route>
+		
+		<!-- JolokiaBean Monitor -->
+		<route id="pollJolokiaBeanMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.JolokiaBeanMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="jolokiaBeanMonitor" />
+		</route>
+		
+		<!-- JschSsh Monitor -->
+		<route id="pollJschSshMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.JschSshMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="jschSshMonitor" />
+		</route>
+		
+		<!-- Ldap Monitor -->
+		<route id="pollLdapMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.LdapMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="ldapMonitor" />
+		</route>
+		
+		<!-- Ldaps Monitor -->
+		<route id="pollLdapsMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.LdapsMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="ldapsMonitor" />
+		</route>
+		
+		<!-- Loop Monitor -->
+		<route id="pollLoopMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.LoopMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="loopMonitor" />
+		</route>
+		
+		<!-- Memcached Monitor -->
+		<route id="pollMemcachedMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.MemcachedMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="memcachedMonitor" />
+		</route>
+		
+		<!-- Nrpe Monitor -->
+		<route id="pollNrpeMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.NrpeMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="nrpeMonitor" />
+		</route>
+		
+		<!-- Ntp Monitor -->
+		<route id="pollNtpMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.NtpMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="ntpMonitor" />
+		</route>
+		
+		<!-- Pop3 Monitor -->
+		<route id="pollPop3Monitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.Pop3Monitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="pop3Monitor" />
+		</route>
+		
+		<!-- Smtp Monitor -->
+		<route id="pollSmtpMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.SmtpMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="smtpMonitor" />
+		</route>
+		
+		<!-- Ssh Monitor -->
+		<route id="pollSshMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.SshMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="sshMonitor" />
+		</route>
+		
+		<!-- SSLCert Monitor -->
+		<route id="pollSSLCertMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.SSLCertMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="sslCertMonitor" />
+		</route>
+		
+		<!-- StrafePing Monitor -->
+		<route id="pollStrafePingMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.StrafePingMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="strafePingMonitor" />
+		</route>
+		
+		<!-- SystemExecute Monitor -->
+		<route id="pollSystemExecuteMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.SystemExecuteMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="systemExecuteMonitor" />
+		</route>
+		
+		<!-- Tcp Monitor -->
+		<route id="pollTcpMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.TcpMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="tcpMonitor" />
+		</route>
+		
+		<!-- TrivialTime Monitor -->
+		<route id="pollTrivialTimeMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.TrivialTimeMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="trivialTimeMonitor" />
+		</route>
+		
+		<!-- Web Monitor -->
+		<route id="pollWebMonitor">
+			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.WebMonitor" />
+			<setExchangePattern pattern="InOut"/>
+			<bean ref="webMonitor" />
+		</route>
+		
+	</camelContext>
+
+</blueprint>
