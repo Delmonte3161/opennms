@@ -408,6 +408,13 @@ public class OnmsFeatureKarafIT extends KarafTestCase {
 		installFeature("opennms-snmp");
 		System.out.println(executeCommand("features:list -i"));
 	}
+	
+	@Test
+	public void testInstallFeatureOpennmsMonitorsCore() {
+		installFeature("opennms-poller-monitors-core");
+		System.out.println(executeCommand("features:list -i"));
+	}
+	
 	/*
 	@Test
 	public void testInstallFeatureOpennmsWebapp() {

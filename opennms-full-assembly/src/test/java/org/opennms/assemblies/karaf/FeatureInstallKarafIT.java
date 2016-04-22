@@ -130,6 +130,7 @@ public class FeatureInstallKarafIT extends KarafTestCase {
         installFeature("opennms-rrd-api");
         installFeature("opennms-rrd-jrobin");
         installFeature("opennms-snmp");
+        installFeature("opennms-poller-monitors-core");
         installFeature("opennms-syslogd");
         //installFeature("opennms-syslogd-handler-default");
         installFeature("opennms-syslogd-handler-kafka");
