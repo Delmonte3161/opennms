@@ -3,18 +3,10 @@
  */
 package org.opennms.netmgt.poller.remote;
 
-import static org.easymock.EasyMock.expect;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.apache.camel.test.junit4.CamelTestSupport;
-import org.apache.commons.lang.builder.EqualsBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,11 +20,11 @@ import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
-import org.opennms.netmgt.poller.ServiceMonitorLocator;
-import org.opennms.netmgt.poller.remote.support.DefaultPollerBackEnd;
 import org.opennms.test.JUnitConfigurationEnvironment;
 import org.opennms.test.mock.EasyMockUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -47,6 +39,7 @@ import org.springframework.test.context.ContextConfiguration;
 })
 @JUnitConfigurationEnvironment
 @JUnitTemporaryDatabase(dirtiesContext=false,tempDbClass=MockDatabase.class,reuseDatabase=false)
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class ContextServiceMonitorLocatorTest extends CamelTestSupport {
 	private EasyMockUtils m_mock = new EasyMockUtils(); 
 
@@ -72,6 +65,25 @@ public class ContextServiceMonitorLocatorTest extends CamelTestSupport {
 		m_serviceregistry.register(m_mockServiceMonitor, properties,ServiceMonitor.class);
 
 		assertIsInstanceOf(ContextServiceMonitorLocator.class ,m_pollerConfig.getServiceMonitorLocators(DistributionContext.REMOTE_MONITOR).iterator().next());
+	}
+	
+	@Test
+	public void testToCheckDaemonForContextServiceMonitorLocator() {
+		
+		Map<String, String> properties =new ConcurrentSkipListMap<String, String>();
+		properties.put("implementation", "org.opennms.netmgt.poller.monitors.VmwareMonitor");
+		
+		m_mockServiceMonitor=new MockServiceMonitor();
+		m_serviceregistry.register(m_mockServiceMonitor, properties,ServiceMonitor.class);
+		
+		assertIsInstanceOf(ContextServiceMonitorLocator.class ,m_pollerConfig.getServiceMonitorLocators(DistributionContext.DAEMON).iterator().next());
+	
+		properties.put("implementation", "org.opennms.netmgt.poller.monitors.ImapMonitor");
+		m_serviceregistry.register(m_mockServiceMonitor, properties,ServiceMonitor.class);
+		
+		assertEquals(2, m_pollerConfig.getServiceMonitorLocators(DistributionContext.DAEMON).size());
+		
+		
 	}
 	
 	public class MockServiceMonitor implements ServiceMonitor
