@@ -249,7 +249,7 @@
             <feature>opennms-elasticsearch-event-forwarder</feature>
             <feature>jira-troubleticketer</feature>
             <feature>datachoices</feature>
-            <feature>opennms-poller-monitors-core</feature>
+            <feature>opennms-poller-monitors-core-minion</feature>
           </features>
         </configuration>
       </plugin>

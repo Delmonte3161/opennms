@@ -77,8 +77,8 @@ public class MinionFeatureKarafIT extends KarafTestCase {
 	}
 	
 	@Test
-	public void testInstallFeatureOpennmsPollerMonitersCore() {
-		installFeature("opennms-poller-monitors-core");
+	public void testInstallFeatureOpennmsPollerMonitersCoreMinion() {
+		installFeature("opennms-poller-monitors-core-minion");
 		System.out.println(executeCommand("features:list -i"));
 	}
 }

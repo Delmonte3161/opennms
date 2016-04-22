@@ -29,9 +29,12 @@
       <bundle>blueprint:mvn:org.opennms.features/org.opennms.features.discovery/${project.version}/xml/blueprint-discovery-distPollerDaoMinion</bundle>
     </feature>
     
-    <feature name="opennms-poller-monitors-core" description="OpenNMS :: Poller :: Monitors :: Core" version="${project.version}">
-      <!-- <feature>opennms-poller-api</feature> -->
-      <bundle>blueprint:mvn:org.opennms.features.poller.monitors/org.opennms.features.poller.monitors.core/${project.version}/xml/blueprint-poller</bundle>
+    <feature name="opennms-poller-monitors-core-minion" description="OpenNMS :: Poller :: Monitors :: Core :: Minion" version="${project.version}">
+      <feature>opennms-poller-api</feature>
+      <feature>camel-core</feature>
+      <feature>commons-net</feature>
+      <feature>opennms-dao-api</feature>
+      <bundle>blueprint:mvn:org.opennms.features.poller.monitors/org.opennms.features.poller.monitors.core/${project.version}/xml/blueprint-poller-monitors-core-minion</bundle>
     </feature>
     
 </features>

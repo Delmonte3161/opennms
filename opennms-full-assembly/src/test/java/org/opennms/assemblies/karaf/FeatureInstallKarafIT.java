@@ -145,6 +145,7 @@ public class FeatureInstallKarafIT extends KarafTestCase {
         installFeature("postgresql");
         installFeature("spring-security32");
         installFeature("spring-webflow");
+        installFeature("opennms-poller-monitors-core-minion");
 
         System.out.println(executeCommand("features:list -i"));
     }

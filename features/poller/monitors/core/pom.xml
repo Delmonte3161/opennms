@@ -22,15 +22,30 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Version>${project.version}</Bundle-Version>
             <Export-Package></Export-Package>
-          </instructions>
-          <artifacts>
-                <artifact>
-                  <file>blueprint-poller.xml</file>
-                  <type>xml</type>
-                  <classifier>blueprint-poller</classifier>
-                </artifact>  
-          </artifacts>  
+          </instructions> 
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-artifacts</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>blueprint-poller-monitors-core-minion.xml</file>
+                  <type>xml</type>
+                  <classifier>blueprint-poller-monitors-core-minion</classifier>
+                </artifact>  
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
