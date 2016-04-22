@@ -291,9 +291,18 @@
       <bundle>wrap:mvn:jfree/jcommon/1.0.16</bundle>
     </feature>
 
+    <feature name="jldap" description="OpenLDAP :: JLDAP" version="4.3">
+      <bundle>wrap:mvn:com.novell.ldap/jldap/4.3</bundle>
+    </feature>
+
     <feature name="jolokia" description="Jolokia" version="1.2.3">
       <feature>http</feature>
       <bundle>mvn:org.jolokia/jolokia-osgi/1.2.3</bundle>
+    </feature>
+
+    <feature name="jolokia-client" description="Jolokia :: Client" version="1.3.3">
+      <feature>http</feature>
+      <bundle>mvn:org.jolokia/jolokia-client-java/1.3.3</bundle>
     </feature>
 
     <feature name="jrobin" description="JRobin" version="1.6.0-SNAPSHOT">
@@ -304,6 +313,10 @@
       <bundle>wrap:mvn:net.sf.ezmorph/ezmorph/1.0.6</bundle>
       <!-- Use the jdk15 qualifier -->
       <bundle>wrap:mvn:net.sf.json-lib/json-lib/2.2.3/jar/jdk15</bundle>
+    </feature>
+
+    <feature name="json-simple" description="json-simple" version="1.1.1">
+      <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/1.1.1</bundle>
     </feature>
 
     <feature name="org.json" description="org.json" version="20140107">
@@ -608,7 +621,7 @@
       <bundle>mvn:org.opennms/opennms-javamail-api/${project.version}</bundle>
     </feature>
 
-    <feature name="opennms-poller-api" description="OpenNMS :: Poller API" version="${project.version}">
+    <feature name="opennms-poller-api" description="OpenNMS :: Poller :: API" version="${project.version}">
       <feature version="[4.0,4.1)">spring</feature>
 
       <feature>hibernate36</feature>
@@ -616,6 +629,26 @@
       <feature>opennms-core</feature>
 
       <bundle>mvn:org.opennms.features.poller/org.opennms.features.poller.api/${project.version}</bundle>
+    </feature>
+
+    <feature name="opennms-poller-monitors-core" description="OpenNMS :: Poller :: Monitors :: Core" version="${project.version}">
+      <feature>camel-core</feature>
+      <feature>camel-http</feature>
+      <feature>commons-io</feature>
+      <feature>commons-lang</feature>
+      <feature>commons-net</feature>
+      <feature>dnsjava</feature>
+      <feature>hibernate36</feature>
+      <feature>jldap</feature>
+      <feature>jolokia-client</feature>
+      <feature>json-simple</feature>
+
+      <!-- We really just need org.apache.httpcomponents out of here -->
+      <feature>opennms-core-web</feature>
+      <feature>opennms-icmp-api</feature> 
+      <feature>opennms-poller-api</feature>
+
+      <bundle>mvn:org.opennms.features.poller.monitors/org.opennms.features.poller.monitors.core/${project.version}</bundle>
     </feature>
 
     <feature name="opennms-measurements-api" description="OpenNMS :: Measurements :: API" version="${project.version}">
