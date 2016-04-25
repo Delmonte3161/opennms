@@ -410,7 +410,7 @@ public class OnmsFeatureKarafIT extends KarafTestCase {
 	}
 	
 	@Test
-	public void testInstallFeatureOpennmsMonitorsCore() {
+	public void testInstallFeatureOpennmsPollerMonitersCore() {
 		installFeature("opennms-poller-monitors-core");
 		System.out.println(executeCommand("features:list -i"));
 	}
@@ -440,12 +440,6 @@ public class OnmsFeatureKarafIT extends KarafTestCase {
 	@Test
 	public void testInstallFeatureSpringWebflow() {
 		installFeature("spring-webflow");
-		System.out.println(executeCommand("features:list -i"));
-	}
-	
-	@Test
-	public void testInstallFeatureOpennmsPollerMonitersCore() {
-		installFeature("opennms-poller-monitors-core");
 		System.out.println(executeCommand("features:list -i"));
 	}
 }
