@@ -26,7 +26,7 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.core.utils;
+package org.opennms.core.net;
 
 import java.io.IOException;
 import java.net.Socket;

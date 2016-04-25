@@ -66,7 +66,6 @@ import org.opennms.core.schema.ExistingResourceAccessor;
 import org.opennms.core.schema.Migration;
 import org.opennms.core.schema.Migrator;
 import org.opennms.core.utils.ConfigFileConstants;
-import org.opennms.core.utils.ProcessExec;
 import org.opennms.netmgt.config.opennmsDataSources.JdbcDataSource;
 import org.opennms.netmgt.icmp.Pinger;
 import org.opennms.netmgt.icmp.PingerFactory;

@@ -132,6 +132,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.opennms.core</groupId>
+      <artifactId>org.opennms.core.soa</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.googlecode.concurrent-locks</groupId>
       <artifactId>concurrent-locks</artifactId>
     </dependency>

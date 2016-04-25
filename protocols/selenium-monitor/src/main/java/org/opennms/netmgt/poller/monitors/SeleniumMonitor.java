@@ -41,7 +41,7 @@ import org.codehaus.groovy.control.CompilationFailedException;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
-import org.opennms.core.utils.TimeoutTracker;
+import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.netmgt.junit.runner.SeleniumComputer;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.MonitoredService;

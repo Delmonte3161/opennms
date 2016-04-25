@@ -43,9 +43,9 @@ import java.nio.ByteBuffer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.core.utils.ParameterMap;
-import org.opennms.core.utils.TimeoutTracker;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.NetworkInterface;
@@ -197,7 +197,7 @@ public class TrivialTimeMonitor extends AbstractServiceMonitor {
      * @param svc a {@link org.opennms.netmgt.poller.MonitoredService} object.
      * @param parameters a {@link java.util.Map} object.
      * @param serviceStatus a {@link org.opennms.netmgt.poller.PollStatus} object.
-     * @param tracker a {@link org.opennms.core.utils.TimeoutTracker} object.
+     * @param tracker a {@link org.opennms.core.concurrent.TimeoutTracker} object.
      * @param ipv4Addr a {@link java.net.InetAddress} object.
      * @param port a int.
      * @param allowedSkew a int.
@@ -280,7 +280,7 @@ public class TrivialTimeMonitor extends AbstractServiceMonitor {
      * @param svc a {@link org.opennms.netmgt.poller.MonitoredService} object.
      * @param parameters a {@link java.util.Map} object.
      * @param serviceStatus a {@link org.opennms.netmgt.poller.PollStatus} object.
-     * @param tracker a {@link org.opennms.core.utils.TimeoutTracker} object.
+     * @param tracker a {@link org.opennms.core.concurrent.TimeoutTracker} object.
      * @param ipv4Addr a {@link java.net.InetAddress} object.
      * @param port a int.
      * @param allowedSkew a int.

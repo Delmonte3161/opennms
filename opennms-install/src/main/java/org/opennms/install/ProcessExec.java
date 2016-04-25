@@ -26,7 +26,7 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.core.utils;
+package org.opennms.install;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
