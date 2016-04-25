@@ -26,10 +26,12 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.core.utils;
+package org.opennms.core.concurrent;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import org.opennms.core.utils.ParameterMap;
 
 
 /**
@@ -37,9 +39,6 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:ranger@opennms.org">Ben Reed</a>
  * @author <a href="mailto:brozow@opennms.org">Mathew Brozowski</a>
- * @author <a href="mailto:ranger@opennms.org">Ben Reed</a>
- * @author <a href="mailto:brozow@opennms.org">Mathew Brozowski</a>
- * @version $Id: $
  */
 public class TimeoutTracker {
 

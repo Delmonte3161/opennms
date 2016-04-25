@@ -33,8 +33,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.core.utils.ParameterMap;
-import org.opennms.core.utils.TimeoutTracker;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.InsufficientParametersException;
 import org.opennms.netmgt.poller.MonitoredService;

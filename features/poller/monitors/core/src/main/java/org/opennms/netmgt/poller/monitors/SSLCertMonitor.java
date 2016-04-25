@@ -40,12 +40,14 @@ import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Map;
+
 import javax.net.ssl.SSLSocket;
+
+import org.opennms.core.concurrent.TimeoutTracker;
+import org.opennms.core.net.SocketWrapper;
+import org.opennms.core.net.SslSocketWrapper;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.core.utils.ParameterMap;
-import org.opennms.core.utils.SocketWrapper;
-import org.opennms.core.utils.SslSocketWrapper;
-import org.opennms.core.utils.TimeoutTracker;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.NetworkInterface;
