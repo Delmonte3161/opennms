@@ -1,4 +1,4 @@
-package org.opennms.core.utils;
+package org.opennms.core.net;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;

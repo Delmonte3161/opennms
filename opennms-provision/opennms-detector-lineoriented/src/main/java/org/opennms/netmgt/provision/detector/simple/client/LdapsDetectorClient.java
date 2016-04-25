@@ -28,8 +28,8 @@
 
 package org.opennms.netmgt.provision.detector.simple.client;
 
-import org.opennms.core.utils.SocketWrapper;
-import org.opennms.core.utils.SslSocketWrapper;
+import org.opennms.core.net.SocketWrapper;
+import org.opennms.core.net.SslSocketWrapper;
 
 /**
  * <p>LdapDetectorClient class.</p>

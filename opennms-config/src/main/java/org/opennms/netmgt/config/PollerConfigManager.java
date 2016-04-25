@@ -85,6 +85,8 @@ abstract public class PollerConfigManager implements PollerConfig {
     private final Lock m_readLock = m_globalLock.readLock();
     private final Lock m_writeLock = m_globalLock.writeLock();
     
+    private Map<String,ServiceMonitor> m_onmsgiServices=new ConcurrentSkipListMap<String, ServiceMonitor>();
+    
     /**
      * <p>Constructor for PollerConfigManager.</p>
      *
@@ -1006,10 +1008,17 @@ abstract public class PollerConfigManager implements PollerConfig {
             getReadLock().lock();
             for(final Monitor monitor : monitors()) {
                 try {
-                    final Class<? extends ServiceMonitor> mc = findServiceMonitorClass(monitor);
-                    if (isDistributableToContext(mc, context)) {
-                        final ServiceMonitorLocator locator = new DefaultServiceMonitorLocator(monitor.getService(), mc);
+                    // If we have an onmsgi implementation of this service, wrap a ContextServiceMonitorLocator locator around it
+                    if (m_onmsgiServices.containsKey(monitor.getClassName())) {
+                        final ServiceMonitorLocator locator = new ContextServiceMonitorLocator(monitor.getService(), m_onmsgiServices.get(monitor.getClassName()).getClass());
                         locators.add(locator);
+                    } else {
+                        // Otherwise use a DefaultServiceMonitorLocator
+                        final Class<? extends ServiceMonitor> mc = findServiceMonitorClass(monitor);
+                        if (isDistributableToContext(mc, context)) {
+                            final ServiceMonitorLocator locator = new DefaultServiceMonitorLocator(monitor.getService(), mc);
+                            locators.add(locator);
+                        }
                     }
                     LOG.debug("Loaded monitor for service: {}, class-name: {}", monitor.getService(), monitor.getClassName());
                 } catch (final ClassNotFoundException e) {
@@ -1084,4 +1093,12 @@ abstract public class PollerConfigManager implements PollerConfig {
 	        getWriteLock().unlock();
 	    }
 	}
+    
+    public void onServiceMonitorBind(final ServiceMonitor monitor, final Map<String,String> properties) {
+        m_onmsgiServices.put(properties.get("implementation"), monitor);
+    }
+
+    public void onServiceMonitorUnbind(final ServiceMonitor monitor, final Map<String,String> properties) {
+        m_onmsgiServices.clear();
+    }
 }
