@@ -35,8 +35,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-import org.opennms.core.utils.SocketUtils;
-import org.opennms.core.utils.SocketWrapper;
+import org.opennms.core.net.SocketUtils;
+import org.opennms.core.net.SocketWrapper;
 import org.opennms.netmgt.provision.detector.simple.request.NrpeRequest;
 import org.opennms.netmgt.provision.support.Client;
 import org.opennms.netmgt.provision.support.nrpe.NrpePacket;

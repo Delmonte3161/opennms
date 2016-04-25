@@ -23,6 +23,7 @@
             <Export-Package>
               org.opennms.core.concurrent.*;version="${project.version}",
               org.opennms.core.fiber.*;version="${project.version}",
+              org.opennms.core.net.*;version="${project.version}",
               org.opennms.core.queue.*;version="${project.version}",
               org.opennms.core.resource.*;version="${project.version}",
               org.opennms.core.resource.db.*;version="${project.version}",

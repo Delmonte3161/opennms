@@ -31,10 +31,10 @@ package org.opennms.netmgt.provision.detector.simple.client;
 import java.io.IOException;
 import java.net.InetAddress;
 
-import org.opennms.core.utils.DefaultSocketWrapper;
+import org.opennms.core.net.DefaultSocketWrapper;
+import org.opennms.core.net.SocketWrapper;
+import org.opennms.core.net.TimeoutSocketFactory;
 import org.opennms.core.utils.InetAddressUtils;
-import org.opennms.core.utils.SocketWrapper;
-import org.opennms.core.utils.TimeoutSocketFactory;
 
 import com.novell.ldap.LDAPConnection;
 import com.novell.ldap.LDAPSocketFactory;

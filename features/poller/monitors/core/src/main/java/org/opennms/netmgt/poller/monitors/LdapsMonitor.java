@@ -30,9 +30,9 @@ package org.opennms.netmgt.poller.monitors;
 
 import java.util.Map;
 
+import org.opennms.core.net.SocketWrapper;
+import org.opennms.core.net.SslSocketWrapper;
 import org.opennms.core.utils.ParameterMap;
-import org.opennms.core.utils.SocketWrapper;
-import org.opennms.core.utils.SslSocketWrapper;
 import org.opennms.netmgt.poller.Distributable;
 
 import com.novell.ldap.LDAPConnection;

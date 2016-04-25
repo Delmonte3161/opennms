@@ -33,7 +33,7 @@ import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFilenameFilter;
 
-import org.opennms.core.utils.TimeoutTracker;
+import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
