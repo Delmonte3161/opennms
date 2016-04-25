@@ -36,11 +36,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.opennms.core.utils.ConfigFileConstants;
 import org.opennms.core.xml.JaxbUtils;
 import org.opennms.netmgt.config.poller.PollerConfiguration;
+import org.opennms.netmgt.poller.ServiceMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -228,5 +230,13 @@ public final class PollerConfigFactory extends PollerConfigManager {
         } finally {
             getWriteLock().unlock();
         }
+    }
+    
+    public void onServiceMonitorBind(ServiceMonitor monitor, Map<String, String> properties) {
+    	super.onServiceMonitorBind(monitor, properties);
+    }
+    
+    public void onServiceMonitorUnbind(ServiceMonitor monitor, Map<String, String> properties) {
+    	super.onServiceMonitorUnbind(monitor, properties);
     }
 }
