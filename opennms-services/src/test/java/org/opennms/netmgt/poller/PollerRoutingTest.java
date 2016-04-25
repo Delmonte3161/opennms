@@ -35,8 +35,9 @@ public class PollerRoutingTest extends CamelTestSupport {
         JndiRegistry registry = super.createRegistry();
 
         registry.bind( "availabilityMonitor", new AvailabilityMonitor() );
-        registry.bind( "availabilityMonitorCamel", new ServiceMonitorCamelImpl("direct:pollAvailabilityMonitor",new AvailabilityMonitor() ) );
-
+        registry.bind( "availabilityMonitorCamel", new ServiceMonitorCamelImpl("direct:pollAvailabilityMonitor") );
+        
+        
         return registry;
     }
 	
