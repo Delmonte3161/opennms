@@ -38,7 +38,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.regex.Pattern;
 
-import org.opennms.core.utils.TimeoutTracker;
+import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.netmgt.poller.AbstractPoll;
 import org.opennms.netmgt.poller.InsufficientParametersException;
 import org.opennms.netmgt.poller.PollStatus;

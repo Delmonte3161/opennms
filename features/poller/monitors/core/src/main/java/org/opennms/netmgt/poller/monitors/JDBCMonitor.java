@@ -39,9 +39,9 @@ import java.sql.Statement;
 import java.util.Map;
 import java.util.Properties;
 
+import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.core.utils.DBTools;
 import org.opennms.core.utils.ParameterMap;
-import org.opennms.core.utils.TimeoutTracker;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.NetworkInterface;
