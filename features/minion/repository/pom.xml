@@ -40,6 +40,7 @@
                                 are included in the repository tar.gz file, add the feature to this list. -->
                             <features>
                                 <feature>opennms-discoverer</feature>
+                                <feature>opennms-poller-monitors-core-minion</feature>
                             </features>
                             <repository>target/maven-repo</repository>
                         </configuration>
