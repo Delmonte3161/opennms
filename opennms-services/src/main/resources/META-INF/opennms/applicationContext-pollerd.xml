@@ -14,6 +14,7 @@
   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
   http://xmlns.opennms.org/xsd/spring/onms-osgi http://xmlns.opennms.org/xsd/spring/onms-osgi.xsd
+  http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
 ">
 
     <aop:aspectj-autoproxy proxy-target-class="true"/>
@@ -28,304 +29,997 @@
       <property name="pollerConfig" ref="pollerConfig" />
       <property name="queryManager" ref="pollerQueryManager" />
     </bean> 
-    
+
     <bean name="pollableNetwork" class="org.opennms.netmgt.poller.pollables.PollableNetwork">
-        <constructor-arg ref="pollContext" />
+      <constructor-arg ref="pollContext" />
     </bean>
-    
+
     <bean name="daemon" class="org.opennms.netmgt.poller.Poller">
       <property name="network" ref="pollableNetwork" />
       <property name="pollerConfig" ref="pollerConfig" />
       <property name="pollOutagesConfig" ref="pollOutagesConfig" />
       <property name="eventIpcManager" ref="eventIpcManager"/>
     </bean>
-    
-	<bean id="availabilityMonitor" class="org.opennms.netmgt.poller.monitors.AvailabilityMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="availabilityMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.AvailabilityMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="citrixMonitor" class="org.opennms.netmgt.poller.monitors.CitrixMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="citrixMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.CitrixMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="dnsMonitor" class="org.opennms.netmgt.poller.monitors.DnsMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="dnsMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.DnsMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="dnsResolutionMonitor" class="org.opennms.netmgt.poller.monitors.DNSResolutionMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="dnsResolutionMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.DNSResolutionMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="dominoIIOPMonitor" class="org.opennms.netmgt.poller.monitors.DominoIIOPMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="dominoIIOPMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.DominoIIOPMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="ftpMonitor" class="org.opennms.netmgt.poller.monitors.FtpMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="ftpMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.FtpMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="gpMonitor" class="org.opennms.netmgt.poller.monitors.GpMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="gpMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.GpMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="httpMonitor" class="org.opennms.netmgt.poller.monitors.HttpMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="httpMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.HttpMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="httpPostMonitor" class="org.opennms.netmgt.poller.monitors.HttpPostMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="httpPostMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.HttpPostMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="httpsMonitor" class="org.opennms.netmgt.poller.monitors.HttpsMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="httpsMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.HttpsMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="icmpMonitor" class="org.opennms.netmgt.poller.monitors.IcmpMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="icmpMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.IcmpMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="imapMonitor" class="org.opennms.netmgt.poller.monitors.ImapMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="imapMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.ImapMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="jdbcMonitor" class="org.opennms.netmgt.poller.monitors.JDBCMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="jdbcMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.JDBCMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="jdbcQueryMonitor" class="org.opennms.netmgt.poller.monitors.JDBCQueryMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="jdbcQueryMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.JDBCQueryMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="jdbcStoredProcedureMonitor" class="org.opennms.netmgt.poller.monitors.JDBCStoredProcedureMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="jdbcStoredProcedureMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.JDBCStoredProcedureMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="jolokiaBeanMonitor" class="org.opennms.netmgt.poller.monitors.JolokiaBeanMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="jolokiaBeanMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.JolokiaBeanMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="jschSshMonitor" class="org.opennms.netmgt.poller.monitors.JschSshMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="jschSshMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.JschSshMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="ldapMonitor" class="org.opennms.netmgt.poller.monitors.LdapMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="ldapMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.LdapMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="ldapsMonitor" class="org.opennms.netmgt.poller.monitors.LdapsMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="ldapsMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.LdapsMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="loopMonitor" class="org.opennms.netmgt.poller.monitors.LoopMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="loopMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.LoopMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="memcachedMonitor" class="org.opennms.netmgt.poller.monitors.MemcachedMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="memcachedMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.MemcachedMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="nrpeMonitor" class="org.opennms.netmgt.poller.monitors.NrpeMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="nrpeMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.NrpeMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="ntpMonitor" class="org.opennms.netmgt.poller.monitors.NtpMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="ntpMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.NtpMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="pop3Monitor" class="org.opennms.netmgt.poller.monitors.Pop3Monitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="pop3Monitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.Pop3Monitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="smtpMonitor" class="org.opennms.netmgt.poller.monitors.SmtpMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="smtpMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.SmtpMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="sshMonitor" class="org.opennms.netmgt.poller.monitors.SshMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="sshMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.SshMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="sslCertMonitor" class="org.opennms.netmgt.poller.monitors.SSLCertMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="sslCertMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.SSLCertMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="strafePingMonitor" class="org.opennms.netmgt.poller.monitors.StrafePingMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="strafePingMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.StrafePingMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="systemExecuteMonitor" class="org.opennms.netmgt.poller.monitors.SystemExecuteMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="systemExecuteMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.SystemExecuteMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="tcpMonitor" class="org.opennms.netmgt.poller.monitors.TcpMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="tcpMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.TcpMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="trivialTimeMonitor" class="org.opennms.netmgt.poller.monitors.TrivialTimeMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="trivialTimeMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.TrivialTimeMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-	
-	<bean id="webMonitor" class="org.opennms.netmgt.poller.monitors.WebMonitor" />
-	<onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor"
-		ref="webMonitor">
-		<onmsgi:service-properties>
-			<entry key="implementation"
-				value="org.opennms.netmgt.poller.monitors.WebMonitor" />
-		</onmsgi:service-properties>
-	</onmsgi:service>
-    
+
+    <!-- ServiceMonitor service beans -->
+    <bean id="availabilityMonitor" class="org.opennms.netmgt.poller.monitors.AvailabilityMonitor" />
+    <bean id="availabilityMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollAvailabilityMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="availabilityMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.AvailabilityMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="citrixMonitor" class="org.opennms.netmgt.poller.monitors.CitrixMonitor" />
+    <bean id="citrixMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollCitrixMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="citrixMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.CitrixMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="dnsMonitor" class="org.opennms.netmgt.poller.monitors.DnsMonitor" />
+    <bean id="dnsMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollDnsMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="dnsMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.DnsMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="dnsResolutionMonitor" class="org.opennms.netmgt.poller.monitors.DNSResolutionMonitor" />
+    <bean id="dnsResolutionMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollDnsResolutionMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="dnsResolutionMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.DNSResolutionMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="dominoIIOPMonitor" class="org.opennms.netmgt.poller.monitors.DominoIIOPMonitor" />
+    <bean id="dominoIIOPMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollDominoIIOPMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="dominoIIOPMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.DominoIIOPMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="ftpMonitor" class="org.opennms.netmgt.poller.monitors.FtpMonitor" />
+    <bean id="ftpMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollFtpMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="ftpMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.FtpMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="gpMonitor" class="org.opennms.netmgt.poller.monitors.GpMonitor" />
+    <bean id="gpMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollGpMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="gpMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.GpMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="httpMonitor" class="org.opennms.netmgt.poller.monitors.HttpMonitor" />
+    <bean id="httpMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollHttpMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="httpMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.HttpMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="httpPostMonitor" class="org.opennms.netmgt.poller.monitors.HttpPostMonitor" />
+    <bean id="httpPostMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollHttpPostMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="httpPostMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.HttpPostMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="httpsMonitor" class="org.opennms.netmgt.poller.monitors.HttpsMonitor" />
+    <bean id="httpsMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollHttpsMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="httpsMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.HttpsMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="icmpMonitor" class="org.opennms.netmgt.poller.monitors.IcmpMonitor" />
+    <bean id="icmpMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollIcmpMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="icmpMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.IcmpMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="imapMonitor" class="org.opennms.netmgt.poller.monitors.ImapMonitor" />
+    <bean id="imapMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollImapMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="imapMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.ImapMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="jdbcMonitor" class="org.opennms.netmgt.poller.monitors.JDBCMonitor" />
+    <bean id="jdbcMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollJdbcMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="jdbcMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.JDBCMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="jdbcQueryMonitor" class="org.opennms.netmgt.poller.monitors.JDBCQueryMonitor" />
+    <bean id="jdbcQueryMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollJdbcQueryMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="jdbcQueryMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.JDBCQueryMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="jdbcStoredProcedureMonitor" class="org.opennms.netmgt.poller.monitors.JDBCStoredProcedureMonitor" />
+    <bean id="jdbcStoredProcedureMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollJdbcStoredProcedureMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="jdbcStoredProcedureMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.JDBCStoredProcedureMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="jolokiaBeanMonitor" class="org.opennms.netmgt.poller.monitors.JolokiaBeanMonitor" />
+    <bean id="jolokiaBeanMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollJolokiaBeanMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="jolokiaBeanMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.JolokiaBeanMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="jschSshMonitor" class="org.opennms.netmgt.poller.monitors.JschSshMonitor" />
+    <bean id="jschSshMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollJschSshMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="jschSshMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.JschSshMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="ldapMonitor" class="org.opennms.netmgt.poller.monitors.LdapMonitor" />
+    <bean id="ldapMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollLdapMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="ldapMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.LdapMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="ldapsMonitor" class="org.opennms.netmgt.poller.monitors.LdapsMonitor" />
+    <bean id="ldapsMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollLdapsMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="ldapsMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.LdapsMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="loopMonitor" class="org.opennms.netmgt.poller.monitors.LoopMonitor" />
+    <bean id="loopMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollLoopMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="loopMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.LoopMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="memcachedMonitor" class="org.opennms.netmgt.poller.monitors.MemcachedMonitor" />
+    <bean id="memcachedMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollMemcachedMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="memcachedMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.MemcachedMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="nrpeMonitor" class="org.opennms.netmgt.poller.monitors.NrpeMonitor" />
+    <bean id="nrpeMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollNrpeMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="nrpeMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.NrpeMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="ntpMonitor" class="org.opennms.netmgt.poller.monitors.NtpMonitor" />
+    <bean id="ntpMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollNtpMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="ntpMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.NtpMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="pop3Monitor" class="org.opennms.netmgt.poller.monitors.Pop3Monitor" />
+    <bean id="pop3MonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollPop3Monitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="pop3MonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.Pop3Monitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="smtpMonitor" class="org.opennms.netmgt.poller.monitors.SmtpMonitor" />
+    <bean id="smtpMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollSmtpMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="smtpMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.SmtpMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="sshMonitor" class="org.opennms.netmgt.poller.monitors.SshMonitor" />
+    <bean id="sshMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollSshMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="sshMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.SshMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="sslCertMonitor" class="org.opennms.netmgt.poller.monitors.SSLCertMonitor" />
+    <bean id="sslCertMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollSSLCertMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="sslCertMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.SSLCertMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="strafePingMonitor" class="org.opennms.netmgt.poller.monitors.StrafePingMonitor" />
+    <bean id="strafePingMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollStrafePingMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="strafePingMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.StrafePingMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="systemExecuteMonitor" class="org.opennms.netmgt.poller.monitors.SystemExecuteMonitor" />
+    <bean id="systemExecuteMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollSystemExecuteMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="systemExecuteMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.SystemExecuteMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="tcpMonitor" class="org.opennms.netmgt.poller.monitors.TcpMonitor" />
+    <bean id="tcpMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollTcpMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="tcpMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.TcpMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="trivialTimeMonitor" class="org.opennms.netmgt.poller.monitors.TrivialTimeMonitor" />
+    <bean id="trivialTimeMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollTrivialTimeMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="trivialTimeMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.TrivialTimeMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <bean id="webMonitor" class="org.opennms.netmgt.poller.monitors.WebMonitor" />
+    <bean id="webMonitorCamel" class="org.opennms.netmgt.poller.ServiceMonitorCamelImpl">
+      <constructor-arg value="direct:pollWebMonitor"/>
+    </bean>
+    <onmsgi:service interface="org.opennms.netmgt.poller.ServiceMonitor" ref="webMonitorCamel">
+      <onmsgi:service-properties>
+        <entry key="implementation" value="org.opennms.netmgt.poller.monitors.WebMonitor" />
+      </onmsgi:service-properties>
+    </onmsgi:service>
+
+    <!-- Active MQ -->
+    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+      <property name="brokerURL" value="tcp://localhost:61616" />
+    </bean>
+
+    <camelContext id="pollerDaemonContext" xmlns="http://camel.apache.org/schema/spring">
+
+      <!-- Avaliability Monitor -->
+      <route id="pollAvailabilityMonitor">
+        <from uri="direct:pollAvailabilityMonitor" />
+        <!-- Calculate an appropriate JMS timeout based on the task -->
+        <setHeader headerName="CamelJmsRequestTimeout">
+          <simple>40000</simple>
+        </setHeader>
+        <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+        <setExchangePattern pattern="InOut"/>
+        <recipientList>
+          <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+          <simple>activemq:Location-${body.location}.Poller.AvailabilityMonitor</simple>
+        </recipientList>
+      </route>
+
+      <route id="locationLocalhostAvailabilityMonitorRoute">
+        <from uri="activemq:Location-localhost.Poller.AvailabilityMonitor" />
+        <bean ref="availabilityMonitor" />
+      </route>
+
+
+      <!-- Citrix Monitor -->
+      <route id="pollCitrixMonitor">
+        <from uri="direct:pollCitrixMonitor" />
+        <!-- Calculate an appropriate JMS timeout based on the task -->
+        <setHeader headerName="CamelJmsRequestTimeout">
+          <simple>40000</simple>
+        </setHeader>
+        <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+        <setExchangePattern pattern="InOut"/>
+        <recipientList>
+          <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+          <simple>activemq:Location-${body.location}.Poller.CitrixMonitor</simple>
+        </recipientList>
+      </route>
+
+      <route id="locationLocalhostCitrixMonitorRoute">
+        <from uri="activemq:Location-localhost.Poller.CitrixMonitor" />
+        <bean ref="citrixMonitor" />
+      </route>
+
+
+      <!-- DNS Monitor -->
+      <route id="pollDNSMonitor">
+        <from uri="direct:pollDNSMonitor" />
+        <!-- Calculate an appropriate JMS timeout based on the task -->
+        <setHeader headerName="CamelJmsRequestTimeout">
+          <simple>40000</simple>
+        </setHeader>
+        <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+        <setExchangePattern pattern="InOut"/>
+        <recipientList>
+          <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+          <simple>activemq:Location-${body.location}.Poller.DnsMonitor</simple>
+        </recipientList>
+      </route>
+
+      <route id="locationLocalhostDNSMonitorRoute">
+        <from uri="activemq:Location-localhost.Poller.DnsMonitor" />
+        <bean ref="dnsMonitor" />
+      </route>
+
+
+      <!-- DNS Resolution Monitor -->
+      <route id="pollDNSResolutionMonitor">
+        <from uri="direct:pollDNSResolutionMonitor" />
+        <!-- Calculate an appropriate JMS timeout based on the task -->
+        <setHeader headerName="CamelJmsRequestTimeout">
+          <simple>40000</simple>
+        </setHeader>
+        <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+        <setExchangePattern pattern="InOut"/>
+        <recipientList>
+          <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+          <simple>activemq:Location-${body.location}.Poller.DNSResolutionMonitor</simple>
+        </recipientList>
+      </route>
+
+      <route id="locationLocalhostDNSResolutionMonitorRoute">
+        <from uri="activemq:Location-localhost.Poller.DNSResolutionMonitor" />
+        <bean ref="dnsResolutionMonitor" />
+      </route>
+
+
+      <!-- DominoIIOP Monitor -->
+      <route id="pollDominoIIOPMonitor">
+        <from uri="direct:pollDominoIIOPMonitor" />
+        <!-- Calculate an appropriate JMS timeout based on the task -->
+        <setHeader headerName="CamelJmsRequestTimeout">
+          <simple>40000</simple>
+        </setHeader>
+        <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+        <setExchangePattern pattern="InOut"/>
+        <recipientList>
+          <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+          <simple>activemq:Location-${body.location}.Poller.DominoIIOPMonitor</simple>
+        </recipientList>
+      </route>
+
+      <route id="locationLocalhostDominoIIOPMonitorRoute">
+        <from uri="activemq:Location-localhost.Poller.DominoIIOPMonitor" />
+        <bean ref="dominoIIOPMonitor" />
+      </route>
+
+
+      <!-- FTP Monitor -->
+      <route id="pollFtpMonitor">
+        <from uri="direct:pollFtpMonitor" />
+        <!-- Calculate an appropriate JMS timeout based on the task -->
+        <setHeader headerName="CamelJmsRequestTimeout">
+          <simple>40000</simple>
+        </setHeader>
+        <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+        <setExchangePattern pattern="InOut"/>
+        <recipientList>
+          <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+          <simple>activemq:Location-${body.location}.Poller.FtpMonitor</simple>
+        </recipientList>
+      </route>
+
+      <route id="locationLocalhostFtpMonitorRoute">
+        <from uri="activemq:Location-localhost.Poller.FtpMonitor" />
+        <bean ref="ftpMonitor" />
+      </route>
+
+
+      <!-- GP Monitor -->
+      <route id="pollGpMonitor">
+        <from uri="direct:pollGpMonitor" />
+        <!-- Calculate an appropriate JMS timeout based on the task -->
+        <setHeader headerName="CamelJmsRequestTimeout">
+          <simple>40000</simple>
+        </setHeader>
+        <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+        <setExchangePattern pattern="InOut"/>
+        <recipientList>
+          <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+          <simple>activemq:Location-${body.location}.Poller.GpMonitor</simple>
+        </recipientList>
+      </route>
+
+      <route id="locationLocalhostGpMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.FtpMonitor" />
+          <bean ref="gpMonitor" />
+      </route>
+
+
+      <!-- HTTP Monitor -->
+      <route id="pollHttpMonitor">
+        <from uri="direct:pollHttpMonitor" />
+        <!-- Calculate an appropriate JMS timeout based on the task -->
+        <setHeader headerName="CamelJmsRequestTimeout">
+          <simple>40000</simple>
+        </setHeader>
+        <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+        <setExchangePattern pattern="InOut"/>
+        <recipientList>
+          <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+          <simple>activemq:Location-${body.location}.Poller.HttpMonitor</simple>
+        </recipientList>
+      </route>
+
+      <route id="locationLocalhostHttpMonitorRoute">
+        <from uri="activemq:Location-localhost.Poller.HttpMonitor" />
+        <bean ref="httpMonitor" />
+      </route>
+
+
+      <!-- Https Monitor --> 
+      <route id="pollHttpsMonitor">
+        <from uri="direct:pollHttpsMonitor" />
+        <!-- Calculate an appropriate JMS timeout based on the task -->
+        <setHeader headerName="CamelJmsRequestTimeout">
+          <simple>40000</simple>
+        </setHeader>
+        <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+        <setExchangePattern pattern="InOut"/>
+        <recipientList>
+          <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+          <simple>activemq:Location-${body.location}.Poller.HttpsMonitor</simple>
+        </recipientList>
+      </route>
+
+      <route id="locationLocalhostHttpsMonitorRoute">
+        <from uri="activemq:Location-localhost.Poller.HttpsMonitor" />
+        <bean ref="httpsMonitor" />
+      </route>
+
+
+      <!-- ICMP Monitor -->
+      <route id="pollIcmpMonitor">
+        <from uri="direct:pollIcmpMonitor" />
+        <!-- Calculate an appropriate JMS timeout based on the task -->
+        <setHeader headerName="CamelJmsRequestTimeout">
+          <simple>40000</simple>
+        </setHeader>
+        <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+        <setExchangePattern pattern="InOut"/>
+        <recipientList>
+          <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+          <simple>activemq:Location-${body.location}.Poller.IcmpMonitor</simple>
+        </recipientList>
+      </route>
+
+      <route id="locationLocalhostIcmpMonitorRoute">
+        <from uri="activemq:Location-localhost.Poller.IcmpMonitor" />
+        <bean ref="icmpMonitor" />
+      </route>
+
+
+      <!-- Imap Monitor -->
+      <route id="pollImapMonitor">
+        <from uri="direct:pollImapMonitor" />
+        <!-- Calculate an appropriate JMS timeout based on the task -->
+        <setHeader headerName="CamelJmsRequestTimeout">
+          <simple>40000</simple>
+        </setHeader>
+        <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+        <setExchangePattern pattern="InOut"/>
+        <recipientList>
+          <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+          <simple>activemq:Location-${body.location}.Poller.ImapMonitor</simple>
+        </recipientList>
+      </route>
+
+      <route id="locationLocalhostImapMonitorRoute">
+        <from uri="activemq:Location-localhost.Poller.ImapMonitor" />
+        <bean ref="imapMonitor" />
+      </route>
+
+
+      <!-- JDBC Monitor -->
+      <route id="pollJDBCMonitor">
+        <from uri="direct:pollJDBCMonitor" />
+        <!-- Calculate an appropriate JMS timeout based on the task -->
+        <setHeader headerName="CamelJmsRequestTimeout">
+          <simple>40000</simple>
+        </setHeader>
+        <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+        <setExchangePattern pattern="InOut"/>
+        <recipientList>
+          <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+          <simple>activemq:Location-${body.location}.Poller.JDBCMonitor</simple>
+        </recipientList>
+      </route>
+
+      <route id="locationLocalhostJDBCMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.JDBCMonitor" />
+          <bean ref="jdbcMonitor" />
+      </route>
+
+
+      <!--JDBC Query Monitor  -->
+      
+      <route id="pollJDBCQueryMonitor">
+            <from uri="direct:pollJDBCQueryMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.JDBCQueryMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostJDBCQueryMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.JDBCQueryMonitor" />
+          <bean ref="jdbcQueryMonitor" />
+      </route>
+      
+      <!-- JDBC StoredProcedure Monitor -->
+      
+      <route id="pollJDBCStoredProcedureMonitor">
+            <from uri="direct:pollJDBCStoredProcedureMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.JDBCStoredProcedureMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostJDBCStoredProcedureMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.JDBCStoredProcedureMonitor" />
+          <bean ref="jdbcStoredProcedureMonitor" />
+      </route>
+      
+      <!-- Jolokia Bean Monitor -->
+      
+      <route id="pollJolokiaBeanMonitor">
+            <from uri="direct:pollJolokiaBeanMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.JolokiaBeanMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostJolokiaBeanMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.JolokiaBeanMonitor" />
+          <bean ref="jolokiaBeanMonitor" />
+      </route>
+      
+      <!-- JschSsh Monitor -->
+      
+      <route id="pollJschSshMonitor">
+            <from uri="direct:pollJschSshMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.JschSshMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostJschSshMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.JschSshMonitor" />
+          <bean ref="jschSshMonitor" />
+      </route>
+      
+      <!-- Ldap Monitor -->
+      
+      <route id="pollLdapMonitor">
+            <from uri="direct:pollLdapMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.LdapMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostLdapMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.LdapMonitor" />
+          <bean ref="ldapMonitor" />
+      </route>
+      
+      <!-- Ldaps Monitor -->
+      
+      <route id="pollLdapsMonitor">
+            <from uri="direct:pollLdapsMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.LdapsMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostLdapsMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.LdapsMonitor" />
+          <bean ref="ldapsMonitor" />
+      </route>
+      
+      <!-- Ldaps Monitor -->
+      
+      <route id="pollLoopMonitor">
+            <from uri="direct:pollLoopMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.LoopMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostLoopMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.LoopMonitor" />
+          <bean ref="loopMonitor" />
+      </route>
+      
+      <!-- Memcached Monitor -->
+      
+      <route id="pollMemcachedMonitor">
+            <from uri="direct:pollMemcachedMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.MemcachedMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostMemcachedMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.MemcachedMonitor" />
+          <bean ref="memcachedMonitor" />
+      </route>
+      
+      <!-- Nrpe Monitor -->
+      
+      <route id="pollNrpeMonitor">
+            <from uri="direct:pollNrpeMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.NrpeMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostNrpeMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.NrpeMonitor" />
+          <bean ref="nrpeMonitor" />
+      </route>
+      
+      <!-- Nrpe Monitor -->
+      
+      <route id="pollNtpMonitor">
+            <from uri="direct:pollNtpMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.NtpMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostNtpMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.NtpMonitor" />
+          <bean ref="ntpMonitor" />
+      </route>
+      
+      <!-- Pop3 Monitor -->
+      
+      <route id="pollPop3Monitor">
+            <from uri="direct:pollPop3Monitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.Pop3Monitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostPop3MonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.Pop3Monitor" />
+          <bean ref="pop3Monitor" />
+      </route>
+      
+      <!-- Smtp Monitor -->
+      
+      <route id="pollSmtpMonitor">
+            <from uri="direct:pollSmtpMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.SmtpMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostSmtpMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.SmtpMonitor" />
+          <bean ref="smtpMonitor" />
+      </route>
+      
+        <!-- Ssh Monitor -->
+      
+      <route id="pollSshMonitor">
+            <from uri="direct:pollSshMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.SshMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostSshMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.SshMonitor" />
+          <bean ref="sshMonitor" />
+      </route>
+      
+      <!-- SSLCert Monitor -->
+      
+      <route id="pollSSLCertMonitor">
+            <from uri="direct:pollSSLCertMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.SSLCertMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostSSLCertMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.SSLCertMonitor" />
+          <bean ref="sslCertMonitor" />
+      </route>
+
+    <!-- StrafePing Monitor -->
+      
+      <route id="pollStrafePingMonitor">
+            <from uri="direct:pollStrafePingMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.StrafePingMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostStrafePingMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.StrafePingMonitor" />
+          <bean ref="strafePingMonitor" />
+      </route>
+      
+      <!-- SystemExecute Monitor -->
+      
+      <route id="pollSystemExecuteMonitor">
+            <from uri="direct:pollSystemExecuteMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.SystemExecuteMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostSystemExecuteMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.SystemExecuteMonitor" />
+          <bean ref="systemExecuteMonitor" />
+      </route>
+      
+      <!-- Tcp Monitor -->
+      
+      <route id="pollTcpMonitor">
+            <from uri="direct:pollTcpMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.TcpMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostTcpMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.TcpMonitor" />
+          <bean ref="tcpMonitor" />
+      </route>
+      
+      <!-- TrivialTime Monitor -->
+      
+      <route id="pollTrivialTimeMonitor">
+            <from uri="direct:pollTrivialTimeMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.TrivialTimeMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostTrivialTimeMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.TrivialTimeMonitor" />
+          <bean ref="trivialTimeMonitor" />
+      </route>
+      
+      <!-- Web Monitor -->
+      
+      <route id="pollWebMonitor">
+            <from uri="direct:pollWebMonitor" />
+            <!-- Calculate an appropriate JMS timeout based on the task -->
+            <setHeader headerName="CamelJmsRequestTimeout">
+              <simple>40000</simple>
+            </setHeader>
+            <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
+            <setExchangePattern pattern="InOut"/>
+            <recipientList>
+              <!-- TODO: NMS-8217: Use a more sophisticated naming convention for this queue -->
+              <simple>activemq:Location-${body.location}.Poller.WebMonitor</simple>
+            </recipientList>
+        </route>
+
+      <route id="locationLocalhostWebMonitorRoute">
+          <from uri="activemq:Location-localhost.Poller.WebMonitor" />
+          <bean ref="webMonitor" />
+      </route>
+
+    </camelContext>
+
 </beans>

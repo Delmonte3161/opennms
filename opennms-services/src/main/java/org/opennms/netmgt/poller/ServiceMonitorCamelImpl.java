@@ -5,7 +5,6 @@ import java.util.Map;
 import org.apache.camel.InOnly;
 import org.apache.camel.Produce;
 import org.opennms.core.camel.DefaultDispatcher;
-import org.opennms.netmgt.passive.PassiveStatusKeeper;
 
 /**
  * This class is an {@link InOnly} endpoint that will send messages to the 
@@ -29,6 +28,10 @@ public class ServiceMonitorCamelImpl extends DefaultDispatcher implements Servic
 	@Override
 	public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
 		return serviceMonitor.poll(svc, parameters);
+	}
+	
+	public PollStatus poll(MonitoredServiceTask task) {
+		   return poll(task.getMonitoredService(), task.getParameters());
 	}
 
 }
