@@ -48,6 +48,7 @@ import org.opennms.netmgt.dao.mock.MockServiceTypeDao;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.monitors.AbstractServiceMonitor;
 import org.opennms.netmgt.provision.persist.ForeignSourceRepository;
 import org.opennms.netmgt.provision.persist.MockForeignSourceRepository;
@@ -185,7 +186,7 @@ public class DefaultManualProvisioningServiceTest {
         final Map<String, ServiceMonitor> serviceMonitors = new HashMap<String, ServiceMonitor>();
         serviceMonitors.put("Shochu-Stock-Level", new AbstractServiceMonitor() {
             @Override
-            public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
+            public PollStatus poll(MonitoredServiceTask monSvct) {
                 return null;
             }
         });

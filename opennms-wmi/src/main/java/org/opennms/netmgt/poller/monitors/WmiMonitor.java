@@ -40,6 +40,7 @@ import org.opennms.netmgt.config.wmi.WmiAgentConfig;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.NetworkInterface;
 import org.opennms.netmgt.poller.NetworkInterfaceNotSupportedException;
 import org.opennms.netmgt.poller.PollStatus;
@@ -91,7 +92,9 @@ public class WmiMonitor extends AbstractServiceMonitor {
 	 * SERVICE_AVAILABLE and return.
 	 */
     @Override
-	public PollStatus poll(final MonitoredService svc, final Map<String,Object> parameters) {
+	public PollStatus poll(MonitoredServiceTask monSvct) {
+    	MonitoredService svc = monSvct.getMonitoredService();
+    	Map<String, Object> parameters = monSvct.getParameters();
 		// Holds the response reason.
 		String reason = null;
 		// Used to exit the retry loop early, if possible.

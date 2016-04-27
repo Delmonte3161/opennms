@@ -46,6 +46,7 @@ import org.opennms.netmgt.dao.WSManConfigDao;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +90,9 @@ public class WsManMonitor extends AbstractServiceMonitor {
     }
 
     @Override
-    public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
+    public PollStatus poll(MonitoredServiceTask monSvct) {
+    	MonitoredService svc = monSvct.getMonitoredService();
+    	Map<String, Object> parameters = monSvct.getParameters();
         // Fetch the monitor specific parameters
         final String resourceUri = getKeyedString(parameters, RESOURCE_URI_PARAM, null);
         if (resourceUri == null) {

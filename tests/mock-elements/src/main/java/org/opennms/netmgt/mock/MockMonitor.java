@@ -36,6 +36,7 @@ import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 
 /**
  *  Mark this as {@link Distributable} so that we can reuse it for the remote poller tests.
@@ -68,7 +69,9 @@ public class MockMonitor implements ServiceMonitor {
     }
 
     @Override
-    public PollStatus poll(MonitoredService monSvc, Map<String, Object> parameters) {
+    public PollStatus poll(MonitoredServiceTask monSvct) {
+    	MonitoredService monSvc = monSvct.getMonitoredService();
+    	Map<String, Object> parameters = monSvct.getParameters();
         synchronized(m_network) {
             int nodeId = monSvc.getNodeId();
             String ipAddr = monSvc.getIpAddr();

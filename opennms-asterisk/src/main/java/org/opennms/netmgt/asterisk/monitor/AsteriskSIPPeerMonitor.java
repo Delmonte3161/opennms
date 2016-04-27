@@ -52,6 +52,7 @@ import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.monitors.AbstractServiceMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 
 /**
  * <P>
@@ -102,8 +103,10 @@ public class AsteriskSIPPeerMonitor extends AbstractServiceMonitor {
 	  * Run the service monitor and return the poll status
 	  * </P>
 	  */
-	public PollStatus poll(MonitoredService svc, Map<String, Object> parameters)
+	public PollStatus poll(MonitoredServiceTask monSvct)
 	{
+    	MonitoredService svc = monSvct.getMonitoredService();
+    	Map<String, Object> parameters = monSvct.getParameters();
 		//check, if interface type is supported
 		final NetworkInterface<InetAddress> iface = svc.getNetInterface();
 		if (iface.getType() != NetworkInterface.TYPE_INET) 
