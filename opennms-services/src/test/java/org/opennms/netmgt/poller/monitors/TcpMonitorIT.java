@@ -45,6 +45,7 @@ import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.test.http.annotations.JUnitHttpServer;
 import org.opennms.netmgt.config.poller.Parameter;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.poller.mock.MonitorTestUtils;
@@ -86,7 +87,7 @@ public class TcpMonitorIT {
         p.setValue("500");
         m.put(p.getKey(), p.getValue());
 
-        PollStatus status = monitor.poll(svc, m);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_UNAVAILABLE, status.getStatusCode());
         assertNotNull(status.getReason());
@@ -114,7 +115,7 @@ public class TcpMonitorIT {
         p.setValue("500");
         m.put(p.getKey(), p.getValue());
 
-        PollStatus status = monitor.poll(svc, m);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
         assertNull(status.getReason());
@@ -143,7 +144,7 @@ public class TcpMonitorIT {
         p.setValue("500");
         m.put(p.getKey(), p.getValue());
 
-        PollStatus status = monitor.poll(svc, m);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
         assertNull(status.getReason());

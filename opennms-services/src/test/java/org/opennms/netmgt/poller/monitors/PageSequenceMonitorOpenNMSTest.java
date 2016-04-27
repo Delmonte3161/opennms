@@ -45,6 +45,7 @@ import org.junit.runner.RunWith;
 import org.opennms.core.test.MockLogAppender;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
 import org.springframework.test.context.ContextConfiguration;
@@ -111,7 +112,7 @@ public class PageSequenceMonitorOpenNMSTest {
         m_params.put("adminPassword", "admin");
 
         try {
-            PollStatus status = m_monitor.poll(getHttpService("localhost"), m_params);
+            PollStatus status = m_monitor.poll(new MonitoredServiceTask(getHttpService("localhost"), m_params));
             assertTrue("Expected available but was "+status+": reason = "+status.getReason(), status.isAvailable());
         } finally {
             // Print some debug output if necessary

@@ -50,11 +50,27 @@ public class MonitoredServiceTask {
 	public MonitoredServiceTask() {
 		super();
 	}
-	
+	/**
+	 * 
+	 * @param m_monitoredService
+	 * @param m_parameters
+	 */
 	public MonitoredServiceTask(MonitoredService m_monitoredService,
 			Map<String, Object> m_parameters) {
 		this.m_monitoredService = m_monitoredService;
 		this.m_parameters = m_parameters;
+	}
+	/**
+	 * 
+	 * @param m_monitoredService
+	 * @param m_parameters
+	 * @param location
+	 */
+	public MonitoredServiceTask(MonitoredService m_monitoredService,
+			Map<String, Object> m_parameters,String location) {
+		this.m_monitoredService = m_monitoredService;
+		this.m_parameters = m_parameters;
+		this.m_location = location;
 	}
 
 	/**

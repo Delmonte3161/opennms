@@ -40,6 +40,7 @@ import org.opennms.netmgt.config.SnmpPeerFactory;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.NetworkInterface;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.snmp.SnmpAgentConfig;
@@ -104,7 +105,9 @@ public class PrTableMonitor extends SnmpMonitorStrategy {
      * @exception RuntimeException
      *                Thrown for any uncrecoverable errors.
      */
-    public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
+    public PollStatus poll(MonitoredServiceTask monSvct) {
+      	MonitoredService svc = monSvct.getMonitoredService();
+    	Map<String, Object> parameters = monSvct.getParameters();
         NetworkInterface<InetAddress> iface = svc.getNetInterface();
 
         PollStatus status = PollStatus.available();

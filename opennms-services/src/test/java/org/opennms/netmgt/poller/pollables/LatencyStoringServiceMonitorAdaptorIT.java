@@ -66,6 +66,7 @@ import org.opennms.netmgt.filter.api.FilterDao;
 import org.opennms.netmgt.mock.MockNetwork;
 import org.opennms.netmgt.model.events.EventBuilder;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.poller.monitors.AbstractServiceMonitor;
@@ -119,7 +120,7 @@ public class LatencyStoringServiceMonitorAdaptorIT implements TemporaryDatabaseA
             this.values = values;
         }
         @Override
-        public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
+        public PollStatus poll(MonitoredServiceTask monSvct) {
             return (PollStatus.get(PollStatus.SERVICE_AVAILABLE, values[current++]));
         }
     }
@@ -248,7 +249,7 @@ public class LatencyStoringServiceMonitorAdaptorIT implements TemporaryDatabaseA
         // Make sure that the ThresholdingSet initializes with test settings
         String previousOpennmsHome = System.setProperty("opennms.home", "src/test/resources");
         for (int i=0; i<rtValues.length; i++) {
-            adaptor.poll(svc, parameters);
+            adaptor.poll(new MonitoredServiceTask(svc, parameters));
             Thread.sleep(1000 * step); // Emulate the appropriate wait time prior inserting another value into the RRD files.
         }
         System.setProperty("opennms.home", previousOpennmsHome);

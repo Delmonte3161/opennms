@@ -316,7 +316,7 @@ public abstract class MonitorTester {
                 System.out.printf("Parameter %s : %s%n", e.getKey(), e.getValue());
             }
             try {
-                PollStatus status = monitor.poll(monSvc, parameters);
+                PollStatus status = monitor.poll(new MonitoredServiceTask(monSvc, parameters));
                 System.out.printf("Available ? %s (status %s[%s])%n", status.isAvailable(), status.getStatusName(), status.getStatusCode());
                 if (status.isAvailable()) {
                     System.out.printf("Response time: %s%n", status.getResponseTime());

@@ -47,6 +47,7 @@ import org.opennms.netmgt.events.api.EventConstants;
 import org.opennms.netmgt.events.api.EventListener;
 import org.opennms.netmgt.model.events.EventUtils;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
@@ -161,7 +162,7 @@ public class MockNetworkTest extends TestCase {
         public void visitService(MockService service) {
             m_serviceCount++;
             ServiceMonitor monitor = m_pollerConfig.getServiceMonitor(service.getSvcName());
-            PollStatus pollResult = monitor.poll(service, new HashMap<String, Object>());
+            PollStatus pollResult = monitor.poll(new MonitoredServiceTask(service, new HashMap<String, Object>()));
             assertEquals(m_expectedStatus, pollResult);
         }
     }
@@ -402,7 +403,7 @@ public class MockNetworkTest extends TestCase {
         m_network.resetInvalidPollCount();
         MonitoredService svc = new MockMonitoredService(99, "InvalidNode", InetAddressUtils.addr("1.1.1.1"), "ICMP");
         ServiceMonitor monitor = m_pollerConfig.getServiceMonitor("ICMP");
-        monitor.poll(svc, new HashMap<String, Object>());
+        monitor.poll(new MonitoredServiceTask(svc, new HashMap<String, Object>()));
         assertEquals(1, m_network.getInvalidPollCount());
 
     }

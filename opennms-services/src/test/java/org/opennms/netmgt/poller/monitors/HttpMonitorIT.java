@@ -50,6 +50,7 @@ import org.opennms.core.test.http.annotations.JUnitHttpServer;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.config.poller.Parameter;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
@@ -100,7 +101,7 @@ public class HttpMonitorIT {
         p.setValue("500");
         m.put(p.getKey(), p.getValue());
 
-        PollStatus status = monitor.poll(svc, m);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_UNAVAILABLE, status.getStatusCode());
         assertNotNull(status.getReason());
@@ -146,7 +147,7 @@ public class HttpMonitorIT {
         m.put("timeout", "500");
         m.put("response", "100-199");
 
-        PollStatus status = monitor.poll(svc, m);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_UNAVAILABLE, status.getStatusCode());
         assertNotNull(status.getReason());
@@ -154,7 +155,7 @@ public class HttpMonitorIT {
         m.put("response", "100,200,302,400-500");
 
         monitor = new HttpMonitor();
-        status = monitor.poll(svc, m);
+        status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
         assertNull(status.getReason());
@@ -162,7 +163,7 @@ public class HttpMonitorIT {
         m.put("response", "*");
 
         monitor = new HttpMonitor();
-        status = monitor.poll(svc, m);
+        status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
         assertNull(status.getReason());
@@ -211,7 +212,7 @@ public class HttpMonitorIT {
         m.put("timeout", "500");
         m.put("response", "100-199");
 
-        final PollStatus status = monitor.poll(svc, m);
+        final PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
         final String reason = status.getReason();
         MockUtil.println("Reason: "+reason);
         assertEquals(PollStatus.SERVICE_UNAVAILABLE, status.getStatusCode());
@@ -255,7 +256,7 @@ public class HttpMonitorIT {
         m.put("url", "/");
         m.put("response-text", "opennmsrulz");
 
-        status = monitor.poll(svc, m);
+        status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_UNAVAILABLE, status.getStatusCode());
         assertNotNull(status.getReason());
@@ -264,7 +265,7 @@ public class HttpMonitorIT {
 
         MockUtil.println("\nliteral text check: \"written by monkeys\"");
         monitor = new HttpMonitor();
-        status = monitor.poll(svc, m);
+        status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
         assertNull(status.getReason());
@@ -273,7 +274,7 @@ public class HttpMonitorIT {
 
         MockUtil.println("\nregex check: \".*[Tt]est HTTP [Ss]erver.*\"");
         monitor = new HttpMonitor();
-        status = monitor.poll(svc, m);
+        status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
         assertNull(status.getReason());
@@ -326,14 +327,14 @@ public class HttpMonitorIT {
         m.put("url", "/");
         m.put("basic-authentication", "admin:istrator");
 
-        status = monitor.poll(svc, m);
+        status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
         assertNull(status.getReason());
 
         m.put("basic-authentication", "admin:flagrator");
 
-        status = monitor.poll(svc, m);
+        status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_UNAVAILABLE, status.getStatusCode());
         assertNotNull(status.getReason());
@@ -376,14 +377,14 @@ public class HttpMonitorIT {
         m.put("host-name", "localhost");
         m.put("url", "/index.html");
 
-        status = monitor.poll(svc, m);
+        status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_UNAVAILABLE, status.getStatusCode());
         assertEquals("HTTP response value: 401. Expecting: 100-302./Ports: " + port, status.getReason());
 
         m.put("basic-authentication", "admin:istrator");
 
-        status = monitor.poll(svc, m);
+        status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
         assertNull(status.getReason());
@@ -424,7 +425,7 @@ public class HttpMonitorIT {
         m.put("url", "/twinkies.html");
         m.put("response-text", "~.*Don.t you love twinkies..*");
 
-        status = monitor.poll(svc, m);
+        status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
         assertNull(status.getReason());
@@ -466,7 +467,7 @@ public class HttpMonitorIT {
         m.put("verbose", "true");
         m.put("nodelabel-host-name", "true");
 
-        status = monitor.poll(svc, m);
+        status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
         assertNull(status.getReason());
@@ -506,7 +507,7 @@ public class HttpMonitorIT {
         m.put("url", "/twinkies.html");
         m.put("response-text", "~.*twinkies.*");
 
-        PollStatus status = monitor.poll(svc, m);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
         assertEquals("poll status available", PollStatus.SERVICE_UNAVAILABLE, status.getStatusCode());
     }
 
@@ -543,7 +544,7 @@ public class HttpMonitorIT {
         m.put("url", "/twinkies.html");
         m.put("response-text", "~.*twinkies.*");
 
-        PollStatus status = monitor.poll(svc, m);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
         assertEquals("poll status not available", PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
     }
 

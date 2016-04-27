@@ -37,7 +37,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 import static org.junit.matchers.JUnitMatchers.containsString;
+
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.opennms.core.spring.BeanUtils;
@@ -47,6 +49,7 @@ import org.opennms.core.test.snmp.annotations.JUnitSnmpAgent;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.config.SnmpPeerFactory;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
 import org.springframework.beans.factory.InitializingBean;
@@ -102,7 +105,7 @@ public class DiskUsageMonitorTest implements InitializingBean {
         DiskUsageMonitor monitor = new DiskUsageMonitor();
         Map<String, Object> parameters = createBasicParams();
         parameters.remove("disk");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertFalse(status.isAvailable());
     }
 
@@ -111,7 +114,7 @@ public class DiskUsageMonitorTest implements InitializingBean {
         DiskUsageMonitor monitor = new DiskUsageMonitor();
         Map<String, Object> parameters = createBasicParams();
         parameters.put("match-type", "invalid");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertFalse(status.isAvailable());
     }
 
@@ -120,7 +123,7 @@ public class DiskUsageMonitorTest implements InitializingBean {
         DiskUsageMonitor monitor = new DiskUsageMonitor();
         Map<String, Object> parameters = createBasicParams();
         parameters.put("require-type", "invalid");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertFalse(status.isAvailable());
     }
 
@@ -128,7 +131,7 @@ public class DiskUsageMonitorTest implements InitializingBean {
     public void testParameters() throws Exception {
         DiskUsageMonitor monitor = new DiskUsageMonitor();
         Map<String, Object> parameters = createBasicParams();
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertTrue(status.isAvailable());
     }
 
@@ -138,7 +141,7 @@ public class DiskUsageMonitorTest implements InitializingBean {
         Map<String, Object> parameters = createBasicParams();
         parameters.put("disk", "^[A-Z:");
         parameters.put("match-type", "regex");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertFalse(status.isAvailable());
         Assert.assertThat(status.getReason(), containsString("Invalid SNMP Criteria: Unclosed character class"));
     }
@@ -149,7 +152,7 @@ public class DiskUsageMonitorTest implements InitializingBean {
         Map<String, Object> parameters = createBasicParams();
         parameters.put("match-type", "startswith");
         parameters.put("require-type", "all");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertFalse(status.isAvailable());
     }
 
@@ -158,7 +161,7 @@ public class DiskUsageMonitorTest implements InitializingBean {
         DiskUsageMonitor monitor = new DiskUsageMonitor();
         Map<String, Object> parameters = createBasicParams();
         parameters.put("free", "25");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertTrue(status.isAvailable());
     }
 
@@ -167,7 +170,7 @@ public class DiskUsageMonitorTest implements InitializingBean {
         DiskUsageMonitor monitor = new DiskUsageMonitor();
         Map<String, Object> parameters = createBasicParams();
         parameters.put("disk", "/data");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertFalse(status.isAvailable());
         Assert.assertThat(status.getReason(), containsString("Could not find /data in hrStorageTable"));
     }
@@ -178,7 +181,7 @@ public class DiskUsageMonitorTest implements InitializingBean {
         Map<String, Object> parameters = createBasicParams();
         parameters.put("disk", "^/$");
         parameters.put("match-type", "regex");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertTrue(status.isAvailable());
     }
 

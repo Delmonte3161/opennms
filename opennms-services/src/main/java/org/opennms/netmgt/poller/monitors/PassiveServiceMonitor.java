@@ -34,6 +34,7 @@ import org.opennms.netmgt.passive.PassiveStatusKeeper;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 /**
@@ -55,7 +56,8 @@ public class PassiveServiceMonitor implements ServiceMonitor {
     }
 
     @Override
-    public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
+    public PollStatus poll(MonitoredServiceTask monSvct) {
+    	MonitoredService svc = monSvct.getMonitoredService();
         PollStatus status = PassiveStatusKeeper.getInstance().getStatus(svc.getNodeLabel(), svc.getIpAddr(), svc.getSvcName());
         return status;
     }

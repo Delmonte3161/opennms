@@ -47,6 +47,7 @@ import org.opennms.netmgt.model.OnmsNode;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.snmp.SnmpAgentConfig;
 import org.opennms.netmgt.snmp.SnmpObjId;
@@ -373,7 +374,9 @@ public class CiscoPingMibMonitor extends SnmpMonitorStrategy {
      *                Thrown for any unrecoverable errors.
      */
     @Override
-    public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
+    public PollStatus poll(MonitoredServiceTask monSvct) {
+    	MonitoredService svc = monSvct.getMonitoredService();
+    	Map<String, Object> parameters = monSvct.getParameters();
 
         if (s_nodeDao == null) {
             s_nodeDao = BeanUtils.getBean("daoContext", "nodeDao", NodeDao.class);

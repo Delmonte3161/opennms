@@ -40,6 +40,7 @@ import org.opennms.netmgt.config.SnmpPeerFactory;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.NetworkInterface;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.snmp.SnmpAgentConfig;
@@ -122,7 +123,9 @@ public class DiskUsageMonitor extends SnmpMonitorStrategy {
      *                             Thrown for any unrecoverable errors.
      */
     @Override
-    public PollStatus poll(final MonitoredService svc, final Map<String, Object> parameters) {
+    public PollStatus poll(MonitoredServiceTask monSvct) {
+    	MonitoredService svc = monSvct.getMonitoredService();
+    	Map<String, Object> parameters = monSvct.getParameters();
         MatchType matchType = MatchType.EXACT;
         RequireType reqType = RequireType.ALL;
 

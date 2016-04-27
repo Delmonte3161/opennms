@@ -44,6 +44,7 @@ import org.opennms.core.test.snmp.annotations.JUnitSnmpAgent;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.config.SnmpPeerFactory;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
 import org.springframework.beans.factory.InitializingBean;
@@ -88,7 +89,7 @@ public class NetScalerGroupHealthMonitorTest implements InitializingBean {
     @Test
     public void testAvailable() throws Exception {
         NetScalerGroupHealthMonitor monitor = new NetScalerGroupHealthMonitor();
-        PollStatus status = monitor.poll(createMonitor(), createBasicParams());
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), createBasicParams()));
         Assert.assertTrue(status.isAvailable());
     }
 
@@ -97,7 +98,7 @@ public class NetScalerGroupHealthMonitorTest implements InitializingBean {
         NetScalerGroupHealthMonitor monitor = new NetScalerGroupHealthMonitor();
         Map<String, Object> parameters =  createBasicParams();
         parameters.put("group-health", 70);
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertFalse(status.isAvailable());
     }
 
