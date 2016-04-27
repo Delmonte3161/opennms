@@ -47,6 +47,7 @@ import org.opennms.core.test.http.annotations.Webapp;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.poller.InetNetworkInterface;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.NetworkInterface;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.monitors.SeleniumMonitor;
@@ -130,7 +131,7 @@ public class SeleniumMonitorTest {
 	    params.put("port", "10342");
 	    
 		SeleniumMonitor ajaxPSM = new SeleniumMonitor();
-		PollStatus pollStatus = ajaxPSM.poll(monSvc, params);
+		PollStatus pollStatus = ajaxPSM.poll(new MonitoredServiceTask(monSvc, params));
 		
 		assertNotNull("PollStatus must not be null", pollStatus);
 		

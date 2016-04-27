@@ -567,13 +567,13 @@ public class HttpMonitorIT {
         // Match a string included on Initial Server Response
         parameters.put("response-text", "~.*OK.*");
         MonitoredService svc = MonitorTestUtils.getMonitoredService(3, "localhost", DnsUtils.resolveHostname("localhost", false), "HTTP");
-        PollStatus status = monitor.poll(svc, parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(svc, parameters));
         assertTrue(status.isAvailable());
 
         // Match a string included on Header
         parameters.put("response-text", "~.*Jetty.*");
         svc = MonitorTestUtils.getMonitoredService(3, "localhost", DnsUtils.resolveHostname("localhost", false), "HTTP");
-        status = monitor.poll(svc, parameters);
+        status = monitor.poll(new MonitoredServiceTask(svc, parameters));
         assertTrue(status.isAvailable());
     }
 

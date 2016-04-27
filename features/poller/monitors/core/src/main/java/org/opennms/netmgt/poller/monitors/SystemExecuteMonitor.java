@@ -34,6 +34,7 @@ import org.opennms.core.utils.ParameterMap;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,8 +76,9 @@ public class SystemExecuteMonitor extends AbstractServiceMonitor {
      * the script or program being called.
      */
     @Override
-    public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
-
+    public PollStatus poll(MonitoredServiceTask monSvct) {
+    	MonitoredService svc = monSvct.getMonitoredService();
+    	Map<String, Object> parameters = monSvct.getParameters();
         TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
 
         String script = ParameterMap.getKeyedString(parameters, "script", null);

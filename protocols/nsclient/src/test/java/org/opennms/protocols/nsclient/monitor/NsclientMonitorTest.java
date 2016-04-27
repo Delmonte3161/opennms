@@ -35,6 +35,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.NetworkInterface;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.protocols.nsclient.AbstractNsclientTest;
@@ -54,7 +55,7 @@ public class NsclientMonitorTest extends AbstractNsclientTest {
         NsclientMonitor monitor = new NsclientMonitor();
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("port", getServer().getLocalPort());
-        PollStatus status = monitor.poll(createMonitoredService(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitoredService(), parameters));
         Assert.assertTrue(status.isAvailable());
         stopServer();
     }
@@ -65,7 +66,7 @@ public class NsclientMonitorTest extends AbstractNsclientTest {
         NsclientMonitor monitor = new NsclientMonitor();
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("port", getServer().getLocalPort());
-        PollStatus status = monitor.poll(createMonitoredService(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitoredService(), parameters));
         Assert.assertFalse(status.isAvailable());
         stopServer();
     }

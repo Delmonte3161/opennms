@@ -29,10 +29,12 @@
 package org.opennms.netmgt.poller.monitors;
 
 import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
 
@@ -59,7 +61,7 @@ public class SystemExecuteMonitorTest {
     @Test
     public void testPollScriptParameterNotSet() {
         monitor = new SystemExecuteMonitor();
-        PollStatus pollStatus = monitor.poll(svc, parameters);
+        PollStatus pollStatus = monitor.poll(new MonitoredServiceTask(svc, parameters));
         Assert.assertEquals("Unknown", pollStatus.getStatusName());
     }
 
@@ -67,7 +69,7 @@ public class SystemExecuteMonitorTest {
     public void testPollScriptParameterEmpty() {
         monitor = new SystemExecuteMonitor();
         parameters.put("script", "");
-        PollStatus pollStatus = monitor.poll(svc, parameters);
+        PollStatus pollStatus = monitor.poll(new MonitoredServiceTask(svc, parameters));
         Assert.assertEquals("Unknown", pollStatus.getStatusName());
     }
 
@@ -77,7 +79,7 @@ public class SystemExecuteMonitorTest {
     public void testPollScriptParameterNotExecutable() {
         monitor = new SystemExecuteMonitor();
         parameters.put("script", "/tmp/log.log");
-        PollStatus pollStatus = monitor.poll(svc, parameters);
+        PollStatus pollStatus = monitor.poll(new MonitoredServiceTask(svc, parameters));
         Assert.assertEquals("Unknown", pollStatus.getStatusName());
     }
 
@@ -89,7 +91,7 @@ public class SystemExecuteMonitorTest {
         parameters.put("script", "/tmp/loadspeed.sh");
         parameters.put("timeout", "30000");
         parameters.put("args", "http://${nodelabel} ${timeout}");
-        PollStatus pollStatus = monitor.poll(svc, parameters);
+        PollStatus pollStatus = monitor.poll(new MonitoredServiceTask(svc, parameters));
         Assert.assertEquals("Up", pollStatus.getStatusName());
     }
 }

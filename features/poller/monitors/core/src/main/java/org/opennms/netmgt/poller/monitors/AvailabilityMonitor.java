@@ -34,6 +34,7 @@ import java.util.Map;
 import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +57,9 @@ public class AvailabilityMonitor extends AbstractServiceMonitor {
 
     /** {@inheritDoc} */
     @Override
-    public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
-        
+    public PollStatus poll(MonitoredServiceTask monSvct) {
+    	MonitoredService svc = monSvct.getMonitoredService();
+    	Map<String, Object> parameters = monSvct.getParameters();
         TimeoutTracker timeoutTracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
         
         for(timeoutTracker.reset(); timeoutTracker.shouldRetry(); timeoutTracker.nextAttempt()) {

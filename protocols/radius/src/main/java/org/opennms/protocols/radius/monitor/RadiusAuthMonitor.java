@@ -52,6 +52,7 @@ import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.core.utils.ParameterMap;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.NetworkInterface;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.monitors.AbstractServiceMonitor;
@@ -153,7 +154,9 @@ public class RadiusAuthMonitor extends AbstractServiceMonitor {
      * @see org.opennms.netmgt.poller.ServiceMonitor#SERVICE_UNRESPONSIVE
      */
     @Override
-    public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
+    public PollStatus poll(MonitoredServiceTask monSvct) {
+    	MonitoredService svc = monSvct.getMonitoredService();
+    	Map<String, Object> parameters = monSvct.getParameters();
     	final NetworkInterface<InetAddress> iface = svc.getNetInterface();
 
     	// Assume that the service is down

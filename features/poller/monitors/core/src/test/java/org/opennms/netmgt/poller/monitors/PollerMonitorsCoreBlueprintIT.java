@@ -44,6 +44,7 @@ import org.junit.runner.RunWith;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
 import org.opennms.test.JUnitConfigurationEnvironment;
@@ -138,7 +139,7 @@ public class PollerMonitorsCoreBlueprintIT extends CamelBlueprintTestSupport {
         Map<String, Object> parms = new HashMap<String, Object>();
         parms.put("port",61716);
 
-        PollStatus ps = icmpMonitor.poll(svc, parms);
+        PollStatus ps = icmpMonitor.poll(new MonitoredServiceTask(svc, parms));
         assertTrue(ps.isUp());
         assertFalse(ps.isDown());
     }

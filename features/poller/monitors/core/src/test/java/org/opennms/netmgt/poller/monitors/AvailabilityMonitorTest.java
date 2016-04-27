@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.poller.InetNetworkInterface;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.NetworkInterface;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
@@ -90,7 +91,7 @@ public class AvailabilityMonitorTest {
             }
             
         };
-        PollStatus status = sm.poll(svc, parameters);
+        PollStatus status = sm.poll(new MonitoredServiceTask(svc, parameters));
         assertEquals(PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
     }
 

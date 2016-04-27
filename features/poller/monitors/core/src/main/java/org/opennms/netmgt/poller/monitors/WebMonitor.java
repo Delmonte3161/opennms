@@ -48,6 +48,7 @@ import org.opennms.core.utils.ParameterMap;
 import org.opennms.core.web.HttpClientWrapper;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +74,9 @@ public class WebMonitor extends AbstractServiceMonitor {
 
     /** {@inheritDoc} */
     @Override
-    public PollStatus poll(MonitoredService svc, Map<String,Object> map) {
+    public PollStatus poll(MonitoredServiceTask monSvct) {
+    	MonitoredService svc = monSvct.getMonitoredService();
+    	Map<String, Object> map = monSvct.getParameters();
         PollStatus pollStatus = PollStatus.unresponsive();
         HttpClientWrapper clientWrapper = HttpClientWrapper.create();
 

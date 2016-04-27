@@ -32,13 +32,16 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.PatternSyntaxException;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
@@ -61,7 +64,7 @@ public class SshMonitorIT {
         MonitoredService svc = new MockMonitoredService(1, "Router", InetAddressUtils.addr(HOST_TO_TEST), "SSH");
         Map<String, Object> parms = new HashMap<String, Object>();
 
-        PollStatus ps = sm.poll(svc, parms);
+        PollStatus ps = sm.poll(new MonitoredServiceTask(svc, parms));
         assertTrue(createAssertMessage(ps, "Up"), ps.isUp());
         assertFalse(createAssertMessage(ps, "not Down"), ps.isDown());
     }
@@ -74,7 +77,7 @@ public class SshMonitorIT {
         Map<String, Object> parms = new HashMap<String, Object>();
         parms.put("match", "SSH");
 
-        PollStatus ps = sm.poll(svc, parms);
+        PollStatus ps = sm.poll(new MonitoredServiceTask(svc, parms));
         assertTrue(createAssertMessage(ps, "Up"), ps.isUp());
         assertFalse(createAssertMessage(ps, "not Down"), ps.isDown());
     }
@@ -87,7 +90,7 @@ public class SshMonitorIT {
         Map<String, Object> parms = new HashMap<String, Object>();
         parms.put("banner", "*");
 
-        PollStatus ps = sm.poll(svc, parms);
+        PollStatus ps = sm.poll(new MonitoredServiceTask(svc, parms));
         assertTrue(createAssertMessage(ps, "Up"), ps.isUp());
         assertFalse(createAssertMessage(ps, "not Down"), ps.isDown());
     }
@@ -100,7 +103,7 @@ public class SshMonitorIT {
         Map<String, Object> parms = new HashMap<String, Object>();
         parms.put("banner", "^SSH");
 
-        PollStatus ps = sm.poll(svc, parms);
+        PollStatus ps = sm.poll(new MonitoredServiceTask(svc, parms));
         assertTrue(createAssertMessage(ps, "Up"), ps.isUp());
         assertFalse(createAssertMessage(ps, "not Down"), ps.isDown());
     }
@@ -113,7 +116,7 @@ public class SshMonitorIT {
         Map<String, Object> parms = new HashMap<String, Object>();
         parms.put("banner", "OpenSSH");
 
-        PollStatus ps = sm.poll(svc, parms);
+        PollStatus ps = sm.poll(new MonitoredServiceTask(svc, parms));
         assertTrue(createAssertMessage(ps, "Up"), ps.isUp());
         assertFalse(createAssertMessage(ps, "not Down"), ps.isDown());
     }
@@ -126,7 +129,7 @@ public class SshMonitorIT {
         Map<String, Object> parms = new HashMap<String, Object>();
         parms.put("banner", "OpenNMS");
 
-        PollStatus ps = sm.poll(svc, parms);
+        PollStatus ps = sm.poll(new MonitoredServiceTask(svc, parms));
         assertTrue(createAssertMessage(ps, "Down"), ps.isDown());
         assertFalse(createAssertMessage(ps, "not Up"), ps.isUp());
     }
@@ -139,7 +142,7 @@ public class SshMonitorIT {
         Map<String, Object> parms = new HashMap<String, Object>();
         parms.put("banner", "^SSH\\-2\\.0\\-OpenSSH_\\d+\\.\\d+.*$");
 
-        PollStatus ps = sm.poll(svc, parms);
+        PollStatus ps = sm.poll(new MonitoredServiceTask(svc, parms));
         assertTrue(createAssertMessage(ps, "Up"), ps.isUp());
         assertFalse(createAssertMessage(ps, "not Down"), ps.isDown());
     }
@@ -152,7 +155,7 @@ public class SshMonitorIT {
         Map<String, Object> parms = new HashMap<String, Object>();
         parms.put("banner", "^SSH\\-2\\.0\\-OpenSSH_\\d+\\.\\d+\\g$");
 
-        PollStatus ps = sm.poll(svc, parms);
+        PollStatus ps = sm.poll(new MonitoredServiceTask(svc, parms));
         assertTrue(ps.isUnavailable());
         assertTrue(createAssertMessage(ps, "Unavailable"), ps.isUnavailable());
     }
@@ -165,7 +168,7 @@ public class SshMonitorIT {
         Map<String, Object> parms = new HashMap<String, Object>();
         parms.put("banner", "^SSH\\-2\\.0\\-OpenSSH_\\d+\\.\\d+\\g$");
 
-        PollStatus ps = sm.poll(svc, parms);
+        PollStatus ps = sm.poll(new MonitoredServiceTask(svc, parms));
         assertTrue(createAssertMessage(ps, "Unavailable"), ps.isUnavailable());
     }
 
@@ -176,7 +179,7 @@ public class SshMonitorIT {
         MonitoredService svc = new MockMonitoredService(1, "Router", InetAddressUtils.UNPINGABLE_ADDRESS, "SSH");
         Map<String, Object> parms = new HashMap<String, Object>();
 
-        PollStatus ps = sm.poll(svc, parms);
+        PollStatus ps = sm.poll(new MonitoredServiceTask(svc, parms));
         assertTrue(createAssertMessage(ps, "Unavailable"), ps.isUnavailable());
     }
 
@@ -188,7 +191,7 @@ public class SshMonitorIT {
         Map<String, Object> parms = new HashMap<String, Object>();
         parms.put("banner", "OpenNMS");
 
-        PollStatus ps = sm.poll(svc, parms);
+        PollStatus ps = sm.poll(new MonitoredServiceTask(svc, parms));
         assertTrue(createAssertMessage(ps, "Down"), ps.isDown());
         assertFalse(createAssertMessage(ps, "not Up"), ps.isUp());
     }

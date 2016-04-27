@@ -53,6 +53,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.mock.MonitorTestUtils;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -133,7 +134,7 @@ public class JCifsMonitorTest {
         m.put("mode", "PATH_EXIST");
         m.put("path", "/validPath");
 
-        pollStatus = jCifsMonitor.poll(svc, m);
+        pollStatus = jCifsMonitor.poll(new MonitoredServiceTask(svc, m));
         assertEquals(PollStatus.up(), pollStatus);
 
         /*
@@ -145,7 +146,7 @@ public class JCifsMonitorTest {
         m.put("mode", "PATH_EXIST");
         m.put("path", "/invalidPath");
 
-        pollStatus = jCifsMonitor.poll(svc, m);
+        pollStatus = jCifsMonitor.poll(new MonitoredServiceTask(svc, m));
         assertEquals(PollStatus.down(), pollStatus);
 
         /*
@@ -157,7 +158,7 @@ public class JCifsMonitorTest {
         m.put("mode", "PATH_NOT_EXIST");
         m.put("path", "/validPath");
 
-        pollStatus = jCifsMonitor.poll(svc, m);
+        pollStatus = jCifsMonitor.poll(new MonitoredServiceTask(svc, m));
         assertEquals(PollStatus.down(), pollStatus);
 
         /*
@@ -169,7 +170,7 @@ public class JCifsMonitorTest {
         m.put("mode", "PATH_NOT_EXIST");
         m.put("path", "/invalidPath");
 
-        pollStatus = jCifsMonitor.poll(svc, m);
+        pollStatus = jCifsMonitor.poll(new MonitoredServiceTask(svc, m));
         assertEquals(PollStatus.up(), pollStatus);
 
         /*
@@ -181,7 +182,7 @@ public class JCifsMonitorTest {
         m.put("mode", "FOLDER_EMPTY");
         m.put("path", "/folderNotEmpty");
 
-        pollStatus = jCifsMonitor.poll(svc, m);
+        pollStatus = jCifsMonitor.poll(new MonitoredServiceTask(svc, m));
         assertEquals(PollStatus.down(), pollStatus);
 
         /*
@@ -193,7 +194,7 @@ public class JCifsMonitorTest {
         m.put("mode", "FOLDER_EMPTY");
         m.put("path", "/folderEmpty");
 
-        pollStatus = jCifsMonitor.poll(svc, m);
+        pollStatus = jCifsMonitor.poll(new MonitoredServiceTask(svc, m));
         assertEquals(PollStatus.up(), pollStatus);
 
         /*
@@ -205,7 +206,7 @@ public class JCifsMonitorTest {
         m.put("mode", "FOLDER_NOT_EMPTY");
         m.put("path", "/folderNotEmpty");
 
-        pollStatus = jCifsMonitor.poll(svc, m);
+        pollStatus = jCifsMonitor.poll(new MonitoredServiceTask(svc, m));
         assertEquals(PollStatus.up(), pollStatus);
 
         /*
@@ -217,7 +218,7 @@ public class JCifsMonitorTest {
         m.put("mode", "FOLDER_NOT_EMPTY");
         m.put("path", "/folderEmpty");
 
-        pollStatus = jCifsMonitor.poll(svc, m);
+        pollStatus = jCifsMonitor.poll(new MonitoredServiceTask(svc, m));
         assertEquals(PollStatus.down(), pollStatus);
 
         /*
@@ -229,7 +230,7 @@ public class JCifsMonitorTest {
         m.put("mode", "ABC");
         m.put("path", "/folderEmpty");
 
-        pollStatus = jCifsMonitor.poll(svc, m);
+        pollStatus = jCifsMonitor.poll(new MonitoredServiceTask(svc, m));
         assertEquals(PollStatus.unknown(), pollStatus);
 
         /*
@@ -241,7 +242,7 @@ public class JCifsMonitorTest {
         m.put("mode", "PATH_EXIST");
         m.put("path", "/smbException");
 
-        pollStatus = jCifsMonitor.poll(svc, m);
+        pollStatus = jCifsMonitor.poll(new MonitoredServiceTask(svc, m));
         assertEquals(PollStatus.down(), pollStatus);
 
         /*
@@ -253,7 +254,7 @@ public class JCifsMonitorTest {
         m.put("mode", "PATH_EXIST");
         m.put("path", "/malformedUrlException");
 
-        pollStatus = jCifsMonitor.poll(svc, m);
+        pollStatus = jCifsMonitor.poll(new MonitoredServiceTask(svc, m));
         assertEquals(PollStatus.down(), pollStatus);
 
         /*
@@ -266,7 +267,7 @@ public class JCifsMonitorTest {
         m.put("smbHost", "");
         m.put("path", "/validPath");
 
-        pollStatus = jCifsMonitor.poll(svc, m);
+        pollStatus = jCifsMonitor.poll(new MonitoredServiceTask(svc, m));
         assertEquals(PollStatus.up(), pollStatus);
 
         /*
@@ -279,7 +280,7 @@ public class JCifsMonitorTest {
         m.put("smbHost", "192.168.0.123");
         m.put("path", "/smbException");
 
-        pollStatus = jCifsMonitor.poll(svc, m);
+        pollStatus = jCifsMonitor.poll(new MonitoredServiceTask(svc, m));
         assertEquals(PollStatus.down(), pollStatus);
         assertTrue(pollStatus.getReason().matches(".*192\\.168\\.0\\.123.*"));
     }
