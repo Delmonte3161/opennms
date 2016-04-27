@@ -125,7 +125,9 @@ public class MonitoredServiceTask {
      */
     public int calculateTaskTimeout() {
         BigDecimal taskTimeOut = BigDecimal.ZERO;
-        taskTimeOut = FUDGE_FACTOR.multiply((BigDecimal) m_parameters.get("timeout")).multiply((BigDecimal) m_parameters.get("retry"));
+        BigDecimal timeout =  m_parameters.get("timeout") == null ? BigDecimal.valueOf(1) : (BigDecimal)m_parameters.get("timeout");
+        BigDecimal retry = m_parameters.get("retry") == null ? BigDecimal.valueOf(1) : (BigDecimal)m_parameters.get("retry");
+        taskTimeOut = FUDGE_FACTOR.multiply(timeout).multiply(retry);
         // If the timeout is greater than Integer.MAX_VALUE, just return Integer.MAX_VALUE
         return taskTimeOut.compareTo(BigDecimal.valueOf(Integer.MAX_VALUE)) >= 0 ? Integer.MAX_VALUE : taskTimeOut.intValue();
     }

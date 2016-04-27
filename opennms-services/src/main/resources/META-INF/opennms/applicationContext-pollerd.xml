@@ -437,7 +437,7 @@
       		<from uri="direct:pollAvailabilityMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -459,7 +459,7 @@
       		<from uri="direct:pollCitrixMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -481,7 +481,7 @@
       		<from uri="direct:pollDNSMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -503,7 +503,7 @@
       		<from uri="direct:pollDNSResolutionMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -525,7 +525,7 @@
       		<from uri="direct:pollDominoIIOPMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -547,7 +547,7 @@
       		<from uri="direct:pollFtpMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -569,7 +569,7 @@
       		<from uri="direct:pollGpMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -591,7 +591,7 @@
       		<from uri="direct:pollHttpMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -613,7 +613,7 @@
       		<from uri="direct:pollHttpsMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -635,7 +635,7 @@
       		<from uri="direct:pollIcmpMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -657,7 +657,7 @@
       		<from uri="direct:pollImapMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -680,7 +680,7 @@
       		<from uri="direct:pollJDBCMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -702,7 +702,7 @@
       		<from uri="direct:pollJDBCQueryMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
       <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
       		<setExchangePattern pattern="InOut"/>
@@ -723,7 +723,7 @@
       		<from uri="direct:pollJDBCStoredProcedureMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
       <!-- Use recipientList so that we can have a dynamic 'to:' URI. -->
       		<setExchangePattern pattern="InOut"/>
@@ -744,7 +744,7 @@
       		<from uri="direct:pollJolokiaBeanMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
       <!-- Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -765,7 +765,7 @@
       		<from uri="direct:pollJschSshMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
       <!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -786,7 +786,7 @@
       		<from uri="direct:pollLdapMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 	<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -807,7 +807,7 @@
       		<from uri="direct:pollLdapsMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -828,7 +828,7 @@
       		<from uri="direct:pollLoopMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->	
       		<setExchangePattern pattern="InOut"/>
@@ -849,7 +849,7 @@
       		<from uri="direct:pollMemcachedMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -870,7 +870,7 @@
       		<from uri="direct:pollNrpeMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -891,7 +891,7 @@
       		<from uri="direct:pollNtpMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -912,7 +912,7 @@
       		<from uri="direct:pollPop3Monitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -933,7 +933,7 @@
       		<from uri="direct:pollSmtpMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -954,7 +954,7 @@
       		<from uri="direct:pollSshMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -975,7 +975,7 @@
       		<from uri="direct:pollSSLCertMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -996,7 +996,7 @@
       		<from uri="direct:pollStrafePingMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -1017,7 +1017,7 @@
       		<from uri="direct:pollSystemExecuteMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -1038,7 +1038,7 @@
       		<from uri="direct:pollTcpMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -1059,7 +1059,7 @@
       		<from uri="direct:pollTrivialTimeMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
@@ -1080,7 +1080,7 @@
       		<from uri="direct:pollWebMonitor" />
       	<!-- Calculate an appropriate JMS timeout based on the task -->
       		<setHeader headerName="CamelJmsRequestTimeout">
-        		<simple>{body.calculateTaskTimeout}</simple>
+        		<simple>${body.calculateTaskTimeout}</simple>
       		</setHeader>
 		<!--Use recipientList so that we can have a dynamic 'to:' URI.-->
       		<setExchangePattern pattern="InOut"/>
