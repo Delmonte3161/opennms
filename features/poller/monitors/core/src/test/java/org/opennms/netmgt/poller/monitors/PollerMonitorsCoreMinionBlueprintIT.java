@@ -12,10 +12,8 @@ import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
-import org.apache.camel.Exchange;
-import org.apache.camel.Message;
-import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.SimpleRegistry;
 import org.apache.camel.test.blueprint.CamelBlueprintTestSupport;
@@ -141,33 +139,27 @@ public class PollerMonitorsCoreMinionBlueprintIT extends CamelBlueprintTestSuppo
 		 /*
          * Create a Camel listener for the location queue that will respond with
          */
+    	MonitoredService svc = new MockMonitoredService(1, "Node One", InetAddressUtils.addr("127.0.0.1"), "SMTP");
+        Map<String, Object> parms = new HashMap<String, Object>();
+        parms.put("port",61616);	
         SimpleRegistry registry = new SimpleRegistry();
         CamelContext mockPoller = new DefaultCamelContext(registry);
         mockPoller.addComponent("queuingservice", ActiveMQComponent.activeMQComponent("tcp://127.0.0.1:61616"));
         mockPoller.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                String from = String.format("activemq:Location-%s.Poller.AvailabilityMonitor", LOCATION);
+                String from = String.format("queuingservice:Location-%s.Poller.AvailabilityMonitor", LOCATION);
 
-                from(from)
-                .process(new Processor() {
-                    @Override
-                    public void process(Exchange exchange) throws Exception {
-                    	MonitoredService svc = new MockMonitoredService(1, "Node One", InetAddressUtils.addr("127.0.0.1"), "SMTP");
-                        Map<String, Object> parms = new HashMap<String, Object>();
-                        parms.put("port",61616);	
-                	    AvailabilityMonitor am = exchange.getIn().getBody(AvailabilityMonitor.class);
-
-                        Message out = exchange.getOut();
-                        PollStatus ps = am.poll(svc, parms);
-                        System.out.println("************************"+ps+"**************************");
-                        out.setBody(ps);
-                    }
-                });
+                from(from).to("bean:availabilityMonitor");
             }
         });
         
         mockPoller.start();
+        
+//        MockEndpoint endpoint = getMockEndpoint( "bean:availabilityMonitor", false );
+//        endpoint.setExpectedMessageCount( 1 );
+        
+       // template.requestBody( "direct:pollAvailabilityMonitor", svc );
         
     }
     
