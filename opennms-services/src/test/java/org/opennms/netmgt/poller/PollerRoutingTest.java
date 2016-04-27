@@ -1,5 +1,7 @@
 package org.opennms.netmgt.poller;
 
+import static org.junit.Assert.*;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.InetAddress;
@@ -7,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.ExchangeTimedOutException;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.spring.SpringCamelContext;
@@ -85,7 +88,8 @@ public class PollerRoutingTest extends RouteBuilder {
 		            template.sendBody( "direct:pollAvailabilityMonitor", monitoredServiceTask);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
+			assertEquals(ExchangeTimedOutException.class, e.getCause().getClass());
 		}
 	       finally {
 	            camelContext.stop();
