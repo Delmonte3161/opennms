@@ -13,7 +13,6 @@ import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.SimpleRegistry;
 import org.apache.camel.test.blueprint.CamelBlueprintTestSupport;
@@ -30,7 +29,6 @@ import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
-import org.opennms.netmgt.poller.monitors.support.DistPollerMonitorDao;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -101,7 +99,7 @@ public class PollerMonitorsCoreMinionBlueprintIT extends CamelBlueprintTestSuppo
         distPoller.setId(DistPollerDao.DEFAULT_DIST_POLLER_ID);
         distPoller.setLabel(DistPollerDao.DEFAULT_DIST_POLLER_ID);
         distPoller.setLocation(LOCATION);
-        DistPollerDao distPollerDao = new DistPollerMonitorDao(distPoller);
+        DistPollerDao distPollerDao = new MockDistPollerMonitorDao(distPoller);
 
         services.put( DistPollerDao.class.getName(),
                 new KeyValueHolder<Object, Dictionary>(distPollerDao, new Properties() ) );

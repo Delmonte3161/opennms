@@ -26,7 +26,7 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.netmgt.poller.monitors.support;
+package org.opennms.netmgt.poller.monitors;
 
 import java.util.Collections;
 import java.util.Date;
@@ -45,15 +45,15 @@ import org.opennms.netmgt.model.OnmsMonitoringSystem;
  * 
  * @author Seth
  */
-public class DistPollerMonitorDao implements DistPollerDao {
+public class MockDistPollerMonitorDao implements DistPollerDao {
 
 	private final OnmsDistPoller m_distPoller;
 
-	public DistPollerMonitorDao(OnmsDistPoller distPoller) {
+	public MockDistPollerMonitorDao(OnmsDistPoller distPoller) {
 		m_distPoller = Objects.requireNonNull(distPoller);
 	}
 
-	public DistPollerMonitorDao(MinionIdentity identity) {
+	public MockDistPollerMonitorDao(MinionIdentity identity) {
 		Objects.requireNonNull(identity);
 		m_distPoller = new OnmsDistPoller();
 		m_distPoller.setId(identity.getId());
