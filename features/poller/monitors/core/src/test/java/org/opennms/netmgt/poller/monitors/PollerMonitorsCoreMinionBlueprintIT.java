@@ -1,6 +1,31 @@
-/**
- * 
- */
+/*******************************************************************************
+ * This file is part of OpenNMS(R).
+ *
+ * Copyright (C) 2016-2016 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2016 The OpenNMS Group, Inc.
+ *
+ * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
+ *
+ * OpenNMS(R) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * OpenNMS(R) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with OpenNMS(R).  If not, see:
+ *      http://www.gnu.org/licenses/
+ *
+ * For more information contact:
+ *     OpenNMS(R) Licensing <license@opennms.org>
+ *     http://www.opennms.org/
+ *     http://www.opennms.com/
+ *******************************************************************************/
+
 package org.opennms.netmgt.poller.monitors;
 
 import java.util.Dictionary;
@@ -35,16 +60,17 @@ import org.springframework.test.context.ContextConfiguration;
  * @author pk015603
  *
  */
-@RunWith( OpenNMSJUnit4ClassRunner.class )
-@ContextConfiguration( locations = {"classpath:/META-INF/opennms/emptyContext.xml",
-		"classpath:/META-INF/opennms/applicationContext-soa.xml" } )
-public class PollerMonitorsCoreMinionBlueprintIT extends CamelBlueprintTestSupport{
-	
-	private static BrokerService m_broker = null;
-	
-	MockServiceMonitor m_mockServiceMonitor=null;
-	
-	private static final String LOCATION = "RDU";
+@RunWith(OpenNMSJUnit4ClassRunner.class)
+@ContextConfiguration( locations = {
+    "classpath:/META-INF/opennms/emptyContext.xml"
+})
+public class PollerMonitorsCoreMinionBlueprintIT extends CamelBlueprintTestSupport {
+
+    private static BrokerService m_broker = null;
+
+    MockServiceMonitor m_mockServiceMonitor=null;
+
+    private static final String LOCATION = "RDU";
 
     /**
      * Use Aries Blueprint synchronous mode to avoid a blueprint deadlock bug.
@@ -53,28 +79,24 @@ public class PollerMonitorsCoreMinionBlueprintIT extends CamelBlueprintTestSuppo
      * @see https://access.redhat.com/site/solutions/640943
      */
     @Override
-    public void doPreSetup() throws Exception
-    {
+    public void doPreSetup() throws Exception {
         System.setProperty( "org.apache.aries.blueprint.synchronous", Boolean.TRUE.toString() );
         System.setProperty( "de.kalpatec.pojosr.framework.events.sync", Boolean.TRUE.toString() );
     }
 
     @Override
-    public boolean isUseAdviceWith()
-    {
+    public boolean isUseAdviceWith() {
         return true;
     }
 
     @Override
-    public boolean isUseDebugger()
-    {
+    public boolean isUseDebugger() {
         // must enable debugger
         return true;
     }
 
     @Override
-    public String isMockEndpoints()
-    {
+    public String isMockEndpoints() {
         return "*";
     }
 
@@ -84,36 +106,32 @@ public class PollerMonitorsCoreMinionBlueprintIT extends CamelBlueprintTestSuppo
      */
     @SuppressWarnings( "rawtypes" )
     @Override
-    protected void addServicesOnStartup( Map<String, KeyValueHolder<Object, Dictionary>> services )
-    {
-    	Properties props = new Properties();
+    protected void addServicesOnStartup( Map<String, KeyValueHolder<Object, Dictionary>> services ) {
+        Properties props = new Properties();
         props.setProperty("alias", "opennms.broker");
-       
+
         //creating the Active MQ component and service
         ActiveMQComponent activeMQ = new ActiveMQComponent();
         activeMQ.setBrokerURL("tcp://127.0.0.1:61616");
-        services.put( Component.class.getName(),
-               new KeyValueHolder<Object, Dictionary>( activeMQ, props ) );
-        
+        services.put(Component.class.getName(), new KeyValueHolder<Object, Dictionary>( activeMQ, props ));
+
         OnmsDistPoller distPoller = new OnmsDistPoller();
         distPoller.setId(DistPollerDao.DEFAULT_DIST_POLLER_ID);
         distPoller.setLabel(DistPollerDao.DEFAULT_DIST_POLLER_ID);
         distPoller.setLocation(LOCATION);
-        DistPollerDao distPollerDao = new MockDistPollerMonitorDao(distPoller);
+        DistPollerDao distPollerDao = new DistPollerDaoMinion(distPoller);
 
-        services.put( DistPollerDao.class.getName(),
-                new KeyValueHolder<Object, Dictionary>(distPollerDao, new Properties() ) );
-    	
-    	Properties prop = new Properties();
-    	prop.setProperty("implementation", "org.opennms.netmgt.poller.monitors.AvailabilityMonitor");
-    	m_mockServiceMonitor = new MockServiceMonitor();
-    	services.put(ServiceMonitor.class.getName(),new KeyValueHolder<Object, Dictionary>( m_mockServiceMonitor, prop));
+        services.put(DistPollerDao.class.getName(), new KeyValueHolder<Object, Dictionary>(distPollerDao, new Properties()));
+
+        Properties prop = new Properties();
+        prop.setProperty("implementation", "org.opennms.netmgt.poller.monitors.AvailabilityMonitor");
+        m_mockServiceMonitor = new MockServiceMonitor();
+        services.put(ServiceMonitor.class.getName(),new KeyValueHolder<Object, Dictionary>( m_mockServiceMonitor, prop));
     }
 
     // The location of our Blueprint XML file to be used for testing
     @Override
-    protected String getBlueprintDescriptor()
-    {
+    protected String getBlueprintDescriptor() {
         return "file:blueprint-poller-monitors-core-minion.xml,file:src/test/resources/blueprint-empty-camel-context.xml";
     }
 
@@ -132,14 +150,13 @@ public class PollerMonitorsCoreMinionBlueprintIT extends CamelBlueprintTestSuppo
     }
     
     @Test
-    public void testPollerMonitorCoreMinion() throws Exception
-    {
-		 /*
+    public void testPollerMonitorCoreMinion() throws Exception {
+        /*
          * Create a Camel listener for the location queue that will respond with
          */
-    	MonitoredService svc = new MockMonitoredService(1, "Node One", InetAddressUtils.addr("127.0.0.1"), "SMTP");
+        MonitoredService svc = new MockMonitoredService(1, "Node One", InetAddressUtils.addr("127.0.0.1"), "SMTP");
         Map<String, Object> parms = new HashMap<String, Object>();
-        parms.put("port",61616);	
+        parms.put("port",61616);
         SimpleRegistry registry = new SimpleRegistry();
         CamelContext mockPoller = new DefaultCamelContext(registry);
         mockPoller.addComponent("queuingservice", ActiveMQComponent.activeMQComponent("tcp://127.0.0.1:61616"));
@@ -158,21 +175,15 @@ public class PollerMonitorsCoreMinionBlueprintIT extends CamelBlueprintTestSuppo
 //        endpoint.setExpectedMessageCount( 1 );
         
        // template.requestBody( "direct:pollAvailabilityMonitor", svc );
-        
     }
-    
-    public class MockServiceMonitor implements ServiceMonitor
-   	{
-   		@Override
-   		public void close() {
-   		}
-   
-   		@Override
-   		public PollStatus poll(MonitoredService svc,
-   				Map<String, Object> parameters) {
-   					return null;
-   		}
-   	}
 
+    public static class MockServiceMonitor implements ServiceMonitor {
+        @Override
+        public void close() {}
 
+        @Override
+        public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
+            return null;
+        }
+    }
 }

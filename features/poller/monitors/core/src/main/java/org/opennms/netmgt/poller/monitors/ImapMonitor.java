@@ -61,18 +61,6 @@ import org.opennms.netmgt.poller.PollStatus;
  * @author <A HREF="mailto:sowmya@opennms.org">Sowmya Nataraj </A>
  * @author <A HREF="mailto:mike@opennms.org">Mike Davidson </A>
  * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
- * @author <A HREF="mailto:tarus@opennms.org">Tarus Balog </A>
- * @author <A HREF="mailto:sowmya@opennms.org">Sowmya Nataraj </A>
- * @author <A HREF="mailto:mike@opennms.org">Mike Davidson </A>
- * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
- * @author <A HREF="mailto:tarus@opennms.org">Tarus Balog </A>
- * @author <A HREF="mailto:sowmya@opennms.org">Sowmya Nataraj </A>
- * @author <A HREF="mailto:mike@opennms.org">Mike Davidson </A>
- * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
- * @author <A HREF="mailto:tarus@opennms.org">Tarus Balog </A>
- * @author <A HREF="mailto:sowmya@opennms.org">Sowmya Nataraj </A>
- * @author <A HREF="mailto:mike@opennms.org">Mike Davidson </A>
- * @author <A HREF="http://www.opennms.org/">OpenNMS </A>
  * @version CVS 1.1.1.1
  */
 @Distributable

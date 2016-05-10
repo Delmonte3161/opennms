@@ -1,6 +1,31 @@
-/**
- * 
- */
+/*******************************************************************************
+ * This file is part of OpenNMS(R).
+ *
+ * Copyright (C) 2016-2016 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2016 The OpenNMS Group, Inc.
+ *
+ * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
+ *
+ * OpenNMS(R) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * OpenNMS(R) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with OpenNMS(R).  If not, see:
+ *      http://www.gnu.org/licenses/
+ *
+ * For more information contact:
+ *     OpenNMS(R) Licensing <license@opennms.org>
+ *     http://www.opennms.org/
+ *     http://www.opennms.com/
+ *******************************************************************************/
+
 package org.opennms.netmgt.poller.monitors;
 
 import java.net.UnknownHostException;
@@ -30,16 +55,17 @@ import org.springframework.test.context.ContextConfiguration;
  * @author pk015603
  *
  */
-@RunWith( OpenNMSJUnit4ClassRunner.class )
-@ContextConfiguration( locations = {"classpath:/META-INF/opennms/emptyContext.xml",
-		"classpath:/META-INF/opennms/applicationContext-soa.xml" } )
+@RunWith(OpenNMSJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {
+		"classpath:/META-INF/opennms/emptyContext.xml"
+})
 @JUnitConfigurationEnvironment
-public class PollerBluprintIT extends CamelBlueprintTestSupport{
-	
-	private static BrokerService m_broker = null;
-	
-	@BeanInject
-	private IcmpMonitor icmpMonitor;
+public class PollerBlueprintIT extends CamelBlueprintTestSupport {
+
+    private static BrokerService m_broker = null;
+
+    @BeanInject
+    private IcmpMonitor icmpMonitor;
 
     /**
      * Use Aries Blueprint synchronous mode to avoid a blueprint deadlock bug.
@@ -48,28 +74,24 @@ public class PollerBluprintIT extends CamelBlueprintTestSupport{
      * @see https://access.redhat.com/site/solutions/640943
      */
     @Override
-    public void doPreSetup() throws Exception
-    {
+    public void doPreSetup() throws Exception {
         System.setProperty( "org.apache.aries.blueprint.synchronous", Boolean.TRUE.toString() );
         System.setProperty( "de.kalpatec.pojosr.framework.events.sync", Boolean.TRUE.toString() );
     }
 
     @Override
-    public boolean isUseAdviceWith()
-    {
+    public boolean isUseAdviceWith() {
         return true;
     }
 
     @Override
-    public boolean isUseDebugger()
-    {
+    public boolean isUseDebugger() {
         // must enable debugger
         return true;
     }
 
     @Override
-    public String isMockEndpoints()
-    {
+    public String isMockEndpoints() {
         return "*";
     }
 
@@ -79,14 +101,12 @@ public class PollerBluprintIT extends CamelBlueprintTestSupport{
      */
     @SuppressWarnings( "rawtypes" )
     @Override
-    protected void addServicesOnStartup( Map<String, KeyValueHolder<Object, Dictionary>> services )
-    {
+    protected void addServicesOnStartup( Map<String, KeyValueHolder<Object, Dictionary>> services ) {
     }
 
     // The location of our Blueprint XML file to be used for testing
     @Override
-    protected String getBlueprintDescriptor()
-    {
+    protected String getBlueprintDescriptor() {
         return "file:src/main/resources/OSGI-INF/blueprint/blueprint.xml,file:src/test/resources/blueprint-empty-camel-context.xml";
     }
 
@@ -105,9 +125,8 @@ public class PollerBluprintIT extends CamelBlueprintTestSupport{
     }
 
     @Test
-    public void testPoller() throws UnknownHostException
-    {
-    	MonitoredService svc = new MockMonitoredService(1, "Node One", InetAddressUtils.addr("127.0.0.1"), "SMTP");
+    public void testPoller() throws UnknownHostException {
+        MonitoredService svc = new MockMonitoredService(1, "Node One", InetAddressUtils.addr("127.0.0.1"), "SMTP");
         Map<String, Object> parms = new HashMap<String, Object>();
         parms.put("port",61716);
 
@@ -115,5 +134,4 @@ public class PollerBluprintIT extends CamelBlueprintTestSupport{
         assertTrue(ps.isUp());
         assertFalse(ps.isDown());
     }
-
 }
