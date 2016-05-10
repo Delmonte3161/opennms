@@ -52,6 +52,10 @@
 
 	<bean id="pollerConfig" class="org.opennms.netmgt.config.PollerConfigFactory" depends-on="init-pollerConfig-factory" factory-method="getInstance"/>
 
+	<onmsgi:list id="contextServiceMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor">
+		<onmsgi:listener ref="pollerConfig" bind-method="onServiceMonitorBind" unbind-method="onServiceMonitorUnbind" />
+	</onmsgi:list>
+
 	<onmsgi:service interface="org.opennms.netmgt.config.PollerConfig" ref="pollerConfig" />
 
 	<!--  collectd config factory is now init'd in the dao context -->

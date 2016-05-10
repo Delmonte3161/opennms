@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.opennms.features.minion</groupId>
         <artifactId>minion-parent</artifactId>
-        <version>18.0.0-SNAPSHOT</version>
+        <version>19.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>repository</artifactId>
@@ -40,6 +40,7 @@
                                 are included in the repository tar.gz file, add the feature to this list. -->
                             <features>
                                 <feature>opennms-discoverer</feature>
+                                <feature>opennms-poller-monitors-core-minion</feature>
                             </features>
                             <repository>target/maven-repo</repository>
                         </configuration>
