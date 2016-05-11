@@ -29,22 +29,19 @@
 package org.opennms.netmgt.poller.monitors;
 
 import java.net.UnknownHostException;
+import java.util.Collections;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.activemq.broker.BrokerService;
-import org.apache.camel.BeanInject;
 import org.apache.camel.test.blueprint.CamelBlueprintTestSupport;
 import org.apache.camel.util.KeyValueHolder;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.PollStatus;
+import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
 import org.opennms.test.JUnitConfigurationEnvironment;
 import org.springframework.test.context.ContextConfiguration;
@@ -61,11 +58,6 @@ import org.springframework.test.context.ContextConfiguration;
 })
 @JUnitConfigurationEnvironment
 public class PollerBlueprintIT extends CamelBlueprintTestSupport {
-
-    private static BrokerService m_broker = null;
-
-    @BeanInject
-    private IcmpMonitor icmpMonitor;
 
     /**
      * Use Aries Blueprint synchronous mode to avoid a blueprint deadlock bug.
@@ -110,28 +102,70 @@ public class PollerBlueprintIT extends CamelBlueprintTestSupport {
         return "file:src/main/resources/OSGI-INF/blueprint/blueprint.xml,file:src/test/resources/blueprint-empty-camel-context.xml";
     }
 
-    @BeforeClass
-    public static void startActiveMQ() throws Exception {
-        m_broker = new BrokerService();
-        m_broker.addConnector("tcp://127.0.0.1:61716");
-        m_broker.start();
+    @Test
+    public void testIcmpPoller() throws UnknownHostException {
+        // Fetch the ICMP monitor from the OSGi registry
+        ServiceMonitor icmpMonitor = getOsgiService(ServiceMonitor.class, String.format("(implementation=%s)", IcmpMonitor.class.getName()));
+        assertNotNull(icmpMonitor);
+
+        MonitoredService svc = new MockMonitoredService(1, "Node One", InetAddressUtils.addr("127.0.0.1"), "ICMP");
+
+        // Ping localhost
+        PollStatus ps = icmpMonitor.poll(svc, Collections.emptyMap());
+        assertTrue(ps.isUp());
+        assertFalse(ps.isDown());
     }
 
-    @AfterClass
-    public static void stopActiveMQ() throws Exception {
-        if (m_broker != null) {
-            m_broker.stop();
+    @Test
+    public void testPollerRegistrations() throws UnknownHostException {
+        // Fetch the ICMP monitor from the OSGi registry
+        for (Class<?> clazz : new Class<?>[] {
+            AvailabilityMonitor.class,
+            CitrixMonitor.class,
+            DnsMonitor.class,
+            DNSResolutionMonitor.class,
+            DominoIIOPMonitor.class,
+            FtpMonitor.class,
+            GpMonitor.class,
+            HttpMonitor.class,
+            HttpsMonitor.class,
+            IcmpMonitor.class,
+            ImapMonitor.class,
+            JDBCMonitor.class,
+            JDBCQueryMonitor.class,
+            JDBCStoredProcedureMonitor.class,
+            JolokiaBeanMonitor.class,
+            JschSshMonitor.class,
+            LdapMonitor.class,
+            LdapsMonitor.class,
+            LoopMonitor.class,
+            MemcachedMonitor.class,
+            NrpeMonitor.class,
+            NtpMonitor.class,
+            Pop3Monitor.class,
+            SmtpMonitor.class,
+            SshMonitor.class,
+            SSLCertMonitor.class,
+            StrafePingMonitor.class,
+            SystemExecuteMonitor.class,
+            TcpMonitor.class,
+            TrivialTimeMonitor.class,
+            WebMonitor.class
+        }) {
+            ServiceMonitor monitor = getOsgiService(ServiceMonitor.class, String.format("(implementation=%s)", clazz.getName()));
+            assertNotNull(monitor);
         }
     }
 
     @Test
-    public void testPoller() throws UnknownHostException {
-        MonitoredService svc = new MockMonitoredService(1, "Node One", InetAddressUtils.addr("127.0.0.1"), "SMTP");
-        Map<String, Object> parms = new HashMap<String, Object>();
-        parms.put("port",61716);
-
-        PollStatus ps = icmpMonitor.poll(svc, parms);
-        assertTrue(ps.isUp());
-        assertFalse(ps.isDown());
+    public void testMissingRegistration() throws UnknownHostException {
+        // Fetch the ICMP monitor from the OSGi registry
+        try {
+            getOsgiService(ServiceMonitor.class, "(implementation=org.opennms.doesnt.Exist)", 5000);
+        } catch (RuntimeException e) {
+            assertEquals("Gave up waiting for service (&(objectClass=org.opennms.netmgt.poller.ServiceMonitor)(implementation=org.opennms.doesnt.Exist))", e.getMessage());
+            return;
+        }
+        fail("Didn't catch expected exception");
     }
 }
