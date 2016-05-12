@@ -46,7 +46,6 @@
 			<bean ref="unmarshaller"/>
 			<to uri="bean:snmpv3User"/>
 		</route>
-	</camelContext>
     
      
     <bean id="trapdConfig" class="org.opennms.netmgt.trapd.TrapdConfigBean">
