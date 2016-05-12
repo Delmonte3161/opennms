@@ -32,6 +32,7 @@
 			<cm:property name="snmpV3Users" value="[[rest.root]]/config/trapd" />
 		</cm:default-properties>
 	</cm:property-placeholder>
+	
 
 	<!-- Camel Event marshalling processor -->
 	<bean id="unmarshaller" class="org.opennms.core.camel.JaxbUtilsUnmarshalProcessor">
