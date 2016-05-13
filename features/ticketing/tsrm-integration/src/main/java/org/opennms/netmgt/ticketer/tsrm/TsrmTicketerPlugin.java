@@ -1,3 +1,31 @@
+/*******************************************************************************
+ * This file is part of OpenNMS(R).
+ *
+ * Copyright (C) 2016 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2016 The OpenNMS Group, Inc.
+ *
+ * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
+ *
+ * OpenNMS(R) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * OpenNMS(R) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with OpenNMS(R).  If not, see:
+ *      http://www.gnu.org/licenses/
+ *
+ * For more information contact:
+ *     OpenNMS(R) Licensing <license@opennms.org>
+ *     http://www.opennms.org/
+ *     http://www.opennms.com/
+ *******************************************************************************/
+
 package org.opennms.netmgt.ticketer.tsrm;
 
 import java.io.File;
@@ -29,6 +57,7 @@ import org.slf4j.LoggerFactory;
 import com.ibm.maximo.CreateSHSIMPINCResponseType;
 import com.ibm.maximo.CreateSHSIMPINCType;
 import com.ibm.maximo.INCIDENTKeyType;
+import com.ibm.maximo.MXBooleanType;
 import com.ibm.maximo.MXStringQueryType;
 import com.ibm.maximo.MXStringType;
 import com.ibm.maximo.QuerySHSIMPINCResponseType;
@@ -125,24 +154,40 @@ public class TsrmTicketerPlugin implements Plugin {
 
                 Ticket ticket = new Ticket();
 
-                MXStringType ticketIdFromIncident = new MXStringType();
-                ticketIdFromIncident = incident.getTICKETID();
+                MXStringType affectedPerson = new MXStringType();
+                affectedPerson = incident.getAFFECTEDPERSON();
+                MXStringType assetNum = new MXStringType();
+                assetNum = incident.getASSETNUM();
+                MXStringType classId = new MXStringType();
+                classId = incident.getCLASS();
+                MXStringType classStructureId = new MXStringType();
+                classStructureId = incident.getCLASSSTRUCTUREID();
                 MXStringType description = new MXStringType();
                 description = incident.getDESCRIPTION();
                 MXStringType longDescription = new MXStringType();
                 longDescription = incident.getDESCRIPTIONLONGDESCRIPTION();
                 MXStringType location = new MXStringType();
                 location = incident.getLOCATION();
-                MXStringType reportedBy = new MXStringType();
-                reportedBy = incident.getREPORTEDBY();
-                MXStringType classStructureId = new MXStringType();
-                classStructureId = incident.getCLASSSTRUCTUREID();
                 MXStringType ownerGroup = new MXStringType();
                 ownerGroup = incident.getOWNERGROUP();
+                MXStringType reportedBy = new MXStringType();
+                reportedBy = incident.getREPORTEDBY();
+                MXStringType shsCallerType = new MXStringType();
+                shsCallerType = incident.getSHSCALLERTYPE();
+                MXStringType shsReasonForOutage = new MXStringType();
+                shsReasonForOutage = incident.getSHSREASONFOROUTAGE();
+                MXStringType shsResolution = new MXStringType();
+                shsResolution = incident.getSHSRESOLUTION();
+                MXStringType shsRoomNumber = new MXStringType();
+                shsRoomNumber = incident.getSHSROOMNUMBER();
                 MXStringType siteId = new MXStringType();
                 siteId = incident.getSITEID();
                 MXStringType source = new MXStringType();
                 source = incident.getSOURCE();
+                MXBooleanType statusIface = new MXBooleanType();
+                statusIface = incident.getSTATUSIFACE();
+                MXStringType ticketIdFromIncident = new MXStringType();
+                ticketIdFromIncident = incident.getTICKETID();
 
                 if (ticketIdFromIncident == null) {
                     return null;
@@ -150,24 +195,50 @@ public class TsrmTicketerPlugin implements Plugin {
 
                 ticket.setId(ticketIdFromIncident.getValue());
 
+                if (affectedPerson != null) {
+                    ticket.addAttribute(AFFECTED_PERSON,
+                                        affectedPerson.getValue());
+                }
+                if (assetNum != null) {
+                    ticket.addAttribute(ASSET_NUM, assetNum.getValue());
+                }
+                if (classId != null) {
+                    ticket.addAttribute(CLASS_ID, classId.getValue());
+                }
+                if (classStructureId != null) {
+                    ticket.addAttribute(CLASS_STRUCTURE_ID,
+                                        classStructureId.getValue());
+                }
                 if (description != null) {
                     ticket.setSummary(description.getValue());
                 }
                 if (longDescription != null) {
                     ticket.setDetails(longDescription.getValue());
                 }
-                if (reportedBy != null) {
-                    ticket.setUser(reportedBy.getValue());
-                }
                 if (location != null) {
                     ticket.addAttribute(LOCATION, location.getValue());
                 }
-                if (classStructureId != null) {
-                    ticket.addAttribute(CLASS_STRUCTURE_ID,
-                                        classStructureId.getValue());
-                }
                 if (ownerGroup != null) {
                     ticket.addAttribute(OWNER_GROUP, ownerGroup.getValue());
+                }
+                if (reportedBy != null) {
+                    ticket.setUser(reportedBy.getValue());
+                }
+                if (shsCallerType != null) {
+                    ticket.addAttribute(SHS_CALLER_TYPE,
+                                        shsCallerType.getValue());
+                }
+                if (shsReasonForOutage != null) {
+                    ticket.addAttribute(SHS_REASON_FOR_OUTAGE,
+                                        shsReasonForOutage.getValue());
+                }
+                if (shsResolution != null) {
+                    ticket.addAttribute(SHS_RESOLUTION,
+                                        shsResolution.getValue());
+                }
+                if (shsRoomNumber != null) {
+                    ticket.addAttribute(SHS_ROOM_NUMBER,
+                                        shsRoomNumber.getValue());
                 }
                 if (siteId != null) {
                     ticket.addAttribute(SITE_ID, siteId.getValue());
@@ -189,6 +260,11 @@ public class TsrmTicketerPlugin implements Plugin {
                 } catch (IOException e) {
                     LOG.error("Unable to load tsrm.status from properties ",
                               e);
+                }
+
+                if (statusIface != null) {
+                    ticket.addAttribute(STATUS_IFACE,
+                                        statusIface.isValue().toString());
                 }
                 return ticket;
             }
@@ -263,37 +339,98 @@ public class TsrmTicketerPlugin implements Plugin {
     private void updateIncidentWithTicket(SHSIMPINCINCIDENTType incident,
             Ticket ticket) {
 
-        MXStringType location = new MXStringType();
-        location.setValue(ticket.getAttribute(LOCATION));
-        incident.setLOCATION(location);
+        if (!StringUtils.isEmpty(ticket.getAttribute(AFFECTED_PERSON))) {
+            MXStringType affectedPerson = new MXStringType();
+            affectedPerson.setValue(ticket.getAttribute(AFFECTED_PERSON));
+            incident.setAFFECTEDPERSON(affectedPerson);
+        }
 
-        MXStringType description = new MXStringType();
-        description.setValue(ticket.getSummary());
-        incident.setDESCRIPTION(description);
+        if (!StringUtils.isEmpty(ticket.getAttribute(ASSET_NUM))) {
+            MXStringType assetNum = new MXStringType();
+            assetNum.setValue(ticket.getAttribute(ASSET_NUM));
+            incident.setASSETNUM(assetNum);
+        }
 
-        MXStringType longDescription = new MXStringType();
-        longDescription.setValue(ticket.getDetails());
-        incident.setDESCRIPTIONLONGDESCRIPTION(longDescription);
+        if (!StringUtils.isEmpty(ticket.getAttribute(CLASS_ID))) {
+            MXStringType classId = new MXStringType();
+            classId.setValue(ticket.getAttribute(CLASS_ID));
+            incident.setCLASS(classId);
+        }
 
-        MXStringType classStructureId = new MXStringType();
-        classStructureId.setValue(ticket.getAttribute(CLASS_STRUCTURE_ID));
-        incident.setCLASSSTRUCTUREID(classStructureId);
+        if (!StringUtils.isEmpty(ticket.getAttribute(CLASS_STRUCTURE_ID))) {
+            MXStringType classStructureId = new MXStringType();
+            classStructureId.setValue(ticket.getAttribute(CLASS_STRUCTURE_ID));
+            incident.setCLASSSTRUCTUREID(classStructureId);
+        }
 
-        MXStringType ownerGroup = new MXStringType();
-        ownerGroup.setValue(ticket.getAttribute(OWNER_GROUP));
-        incident.setOWNERGROUP(ownerGroup);
+        if (!StringUtils.isEmpty(ticket.getAttribute(COMMODITY))) {
+            MXStringType commodity = new MXStringType();
+            commodity.setValue(ticket.getAttribute(COMMODITY));
+            incident.setCOMMODITY(commodity);
+        }
 
-        MXStringType siteId = new MXStringType();
-        siteId.setValue(ticket.getAttribute(SITE_ID));
-        incident.setSITEID(siteId);
+        if (!StringUtils.isEmpty(ticket.getSummary())) {
+            MXStringType description = new MXStringType();
+            description.setValue(ticket.getSummary());
+            incident.setDESCRIPTION(description);
+        }
 
-        MXStringType source = new MXStringType();
-        source.setValue(ticket.getAttribute(SOURCE));
-        incident.setSOURCE(source);
+        if (!StringUtils.isEmpty(ticket.getDetails())) {
+            MXStringType longDescription = new MXStringType();
+            longDescription.setValue(ticket.getDetails());
+            incident.setDESCRIPTIONLONGDESCRIPTION(longDescription);
+        }
 
-        MXStringType reportedBy = new MXStringType();
-        reportedBy.setValue(ticket.getUser());
-        incident.setREPORTEDBY(reportedBy);
+        if (!StringUtils.isEmpty(ticket.getAttribute(LOCATION))) {
+            MXStringType location = new MXStringType();
+            location.setValue(ticket.getAttribute(LOCATION));
+            incident.setLOCATION(location);
+        }
+        if (!StringUtils.isEmpty(ticket.getAttribute(OWNER_GROUP))) {
+            MXStringType ownerGroup = new MXStringType();
+            ownerGroup.setValue(ticket.getAttribute(OWNER_GROUP));
+            incident.setOWNERGROUP(ownerGroup);
+        }
+
+        if (!StringUtils.isEmpty(ticket.getUser())) {
+            MXStringType reportedBy = new MXStringType();
+            reportedBy.setValue(ticket.getUser());
+            incident.setREPORTEDBY(reportedBy);
+        }
+
+        if (!StringUtils.isEmpty(ticket.getAttribute(SHS_CALLER_TYPE))) {
+            MXStringType shsCallerType = new MXStringType();
+            shsCallerType.setValue(ticket.getAttribute(SHS_CALLER_TYPE));
+            incident.setSHSCALLERTYPE(shsCallerType);
+        }
+
+        if (!StringUtils.isEmpty(ticket.getAttribute(SHS_REASON_FOR_OUTAGE))) {
+            MXStringType shsReasonForOutage = new MXStringType();
+            shsReasonForOutage.setValue(ticket.getAttribute(SHS_REASON_FOR_OUTAGE));
+            incident.setSHSREASONFOROUTAGE(shsReasonForOutage);
+        }
+
+        if (!StringUtils.isEmpty(ticket.getAttribute(SHS_RESOLUTION))) {
+            MXStringType shsResolution = new MXStringType();
+            shsResolution.setValue(ticket.getAttribute(SHS_RESOLUTION));
+            incident.setSHSRESOLUTION(shsResolution);
+        }
+
+        if (!StringUtils.isEmpty(ticket.getAttribute(SHS_ROOM_NUMBER))) {
+            MXStringType shsRoomNumber = new MXStringType();
+            shsRoomNumber.setValue(ticket.getAttribute(SHS_ROOM_NUMBER));
+            incident.setSHSROOMNUMBER(shsRoomNumber);
+        }
+        if (!StringUtils.isEmpty(ticket.getAttribute(SITE_ID))) {
+            MXStringType siteId = new MXStringType();
+            siteId.setValue(ticket.getAttribute(SITE_ID));
+            incident.setSITEID(siteId);
+        }
+        if (!StringUtils.isEmpty(ticket.getAttribute(SOURCE))) {
+            MXStringType source = new MXStringType();
+            source.setValue(ticket.getAttribute(SOURCE));
+            incident.setSOURCE(source);
+        }
 
         MXStringType status = new MXStringType();
         try {
@@ -308,6 +445,12 @@ public class TsrmTicketerPlugin implements Plugin {
             LOG.error("Unable to load tsrm.status from properties ", e);
         }
         incident.setSTATUS(status);
+
+        if (!StringUtils.isEmpty(ticket.getAttribute(STATUS_IFACE))) {
+            MXBooleanType statusIface = new MXBooleanType();
+            statusIface.setValue(Boolean.parseBoolean(ticket.getAttribute(STATUS_IFACE)));
+            incident.setSTATUSIFACE(statusIface);
+        }
 
     }
 

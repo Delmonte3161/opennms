@@ -53,9 +53,10 @@ public class MinionFeatureKarafIT extends KarafTestCase {
 
 	@Before
 	public void setUp() {
-		addFeaturesUrl(maven().groupId("org.opennms.container").artifactId("karaf").version("19.0.0-SNAPSHOT").type("xml").classifier("features").getURL());
+		final String version = getOpenNMSVersion();
+		addFeaturesUrl(maven().groupId("org.opennms.container").artifactId("karaf").version(version).type("xml").classifier("features").getURL());
 		// This artifact contains Minion-only Karaf features
-		addFeaturesUrl(maven().groupId("org.opennms.karaf").artifactId("opennms").version("19.0.0-SNAPSHOT").type("xml").classifier("minion").getURL());
+		addFeaturesUrl(maven().groupId("org.opennms.karaf").artifactId("opennms").version(version).type("xml").classifier("minion").getURL());
 	}
 
 	@Test
@@ -79,6 +80,18 @@ public class MinionFeatureKarafIT extends KarafTestCase {
 	@Test
 	public void testInstallFeatureOpennmsPollerMonitersCoreMinion() {
 		installFeature("opennms-poller-monitors-core-minion");
+		System.out.println(executeCommand("features:list -i"));
+	}
+
+	@Test
+	public void testInstallFeatureOpennmsSyslogdHandlerMinion() {
+		installFeature("opennms-syslogd-handler-minion");
+		System.out.println(executeCommand("features:list -i"));
+	}
+
+	@Test
+	public void testInstallFeatureOpennmsTrapdHandlerMinion() {
+		installFeature("opennms-trapd-handler-minion");
 		System.out.println(executeCommand("features:list -i"));
 	}
 }

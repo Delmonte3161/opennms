@@ -30,6 +30,7 @@ package org.opennms.netmgt.mock;
 
 import java.net.UnknownHostException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -162,7 +163,7 @@ public class MockNetworkTest extends TestCase {
         public void visitService(MockService service) {
             m_serviceCount++;
             ServiceMonitor monitor = m_pollerConfig.getServiceMonitor(service.getSvcName());
-            PollStatus pollResult = monitor.poll(new MonitoredServiceTask(service, new HashMap<String, Object>()));
+            PollStatus pollResult = monitor.poll(new MonitoredServiceTask(service, Collections.emptyMap()));
             assertEquals(m_expectedStatus, pollResult);
         }
     }
@@ -403,7 +404,7 @@ public class MockNetworkTest extends TestCase {
         m_network.resetInvalidPollCount();
         MonitoredService svc = new MockMonitoredService(99, "InvalidNode", InetAddressUtils.addr("1.1.1.1"), "ICMP");
         ServiceMonitor monitor = m_pollerConfig.getServiceMonitor("ICMP");
-        monitor.poll(new MonitoredServiceTask(svc, new HashMap<String, Object>()));
+        monitor.poll(new MonitoredServiceTask(svc, Collections.emptyMap()));
         assertEquals(1, m_network.getInvalidPollCount());
 
     }
