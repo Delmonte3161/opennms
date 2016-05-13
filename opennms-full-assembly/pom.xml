@@ -168,6 +168,12 @@
             <goals>
               <goal>testCompile</goal>
             </goals>
+            <configuration>
+              <source>1.8</source>
+              <target>1.8</target>
+              <encoding>UTF-8</encoding>
+              <optimize>true</optimize>
+            </configuration>
           </execution>
         </executions>
       </plugin> 
@@ -306,12 +312,33 @@
                 <feature>minion-core-api</feature>
                 <feature>opennms-discoverer</feature>
                 <feature>opennms-discovery-distPollerDaoMinion</feature>
+                <feature>opennms-trapd-handler-minion</feature>
 
               </features>
-              <repository>target/features-repo</repository>
+              <repository>${project.build.directory}/features-repo</repository>
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin> 
+        <artifactId>maven-clean-plugin</artifactId> 
+        <executions> 
+          <execution> 
+            <id>cleanup-integration-tests</id> 
+            <phase>post-integration-test</phase> 
+            <goals> 
+              <goal>clean</goal> 
+            </goals> 
+            <configuration> 
+              <excludeDefaultDirectories>true</excludeDefaultDirectories> 
+              <filesets> 
+                <fileset> 
+                  <directory>${project.build.directory}/features-repo</directory> 
+                </fileset> 
+              </filesets> 
+            </configuration> 
+          </execution> 
+        </executions> 
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

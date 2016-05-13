@@ -34,7 +34,6 @@ import static org.opennms.features.topology.app.internal.operations.TopologySele
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -94,7 +93,6 @@ import org.opennms.osgi.locator.OnmsServiceManagerLocator;
 import org.opennms.web.api.OnmsHeaderProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -346,7 +344,7 @@ public class TopologyUI extends UI implements CommandUpdateListener, MenuItemUpd
     /**
      * Helper class to load components to show in the info panel.
      */
-    public class InfoPanelItemProvider implements SelectionListener, MenuItemUpdateListener {
+    public class InfoPanelItemProvider implements SelectionListener, MenuItemUpdateListener, GraphContainer.ChangeListener {
 
         // Panel Item to visualize the selection context
         private final InfoPanelItem selectionContextPanelItem = new InfoPanelItem() {
@@ -456,9 +454,28 @@ public class TopologyUI extends UI implements CommandUpdateListener, MenuItemUpd
             infoPanelItems.add(selectionContextPanelItem); // manually add this, as it is not exposed via osgi
             infoPanelItems.add(metaInfoPanelItem); // same here
             return infoPanelItems.stream()
-                    .filter(panel -> panel.contributesTo(m_graphContainer))
+                    .filter(item -> {
+                        try {
+                            return item.contributesTo(m_graphContainer);
+                        } catch (Throwable t) {
+                            // See NMS-8394
+                            LOG.error("An error occured while determining if info panel item {} should be displayed. "
+                                    + "The component will not be displayed.", item.getClass(), t);
+                            return false;
+                        }
+                    })
                     .sorted()
-                    .map(item -> wrap(item))
+                    .map(item -> {
+                        try {
+                            return wrap(item);
+                        } catch (Throwable t) {
+                            // See NMS-8394
+                            LOG.error("An error occured while retriveing the component from info panel item {}. "
+                                    + "The component will not be displayed.", item.getClass(), t);
+                            return null;
+                        }
+                    })
+                    .filter(component -> component != null) // Skip any nulls from components with exceptions
                     .collect(Collectors.toList());
         }
 
@@ -486,6 +503,11 @@ public class TopologyUI extends UI implements CommandUpdateListener, MenuItemUpd
 
         @Override
         public void updateMenuItems() {
+            refreshInfoPanel();
+        }
+
+        @Override
+        public void graphChanged(GraphContainer graphContainer) {
             refreshInfoPanel();
         }
     }
@@ -631,6 +653,7 @@ public class TopologyUI extends UI implements CommandUpdateListener, MenuItemUpd
         final InfoPanelItemProvider infoPanelItemProvider = new InfoPanelItemProvider();
         m_selectionManager.addSelectionListener(infoPanelItemProvider);
         m_commandManager.addMenuItemUpdateListener(infoPanelItemProvider);
+        m_graphContainer.addChangeListener(infoPanelItemProvider);
     }
 
     private boolean noAdditionalFocusCriteria() {
