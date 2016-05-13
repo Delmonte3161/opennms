@@ -99,7 +99,8 @@ public class PollerBlueprintIT extends CamelBlueprintTestSupport {
     // The location of our Blueprint XML file to be used for testing
     @Override
     protected String getBlueprintDescriptor() {
-        return "file:src/main/resources/OSGI-INF/blueprint/blueprint.xml,file:src/test/resources/blueprint-empty-camel-context.xml";
+        // We don't need the OSGI-INF/blueprint files here, they are loaded when the bundle starts
+        return "file:src/test/resources/blueprint-empty-camel-context.xml";
     }
 
     @Test

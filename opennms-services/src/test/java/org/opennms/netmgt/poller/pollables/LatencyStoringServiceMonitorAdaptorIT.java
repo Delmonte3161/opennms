@@ -111,7 +111,7 @@ public class LatencyStoringServiceMonitorAdaptorIT implements TemporaryDatabaseA
         m_db = database;
     }
 
-    private class MockServiceMonitor extends AbstractServiceMonitor {
+    private static class MockServiceMonitor extends AbstractServiceMonitor {
         private  Double[] values;
         private int current = 0;
 
