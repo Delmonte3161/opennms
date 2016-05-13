@@ -120,7 +120,7 @@ public class LatencyStoringServiceMonitorAdaptorIT implements TemporaryDatabaseA
             this.values = values;
         }
         @Override
-        public PollStatus poll(MonitoredServiceTask monSvct) {
+        public PollStatus poll(MonitoredServiceTask task) {
             return (PollStatus.get(PollStatus.SERVICE_AVAILABLE, values[current++]));
         }
     }

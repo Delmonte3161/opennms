@@ -97,9 +97,9 @@ public class SSLCertMonitor extends AbstractServiceMonitor {
      * SERVICE_AVAILABLE and return.
      */
     @Override
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> parameters = monSvct.getParameters();
+    public PollStatus poll(MonitoredServiceTask task) {
+        MonitoredService svc = task.getMonitoredService();
+        Map<String, Object> parameters = task.getParameters();
         final NetworkInterface<InetAddress> iface = svc.getNetInterface();
 
         if (iface.getType() != NetworkInterface.TYPE_INET) {

@@ -111,9 +111,9 @@ public abstract class JMXMonitor extends AbstractServiceMonitor {
      * {@inheritDoc}
      */
     @Override
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> map = monSvct.getParameters();
+    public PollStatus poll(MonitoredServiceTask task) {
+        MonitoredService svc = task.getMonitoredService();
+        Map<String, Object> map = task.getParameters();
         if (m_jmxConfigDao == null) {
             m_jmxConfigDao = BeanUtils.getBean("daoContext", "jmxConfigDao", JmxConfigDao.class);
         }

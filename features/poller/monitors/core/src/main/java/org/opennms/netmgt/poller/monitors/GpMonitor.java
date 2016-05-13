@@ -79,9 +79,9 @@ public class GpMonitor extends AbstractServiceMonitor {
      * the script or program being called.
      */
     @Override
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> parameters = monSvct.getParameters();
+    public PollStatus poll(MonitoredServiceTask task) {
+        MonitoredService svc = task.getMonitoredService();
+        Map<String, Object> parameters = task.getParameters();
         LOG.warn("GpMonitor: This poller monitor is deprecated in favor of SystemExecuteMonitor. GpMonitor will be removed in a future release.");
         NetworkInterface<InetAddress> iface = svc.getNetInterface();
 

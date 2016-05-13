@@ -27,8 +27,8 @@ public class ServiceMonitorCamelImpl extends DefaultDispatcher implements Servic
 	}
 
 	@Override
-	public PollStatus poll(MonitoredServiceTask monSvct) {
-		return serviceMonitor.poll(monSvct);
+	public PollStatus poll(MonitoredServiceTask task) {
+		return serviceMonitor.poll(task);
 	}
 
 }

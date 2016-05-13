@@ -74,9 +74,9 @@ public class WebMonitor extends AbstractServiceMonitor {
 
     /** {@inheritDoc} */
     @Override
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> map = monSvct.getParameters();
+    public PollStatus poll(MonitoredServiceTask task) {
+        MonitoredService svc = task.getMonitoredService();
+        Map<String, Object> map = task.getParameters();
         PollStatus pollStatus = PollStatus.unresponsive();
         HttpClientWrapper clientWrapper = HttpClientWrapper.create();
 

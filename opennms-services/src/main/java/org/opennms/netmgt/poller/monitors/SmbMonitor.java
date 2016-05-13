@@ -77,9 +77,9 @@ public class SmbMonitor extends AbstractServiceMonitor {
     private static final boolean DO_NODE_STATUS_DEFAULT = true;
     
     @Override
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> parameters = monSvct.getParameters();
+    public PollStatus poll(MonitoredServiceTask task) {
+        MonitoredService svc = task.getMonitoredService();
+        Map<String, Object> parameters = task.getParameters();
         NetworkInterface<InetAddress> iface = svc.getNetInterface();
 
         // Get interface address from NetworkInterface

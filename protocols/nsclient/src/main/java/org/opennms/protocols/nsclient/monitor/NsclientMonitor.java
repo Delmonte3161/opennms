@@ -77,9 +77,9 @@ public class NsclientMonitor extends AbstractServiceMonitor {
      * SERVICE_AVAILABLE and return.
      */
     @Override
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> parameters = monSvct.getParameters();
+    public PollStatus poll(MonitoredServiceTask task) {
+        MonitoredService svc = task.getMonitoredService();
+        Map<String, Object> parameters = task.getParameters();
         // Holds the response reason.
         String reason = null;
         // Used to exit the retry loop early, if possible.

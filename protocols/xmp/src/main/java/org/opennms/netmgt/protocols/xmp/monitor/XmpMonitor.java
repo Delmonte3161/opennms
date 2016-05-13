@@ -143,14 +143,13 @@ public class XmpMonitor extends AbstractServiceMonitor {
 
     /** {@inheritDoc} */
     @Override
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> parameters = monSvct.getParameters();
+    public PollStatus poll(MonitoredServiceTask task) {
+        MonitoredService svc = task.getMonitoredService();
+        Map<String, Object> parameters = task.getParameters();
         NetworkInterface<InetAddress> iface = svc.getNetInterface();
 
         PollStatus status = PollStatus.unavailable();
         InetAddress ipaddr = (InetAddress) iface.getAddress();
-
 
         XmpConfig protoConfig = XmpConfigFactory.getInstance().getXmpConfig();
         XmpSession session;

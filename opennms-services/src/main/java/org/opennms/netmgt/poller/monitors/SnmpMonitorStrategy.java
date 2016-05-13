@@ -29,10 +29,8 @@
 package org.opennms.netmgt.poller.monitors;
 
 import java.math.BigInteger;
-import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.snmp.SnmpValue;
@@ -76,7 +74,7 @@ public abstract class SnmpMonitorStrategy extends AbstractServiceMonitor {
 
     /** {@inheritDoc} */
     @Override
-    public abstract PollStatus poll(MonitoredServiceTask monSvct);
+    public abstract PollStatus poll(MonitoredServiceTask task);
     
 
     public String getStringValue(SnmpValue result) {

@@ -104,9 +104,9 @@ public class HttpPostMonitor extends AbstractServiceMonitor {
      * to Provided that the interface's response is valid we set the service
      * status to SERVICE_AVAILABLE and return.
      */
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> parameters = monSvct.getParameters();
+    public PollStatus poll(MonitoredServiceTask task) {
+        MonitoredService svc = task.getMonitoredService();
+        Map<String, Object> parameters = task.getParameters();
         NetworkInterface<InetAddress> iface = svc.getNetInterface();
 
         // Process parameters

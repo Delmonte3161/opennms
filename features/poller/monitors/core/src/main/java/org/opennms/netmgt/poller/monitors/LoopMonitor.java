@@ -57,9 +57,9 @@ public class LoopMonitor implements ServiceMonitor {
      */
     /** {@inheritDoc} */
     @Override
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> parameters = monSvct.getParameters();
+    public PollStatus poll(MonitoredServiceTask task) {
+        MonitoredService svc = task.getMonitoredService();
+        Map<String, Object> parameters = task.getParameters();
         LoopPlugin lp = new LoopPlugin();
         boolean isAvailable = lp.isProtocolSupported(svc.getAddress(), parameters);
         int status = (isAvailable ? PollStatus.SERVICE_AVAILABLE : PollStatus.SERVICE_UNAVAILABLE);

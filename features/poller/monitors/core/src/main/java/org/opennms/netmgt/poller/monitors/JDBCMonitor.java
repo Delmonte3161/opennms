@@ -95,10 +95,10 @@ public class JDBCMonitor extends AbstractServiceMonitor {
 	 *      href="http://manuals.sybase.com/onlinebooks/group-jc/jcg0550e/prjdbc/@Generic__BookTextView/9332;pt=1016#X">Error
 	 *      codes for JConnect </a>
 	 */
-        @Override
-	public PollStatus poll(MonitoredServiceTask monSvct) {
-        MonitoredService svc = monSvct.getMonitoredService();
-        Map<String, Object> parameters = monSvct.getParameters();
+	@Override
+	public PollStatus poll(MonitoredServiceTask task) {
+		MonitoredService svc = task.getMonitoredService();
+		Map<String, Object> parameters = task.getParameters();
 		NetworkInterface<InetAddress> iface = svc.getNetInterface();
 
 		// Assume that the service is down
