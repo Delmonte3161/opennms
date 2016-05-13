@@ -153,9 +153,6 @@ public class PageSequenceMonitor extends AbstractServiceMonitor {
         }
     }
 
-    private static final int DEFAULT_TIMEOUT = 3000;
-    private static final int DEFAULT_RETRY = 0;
-
     public static class HttpPageSequence {
         final PageSequence m_sequence;
         final List<HttpPage> m_pages;
@@ -649,11 +646,11 @@ public class PageSequenceMonitor extends AbstractServiceMonitor {
         }
 
         public int getRetries() {
-            return getKeyedInteger(m_parameterMap, "retry", DEFAULT_RETRY);
+            return getKeyedInteger(m_parameterMap, TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
         }
 
         public int getTimeout() {
-            return getKeyedInteger(m_parameterMap, "timeout", DEFAULT_TIMEOUT);
+            return getKeyedInteger(m_parameterMap, TimeoutTracker.PARM_TIMEOUT, TimeoutTracker.DEFAULT_TIMEOUT);
         }
 
         HttpClientWrapper createHttpClient() {
@@ -675,7 +672,7 @@ public class PageSequenceMonitor extends AbstractServiceMonitor {
 
         final Map<String,Number> responseTimes = new LinkedHashMap<String,Number>();
 
-        SequenceTracker tracker = new SequenceTracker(parameterMap, DEFAULT_SEQUENCE_RETRY, DEFAULT_TIMEOUT);
+        SequenceTracker tracker = new SequenceTracker(parameterMap, DEFAULT_SEQUENCE_RETRY, TimeoutTracker.DEFAULT_TIMEOUT);
         for(tracker.reset(); tracker.shouldRetry() && !serviceStatus.isAvailable(); tracker.nextAttempt() ) {
             HttpClientWrapper clientWrapper = null;
             try {

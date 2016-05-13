@@ -95,16 +95,6 @@ public class VmwareCimMonitor extends AbstractServiceMonitor {
 
     private static final Map<Integer, String> m_healthStates = new HashMap<>();
 
-    /*
-     * default retries
-     */
-    private static final int DEFAULT_RETRY = 0;
-
-    /*
-     * default timeout
-     */
-    private static final int DEFAULT_TIMEOUT = 3000;
-
     /**
      * defining the health states
      */
@@ -147,7 +137,7 @@ public class VmwareCimMonitor extends AbstractServiceMonitor {
         String vmwareManagementServer = onmsNode.getAssetRecord().getVmwareManagementServer();
         String vmwareManagedObjectId = onmsNode.getForeignId();
 
-        TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker tracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
 
         PollStatus serviceStatus = PollStatus.unknown();
 

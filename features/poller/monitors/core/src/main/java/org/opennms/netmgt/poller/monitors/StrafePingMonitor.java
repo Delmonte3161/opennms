@@ -37,6 +37,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.core.utils.CollectionMath;
 import org.opennms.core.utils.ParameterMap;
 import org.slf4j.Logger;
@@ -110,7 +111,7 @@ public class StrafePingMonitor extends AbstractServiceMonitor {
 
             // get parameters
             //
-            long timeout = ParameterMap.getKeyedLong(parameters, "timeout", PingConstants.DEFAULT_TIMEOUT);
+            long timeout = ParameterMap.getKeyedLong(parameters, TimeoutTracker.PARM_TIMEOUT, PingConstants.DEFAULT_TIMEOUT);
             int count = ParameterMap.getKeyedInteger(parameters, "ping-count", DEFAULT_MULTI_PING_COUNT);
             long pingInterval = ParameterMap.getKeyedLong(parameters, "wait-interval", DEFAULT_PING_INTERVAL);
             int failurePingCount = ParameterMap.getKeyedInteger(parameters, "failure-ping-count", DEFAULT_FAILURE_PING_COUNT);

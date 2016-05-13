@@ -42,6 +42,18 @@ import org.opennms.core.utils.ParameterMap;
  */
 public class TimeoutTracker {
 
+    public static final String PARM_RETRY = "retry";
+    public static final String PARM_TIMEOUT = "timeout";
+
+    public static final int DEFAULT_RETRY = 3;
+    public static final int ZERO_RETRIES = 0;
+
+    /**
+     * Default timeout. Specifies how long (in milliseconds) to block waiting
+     * for data from the monitored interface.
+     */
+    public static final int DEFAULT_TIMEOUT = 3000;
+
     private final int m_retry;
     private final long m_timeoutInNanos;
     private final long m_timeoutInMillis;

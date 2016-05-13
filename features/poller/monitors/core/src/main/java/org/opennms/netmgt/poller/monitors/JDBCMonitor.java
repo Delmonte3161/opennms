@@ -73,17 +73,6 @@ public class JDBCMonitor extends AbstractServiceMonitor {
     
     
     public static final Logger LOG = LoggerFactory.getLogger(JDBCMonitor.class);
-    
-	/**
-	 * Number of miliseconds to wait before timing out a database login using
-	 * JDBC Hint: 1 minute is 6000 miliseconds.
-	 */
-	public static final int DEFAULT_TIMEOUT = 3000;
-
-	/**
-	 * Default number of times to retry a test
-	 */
-	public static final int DEFAULT_RETRY = 0;
 
 	/**
 	 * {@inheritDoc}
@@ -143,7 +132,7 @@ public class JDBCMonitor extends AbstractServiceMonitor {
 		url = DBTools.constructUrl(ParameterMap.getKeyedString(parameters, "url", DBTools.DEFAULT_URL), ipv4Addr.getCanonicalHostName());
 		LOG.debug("JDBC url: {}", url);
 		
-		TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+		TimeoutTracker tracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
 
 		String db_user = ParameterMap.getKeyedString(parameters, "user", DBTools.DEFAULT_DATABASE_USER);
 		String db_pass = ParameterMap.getKeyedString(parameters, "password", DBTools.DEFAULT_DATABASE_PASSWORD);
@@ -151,7 +140,7 @@ public class JDBCMonitor extends AbstractServiceMonitor {
 		Properties props = new Properties();
 		props.setProperty("user", db_user);
 		props.setProperty("password", db_pass);
-		props.setProperty("timeout", String.valueOf(tracker.getTimeoutInSeconds()));
+		props.setProperty(TimeoutTracker.PARM_TIMEOUT, String.valueOf(tracker.getTimeoutInSeconds()));
 
 
 		for (tracker.reset(); tracker.shouldRetry(); tracker.nextAttempt()) {

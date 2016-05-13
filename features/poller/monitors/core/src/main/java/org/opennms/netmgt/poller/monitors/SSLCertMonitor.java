@@ -77,17 +77,6 @@ public class SSLCertMonitor extends AbstractServiceMonitor {
     private static final int DEFAULT_PORT = -1;
 
     /**
-     * Default retries.
-     */
-    private static final int DEFAULT_RETRY = 0;
-
-    /**
-     * Default timeout. Specifies how long (in milliseconds) to block waiting for data from the
-     * monitored interface.
-     */
-    private static final int DEFAULT_TIMEOUT = 3000; // 3 second timeout on read()
-
-    /**
      * Default number of days before the certificate expires that we mark the service as failed.
      */
     private static final int DEFAULT_DAYS = 7;
@@ -117,7 +106,7 @@ public class SSLCertMonitor extends AbstractServiceMonitor {
             throw new NetworkInterfaceNotSupportedException("Unsupported interface type, only TYPE_INET currently supported");
         }
 
-        TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker tracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
 
         // Port
         //

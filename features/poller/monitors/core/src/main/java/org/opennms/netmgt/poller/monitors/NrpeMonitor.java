@@ -69,24 +69,6 @@ public class NrpeMonitor extends AbstractServiceMonitor {
     private static final Logger LOG = LoggerFactory.getLogger(NrpeMonitor.class);
 
     /**
-     * Default port.
-     */
-    //Commented out because it is not currently used in this monitor
-    //private static final int DEFAULT_PORT = -1;
-
-    /**
-     * Default retries.
-     */
-    private static final int DEFAULT_RETRY = 0;
-
-    /**
-     * Default timeout. Specifies how long (in milliseconds) to block waiting
-     * for data from the monitored interface.
-     */
-    private static final int DEFAULT_TIMEOUT = 3000; // 3 second timeout on
-                                                        // read()
-    
-    /**
      * Whether to use SSL by default
      */
     private static final boolean DEFAULT_USE_SSL = true;
@@ -122,7 +104,7 @@ public class NrpeMonitor extends AbstractServiceMonitor {
             throw new NetworkInterfaceNotSupportedException("Unsupported interface type, only TYPE_INET currently supported");
         }
 
-        TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker tracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
         String command = ParameterMap.getKeyedString(parameters, "command", NrpePacket.HELLO_COMMAND);
         int port = ParameterMap.getKeyedInteger(parameters, "port", CheckNrpe.DEFAULT_PORT);
         int padding = ParameterMap.getKeyedInteger(parameters, "padding", NrpePacket.DEFAULT_PADDING);

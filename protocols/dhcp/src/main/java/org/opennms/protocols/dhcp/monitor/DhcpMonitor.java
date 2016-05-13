@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Map;
 
+import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.core.utils.ParameterMap;
 import org.opennms.netmgt.dhcpd.Dhcpd;
 import org.opennms.netmgt.poller.Distributable;
@@ -64,18 +65,6 @@ public class DhcpMonitor extends AbstractServiceMonitor {
 	private static final Logger LOG = LoggerFactory.getLogger(DhcpMonitor.class);
 
     /**
-     * Default retries.
-     */
-    private static final int DEFAULT_RETRY = 0;
-
-    /**
-     * Default timeout. Specifies how long (in milliseconds) to block waiting
-     * for data from the monitored interface.
-     */
-    private static final int DEFAULT_TIMEOUT = 3000; // 3 second timeout on
-                                                        // read()
-
-    /**
      * {@inheritDoc}
      *
      * Poll the specified address for DHCP service availability.
@@ -96,8 +85,8 @@ public class DhcpMonitor extends AbstractServiceMonitor {
 
         // Retries
         //
-        int retry = ParameterMap.getKeyedInteger(parameters, "retry", DEFAULT_RETRY);
-        int timeout = ParameterMap.getKeyedInteger(parameters, "timeout", DEFAULT_TIMEOUT);
+        int retry = ParameterMap.getKeyedInteger(parameters, "retry", TimeoutTracker.ZERO_RETRIES);
+        int timeout = ParameterMap.getKeyedInteger(parameters, "timeout", TimeoutTracker.DEFAULT_TIMEOUT);
 
         // Get interface address from NetworkInterface
         //

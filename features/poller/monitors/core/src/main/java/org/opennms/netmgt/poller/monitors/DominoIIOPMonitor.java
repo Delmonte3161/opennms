@@ -76,18 +76,6 @@ public class DominoIIOPMonitor extends AbstractServiceMonitor {
     private static final int DEFAULT_IORPORT = 80;
 
     /**
-     * Default retries.
-     */
-    private static final int DEFAULT_RETRY = 3;
-
-    /**
-     * Default timeout. Specifies how long (in milliseconds) to block waiting
-     * for data from the monitored interface.
-     */
-    private static final int DEFAULT_TIMEOUT = 3000; // 3 second timeout on
-                                                        // read()
-
-    /**
      * {@inheritDoc}
      *
      * Poll the specified address for service availability.
@@ -115,7 +103,7 @@ public class DominoIIOPMonitor extends AbstractServiceMonitor {
             throw new NetworkInterfaceNotSupportedException("Unsupported interface type, only TYPE_INET currently supported");
 
         
-        TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker tracker = new TimeoutTracker(parameters, TimeoutTracker.DEFAULT_RETRY, TimeoutTracker.DEFAULT_TIMEOUT);
         int IORport = ParameterMap.getKeyedInteger(parameters, "ior-port", DEFAULT_IORPORT);
 
         // Port

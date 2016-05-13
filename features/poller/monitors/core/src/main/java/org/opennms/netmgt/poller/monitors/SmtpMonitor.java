@@ -77,17 +77,6 @@ public class SmtpMonitor extends AbstractServiceMonitor {
     private static final int DEFAULT_PORT = 25;
 
     /**
-     * Default retries.
-     */
-    private static final int DEFAULT_RETRY = 0;
-
-    /**
-     * Default timeout. Specifies how long (in milliseconds) to block waiting
-     * for data from the monitored interface.
-     */
-    private static final int DEFAULT_TIMEOUT = 3000;
-
-    /**
      * The name of the local host.
      */
     private static final String LOCALHOST_NAME = InetAddressUtils.getLocalHostName();
@@ -140,7 +129,7 @@ public class SmtpMonitor extends AbstractServiceMonitor {
             throw new NetworkInterfaceNotSupportedException("Unsupported interface type, only TYPE_INET currently supported");
         }
 
-        TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker tracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
 
         int port = ParameterMap.getKeyedInteger(parameters, "port", DEFAULT_PORT);
 

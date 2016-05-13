@@ -28,32 +28,23 @@
 
 package org.opennms.netmgt.poller.monitors;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+
 import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.core.utils.ExecRunner;
 import org.opennms.core.utils.ParameterMap;
 import org.opennms.netmgt.poller.Distributable;
-import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
-
 @Distributable
 public class SystemExecuteMonitor extends AbstractServiceMonitor {
     private static final Logger LOGGER = LoggerFactory.getLogger(SystemExecuteMonitor.class);
-
-    private static final int DEFAULT_RETRY = 0;
-
-    /**
-     * Default timeout. Specifies how long (in milliseconds) to block waiting
-     * for data from the monitored interface on the read method call.
-     */
-    private static final int DEFAULT_TIMEOUT = 3000;
 
     /**
      * {@inheritDoc}
@@ -79,7 +70,7 @@ public class SystemExecuteMonitor extends AbstractServiceMonitor {
     public PollStatus poll(MonitoredServiceTask monSvct) {
     	MonitoredService svc = monSvct.getMonitoredService();
     	Map<String, Object> parameters = monSvct.getParameters();
-        TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker tracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
 
         String script = ParameterMap.getKeyedString(parameters, "script", null);
 
@@ -180,7 +171,7 @@ public class SystemExecuteMonitor extends AbstractServiceMonitor {
         String richArgs = args;
         richArgs = richArgs.replace("${timeout}", ((Long)tracker.getTimeoutInMillis()).toString());
         richArgs = richArgs.replace("${timeoutsec}", ((Long)tracker.getTimeoutInSeconds()).toString());
-        richArgs = richArgs.replace("${retry}", ParameterMap.getKeyedString(parameters, "retry", ((Integer)DEFAULT_RETRY).toString()));
+        richArgs = richArgs.replace("${retry}", ParameterMap.getKeyedString(parameters, TimeoutTracker.PARM_RETRY, String.valueOf(TimeoutTracker.ZERO_RETRIES)));
         richArgs = richArgs.replace("${ipaddr}", svc.getIpAddr());
         richArgs = richArgs.replace("${nodeid}", ((Integer) svc.getNodeId()).toString());
         richArgs = richArgs.replace("${nodelabel}", svc.getNodeLabel());

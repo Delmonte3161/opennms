@@ -85,20 +85,9 @@ public class HttpMonitor extends AbstractServiceMonitor {
     private static final int[] DEFAULT_PORTS = { 80, 8080, 8888};
 
     /**
-     * Default retries.
-     */
-    private static final int DEFAULT_RETRY = 0;
-
-    /**
      * Default URL to 'GET'
      */
     private static final String DEFAULT_URL = "/";
-
-    /**
-     * Default timeout. Specifies how long (in milliseconds) to block waiting for data from the
-     * monitored interface.
-     */
-    private static final int DEFAULT_TIMEOUT = 3000; // 3 second timeout on read()
 
     public static final String PARAMETER_VERBOSE = "verbose";
     public static final String PARAMETER_USER_AGENT = "user-agent";
@@ -143,7 +132,7 @@ public class HttpMonitor extends AbstractServiceMonitor {
         for (int portIndex = 0; portIndex < determinePorts(httpClient.getParameters()).length && httpClient.getPollStatus() != PollStatus.SERVICE_AVAILABLE; portIndex++) {
             currentPort = determinePorts(httpClient.getParameters())[portIndex];
 
-            httpClient.setTimeoutTracker(new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT));
+            httpClient.setTimeoutTracker(new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT));
             LOG.debug("Port = {}, Address = {}, {}", currentPort, (iface.getAddress()), httpClient.getTimeoutTracker());
             
             httpClient.setCurrentPort(currentPort);

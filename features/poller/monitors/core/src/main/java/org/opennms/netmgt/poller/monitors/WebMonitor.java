@@ -43,6 +43,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.util.EntityUtils;
+import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.core.utils.ParameterMap;
 import org.opennms.core.web.HttpClientWrapper;
@@ -63,7 +64,6 @@ import org.slf4j.LoggerFactory;
 @Distributable
 public class WebMonitor extends AbstractServiceMonitor {
     private static final Logger LOG = LoggerFactory.getLogger(WebMonitor.class);
-    static Integer DEFAULT_TIMEOUT = 3000;
     static Integer DEFAULT_PORT = 80;
     static String DEFAULT_USER_AGENT = "OpenNMS WebMonitor";
     static String DEFAULT_PATH = "/";
@@ -98,8 +98,8 @@ public class WebMonitor extends AbstractServiceMonitor {
             }
 
             final HttpGet getMethod = new HttpGet(ub.build());
-            clientWrapper.setConnectionTimeout(ParameterMap.getKeyedInteger(map, "timeout", DEFAULT_TIMEOUT))
-                .setSocketTimeout(ParameterMap.getKeyedInteger(map, "timeout", DEFAULT_TIMEOUT));
+            clientWrapper.setConnectionTimeout(ParameterMap.getKeyedInteger(map, TimeoutTracker.PARM_TIMEOUT, TimeoutTracker.DEFAULT_TIMEOUT))
+                .setSocketTimeout(ParameterMap.getKeyedInteger(map, TimeoutTracker.PARM_TIMEOUT, TimeoutTracker.DEFAULT_TIMEOUT));
 
             final String userAgent = ParameterMap.getKeyedString(map,"user-agent",DEFAULT_USER_AGENT);
             if (userAgent != null && !userAgent.trim().isEmpty()) {

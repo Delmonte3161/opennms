@@ -33,6 +33,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
@@ -89,7 +90,7 @@ public class SystemExecuteMonitorTest {
     public void testPollScriptParameterNotExecutableFoo() {
         monitor = new SystemExecuteMonitor();
         parameters.put("script", "/tmp/loadspeed.sh");
-        parameters.put("timeout", "30000");
+        parameters.put(TimeoutTracker.PARM_TIMEOUT, "30000");
         parameters.put("args", "http://${nodelabel} ${timeout}");
         PollStatus pollStatus = monitor.poll(new MonitoredServiceTask(svc, parameters));
         Assert.assertEquals("Up", pollStatus.getStatusName());

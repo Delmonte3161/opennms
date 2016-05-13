@@ -28,6 +28,7 @@
 
 package org.opennms.protocols.dhcp.detector;
 
+import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.netmgt.provision.support.BasicDetector;
 import org.opennms.netmgt.provision.support.Client;
 import org.opennms.netmgt.provision.support.ResponseValidator;
@@ -46,17 +47,14 @@ import org.springframework.stereotype.Component;
  */
 @Scope("prototype")
 public class DhcpDetector extends BasicDetector<DhcpRequest, DhcpResponse> {
-    
-    private static final int DEFAULT_RETRY = 0;
-    private static final int DEFAULT_TIMEOUT = 3000;
-    
+
     /**
      * <p>Constructor for DhcpDetector.</p>
      */
     public DhcpDetector() {
         super("DHCP", 0);
-        setTimeout(DEFAULT_TIMEOUT);
-        setRetries(DEFAULT_RETRY);
+        setTimeout(TimeoutTracker.DEFAULT_TIMEOUT);
+        setRetries(TimeoutTracker.ZERO_RETRIES);
     }
 
     /** {@inheritDoc} */

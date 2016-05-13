@@ -77,13 +77,6 @@ public class LdapMonitor extends AbstractServiceMonitor {
     private static final int DEFAULT_RETRY = 1;
 
     /**
-     * Default timeout. Specifies how long (in milliseconds) to block waiting
-     * for data from the monitored interface.
-     */
-    private static final int DEFAULT_TIMEOUT = 3000; // 3 second timeout on
-                                                        // read()
-
-    /**
      * Default search base for an LDAP search
      */
     private static final String DEFAULT_BASE = "base";
@@ -130,7 +123,7 @@ public class LdapMonitor extends AbstractServiceMonitor {
         int serviceStatus = PollStatus.SERVICE_UNAVAILABLE;
         String reason = null;
 
-        final TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        final TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, TimeoutTracker.DEFAULT_TIMEOUT);
 
         // get the parameters
         //

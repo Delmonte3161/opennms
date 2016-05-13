@@ -75,17 +75,6 @@ public class Pop3Monitor extends AbstractServiceMonitor {
     private static final int DEFAULT_PORT = 110;
 
     /**
-     * Default retries.
-     */
-    private static final int DEFAULT_RETRY = 0;
-
-    /**
-     * Default timeout. Specifies how long (in milliseconds) to block waiting
-     * for data from the monitored interface.
-     */
-    private static final int DEFAULT_TIMEOUT = 3000;
-
-    /**
      * {@inheritDoc}
      *
      * <P>
@@ -115,7 +104,7 @@ public class Pop3Monitor extends AbstractServiceMonitor {
 
         // Process parameters
         //
-        TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker tracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
 
         int port = ParameterMap.getKeyedInteger(parameters, "port", DEFAULT_PORT);
 

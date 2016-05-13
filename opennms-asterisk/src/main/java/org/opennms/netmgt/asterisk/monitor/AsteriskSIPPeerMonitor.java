@@ -70,17 +70,6 @@ public class AsteriskSIPPeerMonitor extends AbstractServiceMonitor {
 	private static final Logger LOG = LoggerFactory.getLogger(AsteriskSIPPeerMonitor.class);
 
 	/**
-	  * Default retries.
-	  */
-	private static final int DEFAULT_RETRY = 0;
-
-	/**
-	  * Default timeout. Specifies how long (in milliseconds) to block waiting for data from the
-	  * monitored interface.
-	  */
-	private static final int DEFAULT_TIMEOUT = 3000; // 3 second timeout on read()
-
-	/**
 	  * Default sip peer. Specifies the sip peer to get information from the Asterisk server.
 	  */
 	private static final String DEFAULT_SIPPEER = ""; 
@@ -122,7 +111,7 @@ public class AsteriskSIPPeerMonitor extends AbstractServiceMonitor {
 			throw new RuntimeException("AsteriskMonitor: required parameter 'sip-peer' is not present in supplied properties.");
 
 		}
-		TimeoutTracker timeoutTracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+		TimeoutTracker timeoutTracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
 		AmiPeerFactory amiPeerFactory = AmiPeerFactory.getInstance();
 		AmiAgentConfig amiConfig = amiPeerFactory.getAgentConfig(svc.getAddress());
 

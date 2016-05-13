@@ -39,6 +39,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
@@ -159,7 +160,7 @@ public class FtpMonitorTest extends TestCase {
         Map<String, Object> m = new HashMap<String, Object>();
         m.put("port", m_serverSocket.getLocalPort());
         m.put("retries", 0);
-        m.put("timeout", TIMEOUT);
+        m.put(TimeoutTracker.PARM_TIMEOUT, TIMEOUT);
         PollStatus status = m_monitor.poll(new MonitoredServiceTask(new MockMonitoredService(1, "Node One", m_serverSocket.getInetAddress(), "FTP"), m));
         return status;
     }
