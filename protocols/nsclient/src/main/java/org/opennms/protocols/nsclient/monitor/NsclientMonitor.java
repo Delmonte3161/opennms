@@ -64,17 +64,6 @@ public class NsclientMonitor extends AbstractServiceMonitor {
 	private static final Logger LOG = LoggerFactory.getLogger(NsclientMonitor.class);
 
     /**
-     * Default retries.
-     */
-    private static final int DEFAULT_RETRY = 0;
-
-    /**
-     * Default timeout. Specifies how long (in milliseconds) to block waiting
-     * for data from the monitored interface.
-     */
-    private static final int DEFAULT_TIMEOUT = 3000;
-
-    /**
      * {@inheritDoc}
      *
      * Poll the specified address for service availability. During the poll an
@@ -124,7 +113,7 @@ public class NsclientMonitor extends AbstractServiceMonitor {
         int warnPerc = ParameterMap.getKeyedInteger(parameters,
                                                     "warningPercent", 0);
 
-        TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker tracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
 
 
         // Get the address we're going to poll.

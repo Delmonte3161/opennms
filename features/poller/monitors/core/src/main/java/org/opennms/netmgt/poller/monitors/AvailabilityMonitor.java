@@ -52,15 +52,12 @@ public class AvailabilityMonitor extends AbstractServiceMonitor {
     
     public static final Logger LOG = LoggerFactory.getLogger(AvailabilityMonitor.class);
 
-    private static final int DEFAULT_RETRY = 3;
-    private static final int DEFAULT_TIMEOUT = 3000;
-
     /** {@inheritDoc} */
     @Override
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> parameters = monSvct.getParameters();
-        TimeoutTracker timeoutTracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+    public PollStatus poll(MonitoredServiceTask task) {
+        MonitoredService svc = task.getMonitoredService();
+        Map<String, Object> parameters = task.getParameters();
+        TimeoutTracker timeoutTracker = new TimeoutTracker(parameters, TimeoutTracker.DEFAULT_RETRY, TimeoutTracker.DEFAULT_TIMEOUT);
         
         for(timeoutTracker.reset(); timeoutTracker.shouldRetry(); timeoutTracker.nextAttempt()) {
             try {
@@ -69,7 +66,7 @@ public class AvailabilityMonitor extends AbstractServiceMonitor {
                     return PollStatus.available(timeoutTracker.elapsedTimeInMillis());
                 }
             } catch (IOException e) {
-                LOG.debug("Unable to contact {}", svc.getIpAddr(), e);
+                LOG.debug("Unable to contact " + svc.getIpAddr(), e);
             }
         }
         String reason = svc+" failed to respond";

@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Map;
 
+import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.core.utils.ParameterMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,8 +99,8 @@ public class IcmpMonitor extends AbstractServiceMonitor {
             
             // get parameters
             //
-            int retries = ParameterMap.getKeyedInteger(parameters, "retry", PingConstants.DEFAULT_RETRIES);
-            long timeout = ParameterMap.getKeyedLong(parameters, "timeout", PingConstants.DEFAULT_TIMEOUT);
+            int retries = ParameterMap.getKeyedInteger(parameters, TimeoutTracker.PARM_RETRY, PingConstants.DEFAULT_RETRIES);
+            long timeout = ParameterMap.getKeyedLong(parameters, TimeoutTracker.PARM_TIMEOUT, PingConstants.DEFAULT_TIMEOUT);
             int packetSize = ParameterMap.getKeyedInteger(parameters, "packet-size", PingConstants.DEFAULT_PACKET_SIZE);
             
             rtt = PingerFactory.getInstance().ping(host, timeout, retries,packetSize);

@@ -77,11 +77,6 @@ public class DnsMonitor extends AbstractServiceMonitor {
     private static final int DEFAULT_PORT = 53;
 
     /**
-     * Default retries.
-     */
-    private static final int DEFAULT_RETRY = 0;
-
-    /**
      * Default timeout. Specifies how long (in milliseconds) to block waiting
      * for data from the monitored interface.
      */
@@ -133,7 +128,7 @@ public class DnsMonitor extends AbstractServiceMonitor {
 
         // get the parameters
         //
-        TimeoutTracker timeoutTracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker timeoutTracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, DEFAULT_TIMEOUT);
         int port = ParameterMap.getKeyedInteger(parameters, "port", DEFAULT_PORT);
 
         // Host to lookup?

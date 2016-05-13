@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
+import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.poller.InetNetworkInterface;
 import org.opennms.netmgt.poller.MonitoredService;
@@ -55,7 +56,7 @@ public class AvailabilityMonitorTest {
     public final void testPoll() {
         ServiceMonitor sm = new AvailabilityMonitor();
         Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("timeout", "3000");
+        parameters.put(TimeoutTracker.PARM_TIMEOUT, "3000");
         MonitoredService svc = new MonitoredService() {
             @Override
             public InetAddress getAddress() {

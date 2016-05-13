@@ -79,17 +79,6 @@ public class TrivialTimeMonitor extends AbstractServiceMonitor {
     private static final int DEFAULT_PORT = 37;
 
     /**
-     * Default retries.
-     */
-    private static final int DEFAULT_RETRY = 0;
-
-    /**
-     * Default timeout. Specifies how long (in milliseconds) to block waiting
-     * for data from the monitored interface.
-     */
-    private static final int DEFAULT_TIMEOUT = 3000; // 3 second timeout
-    
-    /**
      * Default permissible skew between the remote and local clocks
      */
     private static final int DEFAULT_ALLOWED_SKEW = 30; // 30 second skew
@@ -133,7 +122,7 @@ public class TrivialTimeMonitor extends AbstractServiceMonitor {
         if (iface.getType() != NetworkInterface.TYPE_INET)
             throw new NetworkInterfaceNotSupportedException("Unsupported interface type, only TYPE_INET currently supported");
 
-        TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker tracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
 
         // Port
         //

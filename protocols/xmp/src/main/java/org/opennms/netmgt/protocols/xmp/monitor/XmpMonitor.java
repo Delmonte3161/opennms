@@ -43,6 +43,7 @@ import java.util.regex.PatternSyntaxException;
 import org.krupczak.xmp.SocketOpts;
 import org.krupczak.xmp.Xmp;
 import org.krupczak.xmp.XmpSession;
+import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.core.utils.ParameterMap;
 import org.opennms.netmgt.config.xmpConfig.XmpConfig;
 import org.opennms.netmgt.poller.Distributable;
@@ -73,11 +74,6 @@ public class XmpMonitor extends AbstractServiceMonitor {
      * The default port to use for XMP
      */
     private static final int DEFAULT_PORT = Xmp.XMP_PORT;
-
-    /**
-     * Default number of retries for TCP requests
-     */
-    private static final int DEFAULT_RETRY = 0;
 
     /**
      * Default timeout (in milliseconds) for XMP requests
@@ -160,7 +156,7 @@ public class XmpMonitor extends AbstractServiceMonitor {
         XmpSession session;
         SocketOpts sockopts = new SocketOpts();
         // TODO how to apply timeout and retry to XMP operations?
-        int retry = protoConfig.hasRetry() ? protoConfig.getRetry() : DEFAULT_RETRY;
+        int retry = protoConfig.hasRetry() ? protoConfig.getRetry() : TimeoutTracker.ZERO_RETRIES;
         int timeout = protoConfig.hasTimeout() ? protoConfig.getTimeout() : DEFAULT_TIMEOUT;
         int port = DEFAULT_PORT;
         String authenUser = DEFAULT_AUTHEN_USER;
@@ -178,8 +174,8 @@ public class XmpMonitor extends AbstractServiceMonitor {
         boolean valueCaseSensitive = DEFAULT_VALUE_CASE_SENSITIVE;
 
         if (parameters != null) {
-            retry = ParameterMap.getKeyedInteger(parameters, "retry", protoConfig.hasRetry() ? protoConfig.getRetry() : DEFAULT_RETRY);
-            timeout = ParameterMap.getKeyedInteger(parameters, "timeout", protoConfig.hasTimeout() ? protoConfig.getTimeout() : DEFAULT_TIMEOUT);
+            retry = ParameterMap.getKeyedInteger(parameters, TimeoutTracker.PARM_RETRY, protoConfig.hasRetry() ? protoConfig.getRetry() : TimeoutTracker.ZERO_RETRIES);
+            timeout = ParameterMap.getKeyedInteger(parameters, TimeoutTracker.PARM_TIMEOUT, protoConfig.hasTimeout() ? protoConfig.getTimeout() : DEFAULT_TIMEOUT);
             port = ParameterMap.getKeyedInteger(parameters, "port", protoConfig.hasPort() ? protoConfig.getPort() : DEFAULT_PORT);
             authenUser = ParameterMap.getKeyedString(parameters, "authenUser", (protoConfig.getAuthenUser() != null) ? protoConfig.getAuthenUser() : DEFAULT_AUTHEN_USER);
             requestType = ParameterMap.getKeyedString(parameters, "request-type", DEFAULT_REQUEST_TYPE);

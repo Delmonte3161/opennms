@@ -79,16 +79,6 @@ public class VmwareMonitor extends AbstractServiceMonitor {
      */
     private NodeDao m_nodeDao = null;
 
-    /*
-    * default retries
-    */
-    private static final int DEFAULT_RETRY = 0;
-
-    /*
-     * default timeout
-     */
-    private static final int DEFAULT_TIMEOUT = 3000;
-
     /**
      * This method queries the Vmware vCenter server for sensor data.
      *
@@ -118,7 +108,7 @@ public class VmwareMonitor extends AbstractServiceMonitor {
         String vmwareManagedEntityType = onmsNode.getAssetRecord().getVmwareManagedEntityType();
         String vmwareManagedObjectId = onmsNode.getForeignId();
 
-        TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker tracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
 
         PollStatus serviceStatus = PollStatus.unknown();
 

@@ -70,17 +70,6 @@ public class MemcachedMonitor extends AbstractServiceMonitor {
      */
     private static final int DEFAULT_PORT = 11211;
 
-    /**
-     * Default retries.
-     */
-    private static final int DEFAULT_RETRY = 0;
-
-    /**
-     * Default timeout. Specifies how long (in milliseconds) to block waiting
-     * for data from the monitored interface.
-     */
-    private static final int DEFAULT_TIMEOUT = 3000; // 3 second timeout on read()
-
     private static final String[] m_keys = new String[] {
         "uptime", "rusageuser", "rusagesystem",
         "curritems", "totalitems", "bytes", "limitmaxbytes",
@@ -98,7 +87,7 @@ public class MemcachedMonitor extends AbstractServiceMonitor {
     public PollStatus poll(MonitoredServiceTask monSvct) {
     	MonitoredService svc = monSvct.getMonitoredService();
     	Map<String, Object> parameters = monSvct.getParameters();
-        TimeoutTracker timeoutTracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker timeoutTracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
         
         int port = ParameterMap.getKeyedInteger(parameters, "port", DEFAULT_PORT);
 

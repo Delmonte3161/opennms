@@ -41,6 +41,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.core.test.MockLogAppender;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.test.dns.annotations.DNSEntry;
@@ -96,8 +97,8 @@ public class DnsMonitorIT {
         final MonitoredService svc = MonitorTestUtils.getMonitoredService(99, addr("::1"), "DNS");
 
         m.put("port", "9153");
-        m.put("retry", "1");
-        m.put("timeout", "1000");
+        m.put(TimeoutTracker.PARM_RETRY, "1");
+        m.put(TimeoutTracker.PARM_TIMEOUT, "1000");
         m.put("lookup", "ipv6.example.com");
         
         final PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
@@ -114,8 +115,8 @@ public class DnsMonitorIT {
         final MonitoredService svc = MonitorTestUtils.getMonitoredService(99, addr("127.0.0.1"), "DNS");
 
         m.put("port", "9153");
-        m.put("retry", "2");
-        m.put("timeout", "5000");
+        m.put(TimeoutTracker.PARM_RETRY, "2");
+        m.put(TimeoutTracker.PARM_TIMEOUT, "5000");
         m.put("lookup", "bogus.example.com");
         
         final PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
@@ -132,8 +133,8 @@ public class DnsMonitorIT {
         final MonitoredService svc = MonitorTestUtils.getMonitoredService(99, addr("127.0.0.1"), "DNS");
 
         m.put("port", "9153");
-        m.put("retry", "2");
-        m.put("timeout", "5000");
+        m.put(TimeoutTracker.PARM_RETRY, "2");
+        m.put(TimeoutTracker.PARM_TIMEOUT, "5000");
         m.put("lookup", "bogus.example.com");
         m.put("fatal-response-codes", "3");
         
@@ -150,8 +151,8 @@ public class DnsMonitorIT {
         final MonitoredService svc = MonitorTestUtils.getMonitoredService(99, addr("192.168.1.120"), "DNS");
 
         m.put("port", "9000");
-        m.put("retry", "2");
-        m.put("timeout", "500");
+        m.put(TimeoutTracker.PARM_RETRY, "2");
+        m.put(TimeoutTracker.PARM_TIMEOUT, "500");
         
         final PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
@@ -166,8 +167,8 @@ public class DnsMonitorIT {
         final MonitoredService svc = MonitorTestUtils.getMonitoredService(99, addr("127.0.0.1"), "DNS");
 
         m.put("port", "9153");
-        m.put("retry", "1");
-        m.put("timeout", "3000");
+        m.put(TimeoutTracker.PARM_RETRY, "1");
+        m.put(TimeoutTracker.PARM_TIMEOUT, "3000");
         m.put("lookup", "example.com");
         
         final PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
@@ -183,8 +184,8 @@ public class DnsMonitorIT {
         final MonitoredService svc = MonitorTestUtils.getMonitoredService(99, addr("127.0.0.1"), "DNS");
 
         m.put("port", "9153");
-        m.put("retry", "1");
-        m.put("timeout", "3000");
+        m.put(TimeoutTracker.PARM_RETRY, "1");
+        m.put(TimeoutTracker.PARM_TIMEOUT, "3000");
         m.put("lookup", "example.empty");
         m.put("min-answers", "1");
         
@@ -201,8 +202,8 @@ public class DnsMonitorIT {
         final MonitoredService svc = MonitorTestUtils.getMonitoredService(99, addr("127.0.0.1"), "DNS");
 
         m.put("port", "9153");
-        m.put("retry", "1");
-        m.put("timeout", "3000");
+        m.put(TimeoutTracker.PARM_RETRY, "1");
+        m.put(TimeoutTracker.PARM_TIMEOUT, "3000");
         m.put("lookup", "example.com");
         m.put("max-answers", "0");
         

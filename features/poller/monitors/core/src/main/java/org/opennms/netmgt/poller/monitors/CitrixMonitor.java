@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * plug-ins by the service poller framework.
  *
  * @author <A HREF="mailto:tarus@opennms.org">Tarus Balog </A>
- * @author <A HREF="mailto:jason@opennms.org">Jason </A>
+ * @author <A HREF="mailto:jason@opennms.org">Jason Johns</A>
  */
 @Distributable
 public class CitrixMonitor extends AbstractServiceMonitor {
@@ -68,18 +68,6 @@ public class CitrixMonitor extends AbstractServiceMonitor {
      * Default FTP port.
      */
     private static final int DEFAULT_PORT = 1494;
-
-    /**
-     * Default retries.
-     */
-    private static final int DEFAULT_RETRY = 0;
-
-    /**
-     * Default timeout. Specifies how long (in milliseconds) to block waiting
-     * for data from the monitored interface.
-     */
-    private static final int DEFAULT_TIMEOUT = 3000; // 3 second timeout on
-                                                        // read()
 
     /**
      * {@inheritDoc}
@@ -101,7 +89,7 @@ public class CitrixMonitor extends AbstractServiceMonitor {
         // get the parameters
         //
         
-        TimeoutTracker timeoutTracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker timeoutTracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
         
         int port = ParameterMap.getKeyedInteger(parameters, "port", DEFAULT_PORT);
 

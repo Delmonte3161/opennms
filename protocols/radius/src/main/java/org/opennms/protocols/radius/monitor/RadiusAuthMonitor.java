@@ -82,11 +82,6 @@ public class RadiusAuthMonitor extends AbstractServiceMonitor {
     public static final int DEFAULT_TIMEOUT = 5000;
 
     /**
-     * Default number of times to retry a test
-     */
-    public static final int DEFAULT_RETRY = 0;
-
-    /**
      * Default radius authentication port
      */
     public static final int DEFAULT_AUTH_PORT = 1812;
@@ -166,7 +161,7 @@ public class RadiusAuthMonitor extends AbstractServiceMonitor {
             throw new NullPointerException();
         }
         
-        final TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        final TimeoutTracker tracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, DEFAULT_TIMEOUT);
 
         int authport = ParameterMap.getKeyedInteger(parameters, "authport", DEFAULT_AUTH_PORT);
         int acctport = ParameterMap.getKeyedInteger(parameters, "acctport", DEFAULT_ACCT_PORT);
@@ -211,7 +206,7 @@ public class RadiusAuthMonitor extends AbstractServiceMonitor {
                 tracker.startAttempt();
 
                 // The retry should be handled by the RadiusClient because otherwise it will thrown an exception.
-                RadiusPacket reply = rc.authenticate(accessRequest, auth, ParameterMap.getKeyedInteger(parameters, "retry", DEFAULT_RETRY));
+                RadiusPacket reply = rc.authenticate(accessRequest, auth, ParameterMap.getKeyedInteger(parameters, TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES));
                 if (reply instanceof AccessAccept) {
                     double responseTime = tracker.elapsedTimeInMillis();
                     status = PollStatus.available(responseTime);

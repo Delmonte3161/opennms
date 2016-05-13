@@ -69,11 +69,6 @@ public class NtpMonitor extends AbstractServiceMonitor {
     private static final int DEFAULT_PORT = 123;
 
     /**
-     * Default retries.
-     */
-    private static final int DEFAULT_RETRY = 0;
-
-    /**
      * Default timeout. Specifies how long (in milliseconds) to block waiting
      * for data from the monitored interface.
      */
@@ -111,7 +106,7 @@ public class NtpMonitor extends AbstractServiceMonitor {
 
         // get the parameters
         //
-        TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker tracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, DEFAULT_TIMEOUT);
 
         int port = ParameterMap.getKeyedInteger(parameters, "port", DEFAULT_PORT);
 

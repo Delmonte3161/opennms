@@ -72,17 +72,6 @@ public class HttpPostMonitor extends AbstractServiceMonitor {
      */
     private static final int DEFAULT_PORT = 80;
 
-    /**
-     * Default retries.
-     */
-    private static final int DEFAULT_RETRY = 0;
-
-    /**
-     * Default timeout. Specifies how long (in milliseconds) to block waiting
-     * for data from the monitored interface.
-     */
-    private static final int DEFAULT_TIMEOUT = 3000;
-
     public static final String DEFAULT_MIMETYPE = "text/xml";
     public static final String DEFAULT_CHARSET = "utf-8";
     public static final String DEFAULT_URI = "/";
@@ -126,7 +115,7 @@ public class HttpPostMonitor extends AbstractServiceMonitor {
         if (iface.getType() != NetworkInterface.TYPE_INET)
             throw new NetworkInterfaceNotSupportedException("Unsupported interface type, only TYPE_INET currently supported");
 
-        TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker tracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
 
         // Port
         int port = ParameterMap.getKeyedInteger(parameters, PARAMETER_PORT, DEFAULT_PORT);
@@ -176,7 +165,7 @@ public class HttpPostMonitor extends AbstractServiceMonitor {
                 clientWrapper = HttpClientWrapper.create()
                         .setConnectionTimeout(tracker.getSoTimeout())
                         .setSocketTimeout(tracker.getSoTimeout())
-                        .setRetries(DEFAULT_RETRY);
+                        .setRetries(TimeoutTracker.ZERO_RETRIES);
 
                 if (boolSSLFilter)  {
                     clientWrapper.trustSelfSigned(strScheme);

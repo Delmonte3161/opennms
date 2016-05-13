@@ -60,12 +60,6 @@ public class SshMonitor extends AbstractServiceMonitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(SshMonitor.class);
 
-    private static final int DEFAULT_RETRY = 0;
-    /**
-     * Constant <code>DEFAULT_TIMEOUT=3000</code>
-     */
-    public static final int DEFAULT_TIMEOUT = 3000;
-
     /**
      * Constant <code>DEFAULT_PORT=22</code>
      */
@@ -90,7 +84,7 @@ public class SshMonitor extends AbstractServiceMonitor {
      */
     public PollStatus poll(final InetAddress address, final Map<String, Object> parameters) {
 
-        TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker tracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
 
         int port = ParameterMap.getKeyedInteger(parameters, "port", DEFAULT_PORT);
         String banner = ParameterMap.getKeyedString(parameters, "banner", null);

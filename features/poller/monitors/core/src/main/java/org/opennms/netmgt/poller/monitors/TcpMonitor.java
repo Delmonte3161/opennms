@@ -74,18 +74,6 @@ public class TcpMonitor extends AbstractServiceMonitor {
      */
     private static final int DEFAULT_PORT = -1;
 
-    /**
-     * Default retries.
-     */
-    private static final int DEFAULT_RETRY = 0;
-
-    /**
-     * Default timeout. Specifies how long (in milliseconds) to block waiting
-     * for data from the monitored interface.
-     */
-    private static final int DEFAULT_TIMEOUT = 3000; // 3 second timeout on
-                                                        // read()
-
     public static final String PARAMETER_BANNER = "banner";
     public static final String PARAMETER_PORT = "port";
 
@@ -116,7 +104,7 @@ public class TcpMonitor extends AbstractServiceMonitor {
         if (iface.getType() != NetworkInterface.TYPE_INET)
             throw new NetworkInterfaceNotSupportedException("Unsupported interface type, only TYPE_INET currently supported");
 
-        TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker tracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
 
         // Port
         //

@@ -61,16 +61,6 @@ import java.util.Map;
 @Distributable(DistributionContext.DAEMON)
 public class JCifsMonitor extends AbstractServiceMonitor {
 
-    /*
-    * default retries
-    */
-    private static final int DEFAULT_RETRY = 0;
-
-    /*
-     * default timeout
-     */
-    private static final int DEFAULT_TIMEOUT = 3000;
-
     private static String modeCandidates;
 
     static {
@@ -152,7 +142,7 @@ public class JCifsMonitor extends AbstractServiceMonitor {
         logger.debug("Domain: [{}], Username: [{}], Password: [{}], Mode: [{}], Path: [{}], Authentication: [{}], Full Url: [{}]", new Object[]{domain, username, password, mode, path, authString, fullUrl});
 
         // Initializing TimeoutTracker with default values
-        TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_RETRY, DEFAULT_TIMEOUT);
+        TimeoutTracker tracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
 
         // Setting default PollStatus
         PollStatus serviceStatus = PollStatus.unknown();
