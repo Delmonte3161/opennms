@@ -157,7 +157,7 @@ public class ContextServiceMonitorLocatorTest {
 		}
 
 		@Override
-		public PollStatus poll(MonitoredServiceTask monSvct) {
+		public PollStatus poll(MonitoredServiceTask task) {
 			return null;
 		}
 	}
@@ -170,7 +170,7 @@ public class ContextServiceMonitorLocatorTest {
 		}
 
 		@Override
-		public PollStatus poll(MonitoredServiceTask monSvct) {
+		public PollStatus poll(MonitoredServiceTask task) {
 			return null;
 		}
 	}
@@ -183,7 +183,7 @@ public class ContextServiceMonitorLocatorTest {
 		}
 
 		@Override
-		public PollStatus poll(MonitoredServiceTask monSvct) {
+		public PollStatus poll(MonitoredServiceTask task) {
 			return null;
 		}
 	}
@@ -197,7 +197,7 @@ public class ContextServiceMonitorLocatorTest {
 		}
 
 		@Override
-		public PollStatus poll(MonitoredServiceTask monSvct) {
+		public PollStatus poll(MonitoredServiceTask task) {
 			return null;
 		}
 	}

@@ -69,9 +69,9 @@ public class MockMonitor implements ServiceMonitor {
     }
 
     @Override
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService monSvc = monSvct.getMonitoredService();
-    	Map<String, Object> parameters = monSvct.getParameters();
+    public PollStatus poll(MonitoredServiceTask task) {
+        MonitoredService monSvc = task.getMonitoredService();
+        Map<String, Object> parameters = task.getParameters();
         synchronized(m_network) {
             int nodeId = monSvc.getNodeId();
             String ipAddr = monSvc.getIpAddr();

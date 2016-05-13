@@ -186,7 +186,7 @@ public class DefaultManualProvisioningServiceTest {
         final Map<String, ServiceMonitor> serviceMonitors = new HashMap<String, ServiceMonitor>();
         serviceMonitors.put("Shochu-Stock-Level", new AbstractServiceMonitor() {
             @Override
-            public PollStatus poll(MonitoredServiceTask monSvct) {
+            public PollStatus poll(MonitoredServiceTask task) {
                 return null;
             }
         });

@@ -56,8 +56,8 @@ public class PassiveServiceMonitor implements ServiceMonitor {
     }
 
     @Override
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService svc = monSvct.getMonitoredService();
+    public PollStatus poll(MonitoredServiceTask task) {
+    	MonitoredService svc = task.getMonitoredService();
         PollStatus status = PassiveStatusKeeper.getInstance().getStatus(svc.getNodeLabel(), svc.getIpAddr(), svc.getSvcName());
         return status;
     }

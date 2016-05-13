@@ -84,9 +84,9 @@ public class MemcachedMonitor extends AbstractServiceMonitor {
      * Poll the specified address for Memcached service availability.
      */
     @Override
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> parameters = monSvct.getParameters();
+    public PollStatus poll(MonitoredServiceTask task) {
+        MonitoredService svc = task.getMonitoredService();
+        Map<String, Object> parameters = task.getParameters();
         TimeoutTracker timeoutTracker = new TimeoutTracker(parameters, TimeoutTracker.ZERO_RETRIES, TimeoutTracker.DEFAULT_TIMEOUT);
         
         int port = ParameterMap.getKeyedInteger(parameters, "port", DEFAULT_PORT);

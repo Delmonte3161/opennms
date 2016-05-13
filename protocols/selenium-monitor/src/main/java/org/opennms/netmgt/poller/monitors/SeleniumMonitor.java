@@ -72,20 +72,20 @@ public class SeleniumMonitor extends AbstractServiceMonitor {
     }
     
     private static final int DEFAULT_SEQUENCE_RETRY = 0;
-	private static final int DEFAULT_TIMEOUT = 3000;
-	
-	@Override
-	public PollStatus poll(MonitoredServiceTask monSvct) 
-	{
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> parameters = monSvct.getParameters();
-		PollStatus serviceStatus = PollStatus.unavailable("Poll not completed yet");
-		TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_SEQUENCE_RETRY, DEFAULT_TIMEOUT);
-	    
-		for(tracker.reset(); tracker.shouldRetry() && !serviceStatus.isAvailable(); tracker.nextAttempt()) {
-		    String seleniumTestFilename = getGroovyFilename( parameters );
-    		try {
-    	        
+    private static final int DEFAULT_TIMEOUT = 3000;
+
+    @Override
+    public PollStatus poll(MonitoredServiceTask task) 
+    {
+        MonitoredService svc = task.getMonitoredService();
+        Map<String, Object> parameters = task.getParameters();
+        PollStatus serviceStatus = PollStatus.unavailable("Poll not completed yet");
+        TimeoutTracker tracker = new TimeoutTracker(parameters, DEFAULT_SEQUENCE_RETRY, DEFAULT_TIMEOUT);
+
+        for(tracker.reset(); tracker.shouldRetry() && !serviceStatus.isAvailable(); tracker.nextAttempt()) {
+            String seleniumTestFilename = getGroovyFilename( parameters );
+            try {
+
                 Map<String, Number> responseTimes = new HashMap<String, Number>();
                 responseTimes.put(PollStatus.PROPERTY_RESPONSE_TIME, Double.NaN);
                 
@@ -116,10 +116,10 @@ public class SeleniumMonitor extends AbstractServiceMonitor {
                 SeleniumMonitor.LOG.debug(reason);
                 PollStatus.unavailable(reason);
             }
-		}
-	    
-		return serviceStatus;
-	}
+        }
+        
+        return serviceStatus;
+    }
 
     private int getTimeout(Map<String, Object> parameters) {
         if(parameters.containsKey("timeout")) {

@@ -665,9 +665,9 @@ public class PageSequenceMonitor extends AbstractServiceMonitor {
 
     /** {@inheritDoc} */
     @Override
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> parameterMap = monSvct.getParameters();
+    public PollStatus poll(MonitoredServiceTask task) {
+        MonitoredService svc = task.getMonitoredService();
+        Map<String, Object> parameterMap = task.getParameters();
         PollStatus serviceStatus = PollStatus.unavailable("Poll not completed yet");
 
         final Map<String,Number> responseTimes = new LinkedHashMap<String,Number>();

@@ -87,9 +87,9 @@ public class DominoIIOPMonitor extends AbstractServiceMonitor {
      * status to SERVICE_AVAILABLE and return.
      */
     @Override
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> parameters = monSvct.getParameters();
+    public PollStatus poll(MonitoredServiceTask task) {
+        MonitoredService svc = task.getMonitoredService();
+        Map<String, Object> parameters = task.getParameters();
         NetworkInterface<InetAddress> iface = svc.getNetInterface();
 
         //

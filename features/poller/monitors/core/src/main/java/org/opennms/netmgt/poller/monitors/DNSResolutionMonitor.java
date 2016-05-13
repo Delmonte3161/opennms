@@ -60,9 +60,9 @@ public class DNSResolutionMonitor extends AbstractServiceMonitor {
     public static final String PARM_NAMESERVER = "nameserver";
 
     @Override
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> parameters = monSvct.getParameters();
+    public PollStatus poll(MonitoredServiceTask task) {
+        MonitoredService svc = task.getMonitoredService();
+        Map<String, Object> parameters = task.getParameters();
         // Get the name to query for
         final Name name;
         try {

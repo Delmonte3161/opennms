@@ -90,9 +90,9 @@ public class WsManMonitor extends AbstractServiceMonitor {
     }
 
     @Override
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> parameters = monSvct.getParameters();
+    public PollStatus poll(MonitoredServiceTask task) {
+        MonitoredService svc = task.getMonitoredService();
+        Map<String, Object> parameters = task.getParameters();
         // Fetch the monitor specific parameters
         final String resourceUri = getKeyedString(parameters, RESOURCE_URI_PARAM, null);
         if (resourceUri == null) {

@@ -92,15 +92,15 @@ public class AsteriskSIPPeerMonitor extends AbstractServiceMonitor {
 	  * Run the service monitor and return the poll status
 	  * </P>
 	  */
-	public PollStatus poll(MonitoredServiceTask monSvct)
+	public PollStatus poll(MonitoredServiceTask task)
 	{
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> parameters = monSvct.getParameters();
+		MonitoredService svc = task.getMonitoredService();
+		Map<String, Object> parameters = task.getParameters();
 		//check, if interface type is supported
 		final NetworkInterface<InetAddress> iface = svc.getNetInterface();
 		if (iface.getType() != NetworkInterface.TYPE_INET) 
 		{
-	    		throw new NetworkInterfaceNotSupportedException("Unsupported interface type, only TYPE_INET currently supported");
+			throw new NetworkInterfaceNotSupportedException("Unsupported interface type, only TYPE_INET currently supported");
 		}
 
 		//read configuration parameters
@@ -186,5 +186,3 @@ public class AsteriskSIPPeerMonitor extends AbstractServiceMonitor {
 		return PollStatus.decode("Down", "Could not get the state of SIP Peer: Timeout exceeded");
 	}
 }
-
-

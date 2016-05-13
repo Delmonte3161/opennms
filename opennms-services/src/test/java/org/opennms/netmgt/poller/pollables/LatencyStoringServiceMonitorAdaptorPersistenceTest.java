@@ -163,7 +163,7 @@ public class LatencyStoringServiceMonitorAdaptorPersistenceTest {
         public void close() {}
 
         @Override
-        public PollStatus poll(MonitoredServiceTask monSvct) {
+        public PollStatus poll(MonitoredServiceTask task) {
             return m_pollStatus;
         }
     }

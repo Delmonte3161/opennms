@@ -86,9 +86,9 @@ public class JCifsMonitor extends AbstractServiceMonitor {
      * @return the poll status for this system
      */
     @Override
-    public PollStatus poll(MonitoredServiceTask monSvct) {
-    	MonitoredService svc = monSvct.getMonitoredService();
-    	Map<String, Object> parameters = monSvct.getParameters();
+    public PollStatus poll(MonitoredServiceTask task) {
+        MonitoredService svc = task.getMonitoredService();
+        Map<String, Object> parameters = task.getParameters();
         final String domain = parameters.containsKey("domain") ? (String) parameters.get("domain") : "";
         final String username = parameters.containsKey("username") ? (String) parameters.get("username") : "";
         final String password = parameters.containsKey("password") ? (String) parameters.get("password") : "";
