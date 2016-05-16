@@ -45,15 +45,15 @@ import org.opennms.netmgt.model.OnmsMonitoringSystem;
  * 
  * @author Seth
  */
-public class MockDistPollerMonitorDao implements DistPollerDao {
+public class DistPollerDaoMinion implements DistPollerDao {
 
 	private final OnmsDistPoller m_distPoller;
 
-	public MockDistPollerMonitorDao(OnmsDistPoller distPoller) {
+	public DistPollerDaoMinion(OnmsDistPoller distPoller) {
 		m_distPoller = Objects.requireNonNull(distPoller);
 	}
 
-	public MockDistPollerMonitorDao(MinionIdentity identity) {
+	public DistPollerDaoMinion(MinionIdentity identity) {
 		Objects.requireNonNull(identity);
 		m_distPoller = new OnmsDistPoller();
 		m_distPoller.setId(identity.getId());

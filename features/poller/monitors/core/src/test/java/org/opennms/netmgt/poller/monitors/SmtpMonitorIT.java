@@ -51,7 +51,6 @@ import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
-import org.opennms.test.JUnitConfigurationEnvironment;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -60,11 +59,9 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Ronald J. Roskens <ronald.roskens@gmail.com>
  */
 @RunWith(OpenNMSJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/META-INF/opennms/emptyContext.xml",
-		"classpath:/META-INF/opennms/applicationContext-commonConfigs.xml",
-		"classpath:/META-INF/opennms/applicationContext-minimal-conf.xml",
-		"classpath:/META-INF/opennms/applicationContext-soa.xml"})
-@JUnitConfigurationEnvironment
+@ContextConfiguration(locations = {
+		"classpath:/META-INF/opennms/emptyContext.xml"
+})
 public class SmtpMonitorIT {
 
     private final SmtpMonitor m_monitor = new SmtpMonitor();

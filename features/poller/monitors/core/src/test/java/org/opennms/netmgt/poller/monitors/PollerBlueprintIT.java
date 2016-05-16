@@ -32,31 +32,19 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Map;
-import java.util.Properties;
 
-import org.apache.activemq.broker.BrokerService;
-import org.apache.activemq.camel.component.ActiveMQComponent;
-import org.apache.camel.Component;
 import org.apache.camel.test.blueprint.CamelBlueprintTestSupport;
 import org.apache.camel.util.KeyValueHolder;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
-import org.opennms.core.utils.DBTools;
 import org.opennms.core.utils.InetAddressUtils;
-import org.opennms.netmgt.dao.api.DistPollerDao;
-import org.opennms.netmgt.model.OnmsDistPoller;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
 import org.opennms.test.JUnitConfigurationEnvironment;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -66,17 +54,11 @@ import org.springframework.test.context.ContextConfiguration;
  *
  */
 @RunWith(OpenNMSJUnit4ClassRunner.class)
-@ContextConfiguration(locations={
-    "classpath:/META-INF/opennms/emptyContext.xml"
+@ContextConfiguration(locations = {
+		"classpath:/META-INF/opennms/emptyContext.xml"
 })
 @JUnitConfigurationEnvironment
-public class PollerMonitorsCoreBlueprintIT extends CamelBlueprintTestSupport {
-
-    private static final Logger LOG = LoggerFactory.getLogger(PollerMonitorsCoreBlueprintIT.class);
-
-    private static BrokerService m_broker = null;
-
-    private static final String LOCATION = "RDU";
+public class PollerBlueprintIT extends CamelBlueprintTestSupport {
 
     /**
      * Use Aries Blueprint synchronous mode to avoid a blueprint deadlock bug.
@@ -106,24 +88,13 @@ public class PollerMonitorsCoreBlueprintIT extends CamelBlueprintTestSupport {
         return "*";
     }
 
-    @SuppressWarnings("rawtypes")
+    /**
+     * Register a mock OSGi {@link SchedulerService} so that we can make sure that the scheduler
+     * whiteboard is working properly.
+     */
+    @SuppressWarnings( "rawtypes" )
     @Override
-    protected void addServicesOnStartup(Map<String, KeyValueHolder<Object, Dictionary>> services) {
-        Properties props = new Properties();
-
-        //creating the Active MQ component and service
-        props.setProperty("alias", "opennms.broker");
-        ActiveMQComponent activeMQ = new ActiveMQComponent();
-        activeMQ.setBrokerURL("tcp://127.0.0.1:61716");
-        services.put(Component.class.getName(), new KeyValueHolder<Object, Dictionary>( activeMQ, props ));
-
-        OnmsDistPoller distPoller = new OnmsDistPoller();
-        distPoller.setId(DistPollerDao.DEFAULT_DIST_POLLER_ID);
-        distPoller.setLabel(DistPollerDao.DEFAULT_DIST_POLLER_ID);
-        distPoller.setLocation(LOCATION);
-        DistPollerDao distPollerDao = new DistPollerDaoMinion(distPoller);
-
-        services.put(DistPollerDao.class.getName(), new KeyValueHolder<Object, Dictionary>(distPollerDao, new Properties()));
+    protected void addServicesOnStartup( Map<String, KeyValueHolder<Object, Dictionary>> services ) {
     }
 
     // The location of our Blueprint XML file to be used for testing
@@ -133,37 +104,28 @@ public class PollerMonitorsCoreBlueprintIT extends CamelBlueprintTestSupport {
         return "file:src/test/resources/blueprint-empty-camel-context.xml";
     }
 
-    @BeforeClass
-    public static void startActiveMQ() throws Exception {
-        m_broker = new BrokerService();
-        m_broker.addConnector("tcp://127.0.0.1:61716");
-        m_broker.start();
-    }
-
-    @AfterClass
-    public static void stopActiveMQ() throws Exception {
-        if (m_broker != null) {
-            m_broker.stop();
-        }
-    }
-
     @Test
-    @Ignore("Pinging localhost is failing on the Bamboo machines")
-    public void testPoller() throws UnknownHostException {
-        MonitoredService svc = new MockMonitoredService(1, "Node One", InetAddressUtils.addr("127.0.0.1"), "ICMP");
-
+    public void testIcmpPoller() throws UnknownHostException {
         // Fetch the ICMP monitor from the OSGi registry
         ServiceMonitor icmpMonitor = getOsgiService(ServiceMonitor.class, String.format("(implementation=%s)", IcmpMonitor.class.getName()));
+        assertNotNull(icmpMonitor);
+
+        MonitoredService svc = new MockMonitoredService(1, "Node One", InetAddressUtils.UNPINGABLE_ADDRESS, "ICMP");
 
         PollStatus ps = icmpMonitor.poll(new MonitoredServiceTask(svc, Collections.emptyMap()));
-        assertTrue(ps.isUp());
-        assertFalse(ps.isDown());
+        assertFalse(ps.isUp());
+        assertTrue(ps.isDown());
+
+        svc = new MockMonitoredService(1, "Node One", InetAddressUtils.UNPINGABLE_ADDRESS_IPV6, "ICMP");
+
+        ps = icmpMonitor.poll(new MonitoredServiceTask(svc, Collections.emptyMap()));
+        assertFalse(ps.isUp());
+        assertTrue(ps.isDown());
     }
 
     @Test
-    public void testAllPollers() throws UnknownHostException {
-        MonitoredService svc = new MockMonitoredService(1, "Node One", InetAddressUtils.UNPINGABLE_ADDRESS, "ICMP");
-
+    public void testPollerRegistrations() throws UnknownHostException {
+        // Fetch the ICMP monitor from the OSGi registry
         for (Class<?> clazz : new Class<?>[] {
             AvailabilityMonitor.class,
             CitrixMonitor.class,
@@ -171,8 +133,7 @@ public class PollerMonitorsCoreBlueprintIT extends CamelBlueprintTestSupport {
             DNSResolutionMonitor.class,
             DominoIIOPMonitor.class,
             FtpMonitor.class,
-            // Needs a script to execute
-            //GpMonitor.class,
+            GpMonitor.class,
             HttpMonitor.class,
             HttpsMonitor.class,
             IcmpMonitor.class,
@@ -180,8 +141,7 @@ public class PollerMonitorsCoreBlueprintIT extends CamelBlueprintTestSupport {
             JDBCMonitor.class,
             JDBCQueryMonitor.class,
             JDBCStoredProcedureMonitor.class,
-            // Always returns available unless there is an attribute check
-            //JolokiaBeanMonitor.class,
+            JolokiaBeanMonitor.class,
             JschSshMonitor.class,
             LdapMonitor.class,
             LdapsMonitor.class,
@@ -194,40 +154,25 @@ public class PollerMonitorsCoreBlueprintIT extends CamelBlueprintTestSupport {
             SshMonitor.class,
             SSLCertMonitor.class,
             StrafePingMonitor.class,
-            // Needs a script to execute
-            //SystemExecuteMonitor.class,
+            SystemExecuteMonitor.class,
             TcpMonitor.class,
             TrivialTimeMonitor.class,
             WebMonitor.class
         }) {
-            // Fetch each monitor from the OSGi registry
             ServiceMonitor monitor = getOsgiService(ServiceMonitor.class, String.format("(implementation=%s)", clazz.getName()));
-
-            PollStatus ps = null;
-            try {
-                Map<String,Object> parameters;
-                // TODO: Change timeouts and retries to minimize time spent in waiting for failed polls
-                switch(clazz.getSimpleName()) {
-                    case "JDBCMonitor":
-                    case "JDBCQueryMonitor":
-                    case "JDBCStoredProcedureMonitor":
-                        // Set the required "driver" parameter
-                        parameters = Collections.singletonMap("driver", DBTools.POSTGRESQL_JDBC_DRIVER);
-                        break;
-                    case "SSLCertMonitor":
-                    case "TcpMonitor":
-                        // Set the required "port" parameter
-                        parameters = Collections.singletonMap("port", 9999);
-                        break;
-                    default:
-                        parameters = Collections.emptyMap();
-                        break;
-                }
-                LOG.info("Polling {}", clazz.getSimpleName());
-                ps = monitor.poll(new MonitoredServiceTask(svc, parameters));
-                assertFalse(clazz.getSimpleName() + " should not be up", ps.isUp());
-                assertTrue(clazz.getSimpleName() + " should be down", ps.isDown());
-            } finally {}
+            assertNotNull(monitor);
         }
+    }
+
+    @Test
+    public void testMissingRegistration() throws UnknownHostException {
+        // Fetch the ICMP monitor from the OSGi registry
+        try {
+            getOsgiService(ServiceMonitor.class, "(implementation=org.opennms.doesnt.Exist)", 5000);
+        } catch (RuntimeException e) {
+            assertEquals("Gave up waiting for service (&(objectClass=org.opennms.netmgt.poller.ServiceMonitor)(implementation=org.opennms.doesnt.Exist))", e.getMessage());
+            return;
+        }
+        fail("Didn't catch expected exception");
     }
 }
