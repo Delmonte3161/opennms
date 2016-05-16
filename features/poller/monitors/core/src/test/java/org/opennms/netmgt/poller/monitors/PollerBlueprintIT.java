@@ -109,12 +109,17 @@ public class PollerBlueprintIT extends CamelBlueprintTestSupport {
         ServiceMonitor icmpMonitor = getOsgiService(ServiceMonitor.class, String.format("(implementation=%s)", IcmpMonitor.class.getName()));
         assertNotNull(icmpMonitor);
 
-        MonitoredService svc = new MockMonitoredService(1, "Node One", InetAddressUtils.addr("127.0.0.1"), "ICMP");
+        MonitoredService svc = new MockMonitoredService(1, "Node One", InetAddressUtils.UNPINGABLE_ADDRESS, "ICMP");
 
-        // Ping localhost
         PollStatus ps = icmpMonitor.poll(svc, Collections.emptyMap());
-        assertTrue(ps.isUp());
-        assertFalse(ps.isDown());
+        assertFalse(ps.isUp());
+        assertTrue(ps.isDown());
+
+        svc = new MockMonitoredService(1, "Node One", InetAddressUtils.UNPINGABLE_ADDRESS_IPV6, "ICMP");
+
+        ps = icmpMonitor.poll(svc, Collections.emptyMap());
+        assertFalse(ps.isUp());
+        assertTrue(ps.isDown());
     }
 
     @Test
