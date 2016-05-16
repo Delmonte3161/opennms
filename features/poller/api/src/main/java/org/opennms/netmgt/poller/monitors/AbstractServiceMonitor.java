@@ -31,6 +31,7 @@ package org.opennms.netmgt.poller.monitors;
 import java.util.Map;
 
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.slf4j.Logger;
@@ -75,7 +76,7 @@ public abstract class AbstractServiceMonitor implements ServiceMonitor {
 
     /** {@inheritDoc} */
     @Override
-    public abstract PollStatus poll(MonitoredService svc, Map<String, Object> parameters);
+    public abstract PollStatus poll(MonitoredServiceTask monSvc);
 
     public static Object getKeyedObject(final Map<String, Object> parameterMap, final String key, final Object defaultValue) {
         if (key == null) return defaultValue;

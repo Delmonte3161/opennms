@@ -47,6 +47,7 @@ import org.opennms.netmgt.dao.support.FilesystemResourceStorageDao;
 import org.opennms.netmgt.mock.MockNetwork;
 import org.opennms.netmgt.mock.MockPollerConfig;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
@@ -141,7 +142,7 @@ public class LatencyStoringServiceMonitorAdaptorPersistenceTest {
         EasyMock.replay(m_rrdStrategy);
 
         // Trigger the poll
-        lssma.poll(monitoredService, params);
+        lssma.poll(new MonitoredServiceTask(monitoredService, params));
 
         // Verify
         EasyMock.verify(m_rrdStrategy);
@@ -162,7 +163,7 @@ public class LatencyStoringServiceMonitorAdaptorPersistenceTest {
         public void close() {}
 
         @Override
-        public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
+        public PollStatus poll(MonitoredServiceTask monSvct) {
             return m_pollStatus;
         }
     }

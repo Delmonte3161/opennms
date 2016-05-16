@@ -42,6 +42,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.opennms.core.test.MockLogAppender;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
 
@@ -76,25 +77,25 @@ public class DNSResolutionMonitorTest {
                                                                                    PARM_RESOLUTION_TYPE_EITHER);
         
         
-        assertEquals(PollStatus.available(), monitor.poll(dual, v4Parms));
-        assertEquals(PollStatus.available(), monitor.poll(dual, v6Parms));
-        assertEquals(PollStatus.available(), monitor.poll(dual, bothParms));
-        assertEquals(PollStatus.available(), monitor.poll(dual, eitherParms));
+        assertEquals(PollStatus.available(), monitor.poll(new MonitoredServiceTask(dual, v4Parms)));
+        assertEquals(PollStatus.available(), monitor.poll(new MonitoredServiceTask(dual, v6Parms)));
+        assertEquals(PollStatus.available(), monitor.poll(new MonitoredServiceTask(dual, bothParms)));
+        assertEquals(PollStatus.available(), monitor.poll(new MonitoredServiceTask(dual, eitherParms)));
 
-        assertEquals(PollStatus.available(),   monitor.poll(v4only, v4Parms));
-        assertEquals(PollStatus.unavailable(), monitor.poll(v4only, v6Parms));
-        assertEquals(PollStatus.unavailable(), monitor.poll(v4only, bothParms));
-        assertEquals(PollStatus.available(),   monitor.poll(v4only, eitherParms));
+        assertEquals(PollStatus.available(),   monitor.poll(new MonitoredServiceTask(v4only, v4Parms)));
+        assertEquals(PollStatus.unavailable(), monitor.poll(new MonitoredServiceTask(v4only, v6Parms)));
+        assertEquals(PollStatus.unavailable(), monitor.poll(new MonitoredServiceTask(v4only, bothParms)));
+        assertEquals(PollStatus.available(),   monitor.poll(new MonitoredServiceTask(v4only, eitherParms)));
 
-        assertEquals(PollStatus.unavailable(), monitor.poll(v6only, v4Parms));
-        assertEquals(PollStatus.available(),   monitor.poll(v6only, v6Parms));
-        assertEquals(PollStatus.unavailable(), monitor.poll(v6only, bothParms));
-        assertEquals(PollStatus.available(),   monitor.poll(v6only, eitherParms));
+        assertEquals(PollStatus.unavailable(), monitor.poll(new MonitoredServiceTask(v6only, v4Parms)));
+        assertEquals(PollStatus.available(),   monitor.poll(new MonitoredServiceTask(v6only, v6Parms)));
+        assertEquals(PollStatus.unavailable(), monitor.poll(new MonitoredServiceTask(v6only, bothParms)));
+        assertEquals(PollStatus.available(),   monitor.poll(new MonitoredServiceTask(v6only, eitherParms)));
 
-        assertEquals(PollStatus.unavailable(), monitor.poll(neither, v4Parms));
-        assertEquals(PollStatus.unavailable(), monitor.poll(neither, v6Parms));
-        assertEquals(PollStatus.unavailable(), monitor.poll(neither, bothParms));
-        assertEquals(PollStatus.unavailable(), monitor.poll(neither, eitherParms));
+        assertEquals(PollStatus.unavailable(), monitor.poll(new MonitoredServiceTask(neither, v4Parms)));
+        assertEquals(PollStatus.unavailable(), monitor.poll(new MonitoredServiceTask(neither, v6Parms)));
+        assertEquals(PollStatus.unavailable(), monitor.poll(new MonitoredServiceTask(neither, bothParms)));
+        assertEquals(PollStatus.unavailable(), monitor.poll(new MonitoredServiceTask(neither, eitherParms)));
         
         monitor.close();
 

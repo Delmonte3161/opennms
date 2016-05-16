@@ -82,6 +82,7 @@ import org.opennms.netmgt.config.pagesequence.Parameter;
 import org.opennms.netmgt.config.pagesequence.SessionVariable;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.utils.DnsUtils;
 import org.slf4j.Logger;
@@ -667,7 +668,9 @@ public class PageSequenceMonitor extends AbstractServiceMonitor {
 
     /** {@inheritDoc} */
     @Override
-    public PollStatus poll(final MonitoredService svc, final Map<String, Object> parameterMap) {
+    public PollStatus poll(MonitoredServiceTask monSvct) {
+    	MonitoredService svc = monSvct.getMonitoredService();
+    	Map<String, Object> parameterMap = monSvct.getParameters();
         PollStatus serviceStatus = PollStatus.unavailable("Poll not completed yet");
 
         final Map<String,Number> responseTimes = new LinkedHashMap<String,Number>();

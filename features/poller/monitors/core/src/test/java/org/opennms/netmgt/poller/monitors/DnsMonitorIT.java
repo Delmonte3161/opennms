@@ -47,6 +47,7 @@ import org.opennms.core.test.dns.annotations.DNSEntry;
 import org.opennms.core.test.dns.annotations.DNSZone;
 import org.opennms.core.test.dns.annotations.JUnitDNSServer;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.poller.mock.MonitorTestUtils;
@@ -99,7 +100,7 @@ public class DnsMonitorIT {
         m.put("timeout", "1000");
         m.put("lookup", "ipv6.example.com");
         
-        final PollStatus status = monitor.poll(svc, m);
+        final PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
     }
@@ -117,7 +118,7 @@ public class DnsMonitorIT {
         m.put("timeout", "5000");
         m.put("lookup", "bogus.example.com");
         
-        final PollStatus status = monitor.poll(svc, m);
+        final PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals("Expected service to be available", PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
     }
@@ -136,7 +137,7 @@ public class DnsMonitorIT {
         m.put("lookup", "bogus.example.com");
         m.put("fatal-response-codes", "3");
         
-        final PollStatus status = monitor.poll(svc, m);
+        final PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_UNAVAILABLE, status.getStatusCode());
     }
@@ -152,7 +153,7 @@ public class DnsMonitorIT {
         m.put("retry", "2");
         m.put("timeout", "500");
         
-        final PollStatus status = monitor.poll(svc, m);
+        final PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_UNAVAILABLE, status.getStatusCode());
     }
@@ -169,7 +170,7 @@ public class DnsMonitorIT {
         m.put("timeout", "3000");
         m.put("lookup", "example.com");
         
-        final PollStatus status = monitor.poll(svc, m);
+        final PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
     }
@@ -187,7 +188,7 @@ public class DnsMonitorIT {
         m.put("lookup", "example.empty");
         m.put("min-answers", "1");
         
-        final PollStatus status = monitor.poll(svc, m);
+        final PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_UNAVAILABLE, status.getStatusCode());
     }
@@ -205,7 +206,7 @@ public class DnsMonitorIT {
         m.put("lookup", "example.com");
         m.put("max-answers", "0");
         
-        final PollStatus status = monitor.poll(svc, m);
+        final PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_UNAVAILABLE, status.getStatusCode());
     }

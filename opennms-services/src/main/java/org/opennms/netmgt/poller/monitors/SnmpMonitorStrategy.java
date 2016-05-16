@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.snmp.SnmpValue;
 import org.slf4j.Logger;
@@ -75,7 +76,7 @@ public abstract class SnmpMonitorStrategy extends AbstractServiceMonitor {
 
     /** {@inheritDoc} */
     @Override
-    public abstract PollStatus poll(MonitoredService svc, Map<String, Object> parameters);
+    public abstract PollStatus poll(MonitoredServiceTask monSvct);
     
 
     public String getStringValue(SnmpValue result) {

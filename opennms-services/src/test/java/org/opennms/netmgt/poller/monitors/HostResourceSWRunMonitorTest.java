@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.opennms.netmgt.config.SnmpPeerFactory;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
 import org.springframework.beans.factory.InitializingBean;
@@ -98,7 +99,7 @@ public class HostResourceSWRunMonitorTest implements InitializingBean {
         HostResourceSwRunMonitor monitor = new HostResourceSwRunMonitor();
         Map<String, Object> parameters = createBasicParams();
         parameters.put("service-name", "this service does not exist!");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertFalse(status.isAvailable());
         log(status.getReason());
     }
@@ -107,7 +108,7 @@ public class HostResourceSWRunMonitorTest implements InitializingBean {
     public void testMonitorWithRegex() throws Exception {
         HostResourceSwRunMonitor monitor = new HostResourceSwRunMonitor();
         Map<String, Object> parameters = createBasicParams();
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertTrue(status.isAvailable());
     }
 
@@ -116,7 +117,7 @@ public class HostResourceSWRunMonitorTest implements InitializingBean {
         HostResourceSwRunMonitor monitor = new HostResourceSwRunMonitor();
         Map<String, Object> parameters = createBasicParams();
         parameters.put("service-name", "eclipse");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertTrue(status.isAvailable());
     }
 
@@ -125,7 +126,7 @@ public class HostResourceSWRunMonitorTest implements InitializingBean {
         HostResourceSwRunMonitor monitor = new HostResourceSwRunMonitor();
         Map<String, Object> parameters = createBasicParams();
         parameters.put("min-services", "2");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertTrue(status.isAvailable());
     }
 
@@ -134,7 +135,7 @@ public class HostResourceSWRunMonitorTest implements InitializingBean {
         HostResourceSwRunMonitor monitor = new HostResourceSwRunMonitor();
         Map<String, Object> parameters = createBasicParams();
         parameters.put("min-services", "5");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertFalse(status.isAvailable());
         log(status.getReason());
     }
@@ -144,7 +145,7 @@ public class HostResourceSWRunMonitorTest implements InitializingBean {
         HostResourceSwRunMonitor monitor = new HostResourceSwRunMonitor();
         Map<String, Object> parameters = createBasicParams();
         parameters.put("max-services", "5");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertTrue(status.isAvailable());
     }
 
@@ -153,7 +154,7 @@ public class HostResourceSWRunMonitorTest implements InitializingBean {
         HostResourceSwRunMonitor monitor = new HostResourceSwRunMonitor();
         Map<String, Object> parameters = createBasicParams();
         parameters.put("max-services", "3");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertFalse(status.isAvailable());
         log(status.getReason());
     }
@@ -164,7 +165,7 @@ public class HostResourceSWRunMonitorTest implements InitializingBean {
         Map<String, Object> parameters = createBasicParams();
         parameters.put("min-services", "2");
         parameters.put("max-services", "5");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertTrue(status.isAvailable());
     }
 
@@ -175,7 +176,7 @@ public class HostResourceSWRunMonitorTest implements InitializingBean {
         Map<String, Object> parameters = createBasicParams();
         parameters.put("min-services", "8");
         parameters.put("max-services", "5");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertFalse(status.isAvailable());
         log(status.getReason());
     }
@@ -187,7 +188,7 @@ public class HostResourceSWRunMonitorTest implements InitializingBean {
         parameters.put("min-services", "1");
         parameters.put("max-services", "3");
         parameters.put("match-all", "false");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertTrue(status.isAvailable());
     }
 
@@ -197,7 +198,7 @@ public class HostResourceSWRunMonitorTest implements InitializingBean {
         Map<String, Object> parameters = createBasicParams();
         parameters.put("min-services", "1");
         parameters.put("max-services", "3");
-        PollStatus status = monitor.poll(createMonitor(), parameters);
+        PollStatus status = monitor.poll(new MonitoredServiceTask(createMonitor(), parameters));
         Assert.assertFalse(status.isAvailable());
         log(status.getReason());
     }

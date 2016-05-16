@@ -28,8 +28,6 @@
 
 package org.opennms.netmgt.poller;
 
-import java.util.Map;
-
 
 /**
  * <p>
@@ -111,5 +109,5 @@ public interface ServiceMonitor extends AutoCloseable {
      * @see PollStatus#SERVICE_AVAILABLE
      * @see PollStatus#SERVICE_UNAVAILABLE
      */
-    PollStatus poll(MonitoredService svc, Map<String, Object> parameters);
+    PollStatus poll(MonitoredServiceTask monSvc);
 }

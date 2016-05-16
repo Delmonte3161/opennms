@@ -49,6 +49,7 @@ import org.opennms.netmgt.poller.LatencyCollectionAttribute;
 import org.opennms.netmgt.poller.LatencyCollectionAttributeType;
 import org.opennms.netmgt.poller.LatencyCollectionResource;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.rrd.RrdRepository;
@@ -95,8 +96,10 @@ public class LatencyStoringServiceMonitorAdaptor implements ServiceMonitor {
 
     /** {@inheritDoc} */
     @Override
-    public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
-        PollStatus status = m_serviceMonitor.poll(svc, parameters);
+    public PollStatus poll(MonitoredServiceTask monSvct) {
+    	MonitoredService svc = monSvct.getMonitoredService();
+    	Map<String, Object> parameters = monSvct.getParameters();
+        PollStatus status = m_serviceMonitor.poll(new MonitoredServiceTask(svc, parameters));
 
         if (!status.getProperties().isEmpty()) {
             storeResponseTime(svc, new LinkedHashMap<String, Number>(status.getProperties()), parameters);

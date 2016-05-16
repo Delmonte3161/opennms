@@ -40,6 +40,7 @@ import org.opennms.netmgt.config.poller.Package;
 import org.opennms.netmgt.config.poller.Parameter;
 import org.opennms.netmgt.config.poller.Service;
 import org.opennms.netmgt.dao.api.ResourceStorageDao;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.scheduler.ScheduleInterval;
@@ -113,7 +114,7 @@ public class PollableServiceConfig implements PollConfig, ScheduleInterval {
             String packageName = getPackageName();
             ServiceMonitor monitor = getServiceMonitor();
             LOG.debug("Polling {} using pkg {}", m_service, packageName);
-            PollStatus result = monitor.poll(m_service, getParameters());
+            PollStatus result = monitor.poll(new MonitoredServiceTask(m_service, getParameters()));
             LOG.debug("Finish polling {} using pkg {} result = {}", m_service, packageName, result);
             return result;
         } catch (Throwable e) {

@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.poller.ServiceMonitorLocator;
@@ -74,7 +75,7 @@ public class DefaultPollService implements PollService {
         if (monitor == null) {
             return PollStatus.unknown("No service monitor for service " + polledService.getSvcName());
         } else {
-            PollStatus result = monitor.poll(polledService, polledService.getMonitorConfiguration());
+            PollStatus result = monitor.poll(new MonitoredServiceTask(polledService, polledService.getMonitorConfiguration()));
             result.setTimestamp(m_timeAdjustment.adjustDateToMasterDate(result.getTimestamp()));
             return result;
         }

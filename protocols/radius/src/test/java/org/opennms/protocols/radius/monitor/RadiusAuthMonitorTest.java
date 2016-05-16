@@ -41,6 +41,7 @@ import org.opennms.core.test.MockLogAppender;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.poller.mock.MonitorTestUtils;
@@ -72,7 +73,7 @@ public class RadiusAuthMonitorTest {
         m.put("secret", "testing123");
         m.put("authtype", "chap");
 
-        final PollStatus status = monitor.poll(svc, m);
+        final PollStatus status = monitor.poll(new MonitoredServiceTask(svc, m));
         MockUtil.println("Reason: "+status.getReason());
         assertEquals(PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
 	}

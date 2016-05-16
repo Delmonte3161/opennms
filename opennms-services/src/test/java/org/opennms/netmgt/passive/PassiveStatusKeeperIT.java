@@ -53,6 +53,7 @@ import org.opennms.netmgt.mock.MockEventUtil;
 import org.opennms.netmgt.mock.MockNetwork;
 import org.opennms.netmgt.mock.MockService;
 import org.opennms.netmgt.mock.OutageAnticipator;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
@@ -250,7 +251,7 @@ public class PassiveStatusKeeperIT {
         MockMonitoredService svc = new MockMonitoredService(1, "Router", InetAddressUtils.addr("192.168.1.1"), "ICMP" );
         
         ServiceMonitor m = new PassiveServiceMonitor();
-        PollStatus ps2 = m.poll(svc, null);
+        PollStatus ps2 = m.poll(new MonitoredServiceTask(svc, null));
         m.close();
         
         assertEquals(ps, ps2);

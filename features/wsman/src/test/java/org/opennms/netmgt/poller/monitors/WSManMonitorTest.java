@@ -46,6 +46,7 @@ import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.PollStatus;
 import org.springframework.expression.spel.SpelParseException;
 import org.w3c.dom.Node;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 
 import com.google.common.collect.Maps;
 import com.mycila.xmltool.XMLDoc;
@@ -121,6 +122,6 @@ public class WSManMonitorTest {
         MonitoredService svc = mock(MonitoredService.class);
         when(svc.getAddress()).thenReturn(localhost);
 
-        return monitor.poll(svc, parameters);
+        return monitor.poll(new MonitoredServiceTask(svc, parameters));
     }
 }

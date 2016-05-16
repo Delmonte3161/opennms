@@ -47,6 +47,7 @@ import org.junit.Test;
 import org.opennms.core.test.MockLogAppender;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
 import org.springframework.core.io.ClassPathResource;
@@ -89,7 +90,7 @@ public class MailTransportMonitorTest {
         
         setupLocalhostSendGoogleRead2();
 
-        final PollStatus status = m_monitor.poll(getMailService("127.0.0.1"), m_params);
+        final PollStatus status = m_monitor.poll(new MonitoredServiceTask(getMailService("127.0.0.1"), m_params));
         
         assertEquals(PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
     }
@@ -114,7 +115,7 @@ public class MailTransportMonitorTest {
         "        </readmail-test>\n" + 
         "      </mail-test>\n"+
         "    </mail-transport-test>\n");
-        PollStatus status = m_monitor.poll(getMailService("127.0.0.1"), m_params);
+        PollStatus status = m_monitor.poll(new MonitoredServiceTask(getMailService("127.0.0.1"), m_params));
         assertEquals(PollStatus.SERVICE_AVAILABLE, status.getStatusCode());
     }
 

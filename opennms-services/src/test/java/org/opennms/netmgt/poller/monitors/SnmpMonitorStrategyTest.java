@@ -43,6 +43,7 @@ import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.snmp.SnmpObjId;
 import org.opennms.netmgt.snmp.SnmpUtils;
@@ -60,7 +61,7 @@ public class SnmpMonitorStrategyTest {
 
     private SnmpMonitorStrategy monitor = new SnmpMonitorStrategy() {
         @Override
-        public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
+        public PollStatus poll(MonitoredServiceTask monSvct) {
             throw new UnsupportedOperationException("method not implemented; go away, punk!");
         }
     };

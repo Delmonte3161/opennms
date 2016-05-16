@@ -34,6 +34,7 @@ import org.opennms.core.utils.ParameterMap;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,11 @@ public class Win32ServiceMonitor extends SnmpMonitor {
 	
 	/** {@inheritDoc} */
 	@Override
-	public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
+	public PollStatus poll(MonitoredServiceTask monSvct) {
+
+    	MonitoredService svc = monSvct.getMonitoredService();
+    	Map<String, Object> parameters = monSvct.getParameters();
+
 		String serviceName = ParameterMap.getKeyedString(parameters, "service-name", DEFAULT_SERVICE_NAME);
 		int snLength = serviceName.length();
 		
@@ -68,6 +73,6 @@ public class Win32ServiceMonitor extends SnmpMonitor {
 		parameters.put("operator", "=");
 		parameters.put("operand", "1");
 		
-		return super.poll(svc, parameters);
+		return super.poll(new MonitoredServiceTask(svc, parameters));
 	}
 }

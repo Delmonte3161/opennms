@@ -37,6 +37,7 @@ import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.netmgt.poller.Distributable;
 import org.opennms.netmgt.poller.DistributionContext;
 import org.opennms.netmgt.poller.MonitoredService;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,8 +96,9 @@ public class JCifsMonitor extends AbstractServiceMonitor {
      * @return the poll status for this system
      */
     @Override
-    public PollStatus poll(MonitoredService svc, Map<String, Object> parameters) {
-
+    public PollStatus poll(MonitoredServiceTask monSvct) {
+    	MonitoredService svc = monSvct.getMonitoredService();
+    	Map<String, Object> parameters = monSvct.getParameters();
         final String domain = parameters.containsKey("domain") ? (String) parameters.get("domain") : "";
         final String username = parameters.containsKey("username") ? (String) parameters.get("username") : "";
         final String password = parameters.containsKey("password") ? (String) parameters.get("password") : "";

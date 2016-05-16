@@ -50,6 +50,7 @@ import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.poller.ServiceMonitorLocator;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.test.JUnitConfigurationEnvironment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -156,8 +157,7 @@ public class ContextServiceMonitorLocatorTest {
 		}
 
 		@Override
-		public PollStatus poll(MonitoredService svc,
-				Map<String, Object> parameters) {
+		public PollStatus poll(MonitoredServiceTask monSvct) {
 			return null;
 		}
 	}
@@ -170,8 +170,7 @@ public class ContextServiceMonitorLocatorTest {
 		}
 
 		@Override
-		public PollStatus poll(MonitoredService svc,
-				Map<String, Object> parameters) {
+		public PollStatus poll(MonitoredServiceTask monSvct) {
 			return null;
 		}
 	}
@@ -184,8 +183,7 @@ public class ContextServiceMonitorLocatorTest {
 		}
 
 		@Override
-		public PollStatus poll(MonitoredService svc,
-				Map<String, Object> parameters) {
+		public PollStatus poll(MonitoredServiceTask monSvct) {
 			return null;
 		}
 	}
@@ -199,8 +197,7 @@ public class ContextServiceMonitorLocatorTest {
 		}
 
 		@Override
-		public PollStatus poll(MonitoredService svc,
-				Map<String, Object> parameters) {
+		public PollStatus poll(MonitoredServiceTask monSvct) {
 			return null;
 		}
 	}

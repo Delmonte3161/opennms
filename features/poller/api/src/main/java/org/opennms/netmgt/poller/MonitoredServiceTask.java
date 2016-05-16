@@ -28,6 +28,7 @@
 
 package org.opennms.netmgt.poller;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -41,6 +42,36 @@ public class MonitoredServiceTask {
 	private MonitoredService m_monitoredService;
 
 	private Map<String, Object> m_parameters;
+	
+	private String m_location;
+
+	public static final BigDecimal FUDGE_FACTOR = BigDecimal.valueOf(1.5);
+	
+	public MonitoredServiceTask() {
+		super();
+	}
+	/**
+	 * 
+	 * @param m_monitoredService
+	 * @param m_parameters
+	 */
+	public MonitoredServiceTask(MonitoredService m_monitoredService,
+			Map<String, Object> m_parameters) {
+		this.m_monitoredService = m_monitoredService;
+		this.m_parameters = m_parameters;
+	}
+	/**
+	 * 
+	 * @param m_monitoredService
+	 * @param m_parameters
+	 * @param location
+	 */
+	public MonitoredServiceTask(MonitoredService m_monitoredService,
+			Map<String, Object> m_parameters,String location) {
+		this.m_monitoredService = m_monitoredService;
+		this.m_parameters = m_parameters;
+		this.m_location = location;
+	}
 
 	/**
 	 * @return the m_monitoredService
@@ -69,5 +100,35 @@ public class MonitoredServiceTask {
 	public void setParameters(Map<String, Object> parameters) {
 		this.m_parameters = parameters;
 	}
+	
+	/**
+	 * 
+	 * @param location
+	 */
+	public void setLocation(String location){
+		m_location = location;
+	}
+	
+	/**
+	 * 
+	 * @return location
+	 */
+	public String getLocation(){
+		 return m_location == null || "".equals(m_location) ? "localhost" : m_location;
+	}
+	
 
+    /**
+     * <P>
+     * Returns the total task timeout in milliseconds for all IP ranges.
+     * </P>
+     */
+    public int calculateTaskTimeout() {
+        BigDecimal taskTimeOut = BigDecimal.ZERO;
+        BigDecimal timeout =  m_parameters.get("timeout") == null ? BigDecimal.valueOf(300000) : (BigDecimal)m_parameters.get("timeout");
+        BigDecimal retry = m_parameters.get("retry") == null ? BigDecimal.valueOf(3) : (BigDecimal)m_parameters.get("retry");
+        taskTimeOut = FUDGE_FACTOR.multiply(timeout).multiply(retry);
+        // If the timeout is greater than Integer.MAX_VALUE, just return Integer.MAX_VALUE
+        return taskTimeOut.compareTo(BigDecimal.valueOf(Integer.MAX_VALUE)) >= 0 ? Integer.MAX_VALUE : taskTimeOut.intValue();
+    }
 }
