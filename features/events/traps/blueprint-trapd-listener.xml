@@ -40,13 +40,20 @@
 	</bean>
 
 	<bean id="snmpv3User" class="org.opennms.netmgt.snmp.SnmpV3User"/>
-	  
-	  <route id="unmarshal">
-			<from uri="{{snmpV3Users}}"/>
-			<bean ref="unmarshaller"/>
-			<to uri="bean:snmpv3User"/>
+
+	<camelContext id="trapConnectionHandlerDefaultContext"
+		xmlns="http://camel.apache.org/schema/blueprint">
+
+	<camelContext id="trapConnectionHandlerDefaultContext"
+		xmlns="http://camel.apache.org/schema/blueprint">
+		<propertyPlaceholder id="properties"
+			location="blueprint:trapHandlerDefaultProperties" />
+		<route id="unmarshal">
+			<from uri="{{snmpV3Users}}" />
+			<bean ref="unmarshaller" />
+			<to uri="bean:snmpv3User" />
 		</route>
-    
+	</camelContext>
      
     <bean id="trapdConfig" class="org.opennms.netmgt.trapd.TrapdConfigBean">
         <property name="snmpTrapPort" value="${trapd.listen.port}"/>
