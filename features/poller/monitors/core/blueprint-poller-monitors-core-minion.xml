@@ -33,38 +33,38 @@
 		</cm:default-properties>
 	</cm:property-placeholder>
 
-	<reference id="availabilityMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="availabilityMonitor"/>
-	<reference id="citrixMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="citrixMonitor"/>
-	<reference id="dnsMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="dnsMonitor"/>
-	<reference id="dnsResolutionMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="dnsResolutionMonitor"/>
-	<reference id="dominoIIOPMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="dominoIIOPMonitor"/>
-	<reference id="ftpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="ftpMonitor"/>
-	<reference id="gpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="gpMonitor"/>
-	<reference id="httpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="httpMonitor"/>
-	<reference id="httpPostMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="httpPostMonitor"/>
-	<reference id="httpsMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="availabilityMonitor"/>
-	<reference id="icmpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="icmpMonitor"/>
-	<reference id="imapMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="imapMonitor"/>
-	<reference id="jdbcMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="jdbcMonitor"/>
-	<reference id="jdbcQueryMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="jdbcQueryMonitor"/>
-	<reference id="jdbcStoredProcedureMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="jdbcStoredProcedureMonitor"/>
-	<reference id="jolokiaBeanMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="jolokiaBeanMonitor"/>
-	<reference id="jschSshMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="jschSshMonitor"/>
-	<reference id="ldapMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="ldapMonitor"/>
-	<reference id="ldapsMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="ldapsMonitor"/>
-	<reference id="loopMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="loopMonitor"/>
-	<reference id="memcachedMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="memcachedMonitor"/>
-	<reference id="nrpeMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="nrpeMonitor"/>
-	<reference id="ntpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="ntpMonitor"/>
-	<reference id="pop3Monitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="pop3Monitor"/>
-	<reference id="smtpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="smtpMonitor"/>
-	<reference id="sshMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="sshMonitor"/>
-	<reference id="sslCertMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="sslCertMonitor"/>
-	<reference id="strafePingMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="strafePingMonitor"/>
-	<reference id="systemExecuteMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="systemExecuteMonitor"/>
-	<reference id="tcpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="tcpMonitor"/>
-	<reference id="trivialTimeMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="trivialTimeMonitor"/>
-	<reference id="webMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" bean-name="webMonitor"/>
+	<reference id="availabilityMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.AvailabilityMonitor)"/>
+	<reference id="citrixMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.CitrixMonitor)"/>
+	<reference id="dnsMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.DnsMonitor)"/>
+	<reference id="dnsResolutionMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.DNSResolutionMonitor)"/>
+	<reference id="dominoIIOPMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.DominoIIOPMonitor)"/>
+	<reference id="ftpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.FtpMonitor)"/>
+	<reference id="gpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.GpMonitor)"/>
+	<reference id="httpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.HttpMonitor)"/>
+	<reference id="httpPostMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.HttpPostMonitor)"/>
+	<reference id="httpsMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.HttpsMonitor)"/>
+	<reference id="icmpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.IcmpMonitor)"/>
+	<reference id="imapMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.ImapMonitor)"/>
+	<reference id="jdbcMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.JDBCMonitor)"/>
+	<reference id="jdbcQueryMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.JDBCQueryMonitor)"/>
+	<reference id="jdbcStoredProcedureMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.JDBCStoredProcedureMonitor)"/>
+	<reference id="jolokiaBeanMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.JolokiaBeanMonitor)"/>
+	<reference id="jschSshMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.JschSshMonitor)"/>
+	<reference id="ldapMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.LdapMonitor)"/>
+	<reference id="ldapsMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.LdapsMonitor)"/>
+	<reference id="loopMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.LoopMonitor)"/>
+	<reference id="memcachedMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.MemcachedMonitor)"/>
+	<reference id="nrpeMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.NrpeMonitor)"/>
+	<reference id="ntpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.NtpMonitor)"/>
+	<reference id="pop3Monitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.Pop3Monitor)"/>
+	<reference id="smtpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.SmtpMonitor)"/>
+	<reference id="sshMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.SshMonitor)"/>
+	<reference id="sslCertMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.SSLCertMonitor)"/>
+	<reference id="strafePingMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.StrafePingMonitor)"/>
+	<reference id="systemExecuteMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.SystemExecuteMonitor)"/>
+	<reference id="tcpMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.TcpMonitor)"/>
+	<reference id="trivialTimeMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.TrivialTimeMonitor)"/>
+	<reference id="webMonitor" interface="org.opennms.netmgt.poller.ServiceMonitor" filter="(implementation=org.opennms.netmgt.poller.monitors.WebMonitor)"/>
 
 	<!-- ActiveMQ component provided by minion-core -->
 	<reference id="queuingservice" interface="org.apache.camel.Component" filter="(alias=opennms.broker)"/>
@@ -157,7 +157,7 @@
 		</route>
 		
 		<!-- JDBC Monitor -->
-		<route id="pollAvailabilityMonitor">
+		<route id="pollJDBCMonitor">
 			<from uri="queuingservice:Location-{{monitoringLocationName}}.Poller.JDBCMonitor" />
 			<setExchangePattern pattern="InOut"/>
 			<bean ref="jdbcMonitor" />

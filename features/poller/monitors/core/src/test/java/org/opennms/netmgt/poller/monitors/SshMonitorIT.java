@@ -28,12 +28,14 @@
 
 package org.opennms.netmgt.poller.monitors;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.PatternSyntaxException;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
@@ -42,15 +44,12 @@ import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
-import org.opennms.test.JUnitConfigurationEnvironment;
 import org.springframework.test.context.ContextConfiguration;
 
 @RunWith(OpenNMSJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/META-INF/opennms/emptyContext.xml",
-		"classpath:/META-INF/opennms/applicationContext-commonConfigs.xml",
-		"classpath:/META-INF/opennms/applicationContext-minimal-conf.xml",
-		"classpath:/META-INF/opennms/applicationContext-soa.xml"})
-@JUnitConfigurationEnvironment
+@ContextConfiguration(locations = {
+		"classpath:/META-INF/opennms/emptyContext.xml"
+})
 public class SshMonitorIT {
     public static final String HOST_TO_TEST = "127.0.0.1";
 

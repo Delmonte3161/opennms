@@ -42,6 +42,11 @@ public class MonitoredServiceTask {
 
 	private Map<String, Object> m_parameters;
 
+	public MonitoredServiceTask(MonitoredService service, Map<String,Object> parameters) {
+		m_monitoredService = service;
+		m_parameters = parameters;
+	}
+
 	/**
 	 * @return the m_monitoredService
 	 */

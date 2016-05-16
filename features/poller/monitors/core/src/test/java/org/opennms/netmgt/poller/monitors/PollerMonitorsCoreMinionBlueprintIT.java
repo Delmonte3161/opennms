@@ -28,7 +28,6 @@
 
 package org.opennms.netmgt.poller.monitors;
 
-import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Map;
@@ -41,19 +40,15 @@ import org.apache.camel.test.blueprint.CamelBlueprintTestSupport;
 import org.apache.camel.util.KeyValueHolder;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
-import org.opennms.core.utils.DBTools;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.dao.api.DistPollerDao;
 import org.opennms.netmgt.model.OnmsDistPoller;
 import org.opennms.netmgt.poller.MonitoredService;
-import org.opennms.netmgt.poller.PollStatus;
-import org.opennms.netmgt.poller.ServiceMonitor;
+import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.mock.MockMonitoredService;
-import org.opennms.test.JUnitConfigurationEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
@@ -68,10 +63,9 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration(locations={
     "classpath:/META-INF/opennms/emptyContext.xml"
 })
-@JUnitConfigurationEnvironment
-public class PollerMonitorsCoreBlueprintIT extends CamelBlueprintTestSupport {
+public class PollerMonitorsCoreMinionBlueprintIT extends CamelBlueprintTestSupport {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PollerMonitorsCoreBlueprintIT.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PollerMonitorsCoreMinionBlueprintIT.class);
 
     private static BrokerService m_broker = null;
 
@@ -113,7 +107,7 @@ public class PollerMonitorsCoreBlueprintIT extends CamelBlueprintTestSupport {
         //creating the Active MQ component and service
         props.setProperty("alias", "opennms.broker");
         ActiveMQComponent activeMQ = new ActiveMQComponent();
-        activeMQ.setBrokerURL("tcp://127.0.0.1:61716");
+        activeMQ.setBrokerURL("tcp://127.0.0.1:61616");
         services.put(Component.class.getName(), new KeyValueHolder<Object, Dictionary>( activeMQ, props ));
 
         OnmsDistPoller distPoller = new OnmsDistPoller();
@@ -129,13 +123,13 @@ public class PollerMonitorsCoreBlueprintIT extends CamelBlueprintTestSupport {
     @Override
     protected String getBlueprintDescriptor() {
         // We don't need the OSGI-INF/blueprint files here, they are loaded when the bundle starts
-        return "file:src/test/resources/blueprint-empty-camel-context.xml";
+        return "file:blueprint-poller-monitors-core-minion.xml";
     }
 
     @BeforeClass
     public static void startActiveMQ() throws Exception {
         m_broker = new BrokerService();
-        m_broker.addConnector("tcp://127.0.0.1:61716");
+        m_broker.addConnector("tcp://127.0.0.1:61616");
         m_broker.start();
     }
 
@@ -145,88 +139,18 @@ public class PollerMonitorsCoreBlueprintIT extends CamelBlueprintTestSupport {
             m_broker.stop();
         }
     }
-
+    
     @Test
-    @Ignore("Pinging localhost is failing on the Bamboo machines")
-    public void testPoller() throws UnknownHostException {
-        MonitoredService svc = new MockMonitoredService(1, "Node One", InetAddressUtils.addr("127.0.0.1"), "ICMP");
+    public void testPollerMonitorCoreMinion() throws Exception {
+        // TODO: Add mock endpoint assertions
 
-        // Fetch the ICMP monitor from the OSGi registry
-        ServiceMonitor icmpMonitor = getOsgiService(ServiceMonitor.class, String.format("(implementation=%s)", IcmpMonitor.class.getName()));
-
-        PollStatus ps = icmpMonitor.poll(svc, Collections.emptyMap());
-        assertTrue(ps.isUp());
-        assertFalse(ps.isDown());
-    }
-
-    @Test
-    public void testAllPollers() throws UnknownHostException {
         MonitoredService svc = new MockMonitoredService(1, "Node One", InetAddressUtils.UNPINGABLE_ADDRESS, "ICMP");
+        template.sendBody("queuingservice:Location-" + LOCATION + ".Poller." + IcmpMonitor.class.getSimpleName(), new MonitoredServiceTask(svc, Collections.emptyMap()));
 
-        for (Class<?> clazz : new Class<?>[] {
-            AvailabilityMonitor.class,
-            CitrixMonitor.class,
-            DnsMonitor.class,
-            DNSResolutionMonitor.class,
-            DominoIIOPMonitor.class,
-            FtpMonitor.class,
-            // Needs a script to execute
-            //GpMonitor.class,
-            HttpMonitor.class,
-            HttpsMonitor.class,
-            IcmpMonitor.class,
-            ImapMonitor.class,
-            JDBCMonitor.class,
-            JDBCQueryMonitor.class,
-            JDBCStoredProcedureMonitor.class,
-            // Always returns available unless there is an attribute check
-            //JolokiaBeanMonitor.class,
-            JschSshMonitor.class,
-            LdapMonitor.class,
-            LdapsMonitor.class,
-            LoopMonitor.class,
-            MemcachedMonitor.class,
-            NrpeMonitor.class,
-            NtpMonitor.class,
-            Pop3Monitor.class,
-            SmtpMonitor.class,
-            SshMonitor.class,
-            SSLCertMonitor.class,
-            StrafePingMonitor.class,
-            // Needs a script to execute
-            //SystemExecuteMonitor.class,
-            TcpMonitor.class,
-            TrivialTimeMonitor.class,
-            WebMonitor.class
-        }) {
-            // Fetch each monitor from the OSGi registry
-            ServiceMonitor monitor = getOsgiService(ServiceMonitor.class, String.format("(implementation=%s)", clazz.getName()));
+        // TODO: Send messages to every service monitor endpoint
 
-            PollStatus ps = null;
-            try {
-                Map<String,Object> parameters;
-                // TODO: Change timeouts and retries to minimize time spent in waiting for failed polls
-                switch(clazz.getSimpleName()) {
-                    case "JDBCMonitor":
-                    case "JDBCQueryMonitor":
-                    case "JDBCStoredProcedureMonitor":
-                        // Set the required "driver" parameter
-                        parameters = Collections.singletonMap("driver", DBTools.POSTGRESQL_JDBC_DRIVER);
-                        break;
-                    case "SSLCertMonitor":
-                    case "TcpMonitor":
-                        // Set the required "port" parameter
-                        parameters = Collections.singletonMap("port", 9999);
-                        break;
-                    default:
-                        parameters = Collections.emptyMap();
-                        break;
-                }
-                LOG.info("Polling {}", clazz.getSimpleName());
-                ps = monitor.poll(svc, parameters);
-                assertFalse(clazz.getSimpleName() + " should not be up", ps.isUp());
-                assertTrue(clazz.getSimpleName() + " should be down", ps.isDown());
-            } finally {}
-        }
+        // TODO: Assert that status messages that are returned are all unavailable
+
+        assertMockEndpointsSatisfied();
     }
 }
