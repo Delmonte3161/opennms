@@ -33,7 +33,6 @@
 		</cm:default-properties>
 	</cm:property-placeholder>
 	
-
 	<!-- Camel Event marshalling processor -->
 	<bean id="unmarshaller" class="org.opennms.core.camel.JaxbUtilsUnmarshalProcessor">
 		<argument value="org.opennms.netmgt.trapd.TrapdConfigBean" />
