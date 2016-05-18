@@ -1,7 +1,3 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<trapd-configuration snmp-trap-port="162" new-suspect-on-trap="true">
-<snmpv3users>
-	<snmpv3user securityName="opennmsUser" authPassPhrase="0p3nNMSv3"
-		privPassPhrase="0p3nNMSv3" authProtocol="MD5" privProtocol="DES" />
-</snmpv3users>
-</trapd-configuration>
+<trapd-configuration snmp-trap-port="162" new-suspect-on-trap="true"/>
+

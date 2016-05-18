@@ -35,7 +35,7 @@
 	
 	<!-- Camel Event marshalling processor -->
 	<bean id="unmarshaller" class="org.opennms.core.camel.JaxbUtilsUnmarshalProcessor">
-		<argument value="org.opennms.netmgt.trapd.TrapdConfigBean" />
+		<argument value="org.opennms.netmgt.config.trapd.TrapdConfiguration" />
 	</bean>
 
 	<bean id="snmpv3User" class="org.opennms.netmgt.snmp.SnmpV3User"/>
@@ -51,7 +51,7 @@
 		</route>
 	</camelContext>
      
-    <bean id="trapdConfig" class="org.opennms.netmgt.trapd.TrapdConfigBean">
+    <bean id="trapdConfig" class="org.opennms.netmgt.config.trapd.TrapdConfiguration">
         <property name="snmpTrapPort" value="${trapd.listen.port}"/>
         <property name="snmpTrapAddress" value="${trapd.listen.interface}"/>
         <property name="snmpV3Users" value="${snmpv3User}"/>
