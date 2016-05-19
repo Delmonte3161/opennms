@@ -38,7 +38,7 @@
 		<argument value="org.opennms.netmgt.config.trapd.TrapdConfiguration" />
 	</bean>
 
-	<bean id="snmpv3User" class="org.opennms.netmgt.snmp.SnmpV3User"/>
+	<bean id="snmpv3User" class="org.opennms.netmgt.trapd.TrapdConfigBean"/>
 
 	<camelContext id="trapConnectionHandlerDefaultContext"
 		xmlns="http://camel.apache.org/schema/blueprint">
@@ -47,14 +47,14 @@
 		<route id="unmarshal">
 			<from uri="{{snmpV3Users}}" />
 			<bean ref="unmarshaller" />
-			<to uri="bean:snmpv3User" />
+			<to uri="bean:snmpv3User?method=onSnmpV3UsersUpdate" />
 		</route>
 	</camelContext>
      
-    <bean id="trapdConfig" class="org.opennms.netmgt.config.trapd.TrapdConfiguration">
+    <bean id="trapdConfig" class="org.opennms.netmgt.trapd.TrapdConfigBean">
         <property name="snmpTrapPort" value="${trapd.listen.port}"/>
         <property name="snmpTrapAddress" value="${trapd.listen.interface}"/>
-        <property name="snmpV3Users" value="${snmpv3User}"/>
+        <property name="snmpV3Users" value="${snmpv3User.getSnmpV3Users}"/>
     </bean>
 
     <reference id="trapNotificationHandlers" interface="org.opennms.netmgt.trapd.TrapNotificationHandler"/>
