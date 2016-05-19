@@ -11,50 +11,34 @@
         http://aries.apache.org/schemas/blueprint-ext/blueprint-ext-1.1.xsd
 ">
 
-    <cm:property-placeholder id="trapdProperties" persistent-id="org.opennms.netmgt.trapd" update-strategy="none">
+    <cm:property-placeholder id="trapHandlerDefaultProperties" persistent-id="org.opennms.netmgt.trapd" update-strategy="none">
         <cm:default-properties>
             <cm:property name="trapd.listen.interface" value="127.0.0.1" />
             <cm:property name="trapd.listen.port" value="5150" />
+            <cm:property name="rest.root" value="http://localhost:8980/opennms/rest" />
+            	<cm:property name="snmpV3UsersRest" value="[[rest.root]]/config/trapd" />
         </cm:default-properties>
     </cm:property-placeholder>
 
-	<cm:property-placeholder id="globalProperties"
-		persistent-id="org.opennms.netmgt.sample.trapdConfig" update-strategy="none">
-		<cm:default-properties>
-			<cm:property name="rest.root" value="http://localhost:8980/opennms/rest" />
-		</cm:default-properties>
-	</cm:property-placeholder>
-
-	<cm:property-placeholder id="properties"
-		persistent-id="org.opennms.netmgt.sample.trapdConfig.snmp"
-		update-strategy="none">
-		<cm:default-properties>
-			<cm:property name="snmpV3Users" value="[[rest.root]]/config/trapd" />
-		</cm:default-properties>
-	</cm:property-placeholder>
-	
 	<!-- Camel Event marshalling processor -->
 	<bean id="unmarshaller" class="org.opennms.core.camel.JaxbUtilsUnmarshalProcessor">
 		<argument value="org.opennms.netmgt.config.trapd.TrapdConfiguration" />
 	</bean>
-
-	<bean id="snmpv3User" class="org.opennms.netmgt.trapd.TrapdConfigBean"/>
 
 	<camelContext id="trapConnectionHandlerDefaultContext"
 		xmlns="http://camel.apache.org/schema/blueprint">
 		<propertyPlaceholder id="properties"
 			location="blueprint:trapHandlerDefaultProperties" />
 		<route id="unmarshal">
-			<from uri="{{snmpV3Users}}" />
+			<from uri="direct:{{snmpV3UsersRest}}" />
 			<bean ref="unmarshaller" />
-			<to uri="bean:snmpv3User?method=onSnmpV3UsersUpdate" />
+			<to uri="bean:trapdConfig?method=onSnmpV3UsersUpdate" />
 		</route>
 	</camelContext>
      
     <bean id="trapdConfig" class="org.opennms.netmgt.trapd.TrapdConfigBean">
         <property name="snmpTrapPort" value="${trapd.listen.port}"/>
-        <property name="snmpTrapAddress" value="${trapd.listen.interface}"/>
-        <property name="snmpV3Users" value="${snmpv3User.getSnmpV3Users}"/>
+	    <property name="snmpTrapAddress" value="${trapd.listen.interface}"/>
     </bean>
 
     <reference id="trapNotificationHandlers" interface="org.opennms.netmgt.trapd.TrapNotificationHandler"/>

@@ -89,10 +89,11 @@ public class TrapdConfigBean implements TrapdConfig {
 	public void onSnmpV3UsersUpdate(TrapdConfiguration config) {
 		this.m_snmpTrapAddress = config.getSnmpTrapAddress();
 		this.m_snmpTrapPort =config.getSnmpTrapPort();
-		addToSnmpV3User(config.getSnmpv3UserCollection());
+		this.m_snmpV3Users=addToSnmpV3User(config.getSnmpv3UserCollection());
 	}
 
-	private void addToSnmpV3User(List<Snmpv3User> snmpv3UserCollection) {
+	private List<SnmpV3User> addToSnmpV3User(List<Snmpv3User> snmpv3UserCollection) {
+		List<SnmpV3User> snmpV3UserList=new ArrayList<SnmpV3User>();
 		SnmpV3User snmpV3User = new SnmpV3User();
 		for (Snmpv3User snmpv3User : snmpv3UserCollection) {
 			snmpV3User.setAuthPassPhrase(snmpv3User.getAuthPassphrase());
@@ -101,7 +102,9 @@ public class TrapdConfigBean implements TrapdConfig {
 			snmpV3User.setPrivPassPhrase(snmpv3User.getPrivacyPassphrase());
 			snmpV3User.setPrivProtocol(snmpv3User.getPrivacyProtocol());
 			snmpV3User.setSecurityName(snmpv3User.getSecurityName());
+			snmpV3UserList.add(snmpV3User);
 		}
+		return snmpV3UserList;
 	}
 
 }
