@@ -52,7 +52,7 @@ import org.opennms.netmgt.mock.MockNetwork;
 import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
-import org.opennms.netmgt.poller.mock.MockMonitoredService;
+import org.opennms.netmgt.poller.support.MockMonitoredService;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 

@@ -32,6 +32,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.opennms.core.utils.InetAddressUtils;
+import org.opennms.netmgt.poller.support.MockMonitoredService;
 
 public abstract class MonitorTestUtils {
 

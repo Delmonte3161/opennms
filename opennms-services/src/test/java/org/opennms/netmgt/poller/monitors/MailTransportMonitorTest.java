@@ -49,7 +49,7 @@ import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
-import org.opennms.netmgt.poller.mock.MockMonitoredService;
+import org.opennms.netmgt.poller.support.MockMonitoredService;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 

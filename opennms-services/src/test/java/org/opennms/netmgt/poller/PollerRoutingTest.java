@@ -46,7 +46,7 @@ import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.test.db.MockDatabase;
 import org.opennms.core.test.db.annotations.JUnitTemporaryDatabase;
-import org.opennms.netmgt.poller.mock.MockMonitoredService;
+import org.opennms.netmgt.poller.support.MockMonitoredService;
 import org.opennms.test.JUnitConfigurationEnvironment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -94,8 +94,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.AvailabilityMonitor");
@@ -114,8 +114,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.CitrixMonitor");
@@ -134,8 +134,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.DNSMonitor");
@@ -154,8 +154,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.DNSResolutionMonitor");
@@ -175,8 +175,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.DominoIIOPMonitor");
@@ -196,8 +196,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.FtpMonitor");
@@ -216,8 +216,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.GpMonitor");
@@ -236,8 +236,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.HttpMonitor");
@@ -256,8 +256,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.HttpsMonitor");
@@ -276,8 +276,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.IcmpMonitor");
@@ -296,8 +296,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.ImapMonitor");
@@ -316,8 +316,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.JDBCMonitor");
@@ -336,8 +336,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.JDBCQueryMonitor");
@@ -356,8 +356,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.JDBCStoredProcedureMonitor");
@@ -376,8 +376,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.JolokiaBeanMonitor");
@@ -396,8 +396,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.JschSshMonitor");
@@ -417,8 +417,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.LdapMonitor");
@@ -437,8 +437,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.LdapsMonitor");
@@ -458,8 +458,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.LoopMonitor");
@@ -479,8 +479,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.MemcachedMonitor");
@@ -499,8 +499,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.NrpeMonitor");
@@ -519,8 +519,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.NtpMonitor");
@@ -539,8 +539,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.Pop3Monitor");
@@ -559,8 +559,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.SmtpMonitor");
@@ -579,8 +579,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.SshMonitor");
@@ -599,8 +599,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.SSLCertMonitor");
@@ -619,8 +619,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.StrafePingMonitor");
@@ -640,8 +640,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.SystemExecuteMonitor");
@@ -660,8 +660,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.TcpMonitor");
@@ -680,8 +680,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.TrivialTimeMonitor");
@@ -700,8 +700,8 @@ public class PollerRoutingTest {
 			MonitoredServiceTask monitoredServiceTask  = new MonitoredServiceTask();
 			monitoredServiceTask.setMonitoredService(new MockMonitoredService(1, "wipv6day.opennms.org", InetAddress.getLocalHost(), "RESOLVE"));
 			Map<String,Object> parameters = new HashMap<String, Object>();
-			parameters.put("timeout", 30);
-			parameters.put("retry", TimeoutTracker.ZERO_RETRIES);
+			parameters.put(TimeoutTracker.PARM_TIMEOUT, 30);
+			parameters.put(TimeoutTracker.PARM_RETRY, TimeoutTracker.ZERO_RETRIES);
 
 			monitoredServiceTask.setParameters(parameters);
 			monitoredServiceTask.setLocation("seda:Location-localhost.Poller.WebMonitor");

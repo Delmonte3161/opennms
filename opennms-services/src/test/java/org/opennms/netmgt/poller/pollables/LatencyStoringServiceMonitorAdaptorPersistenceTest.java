@@ -50,7 +50,7 @@ import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
 import org.opennms.netmgt.poller.ServiceMonitor;
-import org.opennms.netmgt.poller.mock.MockMonitoredService;
+import org.opennms.netmgt.poller.support.MockMonitoredService;
 import org.opennms.netmgt.rrd.RrdStrategy;
 
 import com.google.common.collect.Lists;

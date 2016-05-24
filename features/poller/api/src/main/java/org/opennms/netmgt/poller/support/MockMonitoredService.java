@@ -26,10 +26,9 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.netmgt.poller.mock;
+package org.opennms.netmgt.poller.support;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.poller.InetNetworkInterface;
@@ -43,7 +42,7 @@ public class MockMonitoredService implements MonitoredService {
     private final String m_svcName;
     private InetAddress m_inetAddr;
 
-    public MockMonitoredService(int nodeId, String nodeLabel, InetAddress inetAddress, String svcName) throws UnknownHostException {
+    public MockMonitoredService(int nodeId, String nodeLabel, InetAddress inetAddress, String svcName) {
         m_nodeId = nodeId;
         m_nodeLabel = nodeLabel;
         m_inetAddr = inetAddress;

@@ -69,6 +69,7 @@ import org.opennms.netmgt.config.poller.Service;
 import org.opennms.netmgt.dao.api.IpInterfaceDao;
 import org.opennms.netmgt.model.OnmsIpInterface;
 import org.opennms.netmgt.model.OnmsNode;
+import org.opennms.netmgt.poller.support.MockMonitoredService;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -252,7 +253,7 @@ public abstract class MonitorTester {
                     System.out.printf("Warning: there are several IP interface objects associated with the IP address %s (picking the first one)\n", ipAddress);
                 }
                 OnmsNode n = ips.get(0).getNode();
-                return new SimpleMonitoredService(addr, n.getId(), n.getLabel(), serviceName);
+                return new MockMonitoredService(n.getId(), n.getLabel(), addr, serviceName);
             }
         });
         if (monSvc == null) {

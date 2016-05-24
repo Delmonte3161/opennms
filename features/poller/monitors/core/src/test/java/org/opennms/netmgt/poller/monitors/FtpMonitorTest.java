@@ -43,7 +43,7 @@ import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
-import org.opennms.netmgt.poller.mock.MockMonitoredService;
+import org.opennms.netmgt.poller.support.MockMonitoredService;
 
 public class FtpMonitorTest extends TestCase {
     private FtpMonitor m_monitor = new FtpMonitor();

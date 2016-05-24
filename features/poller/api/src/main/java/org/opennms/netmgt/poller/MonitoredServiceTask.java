@@ -28,8 +28,13 @@
 
 package org.opennms.netmgt.poller;
 
+import static java.math.MathContext.DECIMAL64;
+
 import java.math.BigDecimal;
 import java.util.Map;
+
+import org.opennms.core.concurrent.TimeoutTracker;
+import org.opennms.core.utils.ParameterMap;
 
 /**
  * This class is wrapper that stores MonitoredService and Parameters object.  
@@ -124,10 +129,18 @@ public class MonitoredServiceTask {
      * </P>
      */
     public int calculateTaskTimeout() {
-        BigDecimal taskTimeOut = BigDecimal.ZERO;
-        BigDecimal timeout =  m_parameters.get("timeout") == null ? BigDecimal.valueOf(300000) : (BigDecimal)m_parameters.get("timeout");
-        BigDecimal retry = m_parameters.get("retry") == null ? BigDecimal.valueOf(3) : (BigDecimal)m_parameters.get("retry");
-        taskTimeOut = FUDGE_FACTOR.multiply(timeout).multiply(retry);
+        BigDecimal timeout = BigDecimal.valueOf(ParameterMap.getKeyedInteger(m_parameters, TimeoutTracker.PARM_TIMEOUT, TimeoutTracker.DEFAULT_TIMEOUT));
+        BigDecimal retry = BigDecimal.valueOf(ParameterMap.getKeyedInteger(m_parameters, TimeoutTracker.PARM_RETRY, TimeoutTracker.DEFAULT_RETRY));
+
+        // Start with the number of retries
+        BigDecimal taskTimeOut = retry 
+            // Add 1 for the original request
+            .add(BigDecimal.ONE, DECIMAL64)
+            // Multiply by the timeout per retry
+            .multiply(timeout, DECIMAL64)
+            // Multiply by the fudge factor
+            .multiply(FUDGE_FACTOR, DECIMAL64);
+
         // If the timeout is greater than Integer.MAX_VALUE, just return Integer.MAX_VALUE
         return taskTimeOut.compareTo(BigDecimal.valueOf(Integer.MAX_VALUE)) >= 0 ? Integer.MAX_VALUE : taskTimeOut.intValue();
     }

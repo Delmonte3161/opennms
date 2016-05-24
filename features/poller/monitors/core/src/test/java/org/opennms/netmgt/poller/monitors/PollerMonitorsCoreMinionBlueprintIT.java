@@ -48,7 +48,7 @@ import org.opennms.netmgt.dao.api.DistPollerDao;
 import org.opennms.netmgt.model.OnmsDistPoller;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.MonitoredServiceTask;
-import org.opennms.netmgt.poller.mock.MockMonitoredService;
+import org.opennms.netmgt.poller.support.MockMonitoredService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;

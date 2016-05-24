@@ -28,6 +28,10 @@
 
 package org.opennms.netmgt.poller.monitors;
 
+import java.net.InetAddress;
+import java.util.HashMap;
+import java.util.Map;
+
 import junit.framework.Assert;
 
 import org.junit.Before;
@@ -37,11 +41,7 @@ import org.opennms.core.concurrent.TimeoutTracker;
 import org.opennms.netmgt.poller.MonitoredService;
 import org.opennms.netmgt.poller.MonitoredServiceTask;
 import org.opennms.netmgt.poller.PollStatus;
-import org.opennms.netmgt.poller.mock.MockMonitoredService;
-
-import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.Map;
+import org.opennms.netmgt.poller.support.MockMonitoredService;
 
 public class SystemExecuteMonitorTest {
 
