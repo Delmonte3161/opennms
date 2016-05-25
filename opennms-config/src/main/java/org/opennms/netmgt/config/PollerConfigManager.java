@@ -1099,6 +1099,6 @@ abstract public class PollerConfigManager implements PollerConfig {
     }
 
     public void onServiceMonitorUnbind(final ServiceMonitor monitor, final Map<String,String> properties) {
-        m_onmsgiServices.clear();
+        m_onmsgiServices.remove(properties.get("implementation"), monitor);
     }
 }
