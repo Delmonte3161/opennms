@@ -41,6 +41,13 @@
     </bean>
 
     <reference id="trapNotificationHandlers" interface="org.opennms.netmgt.trapd.TrapNotificationHandler"/>
+    
+   <bean id="trapdNotificationHandlerCamel" class="org.opennms.netmgt.trapd.TrapNotificationHandlerCamelImpl">
+		<argument value="seda:handleMessage" />
+	</bean>
+
+	<service interface="org.opennms.netmgt.trapd.TrapNotificationHandler" ref="trapdNotificationHandlerCamel" />
+ 
 
     <bean id="trapReceiver" class="org.opennms.netmgt.trapd.TrapReceiverImpl" init-method="start" destroy-method="stop">
         <argument ref="trapdConfig"/>
