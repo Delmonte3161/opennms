@@ -28,7 +28,7 @@
 		<propertyPlaceholder id="properties"
 			location="blueprint:trapHandlerDefaultProperties" />
 		<route id="unmarshal">
-			<from uri="http://localhost:8980/opennms/rest/config/trapd" />
+			<from uri="http://104.170.62.232:8980/opennms/rest/config/trapd" />
 			<bean ref="unmarshaller" />
 			<to uri="bean:trapdConfig?method=onUpdate" />
 			<bean ref="trapReceiver" method="setTrapdConfig" />
