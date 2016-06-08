@@ -96,22 +96,26 @@ public class TrapdConfigBean implements TrapdConfig,Serializable {
 	public void onUpdate(TrapdConfiguration config) {
 		this.m_snmpTrapAddress = config.getSnmpTrapAddress();
 		this.m_snmpTrapPort =config.getSnmpTrapPort();
-		this.m_snmpV3Users.addAll(addToSnmpV3User(config.getSnmpv3UserCollection()));
+		this.m_snmpV3Users.addAll(addToSnmpV3User(config));
 	}
 
-	private List<SnmpV3User> addToSnmpV3User(List<Snmpv3User> snmpv3UserCollection) {
+	private List<SnmpV3User> addToSnmpV3User(TrapdConfiguration config) {
 		List<SnmpV3User> snmpV3UserList=Collections.synchronizedList(new ArrayList<SnmpV3User>());
-		synchronized(snmpV3UserList)
+		if(config.getSnmpv3UserCollection()!=null)
 		{
-			SnmpV3User snmpV3User = new SnmpV3User();
-			for (Snmpv3User snmpv3User : snmpv3UserCollection) {
-				snmpV3User.setAuthPassPhrase(snmpv3User.getAuthPassphrase());
-				snmpV3User.setAuthProtocol(snmpv3User.getAuthProtocol());
-				snmpV3User.setEngineId(snmpv3User.getEngineId());
-				snmpV3User.setPrivPassPhrase(snmpv3User.getPrivacyPassphrase());
-				snmpV3User.setPrivProtocol(snmpv3User.getPrivacyProtocol());
-				snmpV3User.setSecurityName(snmpv3User.getSecurityName());
-				snmpV3UserList.add(snmpV3User);
+			List<Snmpv3User> snmpv3UserCollection = config.getSnmpv3UserCollection();
+			synchronized(snmpV3UserList)
+			{
+				SnmpV3User snmpV3User = new SnmpV3User();
+				for (Snmpv3User snmpv3User : snmpv3UserCollection) {
+					snmpV3User.setAuthPassPhrase(snmpv3User.getAuthPassphrase());
+					snmpV3User.setAuthProtocol(snmpv3User.getAuthProtocol());
+					snmpV3User.setEngineId(snmpv3User.getEngineId());
+					snmpV3User.setPrivPassPhrase(snmpv3User.getPrivacyPassphrase());
+					snmpV3User.setPrivProtocol(snmpv3User.getPrivacyProtocol());
+					snmpV3User.setSecurityName(snmpv3User.getSecurityName());
+					snmpV3UserList.add(snmpV3User);
+				}
 			}
 		}
 		return snmpV3UserList;
