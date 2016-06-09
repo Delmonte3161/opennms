@@ -760,7 +760,8 @@
       <feature version="[4.0,4.1)">spring</feature>
       <feature>camel-core</feature>
       <feature>camel-http</feature>
-      <feature>camel-netty</feature>
+      <feature>camel-netty-http</feature>
+      <feature>opennms-trapd</feature>
       <feature>activemq-camel</feature>
 
       <feature>opennms-core</feature>
@@ -798,6 +799,7 @@
     <feature name="opennms-trapd-listener" description="OpenNMS :: Trapd :: Listener" version="${project.version}">
       <feature>camel-blueprint</feature>
       <feature>opennms-trapd</feature>
+      
 
       <bundle>blueprint:mvn:org.opennms.features.events/org.opennms.features.events.traps/${project.version}/xml/blueprint-trapd-listener</bundle>
     </feature>
