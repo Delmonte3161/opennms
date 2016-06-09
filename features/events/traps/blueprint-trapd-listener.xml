@@ -14,7 +14,7 @@
     <cm:property-placeholder id="trapHandlerDefaultProperties" persistent-id="org.opennms.netmgt.trapd" update-strategy="none">
         <cm:default-properties>
             <cm:property name="trapd.listen.interface" value="127.0.0.1" />
-            <cm:property name="trapd.listen.port" value="10154" />
+            <cm:property name="trapd.listen.port" value="162" />
         </cm:default-properties>
     </cm:property-placeholder>
 
@@ -42,8 +42,6 @@
             <cm:property name="location" value="MINION"/>
             <cm:property name="id" value="00000000-0000-0000-0000-000000ddba11"/>
             <cm:property name="http-url" value="http://127.0.0.1:8980/opennms"/>
-            <cm:property name="user" value="admin"/>
-            <cm:property name="password" value="admin"/>
         </cm:default-properties>
     </cm:property-placeholder>
 
