@@ -760,7 +760,6 @@
       <feature version="[4.0,4.1)">spring</feature>
       <feature>camel-core</feature>
       <feature>camel-http</feature>
-      <feature>camel-netty-http</feature>
       <feature>activemq-camel</feature>
 
       <feature>opennms-core</feature>
