@@ -29,8 +29,8 @@
 		xmlns="http://camel.apache.org/schema/blueprint">
 			<propertyPlaceholder id="minionproperties"
 			location="blueprint:minionProperties" />
-		<route id="unmarshal">
-			<from uri="netty-http:{{http-url}}/rest/config/trapd" />
+		<route id="restClientToTrapdConfig">
+			<from uri="{{http-url}}/rest/config/trapd" />
 			<bean ref="unmarshaller" />
 			<to uri="bean:trapdConfig?method=onUpdate" />
 			<bean ref="trapReceiver" method="setTrapdConfig" />
