@@ -65,7 +65,7 @@ public class TrapReceiverImpl implements TrapReceiver, TrapNotificationListener 
     @Resource(name="snmpTrapPort")
     private Integer m_snmpTrapPort;
 
-    @Resource(name="snmpV3Users")
+    @Resource(name="snmpv3-user")
     private List<SnmpV3User> m_snmpV3Users;
 
     private boolean m_registeredForTraps;
