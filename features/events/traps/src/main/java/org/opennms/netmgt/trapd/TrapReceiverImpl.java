@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,6 +41,8 @@ import javax.annotation.Resource;
 import org.opennms.core.logging.Logging;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.config.TrapdConfig;
+import org.opennms.netmgt.config.trapd.Snmpv3User;
+import org.opennms.netmgt.config.trapd.TrapdConfiguration;
 import org.opennms.netmgt.snmp.BasicTrapProcessorFactory;
 import org.opennms.netmgt.snmp.SnmpUtils;
 import org.opennms.netmgt.snmp.SnmpV3User;
@@ -66,10 +69,24 @@ public class TrapReceiverImpl implements TrapReceiver, TrapNotificationListener 
     private List<SnmpV3User> m_snmpV3Users;
 
     private boolean m_registeredForTraps;
+    
+	private List<TrapNotificationHandler> m_trapNotificationHandlers = Collections.emptyList();
+	
+	private TrapdConfiguration m_trapdConfiguration;
 
-    private List<TrapNotificationHandler> m_trapNotificationHandlers = Collections.emptyList();
+	public void setTrapdConfig(TrapdConfiguration m_trapdConfig) {
+		this.m_trapdConfiguration =  m_trapdConfig;
+	}
+	
+	/**
+	 * Default constructor
+	 */
+	 public TrapReceiverImpl()
+	 {
+		 
+	 }
 
-    /**
+	/**
      * construct a new receiver
      *
      * @param sock
@@ -77,14 +94,22 @@ public class TrapReceiverImpl implements TrapReceiver, TrapNotificationListener 
      * @param hostGroup
      * @param messageGroup
      */
-    public TrapReceiverImpl(final TrapdConfig config) throws SocketException {
-        if (config == null) {
-            throw new IllegalArgumentException("Config cannot be null");
+    public TrapReceiverImpl(TrapdConfig config) throws SocketException {
+    	if (config == null&&m_trapdConfiguration==null) {
+    		throw new IllegalArgumentException("Config cannot be null");
+    	}
+        if(m_trapdConfiguration!=null)
+        {
+        	m_snmpTrapPort = m_trapdConfiguration.getSnmpTrapPort();
+        	m_snmpTrapAddress = m_trapdConfiguration.getSnmpTrapAddress();
+        	m_snmpV3Users = addToSnmpV3User(m_trapdConfiguration);
         }
-
-        m_snmpTrapPort = config.getSnmpTrapPort();
-        m_snmpTrapAddress = config.getSnmpTrapAddress();
-        m_snmpV3Users = config.getSnmpV3Users();
+        else
+        {
+        	m_snmpTrapPort = config.getSnmpTrapPort();
+        	m_snmpTrapAddress = config.getSnmpTrapAddress();
+        	m_snmpV3Users = config.getSnmpV3Users();
+        }
     }
 
     public TrapNotificationHandler getTrapNotificationHandlers() {
@@ -161,5 +186,27 @@ public class TrapReceiverImpl implements TrapReceiver, TrapNotificationListener 
         }
         return InetAddressUtils.addr(m_snmpTrapAddress);
     }
+    
+    private List<SnmpV3User> addToSnmpV3User(TrapdConfiguration config) {
+		List<SnmpV3User> snmpV3UserList=Collections.synchronizedList(new ArrayList<SnmpV3User>());
+		if(config.getSnmpv3UserCollection()!=null)
+		{
+			List<Snmpv3User> snmpv3UserCollection = config.getSnmpv3UserCollection();
+			synchronized(snmpV3UserList)
+			{
+				SnmpV3User snmpV3User = new SnmpV3User();
+				for (Snmpv3User snmpv3User : snmpv3UserCollection) {
+					snmpV3User.setAuthPassPhrase(snmpv3User.getAuthPassphrase());
+					snmpV3User.setAuthProtocol(snmpv3User.getAuthProtocol());
+					snmpV3User.setEngineId(snmpv3User.getEngineId());
+					snmpV3User.setPrivPassPhrase(snmpv3User.getPrivacyPassphrase());
+					snmpV3User.setPrivProtocol(snmpv3User.getPrivacyProtocol());
+					snmpV3User.setSecurityName(snmpv3User.getSecurityName());
+					snmpV3UserList.add(snmpV3User);
+				}
+			}
+		}
+		return snmpV3UserList;
+	}
 
 }
