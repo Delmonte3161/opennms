@@ -76,6 +76,9 @@ public class TrapReceiverImpl implements TrapReceiver, TrapNotificationListener 
 
 	public void setTrapdConfig(TrapdConfiguration m_trapdConfig) {
 		this.m_trapdConfiguration =  m_trapdConfig;
+		m_snmpTrapPort = m_trapdConfig.getSnmpTrapPort();
+    	m_snmpTrapAddress = m_trapdConfig.getSnmpTrapAddress();
+    	m_snmpV3Users = addToSnmpV3User(m_trapdConfig);
 	}
 	
 	/**

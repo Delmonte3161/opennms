@@ -30,7 +30,7 @@
 			<propertyPlaceholder id="minionproperties"
 			location="blueprint:minionProperties" />
 		<route id="restClientToTrapdConfig">
-			<from uri="{{http-url}}/rest/config/trapd" />
+			<from uri="{{http-url}}/rest/config/trapd?authMethod=Basic&amp;authUsername={{username}}&amp;authPassword={{password}}" />
 			<bean ref="unmarshaller" />
 			<to uri="bean:trapdConfig?method=onUpdate" />
 			<bean ref="trapReceiver" method="setTrapdConfig" />
@@ -42,6 +42,8 @@
             <cm:property name="location" value="MINION"/>
             <cm:property name="id" value="00000000-0000-0000-0000-000000ddba11"/>
             <cm:property name="http-url" value="http://127.0.0.1:8980/opennms"/>
+            <cm:property name="username" value="admin"/>
+            <cm:property name="password" value="admin"/>
         </cm:default-properties>
     </cm:property-placeholder>
 
