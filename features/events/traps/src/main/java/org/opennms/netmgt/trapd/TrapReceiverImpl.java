@@ -72,10 +72,7 @@ public class TrapReceiverImpl implements TrapReceiver, TrapNotificationListener 
     
 	private List<TrapNotificationHandler> m_trapNotificationHandlers = Collections.emptyList();
 	
-	private TrapdConfiguration m_trapdConfiguration;
-
 	public void setTrapdConfig(TrapdConfiguration m_trapdConfig) {
-		this.m_trapdConfiguration =  m_trapdConfig;
 		m_snmpTrapPort = m_trapdConfig.getSnmpTrapPort();
     	m_snmpTrapAddress = m_trapdConfig.getSnmpTrapAddress();
     	m_snmpV3Users = addToSnmpV3User(m_trapdConfig);
@@ -98,21 +95,12 @@ public class TrapReceiverImpl implements TrapReceiver, TrapNotificationListener 
      * @param messageGroup
      */
     public TrapReceiverImpl(TrapdConfig config) throws SocketException {
-    	if (config == null&&m_trapdConfiguration==null) {
+    	if (config == null) {
     		throw new IllegalArgumentException("Config cannot be null");
     	}
-        if(m_trapdConfiguration!=null)
-        {
-        	m_snmpTrapPort = m_trapdConfiguration.getSnmpTrapPort();
-        	m_snmpTrapAddress = m_trapdConfiguration.getSnmpTrapAddress();
-        	m_snmpV3Users = addToSnmpV3User(m_trapdConfiguration);
-        }
-        else
-        {
-        	m_snmpTrapPort = config.getSnmpTrapPort();
-        	m_snmpTrapAddress = config.getSnmpTrapAddress();
-        	m_snmpV3Users = config.getSnmpV3Users();
-        }
+    	m_snmpTrapPort = config.getSnmpTrapPort();
+    	m_snmpTrapAddress = config.getSnmpTrapAddress();
+    	m_snmpV3Users = config.getSnmpV3Users();
     }
 
     public TrapNotificationHandler getTrapNotificationHandlers() {
