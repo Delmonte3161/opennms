@@ -30,7 +30,8 @@
 			<propertyPlaceholder id="minionproperties"
 			location="blueprint:minionProperties" />
 		<route id="restClientToTrapdConfig">
-			<from uri="{{http-url}}/rest/config/trapd?authMethod=Basic&amp;authUsername={{username}}&amp;authPassword={{password}}" />
+			<from uri="timer://restTrapConfigurationTimer?fixedRate=true&amp;period=60000"/>
+			<to uri="{{http-url}}/rest/config/trapd?authMethod=Basic&amp;authUsername={{username}}&amp;authPassword={{password}}" />
 			<bean ref="unmarshaller" />
 			<to uri="bean:trapdConfig?method=onUpdate" />
 			<bean ref="trapReceiver" method="setTrapdConfig" />
