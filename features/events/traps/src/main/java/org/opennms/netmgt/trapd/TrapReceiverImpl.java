@@ -34,7 +34,12 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
@@ -67,17 +72,53 @@ public class TrapReceiverImpl implements TrapReceiver, TrapNotificationListener 
 
     @Resource(name="snmpV3Users")
     private List<SnmpV3User> m_snmpV3Users;
+    
+    private Set<SnmpV3User> m_ChangedSnmpV3Users=new HashSet<SnmpV3User>();
 
     private boolean m_registeredForTraps;
     
 	private List<TrapNotificationHandler> m_trapNotificationHandlers = Collections.emptyList();
 	
+	
 	public void setTrapdConfig(TrapdConfiguration m_trapdConfig) {
-		m_snmpTrapPort = m_trapdConfig.getSnmpTrapPort();
-    	m_snmpTrapAddress = m_trapdConfig.getSnmpTrapAddress();
-    	m_snmpV3Users = addToSnmpV3User(m_trapdConfig);
+	
+		if (checkForTrapdConfigurationChange(m_trapdConfig)) {
+			stop();
+			m_snmpTrapPort = m_trapdConfig.getSnmpTrapPort();
+			m_snmpTrapAddress = m_trapdConfig.getSnmpTrapAddress();
+			m_ChangedSnmpV3Users.addAll(addToSnmpV3User(m_trapdConfig).values());
+			m_snmpV3Users = new ArrayList<SnmpV3User>(m_ChangedSnmpV3Users);
+			m_snmpV3Users.retainAll(m_ChangedSnmpV3Users);
+			start();
+		}
 	}
 	
+	private boolean checkForTrapdConfigurationChange(TrapdConfiguration m_trapdConfig)
+ {
+		if ((m_trapdConfig.getSnmpTrapPort() == m_snmpTrapPort)
+				&& (m_trapdConfig.getSnmpTrapAddress() == m_snmpTrapAddress)
+				&& checkForSnmpV3UserChange(addToSnmpV3User(m_trapdConfig))) {
+			return false;
+
+		}
+		return true;
+	}
+	
+	
+	private boolean checkForSnmpV3UserChange(Map<String, SnmpV3User> m_snmpV3usersMap) {
+		if(m_snmpV3Users.size() < m_snmpV3usersMap.size())
+		{
+			LOG.info("New SNMPV3 users information has been updated from configuration file");
+			return false;
+		}
+		else if(m_snmpV3Users.size() > m_snmpV3usersMap.size())
+		{
+			LOG.warn("Some of the SNMPV3 users information has been removed from configuration file");
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * Default constructor
 	 */
@@ -178,12 +219,12 @@ public class TrapReceiverImpl implements TrapReceiver, TrapNotificationListener 
         return InetAddressUtils.addr(m_snmpTrapAddress);
     }
     
-    private List<SnmpV3User> addToSnmpV3User(TrapdConfiguration config) {
-		List<SnmpV3User> snmpV3UserList=Collections.synchronizedList(new ArrayList<SnmpV3User>());
+    private Map<String, SnmpV3User> addToSnmpV3User(TrapdConfiguration config) {
+		Map<String,SnmpV3User> snmpV3UserMap=Collections.synchronizedMap(new ConcurrentHashMap<String,SnmpV3User>());
 		if(config.getSnmpv3UserCollection()!=null)
 		{
 			List<Snmpv3User> snmpv3UserCollection = config.getSnmpv3UserCollection();
-			synchronized(snmpV3UserList)
+			synchronized(snmpV3UserMap)
 			{
 				SnmpV3User snmpV3User = new SnmpV3User();
 				for (Snmpv3User snmpv3User : snmpv3UserCollection) {
@@ -193,11 +234,11 @@ public class TrapReceiverImpl implements TrapReceiver, TrapNotificationListener 
 					snmpV3User.setPrivPassPhrase(snmpv3User.getPrivacyPassphrase());
 					snmpV3User.setPrivProtocol(snmpv3User.getPrivacyProtocol());
 					snmpV3User.setSecurityName(snmpv3User.getSecurityName());
-					snmpV3UserList.add(snmpV3User);
+					snmpV3UserMap.put(snmpv3User.getSecurityName(),snmpV3User);
 				}
 			}
 		}
-		return snmpV3UserList;
+		return snmpV3UserMap;
 	}
 
 }
