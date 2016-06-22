@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opennms.core</groupId>
   <artifactId>org.opennms.core.camel</artifactId>
-  <name>OpenNMS Core Camel</name>
+  <name>OpenNMS :: Core :: Camel</name>
   <packaging>bundle</packaging>
   <build>
     <plugins>
@@ -26,9 +26,10 @@
               JaxbUtilsMarshalProcessor or JaxbUtilsUnmarshalProcessor
             -->
             <Import-Package>
-           	  org.opennms.netmgt.config.trapd;resolution:=optional,
+              org.opennms.netmgt.config.trapd;resolution:=optional,
               org.opennms.netmgt.syslogd;resolution:=optional,
               org.opennms.minion.core.api;resolution:=optional,
+              org.opennms.netmgt.snmp;resolution:=optional,
               *
             </Import-Package>
             <Export-Package>org.opennms.core.camel.*;version="${project.version}"</Export-Package>
@@ -38,10 +39,6 @@
     </plugins>
   </build>
   <dependencies>
-    <dependency>
-      <groupId>org.opennms.core</groupId>
-      <artifactId>org.opennms.core.api</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.opennms.core</groupId>
       <artifactId>org.opennms.core.xml</artifactId>
@@ -57,18 +54,8 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

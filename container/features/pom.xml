@@ -9,7 +9,7 @@
   <groupId>org.opennms.karaf</groupId>
   <artifactId>opennms</artifactId>
   <packaging>pom</packaging>
-  <name>OpenNMS OSGi Container - OpenNMS Features</name>
+  <name>OpenNMS :: OSGi Container :: Karaf Features</name>
   <build>
     <plugins>
       <plugin>
@@ -149,6 +149,7 @@
             <feature>atomikos</feature>
             <feature>batik</feature>
             <feature>c3p0</feature>
+            <feature>hikari-cp</feature>
             <feature>castor</feature>
             <feature>commons-beanutils</feature>
             <feature>commons-cli</feature>
