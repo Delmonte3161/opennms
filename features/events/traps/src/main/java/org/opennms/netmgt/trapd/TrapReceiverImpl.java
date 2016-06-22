@@ -83,7 +83,7 @@ public class TrapReceiverImpl implements TrapReceiver, TrapNotificationListener 
 			stop();
 			m_snmpTrapPort = m_trapdConfig.getSnmpTrapPort();
 			m_snmpTrapAddress = m_trapdConfig.getSnmpTrapAddress();
-			m_snmpV3Users = new ArrayList<SnmpV3User>(addToSnmpV3User(
+			m_snmpV3Users = new ArrayList<SnmpV3User>(addToSnmpV3Users(
 					m_trapdConfig).values());
 			start();
 		}
@@ -203,7 +203,7 @@ public class TrapReceiverImpl implements TrapReceiver, TrapNotificationListener 
 				&& (m_trapdConfig.getSnmpTrapAddress().equalsIgnoreCase(m_snmpTrapAddress))
 				&& (m_snmpV3Users.isEmpty()||(m_snmpV3Users != null
 					&& compareMap(listToMapConversion(m_snmpV3Users),
-							addToSnmpV3User(m_trapdConfig))))) {
+							addToSnmpV3Users(m_trapdConfig))))) {
 			return false;
 
 		}
@@ -311,7 +311,7 @@ public class TrapReceiverImpl implements TrapReceiver, TrapNotificationListener 
         return InetAddressUtils.addr(m_snmpTrapAddress);
     }
     
-    public static Map<String, SnmpV3User> addToSnmpV3User(TrapdConfiguration config) {
+    public static Map<String, SnmpV3User> addToSnmpV3Users(TrapdConfiguration config) {
 		Map<String,SnmpV3User> snmpV3UserMap=Collections.synchronizedMap(new ConcurrentHashMap<String,SnmpV3User>());
 		if(config.getSnmpv3UserCollection()!=null)
 		{
