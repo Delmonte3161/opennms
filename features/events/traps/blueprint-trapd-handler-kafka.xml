@@ -26,6 +26,11 @@
 	
 	<bean id="kafkaEncoder" class="org.opennms.netmgt.trapd.TrapdKafkaEncoder">
 	</bean>
+			<!-- Camel Event marshalling processor -->
+	<bean id="marshaller" class="org.opennms.core.camel.JaxbUtilsMarshalProcessor">
+		<argument value="org.opennms.netmgt.snmp.TrapNotification" />
+	</bean>
+	
 	
 	<service interface="org.opennms.netmgt.trapd.TrapNotificationHandler" ref="trapNotificationHandlerCamel"/>
 
@@ -38,15 +43,9 @@
 			<setHeader headerName="kafka.PARTITION_KEY">
 				<simple>trap</simple>
 			</setHeader>
-			<bean ref="kafkaEncoder" method="toBytes"/>
-			<log message="${body}"/>
-			<to uri="seda:trapHandler"/>
-		</route>
-		
-		<route id="sendTrapViaKafka">
-			<from uri="seda:trapHandler"/>
-			<!-- Have to use StringEncoder because of camel bug CAMEL-8790 -->
+			<bean ref="marshaller"/>
 			<to uri="kafka:{{kafkahostport}}?topic={{kafkatopic}}&amp;serializerClass=kafka.serializer.StringEncoder"/>
 		</route>
 	</camelContext>
+	
 </blueprint>
