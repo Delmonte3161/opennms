@@ -49,11 +49,22 @@
         <property name="snmpTrapAddress" value="${trapd.listen.interface}"/>
     </bean>
 
-    <reference id="trapNotificationHandlers" interface="org.opennms.netmgt.trapd.TrapNotificationHandler"/>
+    <!--  <reference id="trapNotificationHandlers" interface="org.opennms.netmgt.trapd.TrapNotificationHandler"/>-->
 
     <bean id="trapReceiver" class="org.opennms.netmgt.trapd.TrapReceiverImpl" init-method="start" destroy-method="stop">
         <argument ref="trapdConfig"/>
-        <property name="trapNotificationHandlers" ref="trapNotificationHandlers"/>
+        <property name="trapNotificationDispatcher" ref="trapNotificationDispatcher"/>
     </bean>
+    
+    <!-- Register a whiteboard of TrapNotificationHandler. -->
+	<!-- This whiteboard is injected into the listener instead of being classpath-scanned. -->
+	<bean id="trapNotificationDispatcher" class="org.opennms.core.camel.DispatcherWhiteboard">
+		<argument value="seda:handleTrapMessageViaWhiteBoard"/>
+		
+		<property name="context" ref="blueprintBundleContext"/>
+		<property name="messageClass" value="org.opennms.netmgt.snmp.TrapNotification"/>
+		<property name="serviceClass" value="org.opennms.netmgt.trapd.TrapNotificationHandler"/>
+		<property name="methodName" value="handleTrapNotification"/>
+	</bean>
 
 </blueprint>

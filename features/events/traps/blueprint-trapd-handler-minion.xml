@@ -27,7 +27,7 @@
 	</cm:property-placeholder>
 
 	<bean id="trapdNotificationHandlerCamel" class="org.opennms.netmgt.trapd.TrapNotificationHandlerCamelImpl">
-		<argument value="seda:handleMessage" />
+		<argument value="seda:handleTrapMessageViaWhiteBoard" />
 	</bean>
 
 	<service interface="org.opennms.netmgt.trapd.TrapNotificationHandler" ref="trapdNotificationHandlerCamel" />
@@ -39,7 +39,7 @@
 		<propertyPlaceholder id="properties" location="blueprint:trapHandlerMinionProperties" />
 
 		<route id="trapdHandlerMinion">
-			<from uri="seda:handleMessage" />
+			<from uri="seda:handleTrapMessageViaWhiteBoard" />
 			<convertBodyTo type="org.opennms.netmgt.snmp.TrapNotification" />
 			<!-- TODO: Use marshalling instead of serialization when transmitting object? -->
 			<!-- Broadcast message over ActiveMQ -->

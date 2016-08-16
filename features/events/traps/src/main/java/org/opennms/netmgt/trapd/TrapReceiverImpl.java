@@ -41,6 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
+import org.opennms.core.camel.DispatcherWhiteboard;
 import org.opennms.core.logging.Logging;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.config.TrapdConfig;
@@ -73,11 +74,13 @@ public class TrapReceiverImpl implements TrapReceiver, TrapNotificationListener 
     
     private boolean m_registeredForTraps;
 
-    private List<TrapNotificationHandler> m_trapNotificationHandlers = new ArrayList<TrapNotificationHandler>();
+   // private List<TrapNotificationHandler> m_trapNotificationHandlers = new ArrayList<TrapNotificationHandler>();
 
     private Map<String,SnmpV3User> m_updatedSnmpV3Users = new TreeMap<String, SnmpV3User>();
 
     private Map<String,SnmpV3User> m_SnmpV3UsersMap = new TreeMap<String, SnmpV3User>();
+    
+    private DispatcherWhiteboard trapNotificationDispatcher;
 
 
     public void setTrapdConfig(TrapdConfiguration m_trapdConfig) {
@@ -130,7 +133,16 @@ public class TrapReceiverImpl implements TrapReceiver, TrapNotificationListener 
         return false;
     }
 
-    private static Map<String, SnmpV3User> listToMapConversion(List<SnmpV3User> m_snmpV3Users) {
+    public DispatcherWhiteboard getTrapNotificationDispatcher() {
+		return trapNotificationDispatcher;
+	}
+
+	public void setTrapNotificationDispatcher(
+			DispatcherWhiteboard trapNotificationDispatcher) {
+		this.trapNotificationDispatcher = trapNotificationDispatcher;
+	}
+
+	private static Map<String, SnmpV3User> listToMapConversion(List<SnmpV3User> m_snmpV3Users) {
         Map<String, SnmpV3User> snmpV3UserMap = Collections.synchronizedMap(new ConcurrentHashMap<String, SnmpV3User>());
         for (SnmpV3User snmpv3User : m_snmpV3Users) {
             snmpV3UserMap.put(snmpv3User.getSecurityName(), snmpv3User);
@@ -179,20 +191,21 @@ public class TrapReceiverImpl implements TrapReceiver, TrapNotificationListener 
         m_snmpV3Users = config.getSnmpV3Users();
     }
 
-    public TrapNotificationHandler getTrapNotificationHandlers() {
+  /*  public TrapNotificationHandler getTrapNotificationHandlers() {
         return m_trapNotificationHandlers.get(0);
     }
 
     public void setTrapNotificationHandlers(TrapNotificationHandler handler) {
         m_trapNotificationHandlers = Collections.singletonList(handler);
     }
-
+*/
     @Override
     public void trapReceived(TrapNotification trapNotification) {
         try {
-            for (TrapNotificationHandler handler : m_trapNotificationHandlers) {
+          /*  for (TrapNotificationHandler handler : m_trapNotificationHandlers) {
                 handler.handleTrapNotification(trapNotification);
-            }
+            }*/
+            trapNotificationDispatcher.dispatch(trapNotification);
         } catch (Throwable e) {
             LOG.error("Handler execution failed in {}", this.getClass().getSimpleName(), e);
         }
