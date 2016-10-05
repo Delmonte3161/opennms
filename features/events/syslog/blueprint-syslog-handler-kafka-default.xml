@@ -38,27 +38,32 @@
 		<argument ref="syslogdConfig"/>
 	</bean>
 
-		<!-- Reduces the graceful shutdown time from 300 to 15 seconds. -->
+	<!-- Reduces the graceful shutdown time from 300 to 15 seconds. -->
 	<bean id="shutdownStrategy" class="org.apache.camel.impl.DefaultShutdownStrategy">
 		<property name="timeout" value="15"/>
-    </bean>
+	</bean>
 
 	<!-- @see http://www.davsclaus.com/2012/06/locking-down-jmx-naming-now-easier-with.html -->
 	<camelContext id="syslogdHandlerKafkaDefaultContext" managementNamePattern="#name#" xmlns="http://camel.apache.org/schema/blueprint">
 		<propertyPlaceholder id="properties" location="blueprint:syslogHandlerDefaultKafkaProperties" />
 
-		<route id="receiveSyslogConnectionViaKafka">
+		<route id="syslogReceive">
 			<from uri="kafka:{{kafkaAddress}}?topic={{kafkatopic}}&amp;zookeeperHost={{zookeeperhost}}&amp;zookeeperPort={{zookeeperport}}&amp;groupId={{groupId}}&amp;consumerStreams={{consumerstreams}}"/>
+			<to uri="seda:unmarshalMessage?size=50000"/>
+		</route>
+
+		<route id="syslogUnmarshal">
+			<from uri="seda:unmarshalMessage?size=50000&amp;concurrentConsumers=8&amp;blockWhenFull=true"/>
 			<!-- TODO: Change these to <process> tags once Syslogd is loaded from inside Karaf -->
 			<bean ref="unmarshaller"/>
 			<bean ref="mapper"/>
 			<!-- Update the SyslogdConfig on the message to the local config value -->
 			<bean ref="syslogdConfigProcessor"/>
-			<to uri="seda:syslogkafkaHandler"/>
+			<to uri="seda:syslogHandler?size=50000"/>
 		</route>
 
-		<route id="syslogHandler">
-			<from uri="seda:syslogkafkaHandler"/>
+		<route id="syslogHandle">
+			<from uri="seda:syslogHandler?size=50000&amp;concurrentConsumers=8&amp;blockWhenFull=true"/>
 			<!-- 
 				Pass the message to the default handler which will convert it into
 				an event and broadcast the event.
@@ -66,4 +71,5 @@
 			<bean ref="syslogConnectionHandlerDefault"/>
 		</route>
 	</camelContext>
+
 </blueprint>

@@ -48,7 +48,7 @@
 
 	<reference id="queuingservice" interface="org.apache.camel.Component" filter="(alias=onms.broker)"/>
 
-        <!-- Reduces the graceful shutdown time from 300 to 15 seconds. -->
+	<!-- Reduces the graceful shutdown time from 300 to 15 seconds. -->
 	<bean id="shutdownStrategy" class="org.apache.camel.impl.DefaultShutdownStrategy">
 		<property name="timeout" value="15"/>
 	</bean>
@@ -57,25 +57,25 @@
 	<camelContext id="syslogdHandlerDefaultContext" managementNamePattern="#name#" xmlns="http://camel.apache.org/schema/blueprint">
 		<propertyPlaceholder id="properties" location="blueprint:syslogHandlerDefaultProperties" />
 
-		<route id="receiveSyslogConnection">
+		<route id="syslogReceive">
 			<from uri="queuingservice:{{queueName}}?concurrentConsumers=8"/>
 			<!-- No performance improvement with asyncConsumer -->
 			<!-- <from uri="activemq:{{queueName}}?asyncConsumer=true&amp;concurrentConsumers=8"/> -->
-			<to uri="seda:unmarshalMessage"/>
+			<to uri="seda:unmarshalMessage?size=50000"/>
 		</route>
 
-		<route id="unmarshalSyslogConnection">
-			<from uri="seda:unmarshalMessage?concurrentConsumers=8"/>
+		<route id="syslogUnmarshal">
+			<from uri="seda:unmarshalMessage?size=50000&amp;concurrentConsumers=8&amp;blockWhenFull=true"/>
 			<!-- TODO: Change these to <process> tags once Syslogd is loaded from inside Karaf -->
 			<bean ref="unmarshaller"/>
 			<bean ref="mapper"/>
 			<!-- Update the SyslogdConfig on the message to the local config value -->
 			<bean ref="syslogdConfigProcessor"/>
-			<to uri="seda:syslogHandler"/>
+			<to uri="seda:syslogHandler?size=50000"/>
 		</route>
 
-		<route id="handleSyslogConnection">
-			<from uri="seda:syslogHandler?concurrentConsumers=8"/>
+		<route id="syslogHandle">
+			<from uri="seda:syslogHandler?size=50000&amp;concurrentConsumers=8&amp;blockWhenFull=true"/>
 			<!-- 
 				Pass the message to the default handler which will convert it into
 				an event and broadcast the event.

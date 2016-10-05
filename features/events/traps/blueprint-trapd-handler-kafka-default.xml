@@ -52,12 +52,13 @@
 	<bean id="unmarshaller" class="org.opennms.core.camel.JaxbUtilsUnmarshalProcessor">
 		<argument value="org.opennms.netmgt.trapd.TrapDTO" />
 	</bean>
-	 <!-- Reduces the graceful shutdown time from 300 to 15 seconds. -->
+
+	<bean id="mapper" class="org.opennms.netmgt.trapd.TrapDTOToObjectProcessor"/>
+
+	<!-- Reduces the graceful shutdown time from 300 to 15 seconds. -->
 	<bean id="shutdownStrategy" class="org.apache.camel.impl.DefaultShutdownStrategy">
 		<property name="timeout" value="15"/>
 	</bean>
-
-	<bean id="mapper" class="org.opennms.netmgt.trapd.TrapDTOToObjectProcessor"/>
 
 	<!-- @see http://www.davsclaus.com/2012/06/locking-down-jmx-naming-now-easier-with.html -->
 	<camelContext id="trapdHandlerKafkaDefaultContext" managementNamePattern="#name#" xmlns="http://camel.apache.org/schema/blueprint">
@@ -65,14 +66,19 @@
 
 		<route id="receiveTrapConnectionViaKafka">
 			<from uri="kafka:{{kafkaAddress}}?topic={{kafkatopic}}&amp;zookeeperHost={{zookeeperhost}}&amp;zookeeperPort={{zookeeperport}}&amp;groupId={{groupId}}&amp;consumerStreams={{consumerstreams}}"/>
+			<to uri="seda:unmarshalMessage?size=50000"/>
+		</route>
+
+		<route id="trapUnmarshal">
+			<from uri="seda:unmarshalMessage?size=50000&amp;concurrentConsumers=8&amp;blockWhenFull=true"/>
 			<!-- TODO: Change these to <process> tags once Trapd is loaded from inside Karaf -->
 			<bean ref="unmarshaller"/>
 			<bean ref="mapper"/>
-			<to uri="seda:trapHandler"/>
+			<to uri="seda:trapHandler?size=50000"/>
 		</route>
 
-		<route id="trapHandler">
-			<from uri="seda:trapHandler" />
+		<route id="trapHandle">
+			<from uri="seda:trapHandler?size=50000&amp;concurrentConsumers=8&amp;blockWhenFull=true" />
 			<!--
 				Pass the message to the default handler which will convert it into 
 				an event and broadcast the event.
