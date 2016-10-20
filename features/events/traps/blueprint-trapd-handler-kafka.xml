@@ -54,11 +54,11 @@
 			<!-- Marshal the message to XML -->
 			<process ref="mapper"/>
 			<process ref="marshaller"/>
-			<to uri="seda:sendMessage"/>
-		</route>
+<!-- 			<to uri="seda:sendMessage"/> -->
+<!-- 		</route> -->
 
-		<route id="trapSendKafka">
-			<from uri="seda:sendMessage?concurrentConsumers=4"/>
+<!-- 		<route id="trapSendKafka"> -->
+<!-- 			<from uri="seda:sendMessage?concurrentConsumers=4"/> -->
 
 			<!-- HZN-862: Use ByteArrayPartitioner instead of this key generator -->
 			<setHeader headerName="kafka.PARTITION_KEY">

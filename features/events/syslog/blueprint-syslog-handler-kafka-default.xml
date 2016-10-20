@@ -54,11 +54,11 @@
 			<bean ref="mapper"/>
 			<!-- Update the SyslogdConfig on the message to the local config value -->
 			<bean ref="syslogdConfigProcessor"/>
-			<to uri="seda:syslogkafkaHandler"/>
-		</route>
+<!-- 			<to uri="seda:syslogkafkaHandler"/> -->
+<!-- 		</route> -->
 
-		<route id="syslogHandler">
-			<from uri="seda:syslogkafkaHandler"/>
+<!-- 		<route id="syslogHandler"> -->
+<!-- 			<from uri="seda:syslogkafkaHandler"/> -->
 			<!-- 
 				Pass the message to the default handler which will convert it into
 				an event and broadcast the event.
