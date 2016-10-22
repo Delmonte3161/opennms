@@ -40,8 +40,11 @@ public class SyslogDTOToObjectProcessor implements Processor {
 
 	@Override
 	public void process(final Exchange exchange) throws Exception {
+		long start = System.nanoTime();
 		final SyslogDTO object = exchange.getIn().getBody(SyslogDTO.class);
 		exchange.getIn().setBody(dto2object(object), SyslogConnection.class);
+		LOG.info("Total Time convert DTO Object to SyslogConection:"+(System.nanoTime()-start));
+		
 	}
 
 	public static SyslogConnection dto2object(SyslogDTO syslogDto) {
