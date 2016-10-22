@@ -194,11 +194,11 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                             packetSizeHistogram.update(byteBuffer.remaining());
                             
                             long start = System.nanoTime(); 
-                            LOG.info("Create Time syslogConnectio object:"+start);
+                            LOG.trace("Create Time syslogConnectio object:"+start);
                             SyslogConnection connection = new SyslogConnection(source.getAddress(), source.getPort(), byteBuffer, m_config, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
                             Long end = System.nanoTime();
-                            LOG.info("End Time syslogConnectio object:"+end);
-                            LOG.info("Time taken to create object:"+(end-start));
+                            LOG.trace("End Time syslogConnectio object:"+end);
+                            LOG.trace("Time taken to create object:"+(end-start));
                             exchange.getIn().setBody(connection, SyslogConnection.class);
 
                             /*

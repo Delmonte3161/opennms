@@ -43,7 +43,7 @@ public class SyslogDTOToObjectProcessor implements Processor {
 		long start = System.nanoTime();
 		final SyslogDTO object = exchange.getIn().getBody(SyslogDTO.class);
 		exchange.getIn().setBody(dto2object(object), SyslogConnection.class);
-		LOG.info("Total Time convert DTO Object to SyslogConection:"+(System.nanoTime()-start));
+		LOG.trace("Total Time convert DTO Object to SyslogConection:"+(System.nanoTime()-start));
 		
 	}
 

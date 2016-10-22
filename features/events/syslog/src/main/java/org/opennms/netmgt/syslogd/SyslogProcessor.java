@@ -104,17 +104,17 @@ public final class SyslogProcessor implements Callable<Void> {
                 LOG.trace("}");
             }
             long start = System.nanoTime(); 
-            LOG.info("DB insert Start time:"+start);
+            LOG.trace("DB insert Start time:"+start);
             EventIpcManagerFactory.getIpcManager().sendNow(m_event);
             long end = System.nanoTime(); 
-            LOG.info("DB insert Start time:"+(end-start));
+            LOG.trace("DB insert Start time:"+(end-start));
             
             if (m_NewSuspectOnMessage && !m_event.hasNodeid()) {
                 LOG.trace("Syslogd: Found a new suspect {}", m_event.getInterface());
                 long start1 = System.nanoTime();
                 sendNewSuspectEvent(m_localAddr, m_event.getInterface(), m_event.getDistPoller());
                 long end1 = System.nanoTime();
-                LOG.info("DB insert Start time1:"+(end1-start1));
+                LOG.trace("DB insert end time1:"+(end1-start1));
             }
 
         } catch (Throwable t) {

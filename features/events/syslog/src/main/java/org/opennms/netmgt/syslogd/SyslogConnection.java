@@ -174,6 +174,8 @@ public class SyslogConnection implements Callable<Callable<?>> {
             LOG.debug("Converting syslog message into event ({} bytes)", m_bytes.remaining());
 
             // TODO: Change to a static call?
+            long start = System.nanoTime(); 
+            LOG.trace("COE Start time:"+start);
             ConvertToEvent re = new ConvertToEvent(
                 m_systemId,
                 m_location,
@@ -184,7 +186,8 @@ public class SyslogConnection implements Callable<Callable<?>> {
                 StandardCharsets.US_ASCII.decode(m_bytes).toString(),
                 m_config
             );
-
+            long end = System.nanoTime(); 
+            LOG.trace("COE End time:"+(end-start));
             LOG.debug("Sending syslog event to the SyslogProcessor queue");
 
             return new SyslogProcessor(re.getEvent(), m_config.getNewSuspectOnMessage());

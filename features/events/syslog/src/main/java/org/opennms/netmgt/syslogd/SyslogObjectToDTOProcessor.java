@@ -45,7 +45,7 @@ public class SyslogObjectToDTOProcessor implements Processor {
 		final SyslogConnection object = exchange.getIn().getBody(SyslogConnection.class);
 		boolean syslogRawMessageFlag = (boolean)exchange.getIn().getHeader(INCLUDE_RAW_MESSAGE);
 		exchange.getIn().setBody(object2dto(object, syslogRawMessageFlag), SyslogDTO.class);
-		LOG.info("Total Time to create DTO Object:"+(System.nanoTime()-start));
+		LOG.trace("Total Time to create DTO Object:"+(System.nanoTime()-start));
 	}
 
 	public static SyslogDTO object2dto(SyslogConnection syslog) {
