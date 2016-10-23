@@ -187,7 +187,7 @@ public class SyslogConnection implements Callable<Callable<?>> {
                 m_config
             );
             long end = System.nanoTime(); 
-            LOG.trace("COE End time:"+(end-start));
+            LOG.debug("COE End time:"+(end-start));
             LOG.debug("Sending syslog event to the SyslogProcessor queue");
 
             return new SyslogProcessor(re.getEvent(), m_config.getNewSuspectOnMessage());
