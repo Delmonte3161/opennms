@@ -41,7 +41,7 @@
 		<propertyPlaceholder id="properties" location="blueprint:syslogHandlerKafkaProperties" />
 
 		<route id="syslogMarshal">
-			<from uri="seda:handleMessage?concurrentConsumers=4" />
+			<from uri="seda:handleMessage?concurrentConsumers=4&amp;size=10000" />
 
 			<setHeader headerName="includeRawMessage">
 				<simple resultType="java.lang.Boolean">properties:includeRawMessage</simple>
