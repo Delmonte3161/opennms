@@ -18,6 +18,8 @@
 			<cm:property name="kafkaAddress" value="127.0.0.1:9092" />
 			<cm:property name="kafkatopic" value="syslog" />
 			<cm:property name="includeRawMessage" value="true" />
+			<cm:property name="sedaQueueSize" value="10000" />
+			<cm:property name="concurrentConsumers" value="10" />
 		</cm:default-properties>
 	</cm:property-placeholder>
 
@@ -27,7 +29,7 @@
 		<argument value="seda:handleMessage"/>
 	</bean>
 
-	<service interface="org.opennms.netmgt.syslogd.SyslogConnectionHandler" ref="syslogConnectionHandlerCamel"/>
+	<service interface="org.opennms.netmgt.syslogd.SyslogDTOHandler" ref="syslogConnectionHandlerCamel"/>
 
 	<!-- Camel Event marshalling processor -->
 	<bean id="marshaller" class="org.opennms.core.camel.JaxbUtilsMarshalProcessor">
@@ -41,14 +43,14 @@
 		<propertyPlaceholder id="properties" location="blueprint:syslogHandlerKafkaProperties" />
 
 		<route id="syslogMarshal">
-			<from uri="seda:handleMessage?concurrentConsumers=4" />
+			<from uri="seda:handleMessage?concurrentConsumers={{concurrentConsumers}}&amp;size={{sedaQueueSize}}" />
 
-			<setHeader headerName="includeRawMessage">
-				<simple resultType="java.lang.Boolean">properties:includeRawMessage</simple>
-			</setHeader>
+<!-- 			<setHeader headerName="includeRawMessage"> -->
+<!-- 				<simple resultType="java.lang.Boolean">properties:includeRawMessage</simple> -->
+<!-- 			</setHeader> -->
 
 			<!-- Marshal the message to XML -->
-			<process ref="mapper"/>
+<!-- 			<process ref="mapper"/> -->
 			<process ref="marshaller"/>
 
 <!-- 			<to uri="seda:sendMessage"/> -->
