@@ -28,6 +28,9 @@
 
 package org.opennms.netmgt.syslogd;
 
+import java.net.InetAddress;
+import java.nio.ByteBuffer;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -44,6 +47,17 @@ public class SyslogDTO extends MinionDTO {
 		super();
 	}
 
+	
+	public SyslogDTO(InetAddress address, int port, ByteBuffer byteBuffer,
+			String systemId, String location) {
+
+		setLocation(location);
+		setSourceAddress(address);
+		setSourcePort(port);
+		setSystemId(systemId);
+		setBody(getByteArray(byteBuffer));
+	}
+
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this)
@@ -52,6 +66,15 @@ public class SyslogDTO extends MinionDTO {
 				.append("sourceAddress", super.getHeaders().get(SOURCE_ADDRESS))
 				.append("sourcePort", super.getHeaders().get(SOURCE_PORT))
 				.append("body", super.getBody()).toString();
+	}
+	
+	private byte[] getByteArray(ByteBuffer bytes){
+        bytes.rewind();
+        byte[] retval = new byte[bytes.remaining()];
+        bytes.get(retval);
+        bytes.rewind();
+        
+        return retval;
 	}
 
 }

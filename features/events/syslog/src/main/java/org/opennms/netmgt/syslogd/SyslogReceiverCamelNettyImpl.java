@@ -193,8 +193,10 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                             // Create a metric for the syslog packet size
                             packetSizeHistogram.update(byteBuffer.remaining());
                             
-                            SyslogConnection connection = new SyslogConnection(source.getAddress(), source.getPort(), byteBuffer, m_config, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
-                            exchange.getIn().setBody(connection, SyslogConnection.class);
+                            SyslogDTO syslogDTO = new SyslogDTO(source.getAddress(), source.getPort(), byteBuffer, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
+                            
+                            //SyslogConnection connection = new SyslogConnection(source.getAddress(), source.getPort(), byteBuffer, m_config, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
+                            exchange.getIn().setBody(syslogDTO, SyslogDTO.class);
 
                             /*
                             try {
