@@ -36,10 +36,10 @@ import org.opennms.core.camel.DefaultDispatcher;
  * This class is an {@link InOnly} endpoint that will send messages to the 
  * Camel endpoint specified by the <code>endpointUri</code> constructor argument.
  */
-public class SyslogConnectionHandlerCamelImpl extends DefaultDispatcher implements SyslogDTOHandler {
+public class SyslogConnectionHandlerCamelImpl extends DefaultDispatcher implements SyslogConnectionHandler {
 
 	@Produce(property="endpointUri")
-	SyslogDTOHandler m_proxy;
+	SyslogConnectionHandler m_proxy;
 
 	public SyslogConnectionHandlerCamelImpl(final String endpointUri) {
 		super(endpointUri);
@@ -50,7 +50,7 @@ public class SyslogConnectionHandlerCamelImpl extends DefaultDispatcher implemen
 	 * specified by the {@link #m_endpointUri} property.
 	 */
 	@Override
-	public void handleSyslogDTO(final SyslogDTO message) {
-		m_proxy.handleSyslogDTO(message);
+	public void handleSyslogConnection(final SyslogConnection message) {
+		m_proxy.handleSyslogConnection(message);
 	}
 }
