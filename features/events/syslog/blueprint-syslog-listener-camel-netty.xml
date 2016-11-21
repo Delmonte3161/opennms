@@ -44,7 +44,7 @@
 	<!-- Register a whiteboard of SyslogConnectionHandlers. -->
 	<!-- This whiteboard is injected into the listener instead of being classpath-scanned. -->
 	<bean id="syslogDispatcher" class="org.opennms.core.camel.DispatcherWhiteboard">
-		<argument value="direct:handleMessage"/>
+		<argument value="seda:handleMessage?size={{sedaQueueSize}}&amp;blockWhenFull={{blockWhenFull}}"/>
 		
 		<property name="context" ref="blueprintBundleContext"/>
 		<property name="messageClass" value="org.opennms.netmgt.syslogd.SyslogConnection"/>
