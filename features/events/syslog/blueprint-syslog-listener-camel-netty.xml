@@ -17,9 +17,6 @@
 		<cm:default-properties>
 			<cm:property name="syslog.listen.interface" value="0.0.0.0" />
 			<cm:property name="syslog.listen.port" value="1514" />
-			<cm:property name="sedaQueueSize" value="10000" />
-			<cm:property name="blockWhenFull" value="true" />
-			<cm:property name="concurrentConsumers" value="10" />
 		</cm:default-properties>
 	</cm:property-placeholder>
 
@@ -28,28 +25,20 @@
 		<property name="listenAddress" value="${syslog.listen.interface}" />
 	</bean>
 
-	<reference id="distPollerDao" interface="org.opennms.netmgt.dao.api.DistPollerDao"/>
+	<reference id="syslogConnectionHandlers"
+		interface="org.opennms.netmgt.syslogd.SyslogConnectionHandler" />
 
-	<bean id="syslogReceiverCamelNetty" class="org.opennms.netmgt.syslogd.SyslogReceiverCamelNettyImpl" destroy-method="stop">
+	<service interface="org.opennms.netmgt.syslogd.SyslogReceiver"
+		ref="syslogReceiverCamelNetty" />
+
+	<bean id="syslogReceiverCamelNetty" class="org.opennms.netmgt.syslogd.SyslogReceiverCamelNettyImpl"
+		destroy-method="stop">
 		<argument ref="syslogConfig" />
-		<property name="distPollerDao" ref="distPollerDao"/>
+		<property name="syslogConnectionHandlers" ref="syslogConnectionHandlers" />
 	</bean>
 
 	<bean class="java.lang.Thread" init-method="start">
 		<argument ref="syslogReceiverCamelNetty" />
-	</bean>	
-
-	<service interface="org.opennms.netmgt.syslogd.SyslogReceiver" ref="syslogReceiverCamelNetty" />
-
-	<!-- Register a whiteboard of SyslogConnectionHandlers. -->
-	<!-- This whiteboard is injected into the listener instead of being classpath-scanned. -->
-	<!-- <bean id="syslogDispatcher" class="org.opennms.core.camel.DispatcherWhiteboard">
-		<argument value="seda:handleMessage?concurrentConsumers={{concurrentConsumers}}&amp;size={{sedaQueueSize}}&amp;blockWhenFull={{blockWhenFull}}"/>
-		
-		<property name="context" ref="blueprintBundleContext"/>
-		<property name="messageClass" value="org.opennms.netmgt.syslogd.SyslogConnection"/>
-		<property name="serviceClass" value="org.opennms.netmgt.syslogd.SyslogConnectionHandler"/>
-		<property name="methodName" value="handleSyslogConnection"/>
-	</bean> -->
+	</bean>
 
 </blueprint>
