@@ -190,7 +190,7 @@ public class SyslogdLoadIT implements InitializingBean {
         m_syslogd = new Syslogd();
         SyslogReceiverCamelNettyImpl receiver = new SyslogReceiverCamelNettyImpl(m_config);
         receiver.setDistPollerDao(m_distPollerDao);
-        receiver.setSyslogDispatcher(new MockDispatcherWhiteboard("seda:handleMessageBlueprint"));
+       // receiver.setSyslogDispatcher(new MockDispatcherWhiteboard("seda:handleMessageBlueprint"));
         m_syslogd.setSyslogReceiver(receiver);
         m_syslogd.init();
         SyslogdTestUtils.startSyslogdGracefully(m_syslogd);

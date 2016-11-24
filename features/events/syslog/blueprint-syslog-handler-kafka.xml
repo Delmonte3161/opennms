@@ -30,7 +30,7 @@
 		<argument value="seda:handleMessage?size={{sedaQueueSize}}&amp;blockWhenFull={{blockWhenFull}}"/>
 	</bean> -->
 
-	<service interface="org.opennms.netmgt.syslogd.SyslogConnectionHandler" ref="syslogConnectionHandlerCamel"/>
+	<!--  <service interface="org.opennms.netmgt.syslogd.SyslogConnectionHandler" ref="syslogConnectionHandlerCamel"/>-->
 
 	<!-- Camel Event marshalling processor -->
 	<bean id="marshaller" class="org.opennms.core.camel.JaxbUtilsMarshalProcessor">
