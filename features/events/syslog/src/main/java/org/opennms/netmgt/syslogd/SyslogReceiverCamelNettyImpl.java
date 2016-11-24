@@ -34,6 +34,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -76,6 +78,8 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
     private DefaultCamelContext m_camel;
 
     private DistPollerDao m_distPollerDao = null;
+    
+    private List<SyslogConnectionHandler> m_syslogConnectionHandlers = Collections.emptyList();
     
     /**
      * {@link DispatcherWhiteboard} for broadcasting {@link SyslogConnection}
@@ -196,7 +200,7 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                             SyslogConnection connection = new SyslogConnection(source.getAddress(), source.getPort(), byteBuffer, m_config, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
                             exchange.getIn().setBody(connection, SyslogConnection.class);
 
-                            /*
+                            
                             try {
                                 for (SyslogConnectionHandler handler : m_syslogConnectionHandlers) {
                                     connectionMeter.mark();
@@ -205,9 +209,10 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                             } catch (Throwable e) {
                                 LOG.error("Handler execution failed in {}", this.getClass().getSimpleName(), e);
                             }
-                            */
+                            
+
                         }
-                    }).to("bean:syslogDispatcher?method=dispatch");
+                    });
                 }
             });
 
@@ -215,6 +220,15 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
         } catch (Throwable e) {
             LOG.error("Could not configure Camel routes for syslog receiver", e);
         }
+    }
+    
+    //Getter and setter for syslog handler
+    public SyslogConnectionHandler getSyslogConnectionHandlers() {
+        return m_syslogConnectionHandlers.get(0);
+    }
+
+    public void setSyslogConnectionHandlers(SyslogConnectionHandler handler) {
+        m_syslogConnectionHandlers = Collections.singletonList(handler);
     }
 
     public DispatcherWhiteboard getSyslogDispatcher() {
