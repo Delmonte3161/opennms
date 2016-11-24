@@ -141,7 +141,6 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
 
         // Create some metrics
         Meter packetMeter = METRICS.meter(MetricRegistry.name(getClass(), "packets"));
-        Meter connectionMeter = METRICS.meter(MetricRegistry.name(getClass(), "connections"));
         Histogram packetSizeHistogram = METRICS.histogram(MetricRegistry.name(getClass(), "packetSize"));
 
         SimpleRegistry registry = new SimpleRegistry();
@@ -207,7 +206,7 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                             }
                             */
                         }
-                    }).to("bean:syslogDispatcher?method=dispatch");
+                    }).to("seda:handleMessage?size=1000000");
                 }
             });
 
