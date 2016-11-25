@@ -165,7 +165,7 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
             m_camel.addRoutes(new RouteBuilder() {
                 @Override
                 public void configure() throws Exception {
-                    String from = String.format("netty:udp://%s:%s?sync=false&allowDefaultCodec=false&receiveBufferSize=1000000000&connectTimeout=%d",
+                    String from = String.format("netty:udp://%s:%s?sync=false&allowDefaultCodec=false&receiveBufferSize=%d&connectTimeout=%d",
                         InetAddressUtils.str(m_host),
                         m_port,
                         Integer.MAX_VALUE,
