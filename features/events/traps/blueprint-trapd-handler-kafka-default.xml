@@ -16,7 +16,7 @@
 		<cm:default-properties>
 			<cm:property name="kafkaAddress" value="127.0.0.1:9092" />
 			<!-- TODO: Use JmsQueueNameFactory to generate this name? -->
-			<cm:property name="kafkatopic" value="trapdtest" />
+			<cm:property name="kafkatopic" value="trapd" />
 			<cm:property name="zookeeperhost" value="127.0.0.1"/>
 			<cm:property name="zookeeperport" value="2181"/>
 			<cm:property name="groupId" value="trapdconsumer"/>

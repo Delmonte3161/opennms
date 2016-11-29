@@ -18,7 +18,7 @@
 			<cm:property name="kafkaAddress" value="127.0.0.1:9092" />
 			<cm:property name="kafkatopic" value="trapd" />
 			<cm:property name="includeRawMessage" value="false" />
-			<cm:property name="sedaQueueSize" value="10000" />
+			<cm:property name="sedaQueueSize" value="1000" />
 			<cm:property name="concurrentConsumers" value="4" />
 			<cm:property name="blockWhenFullFlag" value="false" />
 		</cm:default-properties>
