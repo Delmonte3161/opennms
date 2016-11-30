@@ -160,12 +160,12 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
             InetSocketAddress source = (InetSocketAddress)newExchange.getIn().getHeader(NettyConstants.NETTY_REMOTE_ADDRESS);
             packetMeter.mark();
 
-            SyslogDTO syslogDTO = new SyslogDTO(source.getAddress(), source.getPort(), buffer.toByteBuffer(), m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
+            SyslogConnection connection = new SyslogConnection(source.getAddress(), source.getPort(), buffer.toByteBuffer(), m_config, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
 
             //if (oldExchange == null) {
              //   list = new LinkedList<UDPMessageDTO>();
              //   list.add(message);
-                newExchange.getIn().setBody(syslogDTO,SyslogDTO.class);
+                newExchange.getIn().setBody(connection,SyslogConnection.class);
                 return newExchange;
             //} else {
             //    list = (LinkedList<UDPMessageDTO>)oldExchange.getIn().getBody(LinkedList.class);

@@ -30,7 +30,7 @@
 		<argument value="seda:handleMessage"/>
 	</bean>
 
-	<service interface="org.opennms.netmgt.syslogd.SyslogDTOHandler" ref="syslogConnectionHandlerCamel"/>
+	<service interface="org.opennms.netmgt.syslogd.SyslogConnectionHandler" ref="syslogConnectionHandlerCamel"/>
 
 	<!-- Camel Event marshalling processor -->
 	<bean id="marshaller" class="org.opennms.core.camel.JaxbUtilsMarshalProcessor">
@@ -46,12 +46,12 @@
 		<route id="syslogMarshal">
 			<from uri="seda:handleMessage?concurrentConsumers={{concurrentConsumers}}&amp;size={{sedaQueueSize}}&amp;blockWhenFull={{blockWhenFull}}" />
 
-			<!--  <setHeader headerName="includeRawMessage">
+			<setHeader headerName="includeRawMessage">
 				<simple resultType="java.lang.Boolean">properties:includeRawMessage</simple>
-			</setHeader>-->
+			</setHeader>
 
 			<!-- Marshal the message to XML -->
-		<!--  	<process ref="mapper"/>-->
+			<process ref="mapper"/>
 			<process ref="marshaller"/>
 
 <!-- 			<to uri="seda:sendMessage"/> -->
