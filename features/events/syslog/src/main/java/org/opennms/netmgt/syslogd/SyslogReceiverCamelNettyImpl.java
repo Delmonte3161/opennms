@@ -34,6 +34,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.LinkedList;
+import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -49,6 +51,7 @@ import org.apache.camel.component.netty.NettyHelper;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultManagementNameStrategy;
 import org.apache.camel.impl.SimpleRegistry;
+import org.apache.camel.processor.aggregate.AggregationStrategy;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.socket.nio.NioWorkerPool;
 import org.opennms.core.camel.DispatcherWhiteboard;
@@ -139,6 +142,38 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
         m_distPollerDao = distPollerDao;
     }
 
+    public  class SyslogAggregationStrategy implements AggregationStrategy {
+        private final Meter packetMeter;
+        
+        public SyslogAggregationStrategy(Meter packetMeter) {
+            this.packetMeter = Objects.requireNonNull(packetMeter);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
+/*            if (newExchange == null) {
+                return oldExchange;
+            }*/
+
+            final ChannelBuffer buffer = newExchange.getIn().getBody(ChannelBuffer.class);
+            InetSocketAddress source = (InetSocketAddress)newExchange.getIn().getHeader(NettyConstants.NETTY_REMOTE_ADDRESS);
+            packetMeter.mark();
+
+            SyslogDTO syslogDTO = new SyslogDTO(source.getAddress(), source.getPort(), buffer.toByteBuffer(), m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
+
+            //if (oldExchange == null) {
+             //   list = new LinkedList<UDPMessageDTO>();
+             //   list.add(message);
+                newExchange.getIn().setBody(syslogDTO,SyslogDTO.class);
+                return newExchange;
+            //} else {
+            //    list = (LinkedList<UDPMessageDTO>)oldExchange.getIn().getBody(LinkedList.class);
+            //    list.add(message);
+             //   return oldExchange;
+           // }
+        }
+    }
     /**
      * The execution context.
      */
@@ -190,43 +225,13 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                     );
                     
                     from(from)
+                    .aggregate(header(NettyConstants.NETTY_REMOTE_ADDRESS), new SyslogAggregationStrategy(packetMeter))
+                    .completionSize(1)
+                    .completionInterval(0)
+                    .parallelProcessing() // JW: TODO: FIXME
                     // Polled via JMX
                     .routeId("syslogListen")
-                  
-                    //.convertBodyTo(java.nio.ByteBuffer.class)
-                    .process(new Processor() {
-                        @Override
-                        public void process(Exchange exchange) throws Exception {
-                            ChannelBuffer buffer = exchange.getIn().getBody(ChannelBuffer.class);
-                            // NettyConstants.NETTY_REMOTE_ADDRESS is a SocketAddress type but because 
-                            // we are listening on an InetAddress, it will always be of type InetAddressSocket
-                            InetSocketAddress source = (InetSocketAddress)exchange.getIn().getHeader(NettyConstants.NETTY_REMOTE_ADDRESS); 
-                            // Syslog Handler Implementation to receive message from syslog port and pass it on to handler
-                            
-                            ByteBuffer byteBuffer = buffer.toByteBuffer();
-                            
-                            // Increment the packet counter
-                            packetMeter.mark();
-                            
-                            // Create a metric for the syslog packet size
-                            packetSizeHistogram.update(byteBuffer.remaining());
-                            
-                            //SyslogConnection connection = new SyslogConnection(source.getAddress(), source.getPort(), byteBuffer, m_config, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
-                            SyslogDTO syslogDTO = new SyslogDTO(source.getAddress(), source.getPort(), byteBuffer, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
-                            exchange.getIn().setBody(syslogDTO, SyslogDTO.class);
-
-                            /*
-                            try {
-                                for (SyslogConnectionHandler handler : m_syslogConnectionHandlers) {
-                                    connectionMeter.mark();
-                                    handler.handleSyslogConnection(connection);
-                                }
-                            } catch (Throwable e) {
-                                LOG.error("Handler execution failed in {}", this.getClass().getSimpleName(), e);
-                            }
-                            */
-                        }
-                    }).to("bean:syslogDispatcher?method=dispatch");
+                    .to("bean:syslogDispatcher?method=dispatch");
                 }
             });
 
