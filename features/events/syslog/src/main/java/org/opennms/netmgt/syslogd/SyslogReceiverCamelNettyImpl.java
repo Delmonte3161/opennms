@@ -157,7 +157,7 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
         
         final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("SyslogNettyWorker-%d").build();
         final ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<Runnable>(100000);
-        final ThreadPoolExecutor executor = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+        final ThreadPoolExecutor executor = new ThreadPoolExecutor(0, m_noOfThreads,
                 60L, TimeUnit.SECONDS,
                 queue, threadFactory);
         final NioWorkerPool workerPool = new NioWorkerPool(executor, NettyHelper.DEFAULT_IO_THREADS,
@@ -214,9 +214,9 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                             // Create a metric for the syslog packet size
                             packetSizeHistogram.update(byteBuffer.remaining());
                             
-                            SyslogConnection connection = new SyslogConnection(source.getAddress(), source.getPort(), byteBuffer, m_config, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
-                            //SyslogDTO syslogDTO = new SyslogDTO(source.getAddress(), source.getPort(), byteBuffer, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
-                            exchange.getIn().setBody(connection, SyslogConnection.class);
+                            //SyslogConnection connection = new SyslogConnection(source.getAddress(), source.getPort(), byteBuffer, m_config, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
+                            SyslogDTO syslogDTO = new SyslogDTO(source.getAddress(), source.getPort(), byteBuffer, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
+                            exchange.getIn().setBody(syslogDTO, SyslogDTO.class);
 
                             /*
                             try {
@@ -229,7 +229,13 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                             }
                             */
                         }
-                    }).to("bean:syslogDispatcher?method=dispatch");
+                    }).to("direct:SendToKafka");
+                }
+            });
+            m_camel.addRoutes(new RouteBuilder() {
+                public void configure() {
+                    from("direct:SendToKafka")
+                   .to("kafka:taspmoosskafka111.cernerasp.com:9092,taspmoosskafka112.cernerasp.com:9092,taspmoosskafka113.cernerasp.com:9092?topic=syslog&serializerClass=kafka.serializer.StringEncoder");
                 }
             });
             m_camel.start();
