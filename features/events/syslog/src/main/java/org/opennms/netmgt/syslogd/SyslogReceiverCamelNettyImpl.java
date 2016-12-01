@@ -214,9 +214,9 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                             // Create a metric for the syslog packet size
                             packetSizeHistogram.update(byteBuffer.remaining());
                             
-                            //SyslogConnection connection = new SyslogConnection(source.getAddress(), source.getPort(), byteBuffer, m_config, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
-                            SyslogDTO syslogDTO = new SyslogDTO(source.getAddress(), source.getPort(), byteBuffer, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
-                            exchange.getIn().setBody(syslogDTO, SyslogDTO.class);
+                            SyslogConnection connection = new SyslogConnection(source.getAddress(), source.getPort(), byteBuffer, m_config, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
+                            //SyslogDTO syslogDTO = new SyslogDTO(source.getAddress(), source.getPort(), byteBuffer, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
+                            exchange.getIn().setBody(connection, SyslogConnection.class);
 
                             /*
                             try {
@@ -229,15 +229,10 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                             }
                             */
                         }
-                    }).to("direct:SendToKafka");
+                    }).to("bean:syslogDispatcher?method=dispatch");
                 }
             });
-            m_camel.addRoutes(new RouteBuilder() {
-                public void configure() {
-                    from("direct:SendToKafka")
-                   .to("kafka:taspmoosskafka111.cernerasp.com:9092,taspmoosskafka112.cernerasp.com:9092,taspmoosskafka113.cernerasp.com:9092?topic=syslog&serializerClass=kafka.serializer.StringEncoder");
-                }
-            });
+ 
             m_camel.start();
         } catch (Throwable e) {
             LOG.error("Could not configure Camel routes for syslog receiver", e);
