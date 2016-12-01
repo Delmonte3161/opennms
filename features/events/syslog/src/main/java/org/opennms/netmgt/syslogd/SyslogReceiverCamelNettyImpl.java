@@ -78,6 +78,8 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
     private final InetAddress m_host;
 
     private final int m_port;
+    
+    private int m_noOfThreads;
 
     private final SyslogdConfig m_config;
 
@@ -107,6 +109,7 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
 
         m_host = config.getListenAddress() == null ? addr("0.0.0.0"): addr(config.getListenAddress());
         m_port = config.getSyslogPort();
+        m_noOfThreads = config.getnoOfThreads();
         m_config = config;
     }
 
@@ -211,9 +214,9 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                             // Create a metric for the syslog packet size
                             packetSizeHistogram.update(byteBuffer.remaining());
                             
-                            //SyslogConnection connection = new SyslogConnection(source.getAddress(), source.getPort(), byteBuffer, m_config, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
-                            SyslogDTO syslogDTO = new SyslogDTO(source.getAddress(), source.getPort(), byteBuffer, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
-                            exchange.getIn().setBody(syslogDTO, SyslogDTO.class);
+                            SyslogConnection connection = new SyslogConnection(source.getAddress(), source.getPort(), byteBuffer, m_config, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
+                            //SyslogDTO syslogDTO = new SyslogDTO(source.getAddress(), source.getPort(), byteBuffer, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
+                            exchange.getIn().setBody(connection, SyslogConnection.class);
 
                             /*
                             try {
@@ -226,13 +229,7 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                             }
                             */
                         }
-                    }).to("direct:SendToKafka");
-                }
-            });
-            m_camel.addRoutes(new RouteBuilder() {
-                public void configure() {
-                    from("direct:SendToKafka")
-                   .to("kafka:taspmoosskafka111.cernerasp.com:9092,taspmoosskafka112.cernerasp.com:9092,taspmoosskafka113.cernerasp.com:9092?topic=syslog&serializerClass=kafka.serializer.StringEncoder");
+                    }).to("bean:syslogDispatcher?method=dispatch");
                 }
             });
             m_camel.start();
@@ -248,4 +245,12 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
     public void setSyslogDispatcher(DispatcherWhiteboard syslogDispatcher) {
         this.syslogDispatcher = syslogDispatcher;
     }
+
+	public int getM_noOfThreads() {
+		return m_noOfThreads;
+	}
+
+	public void setM_noOfThreads(int m_noOfThreads) {
+		this.m_noOfThreads = m_noOfThreads;
+	}
 }

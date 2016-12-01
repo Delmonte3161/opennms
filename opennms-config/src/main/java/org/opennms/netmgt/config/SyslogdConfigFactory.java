@@ -209,6 +209,11 @@ public final class SyslogdConfigFactory implements SyslogdConfig {
     public synchronized String getDiscardUei() {
         return m_config.getConfiguration().getDiscardUei();
     }
+    
+    @Override
+    public synchronized int getnoOfThreads() {
+        return m_config.getConfiguration().getSyslogPort();
+    }
 
     /**
      * Parse import-file tags and add all uei-matchs and hide-messages.
