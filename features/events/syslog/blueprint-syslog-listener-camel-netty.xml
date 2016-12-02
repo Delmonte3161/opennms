@@ -61,7 +61,7 @@
 	<camelContext id="syslogdListener" managementNamePattern="#name#" xmlns="http://camel.apache.org/schema/blueprint">
 		<propertyPlaceholder id="properties" location="blueprint:syslogProperties" />
 
-		<route id="syslogMarshal">
+		<route id="syslogMarshalCamelNetty">
 			<from uri="direct:sendToKafka" />
 
 <!-- 			<to uri="seda:sendMessage"/> -->

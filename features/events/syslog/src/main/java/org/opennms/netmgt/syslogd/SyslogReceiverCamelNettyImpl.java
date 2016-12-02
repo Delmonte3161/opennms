@@ -229,7 +229,7 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                             }
                             */
                         }
-                    }).to("bean:syslogDispatcher?method=dispatch");
+                    }).to("direct:sendToKafka");
                 }
             });
  
