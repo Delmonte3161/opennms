@@ -92,6 +92,7 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
      * objects to multiple channels such as AMQ and Kafka.
      */
     private DispatcherWhiteboard syslogDispatcher;
+    
 
     /**
      * Construct a new receiver
@@ -230,6 +231,14 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                             */
                         }
                     }).to("direct:sendToKafka");
+                    
+                    m_camel.addRoutes(new RouteBuilder() {
+        				@Override
+        				public void configure() throws Exception {
+        					from("direct:sendToKafka")
+        					.to("bean:syslogDispatcher?method=dispatch");
+        				}
+        			});
                 }
             });
  
