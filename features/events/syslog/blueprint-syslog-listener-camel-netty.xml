@@ -20,6 +20,8 @@
 			<cm:property name="syslog.no.threads" value="50" />
 			<cm:property name="sedaQueueSize" value="10000" />
 			<cm:property name="blockWhenFull" value="true" />
+			<cm:property name="kafkaAddress" value="127.0.0.1:9092" />
+			<cm:property name="kafkatopic" value="syslog" />
 		</cm:default-properties>
 	</cm:property-placeholder>
 
@@ -53,5 +55,30 @@
 		<property name="serviceClass" value="org.opennms.netmgt.syslogd.SyslogConnectionHandler"/>
 		<property name="methodName" value="handleSyslogConnection"/>
 	</bean>
+	
+	<bean id="partitionKeyGenerator" class="org.opennms.core.camel.RandomPartitionKeyGenerator"/>
+	
+	<camelContext id="syslogdListener" managementNamePattern="#name#" xmlns="http://camel.apache.org/schema/blueprint">
+		<propertyPlaceholder id="properties" location="blueprint:syslogProperties" />
+
+		<route id="syslogMarshal">
+			<from uri="direct:sendToKafka" />
+
+<!-- 			<to uri="seda:sendMessage"/> -->
+<!-- 		</route> -->
+
+<!-- 		<route id="syslogSendKafka"> -->
+<!-- 			<from uri="seda:sendMessage?concurrentConsumers=4" /> -->
+
+			<!-- HZN-862: Use ByteArrayPartitioner instead of this key generator -->
+			<setHeader headerName="kafka.PARTITION_KEY">
+				<simple>${bean:partitionKeyGenerator.getPartitionKey()}</simple>
+			</setHeader>
+
+			<!-- Have to use StringEncoder because of camel bug CAMEL-8790 -->
+			<to uri="kafka:{{kafkaAddress}}?topic={{kafkatopic}}&amp;serializerClass=kafka.serializer.StringEncoder"/>
+		</route>
+	</camelContext>
+	
 
 </blueprint>
