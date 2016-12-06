@@ -35,8 +35,8 @@
 		<argument ref="syslogConfig" />
 		<property name="distPollerDao" ref="distPollerDao"/>
 		<property name="syslogDispatcher" ref="syslogDispatcher" />
-		<property name="sedaQueueSize" ref="{{sedaQueueSize}}" />
-		<property name="noOfThreads" ref="{{syslog.no.threads}}" />
+		<property name="sedaQueueSize" value="{{sedaQueueSize}}" />
+		<property name="noOfThreads" value="{{syslog.no.threads}}" />
 	</bean>
 
 	<bean class="java.lang.Thread" init-method="start">
