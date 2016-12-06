@@ -18,6 +18,10 @@
 			<cm:property name="kafkaAddress" value="127.0.0.1:9092" />
 			<cm:property name="kafkatopic" value="syslog" />
 			<cm:property name="includeRawMessage" value="true" />
+			<cm:property name="sedaQueueSize" value="1000" />
+			<cm:property name="concurrentConsumers" value="10" />
+			<cm:property name="blockWhenFull" value="true" />
+			<cm:property name="limitConcurrentConsumers" value="false" />
 		</cm:default-properties>
 	</cm:property-placeholder>
 
@@ -41,7 +45,7 @@
 		<propertyPlaceholder id="properties" location="blueprint:syslogHandlerKafkaProperties" />
 
 		<route id="syslogMarshal">
-			<from uri="seda:handleMessage?concurrentConsumers=4" />
+			<from uri="seda:handleMessage?concurrentConsumers={{concurrentConsumers}}&amp;size={{sedaQueueSize}}&amp;blockWhenFull={{blockWhenFull}}&amp;limitConcurrentConsumers={{limitConcurrentConsumers}}" />
 
 			<setHeader headerName="includeRawMessage">
 				<simple resultType="java.lang.Boolean">properties:includeRawMessage</simple>
@@ -50,12 +54,6 @@
 			<!-- Marshal the message to XML -->
 			<process ref="mapper"/>
 			<process ref="marshaller"/>
-
-			<to uri="seda:sendMessage"/>
-		</route>
-
-		<route id="syslogSendKafka">
-			<from uri="seda:sendMessage?concurrentConsumers=4" />
 
 			<!-- HZN-862: Use ByteArrayPartitioner instead of this key generator -->
 			<setHeader headerName="kafka.PARTITION_KEY">
