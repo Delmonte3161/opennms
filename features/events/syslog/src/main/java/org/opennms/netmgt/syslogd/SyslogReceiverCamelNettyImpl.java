@@ -251,15 +251,15 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
 		return sedaQueueSize;
 	}
 
-	public void setSedaQueueSize(String sedaQueueSize) {
-		this.sedaQueueSize = Integer.parseInt(sedaQueueSize);
+	public void setSedaQueueSize(int sedaQueueSize) {
+		this.sedaQueueSize = sedaQueueSize;
 	}
 	
     public int getNoOfThreads() {
 		return noOfThreads;
 	}
 
-	public void setNoOfThreads(String noOfThreads) {
-		this.noOfThreads = Integer.parseInt(noOfThreads);
+	public void setNoOfThreads(int noOfThreads) {
+		this.noOfThreads = noOfThreads;
 	}
 }
