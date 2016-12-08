@@ -17,7 +17,7 @@
 		<cm:default-properties>
 			<cm:property name="syslog.listen.interface" value="0.0.0.0" />
 			<cm:property name="syslog.listen.port" value="1514" />
-			<cm:property name="syslog.no.threads" value="0" />
+			<cm:property name="syslog.no.threads" value="1000" />
 			<cm:property name="sedaQueueSize" value="1000" />
 			<cm:property name="blockWhenFull" value="true" />
 			<cm:property name="limitConcurrentConsumers" value="false" />
@@ -51,9 +51,9 @@
 		<argument value="seda:handleMessage??size={{sedaQueueSize}}&amp;blockWhenFull={{blockWhenFull}}&amp;limitConcurrentConsumers={{limitConcurrentConsumers}}"/>
 		
 		<property name="context" ref="blueprintBundleContext"/>
-		<property name="messageClass" value="org.opennms.netmgt.syslogd.SyslogConnection"/>
-		<property name="serviceClass" value="org.opennms.netmgt.syslogd.SyslogConnectionHandler"/>
-		<property name="methodName" value="handleSyslogConnection"/>
+		<property name="messageClass" value="org.opennms.netmgt.syslogd.UDPMessageLogDTO"/>
+		<property name="serviceClass" value="org.opennms.netmgt.syslogd.UDPMessageLogDTOHandler"/>
+		<property name="methodName" value="handleUDPMessageLog"/>
 	</bean>
 
 </blueprint>

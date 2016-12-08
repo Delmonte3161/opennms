@@ -3,31 +3,37 @@
     xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
     xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.1.0"
     xsi:schemaLocation="
-		http://www.osgi.org/xmlns/blueprint/v1.0.0 
-		http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
-		http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0
-		http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.1.0.xsd
-		http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.1.0
-		http://aries.apache.org/schemas/blueprint-ext/blueprint-ext-1.1.xsd
-">
-
+    http://www.osgi.org/xmlns/blueprint/v1.0.0
+    http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+    http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0
+    http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.1.0.xsd
+    http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.1.0
+    http://aries.apache.org/schemas/blueprint-ext/blueprint-ext-1.1.xsd
+    ">
+    
     <!-- Provided by minion-core -->
     <reference id="minionIdentity" interface="org.opennms.minion.core.api.MinionIdentity" />
-
+    
     <!-- Provided by minion-core -->
     <reference id="queuingservice" interface="org.apache.camel.Component" filter="(alias=opennms.broker)" />
-
+    
+    <bean id="partitionKeyGenerator" class="org.opennms.core.camel.RandomPartitionKeyGenerator"/>
+    
     <bean id="camelRemoteMessageProducerFactory" class="org.opennms.core.ipc.sink.camel.CamelRemoteMessageProducerFactory" />
     <service ref="camelRemoteMessageProducerFactory" interface="org.opennms.core.ipc.sink.api.MessageProducerFactory"/>
-
+    
     <camelContext id="sinkClient" xmlns="http://camel.apache.org/schema/blueprint">
-      <route id="sinkClient">
-        <from uri="direct:sendMessage" />
-        <setExchangePattern pattern="InOnly"/>
-        <recipientList>
-          <simple>queuingservice:${header.JmsQueueName}</simple>
-        </recipientList>
-      </route>
+        <route id="sinkClient">
+            <from uri="seda:sendMessage?size=1000000&amp;blockWhenFull=true" />
+            <setExchangePattern pattern="InOnly"/>
+            <!--  <recipientList>
+             <simple>kafka:taspmoosskafka101.cernerasp.com:9092,taspmoosskafka102.cernerasp.com:9092,taspmoosskafka103.cernerasp.com:9092?topic=syslog&amp;serializerClass=kafka.serializer.StringEncoder</simple>
+             </recipientList>-->
+            <setHeader headerName="kafka.PARTITION_KEY">
+                <simple>${bean:partitionKeyGenerator.getPartitionKey()}</simple>
+            </setHeader>
+            <to uri="kafka:taspmoosskafka101.cernerasp.com:9092,taspmoosskafka102.cernerasp.com:9092,taspmoosskafka103.cernerasp.com:9092?topic=syslog&amp;serializerClass=kafka.serializer.StringEncoder"/>
+        </route>
     </camelContext>
-
+    
 </blueprint>

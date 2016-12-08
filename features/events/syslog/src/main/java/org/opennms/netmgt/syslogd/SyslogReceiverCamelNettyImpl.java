@@ -33,7 +33,7 @@ import static org.opennms.core.utils.InetAddressUtils.addr;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
+import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -49,7 +49,6 @@ import org.apache.camel.component.netty.NettyHelper;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultManagementNameStrategy;
 import org.apache.camel.impl.SimpleRegistry;
-import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.socket.nio.NioWorkerPool;
 import org.opennms.core.camel.DispatcherWhiteboard;
 import org.opennms.core.logging.Logging;
@@ -182,6 +181,9 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
 
         m_camel.addComponent("netty", nettyComponent);
         
+        final String currentSystemId = m_distPollerDao.whoami().getId();
+        final String currentLocation = m_distPollerDao.whoami().getLocation();
+        
 
         try {
             m_camel.addRoutes(new RouteBuilder() {
@@ -201,33 +203,12 @@ public class SyslogReceiverCamelNettyImpl implements SyslogReceiver {
                     .process(new Processor() {
                         @Override
                         public void process(Exchange exchange) throws Exception {
-                            ChannelBuffer buffer = exchange.getIn().getBody(ChannelBuffer.class);
-                            // NettyConstants.NETTY_REMOTE_ADDRESS is a SocketAddress type but because 
+                        	 // NettyConstants.NETTY_REMOTE_ADDRESS is a SocketAddress type but because 
                             // we are listening on an InetAddress, it will always be of type InetAddressSocket
-                            InetSocketAddress source = (InetSocketAddress)exchange.getIn().getHeader(NettyConstants.NETTY_REMOTE_ADDRESS); 
-                            // Syslog Handler Implementation to receive message from syslog port and pass it on to handler
-                            
-                            ByteBuffer byteBuffer = buffer.toByteBuffer();
-                            
-                            // Increment the packet counter
-                            packetMeter.mark();
-                            
-                            // Create a metric for the syslog packet size
-                            packetSizeHistogram.update(byteBuffer.remaining());
-                            
-                            SyslogConnection connection = new SyslogConnection(source.getAddress(), source.getPort(), byteBuffer, m_config, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation());
-                            exchange.getIn().setBody(connection, SyslogConnection.class);
-
-                            /*
-                            try {
-                                for (SyslogConnectionHandler handler : m_syslogConnectionHandlers) {
-                                    connectionMeter.mark();
-                                    handler.handleSyslogConnection(connection);
-                                }
-                            } catch (Throwable e) {
-                                LOG.error("Handler execution failed in {}", this.getClass().getSimpleName(), e);
-                            }
-                            */
+                            final InetSocketAddress source = (InetSocketAddress)exchange.getIn().getHeader(NettyConstants.NETTY_REMOTE_ADDRESS); 
+                            final LinkedList<UDPMessageDTO> messages = (LinkedList<UDPMessageDTO>)exchange.getIn().getBody(LinkedList.class);
+                            final UDPMessageLogDTO messageLog = new UDPMessageLogDTO(currentLocation, currentSystemId, source, messages);
+                            exchange.getIn().setBody(messageLog, UDPMessageLogDTO.class);
                         }
                     }).to("bean:syslogDispatcher?method=dispatch");
                 }
