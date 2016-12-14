@@ -144,6 +144,9 @@
     <logger name="com.datastax.driver" additivity="false" level="INFO">
       <appender-ref ref="RoutingAppender"/>
     </logger>
+    <logger name="org.snmp4j.transport" additivity="false" level="ERROR">
+      <appender-ref ref="RoutingAppender"/>
+    </logger>
 
     <!-- Allow any message to pass through the root logger -->
     <root level="DEBUG">
@@ -177,6 +180,7 @@
         <KeyValuePair key="eventd"               value="DEBUG" />
         <KeyValuePair key="event-translator"     value="DEBUG" />
         <KeyValuePair key="icmp"                 value="DEBUG" />
+        <KeyValuePair key="ipc"                  value="DEBUG" />
         <KeyValuePair key="jetty-server"         value="DEBUG" />
         <KeyValuePair key="enlinkd"              value="DEBUG" />
         <KeyValuePair key="manager"              value="DEBUG" />

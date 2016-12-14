@@ -1,7 +1,7 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2016-2016 The OpenNMS Group, Inc.
+ * Copyright (C) 2016 The OpenNMS Group, Inc.
  * OpenNMS(R) is Copyright (C) 1999-2016 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
@@ -26,21 +26,8 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.features.activemq;
+package org.opennms.netmgt.ticketer.jira.cache;
 
-import javax.jms.Connection;
-
-/**
- * Used to create connection pools using our own ConnectionPool subclass.
- * See {@link org.opennms.features.activemq.ConnectionPool} for details.
- *
- * @author jwhite
- */
-public class PooledConnectionFactory extends org.apache.activemq.pool.PooledConnectionFactory {
-
-    @Override
-    protected ConnectionPool createConnectionPool(Connection connection) {
-        return new ConnectionPool(connection);
-    }
-
+public interface RefreshPolicy {
+    boolean needsRefresh();
 }

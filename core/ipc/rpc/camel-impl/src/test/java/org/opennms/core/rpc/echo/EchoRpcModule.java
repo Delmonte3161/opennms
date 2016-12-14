@@ -42,11 +42,35 @@ public class EchoRpcModule extends AbstractXmlRpcModule<EchoRequest, EchoRespons
 
     @Override
     public CompletableFuture<EchoResponse> execute(EchoRequest request) {
-        return CompletableFuture.completedFuture(new EchoResponse(request.getMessage()));
+        final CompletableFuture<EchoResponse> future = new CompletableFuture<>();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (request.getDelay() != null) {
+                    try {
+                        Thread.sleep(request.getDelay());
+                    } catch (InterruptedException e) {
+                        future.completeExceptionally(e);
+                        return;
+                    }
+                }
+                if (request.shouldThrow()) {
+                    future.completeExceptionally(new MyEchoException(request.getMessage()));
+                } else {
+                    future.complete(new EchoResponse(request.getMessage()));
+                }
+            }
+        }).start();
+        return future;
     }
 
     @Override
     public String getId() {
         return RPC_MODULE_ID;
+    }
+
+    @Override
+    public EchoResponse createResponseWithException(Throwable ex) {
+        return new EchoResponse(ex);
     }
 }
