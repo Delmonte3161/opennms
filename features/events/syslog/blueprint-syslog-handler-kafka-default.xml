@@ -19,6 +19,8 @@
 			<cm:property name="zookeeperport" value="2181"/>
 			<cm:property name="groupId" value="syslogconsumer"/>
 			<cm:property name="consumerstreams" value="1"/>
+			<cm:property name="sedaQueueSize" value="10000" />
+			<cm:property name="blockWhenFull" value="true" />
 		</cm:default-properties>
 	</cm:property-placeholder>
 
@@ -52,11 +54,11 @@
 			<bean ref="mapper"/>
 			<!-- Update the SyslogdConfig on the message to the local config value -->
 			<bean ref="syslogdConfigProcessor"/>
-<!-- 			<to uri="seda:syslogkafkaHandler"/> -->
-<!-- 		</route> -->
+			<to uri="seda:syslogkafkaHandler?size={{sedaQueueSize}}&amp;blockWhenFull={{blockWhenFull}}"/> 
+ 		</route>
 
-<!-- 		<route id="syslogHandler"> -->
-<!-- 			<from uri="seda:syslogkafkaHandler"/> -->
+		<route id="syslogHandler"> 
+			<from uri="seda:syslogkafkaHandler"/> 
 			<!-- 
 				Pass the message to the default handler which will convert it into
 				an event and broadcast the event.
