@@ -247,6 +247,10 @@ include::text/ticketing/tsrm.adoc[]
 == Enabling RMI
 include::text/rmi.adoc[]
 
+[[ga-minion]]
+== Minion
+include::text/minion/kafka.adoc[]
+
 [[ga-opennms-plugin-manager]]
 == Plugin Manager
 include::text/plugin-manager/introduction.adoc[]
@@ -259,3 +263,7 @@ include::text/plugin-manager/internal-plugins-repository.adoc[]
 include::text/plugins/introduction.adoc[]
 include::text/plugins/alarm-change-notifier.adoc[]
 include::text/plugins/opennms-es-rest.adoc[]
+
+[[ga-special-cases-and-workarounds]]
+== Special Cases and Workarounds
+include::text/workarounds/snmp.adoc[]

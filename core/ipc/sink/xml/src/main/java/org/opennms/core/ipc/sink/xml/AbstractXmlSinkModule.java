@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.opennms.core.ipc.sink.api.Message;
 
-public abstract class AbstractXmlSinkModule<T extends Message> implements SinkModule<T> {
+public abstract class AbstractXmlSinkModule<S extends Message, T extends Message> implements SinkModule<S, T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractXmlSinkModule.class);
 
@@ -60,6 +60,18 @@ public abstract class AbstractXmlSinkModule<T extends Message> implements SinkMo
     @Override
     public T unmarshal(String message) {
         return getXmlHandler().unmarshal(message);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        return getClass() == obj.getClass();
     }
 
     private XmlHandler<T> getXmlHandler() {
