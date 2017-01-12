@@ -1,8 +1,8 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2016-2016 The OpenNMS Group, Inc.
- * OpenNMS(R) is Copyright (C) 1999-2016 The OpenNMS Group, Inc.
+ * Copyright (C) 2017-2017 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2017 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
  *
@@ -26,34 +26,26 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.web.event.filter;
+package org.opennms.netmgt.collectd;
 
-import org.opennms.web.filter.EqualsFilter;
-import org.opennms.web.filter.SQLType;
+import org.opennms.netmgt.collection.api.CollectionException;
 
-public class LocationFilter extends EqualsFilter<String> {
-    public static final String TYPE = "location";
-    private String m_location;
+/**
+ * This exception should be thrown by a {@link ServiceCollector} when
+ * collection fails, but should not trigger a status change (resulting
+ * in an alarm) for target service.
+ *
+ * For example, collection may fail if the OpenNMS system is in the process
+ * of shutting down, and required components are not available.
+ *
+ * @author jesse
+ */
+public class CollectionUnknown extends CollectionException {
 
-    public LocationFilter(String location) {
-        super(TYPE, SQLType.STRING, "MONITORINGSYSTEMS.LOCATION", "distPoller.location", location);
-        m_location = location;
+    private static final long serialVersionUID = 5630156328994222706L;
+
+    public CollectionUnknown(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    @Override
-    public String getTextDescription() {
-        return ("Location is " + m_location);
-    }
-
-    @Override
-    public String toString() {
-        return ("<WebEventRepository.LocationFilter: " + getDescription() + ">");
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (!(obj instanceof LocationFilter)) return false;
-        return (this.toString().equals(obj.toString()));
-    }
 }
