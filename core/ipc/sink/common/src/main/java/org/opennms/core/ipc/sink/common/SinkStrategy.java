@@ -61,7 +61,7 @@ public class SinkStrategy {
     }
 
     public static Strategy getSinkStrategy() {
-        final String effectiveStrategyName = System.getProperty(SINK_STRATEGY_PROPERTY, CAMEL_SINK_STRATEGY_NAME);
+        final String effectiveStrategyName = System.getProperty(SINK_STRATEGY_PROPERTY,KAFKA_SINK_STRATEGY_NAME);
         for (Strategy strategy : Strategy.values()) {
             if (strategy.getName().equalsIgnoreCase(effectiveStrategyName)) {
                 return strategy;
