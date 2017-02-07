@@ -136,8 +136,7 @@ public final class SyslogConfigBean implements SyslogdConfig {
     @Override
     public int getNumThreads() {
         if (m_numThreads <= 0) {
-           // return Runtime.getRuntime().availableProcessors() * 2;
-        	return 1;
+           return Runtime.getRuntime().availableProcessors() * 2;
         }
         return m_numThreads;
     }

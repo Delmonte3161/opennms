@@ -89,6 +89,8 @@ public class KafkaMessageConsumerManager extends AbstractMessageConsumerManager 
 
         @Override
         public void run() {
+        	new Thread(new Runnable(){
+        		public void run(){
             Logging.putPrefix(MessageConsumerManager.LOG_PREFIX);
             try {
                 consumer.subscribe(Arrays.asList(topic));
@@ -106,6 +108,8 @@ public class KafkaMessageConsumerManager extends AbstractMessageConsumerManager 
             } finally {
                 consumer.close();
             }
+        		}
+        	}).start();
         }
 
         // Shutdown hook which can be called from a separate thread
