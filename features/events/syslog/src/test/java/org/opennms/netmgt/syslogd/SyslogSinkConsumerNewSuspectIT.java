@@ -33,10 +33,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.exolab.castor.xml.MarshalException;
@@ -129,6 +131,11 @@ public class SyslogSinkConsumerNewSuspectIT {
         m_syslogSinkConsumer.setSyslogdConfig(config);
         m_syslogSinkConsumer.setEventForwarder(m_eventIpcManager);
         m_syslogSinkModule = m_syslogSinkConsumer.getModule();
+        
+        SyslogSinkConsumerTest.grookPatternList = new ArrayList<String>(SyslogSinkConsumerTest.setGrookPatternList(new File(
+                                                                                                                            this.getClass().getResource("/etc/syslogd-configuration.properties").getPath())));
+        m_syslogSinkConsumer.setGrokPatternsList(SyslogSinkConsumerTest.grookPatternList);
+
     }
 
     @After

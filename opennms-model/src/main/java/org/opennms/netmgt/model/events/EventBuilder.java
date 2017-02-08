@@ -86,6 +86,10 @@ public class EventBuilder {
         setTime(date);
         setSource(source);
     }
+    
+    public EventBuilder() {
+        m_event = new Event();
+    }
 
     /**
      * <p>Constructor for EventBuilder.</p>

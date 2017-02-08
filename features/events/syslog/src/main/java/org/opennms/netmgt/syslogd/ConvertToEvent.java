@@ -33,7 +33,9 @@ import static org.opennms.core.utils.InetAddressUtils.str;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -52,6 +54,7 @@ import org.opennms.netmgt.config.syslogd.UeiMatch;
 import org.opennms.netmgt.dao.api.AbstractInterfaceToNodeCache;
 import org.opennms.netmgt.model.events.EventBuilder;
 import org.opennms.netmgt.xml.event.Event;
+import org.opennms.netmgt.xml.event.Parm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,14 +108,16 @@ public class ConvertToEvent {
      *          Thrown if the data buffer cannot be decoded using the
      *          US-ASCII encoding.
      * @throws MessageDiscardedException 
+     * @throws ParseException 
      */
     public ConvertToEvent(
         final String systemId,
         final String location,
         final DatagramPacket packet,
-        final SyslogdConfig config
-    ) throws UnsupportedEncodingException, MessageDiscardedException {
-        this(systemId, location, packet.getAddress(), packet.getPort(), new String(packet.getData(), 0, packet.getLength(), "US-ASCII"), config);
+        final SyslogdConfig config,
+        final Map<String,String> params
+    ) throws UnsupportedEncodingException, MessageDiscardedException, ParseException {
+        this(systemId, location, packet.getAddress(), packet.getPort(), new String(packet.getData(), 0, packet.getLength(), "US-ASCII"), config,params);
     }
 
     /**
@@ -123,11 +128,13 @@ public class ConvertToEvent {
      * @param addr The remote agent's address.
      * @param port The remote agent's port
      * @param data The XML data in US-ASCII encoding.
+     * @param list 
      * @param len  The length of the XML data in the buffer.
      * @throws java.io.UnsupportedEncodingException
      *          Thrown if the data buffer cannot be decoded using the
      *          US-ASCII encoding.
      * @throws MessageDiscardedException 
+     * @throws ParseException 
      */
     public ConvertToEvent(
         final String systemId,
@@ -135,13 +142,12 @@ public class ConvertToEvent {
         final InetAddress addr,
         final int port,
         final String data,
-        final SyslogdConfig config
-    ) throws UnsupportedEncodingException, MessageDiscardedException {
+        final SyslogdConfig config, Map<String, String> params
+    ) throws UnsupportedEncodingException, MessageDiscardedException, ParseException {
 
         if (config == null) {
             throw new IllegalArgumentException("Config cannot be null");
         }
-
         final UeiList ueiList = config.getUeiList();
         final HideMessage hideMessage = config.getHideMessages();
         final String discardUei = config.getDiscardUei();
@@ -157,14 +163,14 @@ public class ConvertToEvent {
             LOG.debug("Converting to event: {}", this);
         }
 
-        SyslogParser parser = SyslogParser.getParserInstance(config, syslogString);
+        GenericParser parser = new GenericParser(config, syslogString);
         if (!parser.find()) {
             throw new MessageDiscardedException("message does not match");
         }
         SyslogMessage message;
         try {
-            message = parser.parse();
-        } catch (final SyslogParserException ex) {
+            message = parser.parse(params);
+        } catch (final Exception ex) {
             LOG.debug("Unable to parse '{}'", syslogString, ex);
             throw new MessageDiscardedException(ex);
         }
@@ -400,15 +406,24 @@ public class ConvertToEvent {
         final String expression = uei.getMatch().getExpression();
         final Pattern msgPat = getPattern(expression);
         final Matcher msgMat;
+        String processName=null;
         if (msgPat == null) {
             LOG.debug("Unable to create pattern for expression '{}'", expression);
             return false;
         } else {
             final String text;
+            if(message.getProcessName()!=null&&!message.getProcessName().isEmpty())
+            {
+                processName=message.getProcessName()+": ";
+            }
+            else
+            {
+                processName="";
+            }
             if (message.getMatchedMessage() != null) {
-                text = message.getMatchedMessage();
+                text = processName+message.getMatchedMessage();
             } else {
-                text = message.getFullText();
+                text = processName+message.getFullText();
             }
             msgMat = msgPat.matcher(text);
         }

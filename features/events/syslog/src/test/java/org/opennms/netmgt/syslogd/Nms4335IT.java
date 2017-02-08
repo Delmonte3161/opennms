@@ -32,9 +32,12 @@ import static org.junit.Assert.assertEquals;
 import static org.opennms.core.utils.InetAddressUtils.addr;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -193,11 +196,11 @@ public class Nms4335IT implements InitializingBean {
      * @param expectedUEI The expected UEI of the resulting event
      * @param expectedLogMsg The expected contents of the logmsg for the resulting event 
      * 
-     * @throws UnknownHostException 
      * @throws InterruptedException 
      * @throws ExecutionException 
+     * @throws IOException 
      */
-    private List<Event> doMessageTest(String testPDU, String expectedHost, String expectedUEI, String expectedLogMsg) throws UnknownHostException, InterruptedException, ExecutionException {
+    private List<Event> doMessageTest(String testPDU, String expectedHost, String expectedUEI, String expectedLogMsg) throws InterruptedException, ExecutionException, IOException {
         SyslogdTestUtils.startSyslogdGracefully(m_syslogd);
         
         final EventBuilder expectedEventBldr = new EventBuilder(expectedUEI, "syslogd");
@@ -211,6 +214,10 @@ public class Nms4335IT implements InitializingBean {
         syslogSinkConsumer.setDistPollerDao(m_distPollerDao);
         syslogSinkConsumer.setSyslogdConfig(m_config);
         syslogSinkConsumer.setEventForwarder(m_eventIpcManager);
+        SyslogSinkConsumerTest.grookPatternList = new ArrayList<String>(SyslogSinkConsumerTest.setGrookPatternList(new File(
+                                                                                                                            this.getClass().getResource("/etc/syslogd-configuration.properties").getPath())));
+        syslogSinkConsumer.setGrokPatternsList(SyslogSinkConsumerTest.grookPatternList);
+
 
         final SyslogSinkModule syslogSinkModule = syslogSinkConsumer.getModule();
 

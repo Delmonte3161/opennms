@@ -30,20 +30,40 @@ package org.opennms.netmgt.syslogd;
 
 import static org.opennms.core.utils.InetAddressUtils.addr;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import org.opennms.core.ipc.sink.api.MessageConsumer;
 import org.opennms.core.ipc.sink.api.MessageConsumerManager;
 import org.opennms.core.logging.Logging;
 import org.opennms.core.logging.Logging.MDCCloseable;
+import org.opennms.core.utils.ConfigFileConstants;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.config.SyslogdConfig;
 import org.opennms.netmgt.dao.api.DistPollerDao;
 import org.opennms.netmgt.events.api.EventConstants;
 import org.opennms.netmgt.events.api.EventForwarder;
 import org.opennms.netmgt.model.events.EventBuilder;
+import org.opennms.netmgt.syslogd.BufferParser.BufferParserFactory;
 import org.opennms.netmgt.syslogd.api.SyslogConnection;
 import org.opennms.netmgt.syslogd.api.SyslogMessageDTO;
 import org.opennms.netmgt.syslogd.api.SyslogMessageLogDTO;
@@ -55,7 +75,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.Timer.Context;
@@ -80,6 +99,18 @@ public class SyslogSinkConsumer implements MessageConsumer<SyslogConnection, Sys
     private final Timer consumerTimer;
     private final Timer toEventTimer;
     private final Timer broadcastTimer;
+    
+    private final static ExecutorService m_executor = Executors.newSingleThreadExecutor();
+    
+    private static List<String> grokPatternsList;
+    
+    public static List<String> getGrokPatternsList() {
+        return grokPatternsList;
+    }
+
+    public void setGrokPatternsList(List<String> grokPatternsList) {
+        this.grokPatternsList = grokPatternsList;
+    }
 
     public SyslogSinkConsumer(MetricRegistry registry) {
         consumerTimer = registry.timer("consumer");
@@ -92,7 +123,26 @@ public class SyslogSinkConsumer implements MessageConsumer<SyslogConnection, Sys
     public SyslogSinkModule getModule() {
         return new SyslogSinkModule(syslogdConfig, distPollerDao);
     }
+   
+    /**
+     * Static block to load grokPatterns during the start of SyslogSink class call.
+     */
+    static {
+        try {
+            loadGrokParserList();
+        } catch (IOException e) {
+            LOG.debug("Failed to load Grok pattern list."+e);
+        }
 
+    }
+
+    public static void loadGrokParserList() throws IOException {
+        grokPatternsList = new ArrayList<String>();
+        File syslogConfigFile = ConfigFileConstants
+                .getFile(ConfigFileConstants.SYSLOGD_CONFIGURATION_PROPERTIES);
+        readPropertiesInOrderFrom(syslogConfigFile);
+    }
+    
     @Override
     public void handleMessage(SyslogMessageLogDTO syslogDTO) {
         try (Context consumerCtx = consumerTimer.time()) {
@@ -125,7 +175,8 @@ public class SyslogSinkConsumer implements MessageConsumer<SyslogConnection, Sys
                         // Decode the packet content as ASCII
                         // TODO: Support more character encodings?
                         StandardCharsets.US_ASCII.decode(message.getBytes()).toString(),
-                        syslogdConfig
+                        syslogdConfig,
+                        parse(message.getBytes())
                     );
                 events.addEvent(re.getEvent());
             } catch (final UnsupportedEncodingException e) {
@@ -207,4 +258,72 @@ public class SyslogSinkConsumer implements MessageConsumer<SyslogConnection, Sys
     public void setDistPollerDao(DistPollerDao distPollerDao) {
         this.distPollerDao = distPollerDao;
     }
+    
+    /**
+     * This method will parse the message against the grok patterns
+     * @param messageBytes 
+     *  
+     * @return
+     *  Parameter list
+     */
+        public static Map<String, String> parse(ByteBuffer messageBytes) {
+                String grokPattern;
+                if (null == getGrokPatternsList() || getGrokPatternsList().isEmpty()) {
+                        LOG.error("No Grok Pattern has been defined");
+                        return null;
+                }
+                for (int i = 0; i < getGrokPatternsList().size(); i++) {
+                        grokPattern = getGrokPatternsList().get(i);
+                        BufferParserFactory grokFactory = GrokParserFactory
+                                        .parseGrok(grokPattern);
+                        ByteBuffer incoming = ByteBuffer.wrap(messageBytes.array());
+                        try {
+                                return loadParamsMap(grokFactory
+                                                .parse(incoming.asReadOnlyBuffer(), m_executor).get()
+                                                .getParmCollection());
+                        } catch (InterruptedException | ExecutionException e) {
+                                LOG.debug("Parse Exception occured No Grok Pattern matched");
+                                continue;
+                        }
+                }
+                return null;
+
+        }
+        
+        public static Map<String, String> loadParamsMap(List<Parm> paramsList) {
+                return paramsList.stream().collect(
+                                Collectors.toMap(Parm::getParmName, param -> param.getValue()
+                                                .getContent(), (paramKey1, paramKey2) -> paramKey2));
+        }
+        
+        
+        public static List<String> readPropertiesInOrderFrom(File syslogdConfigdFile)
+                throws IOException {
+            InputStream propertiesFileInputStream = new FileInputStream(syslogdConfigdFile);
+            Set<String> grookSet=new LinkedHashSet<String>();
+            final Properties properties = new Properties(); 
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(propertiesFileInputStream));
+
+            String bufferedReader = reader.readLine();
+
+            while (bufferedReader != null) {
+                final ByteArrayInputStream lineStream = new ByteArrayInputStream(bufferedReader.getBytes("ISO-8859-1"));
+                properties.load(lineStream); 
+
+                final Enumeration<?> propertyNames = properties.<String>propertyNames();
+
+                if (propertyNames.hasMoreElements()) { 
+
+                    final String paramKey = (String) propertyNames.nextElement();
+                    final String paramsValue = properties.getProperty(paramKey);
+
+                    grookSet.add(paramsValue);
+                    properties.clear(); 
+                }
+                bufferedReader = reader.readLine();
+            }
+            grokPatternsList=new ArrayList<String>(grookSet);
+            return grokPatternsList;
+        }
+
 }

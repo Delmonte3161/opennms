@@ -31,6 +31,7 @@ package org.opennms.netmgt.syslogd;
 import static org.junit.Assert.assertEquals;
 import static org.opennms.core.utils.InetAddressUtils.addr;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.DatagramPacket;
@@ -138,6 +139,9 @@ public class SyslogdEventdLoadIT implements InitializingBean {
         m_syslogSinkConsumer.setSyslogdConfig(m_config);
         m_syslogSinkConsumer.setEventForwarder(m_eventIpcManager);
         m_syslogSinkModule = m_syslogSinkConsumer.getModule();
+        SyslogSinkConsumerTest.grookPatternList = new ArrayList<String>(SyslogSinkConsumerTest.setGrookPatternList(new File(
+                                                                                                                            this.getClass().getResource("/etc/syslogd-configuration.properties").getPath())));
+        m_syslogSinkConsumer.setGrokPatternsList(SyslogSinkConsumerTest.grookPatternList);
 
         m_messageDispatcherFactory.setConsumer(m_syslogSinkConsumer);
     }
@@ -240,7 +244,7 @@ public class SyslogdEventdLoadIT implements InitializingBean {
 
         m_eventCounter.waitForFinish(120000);
         
-        assertEquals(1, m_eventCounter.getCount());
+        assertEquals(2, m_eventCounter.getCount());
     }
 
     @Test(timeout=120000)
