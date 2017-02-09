@@ -855,14 +855,13 @@
     <feature name="opennms-syslogd-listener-javanet" description="OpenNMS :: Syslogd :: Listener :: java.net" version="${project.version}">
       <feature>camel-blueprint</feature>
       <feature>opennms-syslogd</feature>
-
       <bundle>blueprint:mvn:org.opennms.features.events/org.opennms.features.events.syslog/${project.version}/xml/blueprint-syslog-listener-javanet</bundle>
     </feature>
 
     <feature name="opennms-syslogd-listener-camel-netty" description="OpenNMS :: Syslogd :: Listener :: camel-netty" version="${project.version}">
       <feature>camel-blueprint</feature>
       <feature>opennms-syslogd</feature>
-
+	  <bundle>wrap:mvn:com.joestelmach/natty/0.12</bundle>
       <bundle>blueprint:mvn:org.opennms.features.events/org.opennms.features.events.syslog/${project.version}/xml/blueprint-syslog-listener-camel-netty</bundle>
     </feature>
 

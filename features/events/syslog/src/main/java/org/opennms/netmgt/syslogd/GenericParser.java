@@ -33,7 +33,7 @@ public class GenericParser extends SyslogParser {
         try {
             int priorityField = parseInteger(getStringTokenValue(params,
                                                                      Params.facilityCode.toString(),
-                                                                     "0"));
+                                                                     "99"));
             syslogMessage.setFacility(SyslogFacility.getFacilityForCode(priorityField));
             syslogMessage.setSeverity(SyslogSeverity.getSeverityForCode(priorityField));
         } catch (final NumberFormatException e) {
