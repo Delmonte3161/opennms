@@ -1,7 +1,7 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2009-2017 The OpenNMS Group, Inc.
+ * Copyright (C) 2017-2017 The OpenNMS Group, Inc.
  * OpenNMS(R) is Copyright (C) 1999-2017 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
@@ -26,38 +26,32 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.netmgt.provision.persist;
+package org.opennms.netmgt.ticketer.jira.fieldmapper;
 
-import java.beans.PropertyEditor;
-import java.beans.PropertyEditorSupport;
+import java.util.Map;
+import java.util.function.Supplier;
 
-import org.joda.time.Duration;
-import org.joda.time.Period;
+import com.atlassian.jira.rest.client.api.domain.FieldSchema;
 
-public class StringIntervalPropertyEditor extends PropertyEditorSupport implements PropertyEditor {
-    
-    /** {@inheritDoc} */
-    @Override
-    public void setAsText(final String text) throws IllegalArgumentException {
-        if ("0".equals(text)) {
-            setValue(Duration.ZERO);
-        } else {
-            setValue(StringIntervalAdapter.DEFAULT_PERIOD_FORMATTER.parsePeriod(text).toStandardDuration());
-        }
+public class VersionFieldMapper extends AbstractModifyableOptionKeyFieldMapper {
+
+    public VersionFieldMapper(Supplier<Map<String, String>> optionKeySupplier) {
+        super(optionKeySupplier);
     }
 
-    /**
-     * <p>getAsText</p>
-     *
-     * @return a {@link java.lang.String} object.
-     */
     @Override
-    public String getAsText() {
-        final Duration value = (Duration)getValue();
-        if (value.equals(Duration.ZERO)) {
-            return "0";
+    public boolean matches(FieldSchema schema) {
+        return ("fixVersions".equals(schema.getSystem()) && schema.getCustom() == null)
+                || ("versions".equals(schema.getSystem()) && schema.getCustom() == null)
+                || "version".equals(schema.getType())
+                || "version".equals(schema.getItems());
+    }
+
+    @Override
+    public Object mapToFieldValue(String fieldId, FieldSchema schema, String attributeValue) {
+        if ("array".equals(schema.getType())) {
+            return new ArrayWrapper().map(eachItem -> createComplexIssueInputField(fieldId, "name", eachItem), attributeValue);
         }
-        Period p = value.toPeriod().normalizedStandard();
-        return StringIntervalAdapter.DEFAULT_PERIOD_FORMATTER.print(p);
-    } 
+        return createComplexIssueInputField(fieldId, "name", attributeValue);
+    }
 }
