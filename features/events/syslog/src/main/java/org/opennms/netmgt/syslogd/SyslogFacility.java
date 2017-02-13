@@ -89,6 +89,9 @@ public enum SyslogFacility {
 
     public static SyslogFacility getFacility(final int fac) {
         final SyslogFacility[] facilities = SyslogFacility.values();
+    	if (fac == 99) {
+			return facilities[(facilities.length) - 1];
+		}
         if (facilities.length < fac) {
             return null;
         }
