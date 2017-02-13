@@ -143,8 +143,7 @@ public class GenericParser extends SyslogParser {
     }
 
     private String getTime(Map<String, String> dateParams, String tokenValue,String isNullValue) {
-    	String hour = "00",minute="00",second="00";
-    	String ZERO_VALUE="0";
+    	String hour,minute,second;
         if(dateParams.get(tokenValue)!=null)
         {
             return dateParams.get(tokenValue);
@@ -157,15 +156,6 @@ public class GenericParser extends SyslogParser {
 				hour = dateParams.get("hour");
 				minute = dateParams.get("minute");
 				second = dateParams.get("second");
-				if (minute.length() == 1) {
-					minute = ZERO_VALUE.concat(minute);
-				}
-				if (hour.length() == 1) {
-					hour = ZERO_VALUE.concat(hour);
-				}
-				if (second.length() == 1) {
-					second = ZERO_VALUE.concat(second);
-				}
 				return hour + ":" + minute + ":" + second;
 			}
         }

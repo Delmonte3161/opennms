@@ -43,13 +43,23 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.opennms.core.test.ConfigurationTestUtils;
 import org.opennms.core.test.MockLogAppender;
+import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.config.SyslogdConfigFactory;
+import org.opennms.netmgt.dao.api.DistPollerDao;
+import org.opennms.netmgt.dao.api.MonitoringLocationDao;
+import org.opennms.netmgt.syslogd.BufferParser.BufferParserFactory;
+import org.opennms.netmgt.xml.event.Event;
+import org.opennms.netmgt.xml.event.Parm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +71,8 @@ public class SyslogSinkConsumerMessageTest {
     private static String syslogMessageString;
     
     public static List<String> grookPatternList=new ArrayList<String>();
+    
+    private final ExecutorService m_executor = Executors.newSingleThreadExecutor();
 
     public SyslogSinkConsumerMessageTest() throws Exception {
         InputStream stream = null;
@@ -381,4 +393,43 @@ public class SyslogSinkConsumerMessageTest {
         assertEquals(Integer.valueOf(1317), message.getProcessId());
         assertEquals("CFMD_CCM_DEFECT_RMEP", message.getMessageID());
     }
+    
+    @Test
+    public void testRfc5424ParserExample6() throws Exception {
+        syslogMessageString="hi";
+        final GenericParser parser = new GenericParser(m_config,syslogMessageString);
+        assertTrue(parser.find());
+        final SyslogMessage message =parser.parse(SyslogSinkConsumer.parse(ByteBuffer.wrap(syslogMessageString.getBytes())));
+        ConvertToEvent convertToEvent = new ConvertToEvent(
+                DistPollerDao.DEFAULT_DIST_POLLER_ID,
+                MonitoringLocationDao.DEFAULT_MONITORING_LOCATION_ID,
+                InetAddressUtils.ONE_TWENTY_SEVEN,
+                9999,
+                syslogMessageString,
+                m_config,
+                SyslogSinkConsumer.loadParamsMap(getParamsList(ByteBuffer.wrap(syslogMessageString.getBytes()), "%{STRING:message}")
+            ));
+        System.out.println(message);
+    }
+    
+    private List<Parm> getParamsList(ByteBuffer message,String pattern) throws InterruptedException, ExecutionException
+    {
+        BufferParserFactory grokFactory = GrokParserFactory.parseGrok(pattern);
+
+        CompletableFuture<Event>  event = null;
+
+        event = grokFactory.parse(message.asReadOnlyBuffer(), m_executor);
+        event.whenComplete((e, ex) -> {
+            if (ex == null) {
+                //System.out.println(e.toString());
+            } else {
+                ex.printStackTrace();
+            }
+        });
+
+        return event.get().getParmCollection();
+
+    }
+    
+    
 }

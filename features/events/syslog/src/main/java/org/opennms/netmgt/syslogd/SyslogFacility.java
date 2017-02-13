@@ -96,6 +96,9 @@ public enum SyslogFacility {
     }
     
     public static SyslogFacility getFacilityForCode(final int code) {
+		if (code == 99) {
+			return getFacility(code);
+		}
         return getFacility((code & MASK) >> 3);
     }
 }

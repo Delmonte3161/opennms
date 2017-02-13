@@ -81,6 +81,9 @@ public enum SyslogSeverity {
     }
     
     public static SyslogSeverity getSeverityForCode(final int code) {
+		if (code == 99) {
+			return getSeverity(code);
+		}
         return getSeverity(code & MASK);
     }
 }
