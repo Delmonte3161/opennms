@@ -122,27 +122,19 @@ public class SyslogSinkConsumerMessageTest {
         final GenericParser parser = new GenericParser(m_config,syslogMessageString);
         assertTrue(parser.find());
         final SyslogMessage message =parser.parse(SyslogSinkConsumer.parse(ByteBuffer.wrap(syslogMessageString.getBytes())));
-        final Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        final Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.MONTH, 11);
         calendar.set(Calendar.DATE, 7);
         calendar.set(Calendar.HOUR_OF_DAY, 12);
         calendar.set(Calendar.MINUTE, 2);
         calendar.set(Calendar.SECOND, 6);
         calendar.set(Calendar.MILLISECOND, 0);
-
+        assertEquals(calendar.getTime(), message.getDate());
         LOG.debug("got message: {}", message);
 
         assertEquals(SyslogFacility.LOCAL5, message.getFacility());
         assertEquals(SyslogSeverity.NOTICE, message.getSeverity());
         assertEquals(null, message.getMessageID());
-        final Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.MONTH, Calendar.JANUARY);
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-        cal.set(Calendar.YEAR, 2007);
-        cal.set(Calendar.HOUR_OF_DAY, 00);
-        cal.set(Calendar.MINUTE, 00);
-        cal.set(Calendar.SECOND, 00);
-        cal.set(Calendar.MILLISECOND, 0);
         assertEquals("10.13.110.116", message.getHostName());
         assertEquals("mgmtd", message.getProcessName());
         assertEquals(8326, message.getProcessId().intValue());
@@ -197,11 +189,12 @@ public class SyslogSinkConsumerMessageTest {
         final Calendar cal = Calendar.getInstance();
         cal.set(Calendar.MONTH, Calendar.JANUARY);
         cal.set(Calendar.DAY_OF_MONTH, 1);
-        cal.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+        cal.set(Calendar.YEAR,2007);
         cal.set(Calendar.HOUR_OF_DAY, 00);
         cal.set(Calendar.MINUTE, 00);
         cal.set(Calendar.SECOND, 00);
         cal.set(Calendar.MILLISECOND, 0);
+        assertEquals(cal.getTime(), message.getDate());
         assertEquals("127.0.0.1", message.getHostName());
         assertEquals("OpenNMS", message.getProcessName());
         assertEquals(1234, message.getProcessId().intValue());
@@ -229,6 +222,7 @@ public class SyslogSinkConsumerMessageTest {
         cal.set(Calendar.MINUTE, 00);
         cal.set(Calendar.SECOND, 00);
         cal.set(Calendar.MILLISECOND, 0);
+        assertEquals(cal.getTime(), message.getDate());
         assertEquals("127.0.0.1", message.getHostName());
         assertEquals(null, message.getProcessName());
         assertEquals(0, message.getProcessId().intValue());
@@ -255,7 +249,7 @@ public class SyslogSinkConsumerMessageTest {
         cal.set(Calendar.MINUTE, 2);
         cal.set(Calendar.SECOND, 6);
         cal.set(Calendar.MILLISECOND, 0);
-        
+        assertEquals(cal.getTime(), message.getDate());
         assertEquals("10.13.110.116", message.getHostName());
         assertEquals("mgmtd", message.getProcessName());
         assertEquals(8326, message.getProcessId().intValue());
@@ -283,6 +277,7 @@ public class SyslogSinkConsumerMessageTest {
         cal.set(Calendar.MINUTE, 14);
         cal.set(Calendar.SECOND, 15);
         cal.set(Calendar.MILLISECOND, 0);
+        assertEquals(cal.getTime(), message.getDate());
         assertEquals("mymachine.example.com", message.getHostName());
         assertEquals("su", message.getProcessName());
         assertEquals("ID47", message.getMessageID());
@@ -309,6 +304,7 @@ public class SyslogSinkConsumerMessageTest {
         cal.set(Calendar.MINUTE, 14);
         cal.set(Calendar.SECOND, 15);
         cal.set(Calendar.MILLISECOND, 0);
+        assertEquals(cal.getTime(), message.getDate());
         assertEquals("192.0.2.1", message.getHostName());
         assertEquals("myproc", message.getProcessName());
         assertEquals(8710, message.getProcessId().intValue());
@@ -396,10 +392,7 @@ public class SyslogSinkConsumerMessageTest {
     
     @Test
     public void testRfc5424ParserExample6() throws Exception {
-        syslogMessageString="hi";
-        final GenericParser parser = new GenericParser(m_config,syslogMessageString);
-        assertTrue(parser.find());
-        final SyslogMessage message =parser.parse(SyslogSinkConsumer.parse(ByteBuffer.wrap(syslogMessageString.getBytes())));
+        syslogMessageString="Junk Message";
         ConvertToEvent convertToEvent = new ConvertToEvent(
                 DistPollerDao.DEFAULT_DIST_POLLER_ID,
                 MonitoringLocationDao.DEFAULT_MONITORING_LOCATION_ID,
@@ -409,7 +402,7 @@ public class SyslogSinkConsumerMessageTest {
                 m_config,
                 SyslogSinkConsumer.loadParamsMap(getParamsList(ByteBuffer.wrap(syslogMessageString.getBytes()), "%{STRING:message}")
             ));
-        System.out.println(message);
+        System.out.println(convertToEvent.getEvent());
     }
     
     private List<Parm> getParamsList(ByteBuffer message,String pattern) throws InterruptedException, ExecutionException
