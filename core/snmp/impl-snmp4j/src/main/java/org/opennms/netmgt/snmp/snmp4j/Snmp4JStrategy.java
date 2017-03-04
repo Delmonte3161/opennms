@@ -32,10 +32,13 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -68,6 +71,8 @@ import org.snmp4j.Snmp;
 import org.snmp4j.TransportMapping;
 import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.event.ResponseListener;
+import org.snmp4j.log.Log4jLogFactory;
+import org.snmp4j.log.LogFactory;
 import org.snmp4j.mp.MPv3;
 import org.snmp4j.mp.MessageProcessingModel;
 import org.snmp4j.mp.PduHandle;
@@ -86,7 +91,7 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
 public class Snmp4JStrategy implements SnmpStrategy {
 
     private static final transient Logger LOG = LoggerFactory.getLogger(Snmp4JStrategy.class);
-
+    
     private static final ExecutorService REAPER_EXECUTOR = Executors.newSingleThreadExecutor(new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
@@ -101,6 +106,10 @@ public class Snmp4JStrategy implements SnmpStrategy {
     private static USM m_usm;
 
     private Snmp4JValueFactory m_valueFactory;
+    
+    private int i=0;
+    
+    public static List<Integer> setOfInt=new ArrayList<Integer>();
 
     /**
      * Initialize for v3 communications
@@ -109,7 +118,7 @@ public class Snmp4JStrategy implements SnmpStrategy {
         if (s_initialized) {
             return;
         }
-
+  	  LogFactory.setLogFactory(new Log4jLogFactory());
         SNMP4JSettings.setEnterpriseID(5813);
         //USM usm = new USM(SecurityProtocols.getInstance(), new OctetString(MPv3.createLocalEngineID()), 0);
         m_usm = new USM();
@@ -283,6 +292,23 @@ public class Snmp4JStrategy implements SnmpStrategy {
             return new SnmpValue[] { null };
         }
     }
+    
+    /**
+     * Sends and SNMP4J request PDU.  The attributes in SnmpAgentConfig should have been
+     * adapted from default SnmpAgentConfig values to those compatible with the SNMP4J library.
+     * @param session 
+     */
+    protected SnmpValue[] send(Snmp4JAgentConfig agentConfig, PDU pdu, boolean expectResponse, Snmp session) {
+        final CompletableFuture<SnmpValue[]> future = new CompletableFuture<>();
+        send(agentConfig, pdu, expectResponse, future,session);
+        try {
+            return future.get();
+        } catch (ExecutionException | InterruptedException e) {
+            LOG.error(e.getMessage(), e);
+            return new SnmpValue[] { null };
+        }
+    }
+
 
     private void send(Snmp4JAgentConfig agentConfig, PDU pdu, boolean expectResponse, CompletableFuture<SnmpValue[]> future) {
         Snmp session;
@@ -341,6 +367,46 @@ public class Snmp4JStrategy implements SnmpStrategy {
             LOG.error("send: unexpected error during SNMP operation", e);
             future.completeExceptionally(e);
         }
+    }
+    
+    private void send(Snmp4JAgentConfig agentConfig, PDU pdu, boolean expectResponse, CompletableFuture<SnmpValue[]> future,Snmp session) {
+    	if (expectResponse) {
+    			try {
+    				session.listen();
+    			} catch (IOException e) {
+    				LOG.error("send: error setting up listener for SNMP responses", e);
+    				future.completeExceptionally(new Exception("error setting up listener for SNMP responses"));
+    				return;
+    			}
+    		}
+
+    		try {
+    			if (expectResponse) {
+    				session.send(pdu, agentConfig.getTarget(), null, new ResponseListener() {
+    					@Override
+    					public void onResponse(ResponseEvent responseEvent) {
+    						if (expectResponse) {
+    							try {
+    								future.complete(processResponse(agentConfig, responseEvent));
+    							} catch (IOException e) {
+    								future.completeExceptionally(e);
+    							}
+    						}
+    					}
+    				});
+    			} else {
+    				session.send(pdu, agentConfig.getTarget());
+    				future.complete(null);
+    				i++;
+    		    	setOfInt.add(i);
+    			}
+    		} catch (final IOException e) {
+    			LOG.error("send: error during SNMP operation", e);
+    			future.completeExceptionally(e);
+    		} catch (final RuntimeException e) {
+    			LOG.error("send: unexpected error during SNMP operation", e);
+    			future.completeExceptionally(e);
+    		}
     }
 
     protected PDU buildPdu(Snmp4JAgentConfig agentConfig, int pduType, SnmpObjId[] oids, SnmpValue[] values) {
@@ -505,12 +571,7 @@ public class Snmp4JStrategy implements SnmpStrategy {
 
         // Set socket option SO_REUSEADDR so that we can bind to the port even if it
         // has recently been closed by passing 'true' as the second argument here.
-        final DefaultUdpTransportMapping transport = new DefaultUdpTransportMapping(udpAddress, true);
-        // Increase the receive buffer for the socket
-        LOG.debug("Attempting to set receive buffer size to {}", Integer.MAX_VALUE);
-        transport.setReceiveBufferSize(Integer.MAX_VALUE);
-        LOG.debug("Actual receive buffer size is {}", transport.getReceiveBufferSize());
-
+        final TransportMapping<UdpAddress> transport = new DefaultUdpTransportMapping(udpAddress, true);
         info.setTransportMapping(transport);
         Snmp snmp = new Snmp(transport);
         snmp.addCommandResponder(trapNotifier);

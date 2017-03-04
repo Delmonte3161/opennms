@@ -28,6 +28,8 @@
 
 package org.opennms.netmgt.snmp;
 
+import org.snmp4j.Snmp;
+
 
 public interface SnmpTrapBuilder {
 
@@ -36,5 +38,7 @@ public interface SnmpTrapBuilder {
     void sendTest(String destAddr, int destPort, String community) throws Exception;
 
     void addVarBind(SnmpObjId name, SnmpValue value);
+
+    void send(String destAddr, int destPort, String community, Snmp session) throws Exception;
 
 }

@@ -331,8 +331,9 @@ public class Snmp4JAgentConfig {
     }
 
     public Snmp createSnmpSession() throws IOException {
-        TransportMapping<?> transport = new DefaultUdpTransportMapping();
+    	DefaultUdpTransportMapping transport = new DefaultUdpTransportMapping();
         Snmp session = new Snmp(transport);
+        transport.listen();
         
         if (isSnmpV3()) {
             // Make a new USM

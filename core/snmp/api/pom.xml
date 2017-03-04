@@ -57,5 +57,14 @@
       <artifactId>guava</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.opennms.dependencies</groupId>
+      <artifactId>snmp4j-dependencies</artifactId>
+      <type>pom</type>
+    </dependency>
+          <dependency>
+      <groupId>org.opennms.core</groupId>
+      <artifactId>org.opennms.core.camel</artifactId>
+    </dependency>
   </dependencies>
 </project>

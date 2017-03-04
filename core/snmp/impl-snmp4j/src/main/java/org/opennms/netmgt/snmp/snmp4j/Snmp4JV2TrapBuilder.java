@@ -33,6 +33,7 @@ import org.opennms.netmgt.snmp.SnmpObjId;
 import org.opennms.netmgt.snmp.SnmpTrapBuilder;
 import org.opennms.netmgt.snmp.SnmpValue;
 import org.snmp4j.PDU;
+import org.snmp4j.Snmp;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.Variable;
 import org.snmp4j.smi.VariableBinding;
@@ -104,6 +105,15 @@ public class Snmp4JV2TrapBuilder implements SnmpTrapBuilder {
     public void sendTest(String destAddr, int destPort, String community) throws Exception {
         m_strategy.sendTest(destAddr, destPort, community, m_pdu);
     }
+    
+    @Override
+	public void send(String destAddr, int destPort, String community, Snmp session) throws Exception {
+		 SnmpAgentConfig snmpAgentConfig = m_strategy.buildAgentConfig(destAddr, destPort, community, m_pdu);
+	        Snmp4JAgentConfig agentConfig = new Snmp4JAgentConfig(snmpAgentConfig);
+	        
+	        m_strategy.send(agentConfig, m_pdu, false,session);
+		
+	}
 
 
 }

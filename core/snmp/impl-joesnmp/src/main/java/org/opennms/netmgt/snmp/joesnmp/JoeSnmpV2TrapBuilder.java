@@ -36,6 +36,7 @@ import org.opennms.protocols.snmp.SnmpPduPacket;
 import org.opennms.protocols.snmp.SnmpPduRequest;
 import org.opennms.protocols.snmp.SnmpSyntax;
 import org.opennms.protocols.snmp.SnmpVarBind;
+import org.snmp4j.Snmp;
 
 public class JoeSnmpV2TrapBuilder implements SnmpTrapBuilder {
 
@@ -61,6 +62,10 @@ public class JoeSnmpV2TrapBuilder implements SnmpTrapBuilder {
         SnmpSyntax val = ((JoeSnmpValue) value).getSnmpSyntax();
         m_pdu.addVarBind(new SnmpVarBind(new SnmpObjectId(name.getIds()), val));
     }
-
+    @Override
+	public void send(String destAddr, int destPort, String community,
+			Snmp session) throws Exception {
+    	 JoeSnmpStrategy.send(destAddr, destPort, community, m_pdu);
+	}
 
 }
