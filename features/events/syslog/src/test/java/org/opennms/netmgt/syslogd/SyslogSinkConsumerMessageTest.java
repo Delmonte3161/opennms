@@ -190,10 +190,6 @@ public class SyslogSinkConsumerMessageTest {
         cal.set(Calendar.MONTH, Calendar.JANUARY);
         cal.set(Calendar.DAY_OF_MONTH, 1);
         cal.set(Calendar.YEAR,2007);
-        cal.set(Calendar.HOUR_OF_DAY, 00);
-        cal.set(Calendar.MINUTE, 00);
-        cal.set(Calendar.SECOND, 00);
-        cal.set(Calendar.MILLISECOND, 0);
         assertEquals(cal.getTime(), message.getDate());
         assertEquals("127.0.0.1", message.getHostName());
         assertEquals("OpenNMS", message.getProcessName());
@@ -214,15 +210,6 @@ public class SyslogSinkConsumerMessageTest {
         assertEquals(SyslogFacility.KERNEL, message.getFacility());
         assertEquals(SyslogSeverity.INFO, message.getSeverity());
         assertEquals("test", message.getMessageID());
-        final Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.MONTH, Calendar.JANUARY);
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-        cal.set(Calendar.YEAR, 2007);
-        cal.set(Calendar.HOUR_OF_DAY, 00);
-        cal.set(Calendar.MINUTE, 00);
-        cal.set(Calendar.SECOND, 00);
-        cal.set(Calendar.MILLISECOND, 0);
-        assertEquals(cal.getTime(), message.getDate());
         assertEquals("127.0.0.1", message.getHostName());
         assertEquals(null, message.getProcessName());
         assertEquals(0, message.getProcessId().intValue());
@@ -403,6 +390,29 @@ public class SyslogSinkConsumerMessageTest {
                 SyslogSinkConsumer.loadParamsMap(getParamsList(ByteBuffer.wrap(syslogMessageString.getBytes()), "%{STRING:message}")
             ));
         System.out.println(convertToEvent.getEvent());
+    }
+    
+    @Test
+    public void testNgStyle() throws Exception {
+    	GenericParser parser;
+		SyslogMessage message = null;
+		syslogMessageString = "<34> 10.181.230.67 foo10000: load test 10000 on abc";
+		long startTime = System.currentTimeMillis();
+		parser = new GenericParser(m_config, syslogMessageString);
+		message = parser.parse(SyslogSinkConsumer.parse(ByteBuffer
+				.wrap(syslogMessageString.getBytes())));
+		long endTime = System.currentTimeMillis();
+		System.out.println("Time Taken : " + (endTime - startTime) / 1000L
+				+ " Seconds");
+		assertEquals(SyslogFacility.AUTH, message.getFacility());
+		assertEquals(SyslogSeverity.CRITICAL, message.getSeverity());
+		assertEquals(0, message.getVersion().intValue());
+		assertEquals("10.181.230.67", message.getHostName());
+		assertEquals("foo10000", message.getProcessName());
+		assertEquals(0, message.getProcessId().intValue());
+		assertEquals(null, message.getMessageID());
+		assertEquals("load test 10000 on abc", message.getMessage());
+		System.out.println(message.getDate());
     }
     
     private List<Parm> getParamsList(ByteBuffer message,String pattern) throws InterruptedException, ExecutionException

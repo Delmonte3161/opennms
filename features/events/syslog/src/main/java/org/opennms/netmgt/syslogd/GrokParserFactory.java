@@ -28,7 +28,17 @@
 
 package org.opennms.netmgt.syslogd;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
 import org.opennms.netmgt.syslogd.BufferParser.BufferParserFactory;
+
+import com.joestelmach.natty.DateGroup;
+import com.joestelmach.natty.Parser;
 
 public abstract class GrokParserFactory {
 
@@ -46,6 +56,33 @@ public abstract class GrokParserFactory {
 		INTEGER,
 		MONTH,TIMESTAMP_ISO8601
 	}
+	
+	//Method needs to be changed since all deprecated items are used.
+	@SuppressWarnings("deprecation")
+	public static Date tokenizeRfcDate(String dateString)
+			throws ParseException, InterruptedException {
+		Parser parser = new Parser();
+		List<DateGroup> groups = parser.parse(dateString);
+		for (DateGroup group : groups) {
+			if (group.getDates().get(0).getDate() == Calendar.getInstance()
+					.getTime().getDate()
+					&& group.getDates().get(0).getDay() == Calendar
+							.getInstance().getTime().getDay()
+					&& group.getDates().get(0).getYear() == Calendar
+							.getInstance().getTime().getYear()) {
+				throw new InterruptedException();
+			} else {
+				return group.getDates().get(0);
+			}
+		}
+		return null;
+
+	}
+	 
+	 @SuppressWarnings("unchecked")
+	    private static <E extends Exception> void throwCustomInterruptedException(Exception exception) throws E {
+	        throw (E) exception;
+	    }
 
 	public static BufferParserFactory parseGrok(String grok) {
 		GrokState state = GrokState.TEXT;
@@ -136,8 +173,14 @@ public abstract class GrokParserFactory {
 						factory.whitespace();
 						break;
 					case TIMESTAMP_ISO8601:
-						factory.stringUntilWhitespace((s,v) -> {
-							s.builder.addParam(semanticString, v);
+						factory.stringUntilWhitespace((s, v) -> {
+									try {
+										if (tokenizeRfcDate(v) != null) {
+											s.builder.addParam(semanticString, v);
+										}
+									} catch (Exception e) {
+										throwCustomInterruptedException(e);
+									}
 						});
 						factory.whitespace();
 						break;

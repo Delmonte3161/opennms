@@ -111,7 +111,7 @@ public class GenericParser extends SyslogParser {
                                     "month",
                                     String.valueOf(Calendar.getInstance().get(Calendar.MONTH)));
         
-        time = getTime(dateParams,"timestamp","00:00:00");
+        time = getTime(dateParams,"timestamp",null);
 
         timeZone = getStringTokenValue(dateParams, "timeZone", "UTC");
         
