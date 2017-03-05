@@ -220,10 +220,11 @@ public class ElasticSearchInitialiser {
 
 						JestResult jestResult = new OnmsJestResult(getJestClient().execute(putTemplate));
 
-						if (jestResult.getResponseCode() > 399){
+						//If HTTP response code is not within success range, log error
+						if ( !(jestResult.getResponseCode() >= 200 && jestResult.getResponseCode() > 399) ) {
 							LOG.error("Error sending template '"+templateName+"' to Elasticsearch"
 									+ " received result: "+jestResult.getJsonString()
-									+ "\n   response code:" +jestResult.getResponseCode() 
+									+ "\n   response code:" +jestResult.getResponseCode()
 									+ "\n   error message: "+jestResult.getErrorMessage());
 						} else {
 							LOG.info("Sent template '"+templateName+"' to Elasticsearch"

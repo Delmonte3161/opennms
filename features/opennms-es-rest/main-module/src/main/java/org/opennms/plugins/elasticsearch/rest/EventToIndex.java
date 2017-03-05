@@ -356,7 +356,7 @@ public class EventToIndex implements AutoCloseable {
 						BulkResult result = getJestClient().execute(bulk);
 
 						// If the bulk command fails completely...
-						if (result.getResponseCode() > 399) {
+						if (!isSuccess(result.getResponseCode())) {
 							logEsError("Bulk API action", entry.getKey(), type, result.getJsonString(), result.getResponseCode(), result.getErrorMessage());
 
 							// Try and issue the bulk actions individually as a fallback
@@ -390,7 +390,7 @@ public class EventToIndex implements AutoCloseable {
 						}
 
 						// If the bulk command fails completely...
-						if (result.getResponseCode() > 399) {
+						if (!isSuccess(result.getResponseCode())) {
 							logEsError("Bulk API action", entry.getKey(), type, result.getJsonString(), result.getResponseCode(), result.getErrorMessage());
 
 							// Try and issue the bulk actions individually as a fallback
@@ -403,7 +403,7 @@ public class EventToIndex implements AutoCloseable {
 
 						// Log any unsuccessful completions as errors
 						for (BulkResultItem item : result.getItems()) {
-							if(item.status != 200){
+							if(!isSuccess(item.status)){
 								logEsError(item.operation, entry.getKey(), item.type, "none", item.status, item.error);
 							} else if(LOG.isDebugEnabled()) {
 								// If debug is enabled, log all completions
@@ -418,6 +418,10 @@ public class EventToIndex implements AutoCloseable {
 				}
 			}
 		}
+	}
+	
+	private boolean isSuccess(int responseCode) {
+		return (responseCode >= 200 && responseCode < 400);
 	}
 
 	private static final void logEsError(String operation, String index, String type, String result, int responseCode, String errorMessage) {
