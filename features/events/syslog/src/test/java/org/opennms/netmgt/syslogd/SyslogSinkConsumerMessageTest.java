@@ -397,13 +397,9 @@ public class SyslogSinkConsumerMessageTest {
     	GenericParser parser;
 		SyslogMessage message = null;
 		syslogMessageString = "<34> 10.181.230.67 foo10000: load test 10000 on abc";
-		long startTime = System.currentTimeMillis();
 		parser = new GenericParser(m_config, syslogMessageString);
 		message = parser.parse(SyslogSinkConsumer.parse(ByteBuffer
 				.wrap(syslogMessageString.getBytes())));
-		long endTime = System.currentTimeMillis();
-		System.out.println("Time Taken : " + (endTime - startTime) / 1000L
-				+ " Seconds");
 		assertEquals(SyslogFacility.AUTH, message.getFacility());
 		assertEquals(SyslogSeverity.CRITICAL, message.getSeverity());
 		assertEquals(0, message.getVersion().intValue());
@@ -412,7 +408,6 @@ public class SyslogSinkConsumerMessageTest {
 		assertEquals(0, message.getProcessId().intValue());
 		assertEquals(null, message.getMessageID());
 		assertEquals("load test 10000 on abc", message.getMessage());
-		System.out.println(message.getDate());
     }
     
     private List<Parm> getParamsList(ByteBuffer message,String pattern) throws InterruptedException, ExecutionException
@@ -433,6 +428,27 @@ public class SyslogSinkConsumerMessageTest {
         return event.get().getParmCollection();
 
     }
+    
+    @Test
+  	public void testCiscoParserExample1() throws Exception {
+  		GenericParser parser;
+  		SyslogMessage message = null;
+  		syslogMessageString =  "<189>: 2017 Mar  4 15:26:19 CST: %ETHPORT-5-IF_DOWN_ERROR_DISABLED: Interface Ethernet103/1/3 is down (Error disabled. Reason:ekeying triggered)Reply'User profile picture'";
+  		parser = new GenericParser(m_config, syslogMessageString);
+  		message = parser.parse(SyslogSinkConsumer.parse(ByteBuffer
+  				.wrap(syslogMessageString.getBytes())));
+  		parser = new GenericParser(m_config, syslogMessageString);
+		message = parser.parse(SyslogSinkConsumer.parse(ByteBuffer
+				.wrap(syslogMessageString.getBytes())));
+		assertEquals(SyslogFacility.LOCAL7, message.getFacility());
+		assertEquals(SyslogSeverity.NOTICE, message.getSeverity());
+		assertEquals(0, message.getVersion().intValue());
+		assertEquals(null, message.getHostName());
+		assertEquals("%ETHPORT-5-IF_DOWN_ERROR_DISABLED", message.getProcessName());
+		assertEquals(0, message.getProcessId().intValue());
+		assertEquals(null, message.getMessageID());
+		assertEquals("Interface Ethernet103/1/3 is down (Error disabled. Reason:ekeying triggered)Reply'User profile picture'", message.getMessage());
+  	}
     
     
 }
