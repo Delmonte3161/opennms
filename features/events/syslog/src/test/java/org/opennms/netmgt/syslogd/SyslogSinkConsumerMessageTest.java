@@ -450,5 +450,20 @@ public class SyslogSinkConsumerMessageTest {
 		assertEquals("Interface Ethernet103/1/3 is down (Error disabled. Reason:ekeying triggered)Reply'User profile picture'", message.getMessage());
   	}
     
+    @Test
+    public void testCiscoConverToEvent() throws Exception {
+        syslogMessageString="<189>: 2017 Mar  4 15:26:19 CST: %ETHPORT-5-IF_DOWN_ERROR_DISABLED: Interface Ethernet103/1/3 is down (Error disabled. Reason:ekeying triggered)Reply'User profile picture'";
+        ConvertToEvent convertToEvent = new ConvertToEvent(
+                DistPollerDao.DEFAULT_DIST_POLLER_ID,
+                MonitoringLocationDao.DEFAULT_MONITORING_LOCATION_ID,
+                InetAddressUtils.ONE_TWENTY_SEVEN,
+                9999,
+                syslogMessageString,
+                m_config,
+                SyslogSinkConsumer.loadParamsMap(getParamsList(ByteBuffer.wrap(syslogMessageString.getBytes()), "%{STRING:message}")
+            ));
+        System.out.println(convertToEvent.getEvent());
+    }
+    
     
 }

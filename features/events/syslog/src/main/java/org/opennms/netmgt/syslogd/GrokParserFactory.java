@@ -28,18 +28,13 @@
 
 package org.opennms.netmgt.syslogd;
 
-import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.regex.Pattern;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.opennms.netmgt.syslogd.BufferParser.BufferParserFactory;
 
-import com.joestelmach.natty.DateGroup;
-import com.joestelmach.natty.Parser;
-
 public abstract class GrokParserFactory {
+	
+	private static final Pattern m_datePattern=Pattern.compile("\\d{4}-\\d{2}-\\d{2}T(\\d{2})(:{1})(\\d{2})(:{1})(\\d{2}).(\\d|-|:)*Z*", Pattern.MULTILINE);
 
 	private static enum GrokState {
 		TEXT,
@@ -56,30 +51,10 @@ public abstract class GrokParserFactory {
 		MONTH,TIMESTAMP_ISO8601
 	}
 	
-	public static Date tokenizeRfcDate(String dateString)
-			throws ParseException, InterruptedException {
-		Parser parser = new Parser();
-
-		List<DateGroup> groups = parser.parse(dateString);
-		for (DateGroup group : groups) {
-			// Checking whether the date is same as current date since message
-			// without date runs as RFC Parser and
-			// shows wrong message as output
-			if (DateUtils.isSameDay(group.getDates().get(0), Calendar
-					.getInstance().getTime())) {
-				throw new InterruptedException();
-			} else {
-				return group.getDates().get(0);
-			}
-		}
-		return null;
-
+	private static <E extends Exception> void throwCustomInterruptedException(
+			Exception exception) throws E {
+		throw (E) exception;
 	}
-	 
-	 @SuppressWarnings("unchecked")
-	    private static <E extends Exception> void throwCustomInterruptedException(Exception exception) throws E {
-	        throw (E) exception;
-	    }
 
 	public static BufferParserFactory parseGrok(String grok) {
 		GrokState state = GrokState.TEXT;
@@ -171,13 +146,13 @@ public abstract class GrokParserFactory {
 						break;
 					case TIMESTAMP_ISO8601:
 						factory.stringUntilWhitespace((s, v) -> {
-									try {
-										if (tokenizeRfcDate(v) != null) {
-											s.builder.addParam(semanticString, v);
-										}
-									} catch (Exception e) {
-										throwCustomInterruptedException(e);
-									}
+							try {
+								if (matchDatePattern(v)) {
+									s.builder.addParam(semanticString, v);
+								}
+							} catch (Exception e) {
+								throwCustomInterruptedException(e);
+							}
 						});
 						factory.whitespace();
 						break;
@@ -243,5 +218,16 @@ public abstract class GrokParserFactory {
 			}
 		}
 		return factory;
+	}
+
+	/*
+	 * Method to pass and match date with formats "yyyy-MM-dd'T'HH:mm:ss'Z'" 
+	 */
+	private static boolean matchDatePattern(String v)
+			throws InterruptedException {
+		if (m_datePattern.matcher(v).matches()) {
+			return true;
+		}
+		throw new InterruptedException();
 	}
 }
