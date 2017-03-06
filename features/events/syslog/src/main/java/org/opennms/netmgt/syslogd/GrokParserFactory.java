@@ -28,13 +28,12 @@
 
 package org.opennms.netmgt.syslogd;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.opennms.netmgt.syslogd.BufferParser.BufferParserFactory;
 
 import com.joestelmach.natty.DateGroup;
@@ -57,19 +56,17 @@ public abstract class GrokParserFactory {
 		MONTH,TIMESTAMP_ISO8601
 	}
 	
-	//Method needs to be changed since all deprecated items are used.
-	@SuppressWarnings("deprecation")
 	public static Date tokenizeRfcDate(String dateString)
 			throws ParseException, InterruptedException {
 		Parser parser = new Parser();
+
 		List<DateGroup> groups = parser.parse(dateString);
 		for (DateGroup group : groups) {
-			if (group.getDates().get(0).getDate() == Calendar.getInstance()
-					.getTime().getDate()
-					&& group.getDates().get(0).getDay() == Calendar
-							.getInstance().getTime().getDay()
-					&& group.getDates().get(0).getYear() == Calendar
-							.getInstance().getTime().getYear()) {
+			// Checking whether the date is same as current date since message
+			// without date runs as RFC Parser and
+			// shows wrong message as output
+			if (DateUtils.isSameDay(group.getDates().get(0), Calendar
+					.getInstance().getTime())) {
 				throw new InterruptedException();
 			} else {
 				return group.getDates().get(0);
