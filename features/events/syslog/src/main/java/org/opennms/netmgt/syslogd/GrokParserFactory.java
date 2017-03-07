@@ -34,7 +34,9 @@ import org.opennms.netmgt.syslogd.BufferParser.BufferParserFactory;
 
 public abstract class GrokParserFactory {
 	
-	private static final Pattern m_datePattern=Pattern.compile("\\d{4}-\\d{2}-\\d{2}T(\\d{2})(:{1})(\\d{2})(:{1})(\\d{2}).(\\d|-|:)*Z*", Pattern.MULTILINE);
+	private static final Pattern m_datePatternRFC=Pattern.compile("\\d{4}-\\d{2}-\\d{2}T(\\d{2})(:{1})(\\d{2})(:{1})(\\d{2}).(\\d|-|:)*Z*", Pattern.MULTILINE);
+	private static final Pattern m_datePattern=Pattern.compile("\\d{4}-\\d{2}-\\d{2}", Pattern.MULTILINE);
+	private static final Pattern m_timePattern=Pattern.compile("\\d{2}:\\d{2}:\\d{2}", Pattern.MULTILINE);
 
 	private static enum GrokState {
 		TEXT,
@@ -48,7 +50,7 @@ public abstract class GrokParserFactory {
 	private static enum GrokPattern {
 		STRING,
 		INTEGER,
-		MONTH,TIMESTAMP_ISO8601
+		MONTH,TIMESTAMP_ISO8601,DATE,TIMESTAMP
 	}
 	
 	private static <E extends Exception> void throwCustomInterruptedException(
@@ -132,6 +134,30 @@ public abstract class GrokParserFactory {
 				switch(c) {
 				case ' ':
 					switch(patternType) {
+					case TIMESTAMP:
+						factory.stringUntilWhitespace((s, v) -> {
+							try {
+								if (matchDateTimePattern(v)) {
+									s.builder.addParam(semanticString, v);
+								}
+							} catch (Exception e) {
+								throwCustomInterruptedException(e);
+							}
+						});
+						factory.whitespace();
+						break;
+					case DATE:
+						factory.stringUntilWhitespace((s, v) -> {
+							try {
+								if (matchDateTimePattern(v)) {
+									s.builder.addParam(semanticString, v);
+								}
+							} catch (Exception e) {
+								throwCustomInterruptedException(e);
+							}
+						});
+						factory.whitespace();
+						break;
 					case STRING:
 						factory.stringUntilWhitespace((s,v) -> {
 							s.builder.addParam(semanticString, v);
@@ -147,7 +173,7 @@ public abstract class GrokParserFactory {
 					case TIMESTAMP_ISO8601:
 						factory.stringUntilWhitespace((s, v) -> {
 							try {
-								if (matchDatePattern(v)) {
+								if (matchDateTimePattern(v)) {
 									s.builder.addParam(semanticString, v);
 								}
 							} catch (Exception e) {
@@ -223,9 +249,15 @@ public abstract class GrokParserFactory {
 	/*
 	 * Method to pass and match date with formats "yyyy-MM-dd'T'HH:mm:ss'Z'" 
 	 */
-	private static boolean matchDatePattern(String v)
+	private static boolean matchDateTimePattern(String date)
 			throws InterruptedException {
-		if (m_datePattern.matcher(v).matches()) {
+		if (m_datePatternRFC.matcher(date).matches()) {
+			return true;
+		}
+		else if (m_datePattern.matcher(date).matches()) {
+			return true;
+		}
+		else if (m_timePattern.matcher(date).matches()) {
 			return true;
 		}
 		throw new InterruptedException();

@@ -99,68 +99,62 @@ public class GenericParser extends SyslogParser {
 
     private String getDateFromParams(Map<String, String> dateParams) {
         StringBuilder dateBuilder = new StringBuilder();
-        String time, day, month, year, timeZone, DATE_SEPERATOR, WHITE_SPACE = " ",timeStamp;
+        String time, day, month, year, timeZone, DATE_SEPERATOR, WHITE_SPACE = " ",rfcTimeStamp;
 
-        year = getStringTokenValue(dateParams,
-                                   "year",
-                                   String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
-        day = getStringTokenValue(dateParams,
-                                  "day",
-                                  String.valueOf(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)));
-        month = getStringTokenValue(dateParams,
-                                    "month",
-                                    String.valueOf(Calendar.getInstance().get(Calendar.MONTH)));
+        time = getTime(dateParams,"timestamp","");
         
-        time = getTime(dateParams,"timestamp",null);
+        rfcTimeStamp=getStringTokenValue(dateParams, "isotimestamp", null);
 
-        timeZone = getStringTokenValue(dateParams, "timeZone", "UTC");
+        if(rfcTimeStamp!=null)
+        return rfcTimeStamp;  
         
-        timeStamp=getStringTokenValue(dateParams, "isotimestamp", null);
+		if (dateParams.get("date") == null) {
+			year = getStringTokenValue(dateParams, "year",
+					String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
+			day = getStringTokenValue(
+					dateParams,
+					"day",
+					String.valueOf(Calendar.getInstance().get(
+							Calendar.DAY_OF_MONTH)));
+			month = getStringTokenValue(dateParams, "month",
+					String.valueOf(Calendar.getInstance().get(Calendar.MONTH)));
 
-        if (isInteger(month)) {
-            DATE_SEPERATOR = "-";
-        } else {
-            DATE_SEPERATOR = " ";
-        }
-        if(timeStamp!=null)
-        return timeStamp;    
-            
-        dateBuilder.append(month);
-        dateBuilder.append(DATE_SEPERATOR);
-        dateBuilder.append(day);
-        dateBuilder.append(DATE_SEPERATOR);
-        dateBuilder.append(year);
-        dateBuilder.append(WHITE_SPACE);
+			if (isInteger(month)) {
+				DATE_SEPERATOR = "-";
+			} else {
+				DATE_SEPERATOR = " ";
+			}
+
+			dateBuilder.append(month);
+			dateBuilder.append(DATE_SEPERATOR);
+			dateBuilder.append(day);
+			dateBuilder.append(DATE_SEPERATOR);
+			dateBuilder.append(year);
+			dateBuilder.append(WHITE_SPACE);
+			dateBuilder.append(time);
+			return dateBuilder.toString();
+		}
+        
+        dateBuilder.append(dateParams.get("date"));
         dateBuilder.append(time);
+        return dateBuilder.toString();
+        
+        // timeZone = getStringTokenValue(dateParams, "timeZone", "UTC");
         // Intentionally commented since adding timezone gives different time
         // which seems to be correct
         // but not matching the existing output
         // dateBuilder.append(WHITE_SPACE);
         // dateBuilder.append(timeZone);
-
-        return dateBuilder.toString();
-
     }
 
-    private String getTime(Map<String, String> dateParams, String tokenValue,String isNullValue) {
-    	String hour,minute,second;
-        if(dateParams.get(tokenValue)!=null)
-        {
-            return dateParams.get(tokenValue);
-        }
-        else
-        {
-			if (dateParams.get("hour") != null
-					&& dateParams.get("minute") != null
-					&& dateParams.get("second") != null) {
-				hour = dateParams.get("hour");
-				minute = dateParams.get("minute");
-				second = dateParams.get("second");
-				return hour + ":" + minute + ":" + second;
-			}
-        }
-        return isNullValue;
-    }
+	private String getTime(Map<String, String> dateParams, String tokenValue,
+			String isNullValue) {
+		
+		if (dateParams.get(tokenValue) != null) {
+			return dateParams.get(tokenValue);
+		}
+		return isNullValue;
+	}
 
     public static boolean isInteger(String s) {
         try {

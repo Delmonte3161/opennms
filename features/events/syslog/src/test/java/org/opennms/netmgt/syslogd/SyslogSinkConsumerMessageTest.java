@@ -49,6 +49,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.opennms.core.test.ConfigurationTestUtils;
@@ -410,6 +411,29 @@ public class SyslogSinkConsumerMessageTest {
 		assertEquals("load test 10000 on abc", message.getMessage());
     }
     
+    @Test
+    public void testNgStyleWithDate() throws Exception {
+    	GenericParser parser;
+		SyslogMessage message = null;
+		syslogMessageString = "<34> 2007-01-01 10.181.230.67 foo10000: load test 10000 on abc";
+		parser = new GenericParser(m_config, syslogMessageString);
+		message = parser.parse(SyslogSinkConsumer.parse(ByteBuffer
+				.wrap(syslogMessageString.getBytes())));
+		assertEquals(SyslogFacility.AUTH, message.getFacility());
+		assertEquals(SyslogSeverity.CRITICAL, message.getSeverity());
+		assertEquals(0, message.getVersion().intValue());
+		assertEquals("10.181.230.67", message.getHostName());
+		assertEquals("foo10000", message.getProcessName());
+		final Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.MONTH, Calendar.JANUARY);
+		cal.set(Calendar.DAY_OF_MONTH, 01);
+		cal.set(Calendar.YEAR, 2007);
+		assertTrue(DateUtils.isSameDay(cal.getTime(), message.getDate()));
+		assertEquals(0, message.getProcessId().intValue());
+		assertEquals(null, message.getMessageID());
+		assertEquals("load test 10000 on abc", message.getMessage());
+    }
+    
     private List<Parm> getParamsList(ByteBuffer message,String pattern) throws InterruptedException, ExecutionException
     {
         BufferParserFactory grokFactory = GrokParserFactory.parseGrok(pattern);
@@ -434,9 +458,6 @@ public class SyslogSinkConsumerMessageTest {
   		GenericParser parser;
   		SyslogMessage message = null;
   		syslogMessageString =  "<189>: 2017 Mar  4 15:26:19 CST: %ETHPORT-5-IF_DOWN_ERROR_DISABLED: Interface Ethernet103/1/3 is down (Error disabled. Reason:ekeying triggered)Reply'User profile picture'";
-  		parser = new GenericParser(m_config, syslogMessageString);
-  		message = parser.parse(SyslogSinkConsumer.parse(ByteBuffer
-  				.wrap(syslogMessageString.getBytes())));
   		parser = new GenericParser(m_config, syslogMessageString);
 		message = parser.parse(SyslogSinkConsumer.parse(ByteBuffer
 				.wrap(syslogMessageString.getBytes())));
