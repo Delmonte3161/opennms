@@ -104,10 +104,6 @@ public class EventBuilder {
         setSource(source);
     }
     
-    public EventBuilder() {
-        m_event = new Event();
-    }
-
     /**
      * <p>Constructor for EventBuilder.</p>
      *
