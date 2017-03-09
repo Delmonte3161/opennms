@@ -39,10 +39,8 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -58,6 +56,8 @@ import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.config.SyslogdConfigFactory;
 import org.opennms.netmgt.dao.api.DistPollerDao;
 import org.opennms.netmgt.dao.api.MonitoringLocationDao;
+import org.opennms.netmgt.dao.hibernate.InterfaceToNodeCacheDaoImpl;
+import org.opennms.netmgt.dao.mock.MockInterfaceToNodeCache;
 import org.opennms.netmgt.syslogd.BufferParser.BufferParserFactory;
 import org.opennms.netmgt.xml.event.Event;
 import org.opennms.netmgt.xml.event.Parm;
@@ -131,7 +131,6 @@ public class SyslogSinkConsumerMessageTest {
         calendar.set(Calendar.SECOND, 6);
         calendar.set(Calendar.MILLISECOND, 0);
         assertEquals(calendar.getTime(), message.getDate());
-        LOG.debug("got message: {}", message);
 
         assertEquals(SyslogFacility.LOCAL5, message.getFacility());
         assertEquals(SyslogSeverity.NOTICE, message.getSeverity());
@@ -154,7 +153,6 @@ public class SyslogSinkConsumerMessageTest {
             final SyslogMessage message =parser.parse(SyslogSinkConsumer.parse(ByteBuffer.wrap(syslogMessageString.getBytes())));
             
             
-            LOG.debug("message = {}", message);
             final Calendar cal = Calendar.getInstance();
             cal.set(Calendar.MONTH, Calendar.MARCH);
             cal.set(Calendar.DAY_OF_MONTH, 14);
@@ -379,21 +377,6 @@ public class SyslogSinkConsumerMessageTest {
     }
     
     @Test
-    public void testRfc5424ParserExample6() throws Exception {
-        syslogMessageString="Junk Message";
-        ConvertToEvent convertToEvent = new ConvertToEvent(
-                DistPollerDao.DEFAULT_DIST_POLLER_ID,
-                MonitoringLocationDao.DEFAULT_MONITORING_LOCATION_ID,
-                InetAddressUtils.ONE_TWENTY_SEVEN,
-                9999,
-                syslogMessageString,
-                m_config,
-                SyslogSinkConsumer.loadParamsMap(getParamsList(ByteBuffer.wrap(syslogMessageString.getBytes()), "%{STRING:message}")
-            ));
-        System.out.println(convertToEvent.getEvent());
-    }
-    
-    @Test
     public void testNgStyle() throws Exception {
     	GenericParser parser;
 		SyslogMessage message = null;
@@ -472,19 +455,42 @@ public class SyslogSinkConsumerMessageTest {
   	}
     
     @Test
-    public void testCiscoConverToEvent() throws Exception {
-        syslogMessageString="<189>: 2017 Mar  4 15:26:19 CST: %ETHPORT-5-IF_DOWN_ERROR_DISABLED: Interface Ethernet103/1/3 is down (Error disabled. Reason:ekeying triggered)Reply'User profile picture'";
-        ConvertToEvent convertToEvent = new ConvertToEvent(
-                DistPollerDao.DEFAULT_DIST_POLLER_ID,
-                MonitoringLocationDao.DEFAULT_MONITORING_LOCATION_ID,
-                InetAddressUtils.ONE_TWENTY_SEVEN,
-                9999,
-                syslogMessageString,
-                m_config,
-                SyslogSinkConsumer.loadParamsMap(getParamsList(ByteBuffer.wrap(syslogMessageString.getBytes()), "%{STRING:message}")
-            ));
-        System.out.println(convertToEvent.getEvent());
-    }
+	public void testCiscoConverToEvent() throws Exception {
+    	long start = java.util.Calendar.getInstance().getTimeInMillis();
+		for (int i = 0; i < 1000; i++) {
+			syslogMessageString = "<189>: 2017 Mar  4 15:26:19 CST: %ETHPORT-5-IF_DOWN_ERROR_DISABLED: Interface Ethernet103/1/3 is down (Error disabled. Reason:ekeying triggered)Reply'User profile picture'";
+			ConvertToEvent convertToEvent = new ConvertToEvent(
+					DistPollerDao.DEFAULT_DIST_POLLER_ID,
+					MonitoringLocationDao.DEFAULT_MONITORING_LOCATION_ID,
+					InetAddressUtils.ONE_TWENTY_SEVEN, 9999,
+					syslogMessageString, m_config,
+					SyslogSinkConsumer.loadParamsMap(getParamsList(
+							ByteBuffer.wrap(syslogMessageString.getBytes()),
+							"<%{INTEGER:facilityCode}>: %{INTEGER:year} %{STRING:month} %{STRING:day} %{TIMESTAMP:timestamp} %{STRING:timeZone}: %{STRING:processName}: %{STRING:message}")));
+			System.out.println(convertToEvent.getEvent());
+		}
+		long end = java.util.Calendar.getInstance().getTimeInMillis();
+		 System.out.println("Time Taken: " + (end - start)/1000L + "s");
+	}
+    
+    @Test
+	public void testSyslogNgConvertToEvent() throws Exception {
+    	InterfaceToNodeCacheDaoImpl.setInstance(new MockInterfaceToNodeCache());
+		long start = java.util.Calendar.getInstance().getTimeInMillis();
+		syslogMessageString = "<34> 2007-01-01 10.181.230.67 foo10000: load test 10000 on abc";
+		for (int i = 0; i < 5000; i++) {
+			ConvertToEvent convertToEvent = new ConvertToEvent(
+					DistPollerDao.DEFAULT_DIST_POLLER_ID,
+					MonitoringLocationDao.DEFAULT_MONITORING_LOCATION_ID,
+					InetAddressUtils.ONE_TWENTY_SEVEN, 9999,
+					syslogMessageString, m_config,
+					SyslogSinkConsumer.parse(ByteBuffer.wrap(syslogMessageString.getBytes())));
+			System.out.println(convertToEvent.getEvent());
+		}
+		long end = java.util.Calendar.getInstance().getTimeInMillis();
+		System.out.println("Time Taken: "
+				+ (end - start) / 1000L + "s");
+	}
     
     
 }
