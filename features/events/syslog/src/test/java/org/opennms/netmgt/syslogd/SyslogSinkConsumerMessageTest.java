@@ -457,7 +457,7 @@ public class SyslogSinkConsumerMessageTest {
     @Test
 	public void testCiscoConverToEvent() throws Exception {
     	long start = java.util.Calendar.getInstance().getTimeInMillis();
-		for (int i = 0; i < 1000; i++) {
+	//	for (int i = 0; i < 1000; i++) {
 			syslogMessageString = "<189>: 2017 Mar  4 15:26:19 CST: %ETHPORT-5-IF_DOWN_ERROR_DISABLED: Interface Ethernet103/1/3 is down (Error disabled. Reason:ekeying triggered)Reply'User profile picture'";
 			ConvertToEvent convertToEvent = new ConvertToEvent(
 					DistPollerDao.DEFAULT_DIST_POLLER_ID,
@@ -468,7 +468,7 @@ public class SyslogSinkConsumerMessageTest {
 							ByteBuffer.wrap(syslogMessageString.getBytes()),
 							"<%{INTEGER:facilityCode}>: %{INTEGER:year} %{STRING:month} %{STRING:day} %{TIMESTAMP:timestamp} %{STRING:timeZone}: %{STRING:processName}: %{STRING:message}")));
 			System.out.println(convertToEvent.getEvent());
-		}
+	//	}
 		long end = java.util.Calendar.getInstance().getTimeInMillis();
 		 System.out.println("Time Taken: " + (end - start)/1000L + "s");
 	}
@@ -478,7 +478,7 @@ public class SyslogSinkConsumerMessageTest {
     	InterfaceToNodeCacheDaoImpl.setInstance(new MockInterfaceToNodeCache());
 		long start = java.util.Calendar.getInstance().getTimeInMillis();
 		syslogMessageString = "<34> 2007-01-01 10.181.230.67 foo10000: load test 10000 on abc";
-		for (int i = 0; i < 5000; i++) {
+	//	for (int i = 0; i < 5000; i++) {
 			ConvertToEvent convertToEvent = new ConvertToEvent(
 					DistPollerDao.DEFAULT_DIST_POLLER_ID,
 					MonitoringLocationDao.DEFAULT_MONITORING_LOCATION_ID,
@@ -486,7 +486,7 @@ public class SyslogSinkConsumerMessageTest {
 					syslogMessageString, m_config,
 					SyslogSinkConsumer.parse(ByteBuffer.wrap(syslogMessageString.getBytes())));
 			System.out.println(convertToEvent.getEvent());
-		}
+	//	}
 		long end = java.util.Calendar.getInstance().getTimeInMillis();
 		System.out.println("Time Taken: "
 				+ (end - start) / 1000L + "s");

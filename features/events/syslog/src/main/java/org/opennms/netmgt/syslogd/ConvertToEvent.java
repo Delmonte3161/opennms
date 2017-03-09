@@ -52,6 +52,7 @@ import org.opennms.netmgt.config.syslogd.ProcessMatch;
 import org.opennms.netmgt.config.syslogd.UeiList;
 import org.opennms.netmgt.config.syslogd.UeiMatch;
 import org.opennms.netmgt.dao.api.AbstractInterfaceToNodeCache;
+import org.opennms.netmgt.dao.api.InterfaceToNodeCache;
 import org.opennms.netmgt.model.events.EventBuilder;
 import org.opennms.netmgt.xml.event.Event;
 import org.slf4j.Logger;
@@ -151,11 +152,10 @@ public class ConvertToEvent {
         final HideMessage hideMessage = config.getHideMessages();
         final String discardUei = config.getDiscardUei();
 
-        final String syslogString;
-        if (data.endsWith("\0")) {
-            syslogString = data.substring(0, data.length() - 1);
-        } else {
-            syslogString = data;
+        String syslogString = data;
+        // Trim trailing nulls from the string
+        while (syslogString.endsWith("\0")) {
+            syslogString = syslogString.substring(0, syslogString.length() - 1);
         }
 
         if (LOG.isDebugEnabled()) {
@@ -164,7 +164,7 @@ public class ConvertToEvent {
 
         GenericParser parser = new GenericParser(config, syslogString);
         if (!parser.find()) {
-            throw new MessageDiscardedException("message does not match");
+            throw new MessageDiscardedException("Message does not match the grok : "+syslogString);
         }
         SyslogMessage message;
         try {
@@ -194,11 +194,16 @@ public class ConvertToEvent {
         bldr.setHost(InetAddressUtils.getLocalHostName());
 
         final InetAddress hostAddress = message.getHostAddress();
+        
+        //Updated the code from foundation-2017
         if (hostAddress != null) {
             // Set nodeId
-            int nodeId = AbstractInterfaceToNodeCache.getInstance().getNodeId(location, hostAddress);
-            if (nodeId > 0) {
-                bldr.setNodeid(nodeId);
+            InterfaceToNodeCache cache = AbstractInterfaceToNodeCache.getInstance();
+            if (cache != null) {
+                int nodeId = cache.getNodeId(location, hostAddress);
+                if (nodeId > 0) {
+                    bldr.setNodeid(nodeId);
+                }
             }
 
             bldr.setInterface(hostAddress);
@@ -249,11 +254,11 @@ public class ConvertToEvent {
                 // boolean check for both if and else if which causes a extra time
                 if (otherStuffMatches) {
                     if (uei.getMatch().getType().equals("substr")) {
-                        if (matchSubstring(discardUei, bldr, matchedText, uei)) {
+                    	if (matchSubstring(message.getMessage(), uei, bldr, config.getDiscardUei())) {
                             break;
                         }
                     } else if ((uei.getMatch().getType().startsWith("regex"))) {
-                        if (matchRegex(message, uei, bldr, discardUei)) {
+                    	 if (matchRegex(message.getMessage(), uei, bldr, config.getDiscardUei())) {
                             break;
                         }
                     }
@@ -380,63 +385,73 @@ public class ConvertToEvent {
         return CACHED_PATTERNS.getUnchecked(expression);
     }
 
-    private static boolean matchSubstring(final String discardUei, final EventBuilder bldr, String message, final UeiMatch uei) throws MessageDiscardedException {
-        boolean doIMatch = false;
-        boolean traceEnabled = LOG.isTraceEnabled();
+    /**
+     * Checks the message for substring matches to a {@link UeiMatch}. If the message
+     * matches, then the UEI is updated (or the event is discarded if the discard
+     * UEI is used). Parameter assignments are NOT performed for substring matches.
+     * 
+     * @param message
+     * @param uei
+     * @param bldr
+     * @param discardUei
+     * @return
+     * @throws MessageDiscardedException
+     */
+    private static boolean matchSubstring(String message, final UeiMatch uei, final EventBuilder bldr, final String discardUei) throws MessageDiscardedException {
+        final boolean traceEnabled = LOG.isTraceEnabled();
         if (message.contains(uei.getMatch().getExpression())) {
             if (discardUei.equals(uei.getUei())) {
                 if (traceEnabled) LOG.trace("Specified UEI '{}' is same as discard-uei, discarding this message.", uei.getUei());
                 throw new MessageDiscardedException();
             } else {
-                //We can pass a new UEI on this
+                // Update the UEI to the new value
                 if (traceEnabled) LOG.trace("Changed the UEI of a Syslogd event, based on substring match, to : {}", uei.getUei());
                 bldr.setUei(uei.getUei());
-                // I think we want to stop processing here so the first
-                // ueiMatch wins, right?
-                doIMatch = true;
+                return true;
             }
         } else {
             if (traceEnabled) LOG.trace("No substring match for text of a Syslogd event to : {}", uei.getMatch().getExpression());
+            return false;
         }
-        return doIMatch;
     }
 
-    private static boolean matchRegex(final SyslogMessage message, final UeiMatch uei, final EventBuilder bldr, final String discardUei) throws MessageDiscardedException {
-        boolean traceEnabled = LOG.isTraceEnabled();
+    /**
+     * Checks the message for matches to a {@link UeiMatch}. If the message
+     * matches, then the UEI is updated (or the event is discarded if the discard
+     * UEI is used) and parameters are added to the event.
+     * 
+     * @param message
+     * @param uei
+     * @param bldr
+     * @param discardUei
+     * @return
+     * @throws MessageDiscardedException
+     */
+    private static boolean matchRegex(final String message, final UeiMatch uei, final EventBuilder bldr, final String discardUei) throws MessageDiscardedException {
+        final boolean traceEnabled = LOG.isTraceEnabled();
         final String expression = uei.getMatch().getExpression();
         final Pattern msgPat = getPattern(expression);
-        final Matcher msgMat;
-        String processName=null;
         if (msgPat == null) {
             LOG.debug("Unable to create pattern for expression '{}'", expression);
             return false;
-        } else {
-            final String text;
-            if(message.getProcessName()!=null&&!message.getProcessName().isEmpty())
-            {
-                processName=message.getProcessName()+": ";
-            }
-            else
-            {
-                processName="";
-            }
-            if (message.getMatchedMessage() != null) {
-                text = processName+message.getMatchedMessage();
-            } else {
-                text = processName+message.getFullText();
-            }
-            msgMat = msgPat.matcher(text);
-        }
+        } 
+
+        final Matcher msgMat = msgPat.matcher(message);
+
+        // If the message matches the regex
         if ((msgMat != null) && (msgMat.find())) {
+            // Discard the message if the UEI is set to the discard UEI
             if (discardUei.equals(uei.getUei())) {
-                LOG.debug("Specified UEI '{}' is same as discard-uei, discarding this message.", uei.getUei());
+                if (traceEnabled) LOG.trace("Specified UEI '{}' is same as discard-uei, discarding this message.", uei.getUei());
                 throw new MessageDiscardedException();
+            } else {
+                // Update the UEI to the new value
+                if (traceEnabled) LOG.trace("Changed the UEI of a Syslogd event, based on regex match, to : {}", uei.getUei());
+                bldr.setUei(uei.getUei());
             }
 
-            // We matched a UEI
-            bldr.setUei(uei.getUei());
-            // Removed check of count in both if condition which is redundant
             if (msgMat.groupCount() > 0) {
+                // Perform default parameter mapping
                 if (uei.getMatch().isDefaultParameterMapping()) {
                     if (traceEnabled) LOG.trace("Doing default parameter mappings for this regex match.");
                     for (int groupNum = 1; groupNum <= msgMat.groupCount(); groupNum++) {
@@ -445,6 +460,7 @@ public class ConvertToEvent {
                     }
                 }
 
+                // If there are specific parameter mappings as well, perform those mappings
                 if (uei.getParameterAssignmentCount() > 0) {
                     if (traceEnabled) LOG.trace("Doing user-specified parameter assignments for this regex match.");
                     for (ParameterAssignment assignment : uei.getParameterAssignmentCollection()) {
@@ -458,11 +474,11 @@ public class ConvertToEvent {
                     }
                 }
             }
-            // I think we want to stop processing here so the first
-            // ueiMatch wins, right?
+
             return true;
         }
-        if (traceEnabled) LOG.trace("Message '{}' did not regex-match pattern '{}'", message.getMessage(), expression);
+
+        if (traceEnabled) LOG.trace("Message portion '{}' did not regex-match pattern '{}'", message, expression);
         return false;
     }
 
