@@ -1598,11 +1598,12 @@
                 <artifactId>checkstyle</artifactId>
                 <version>7.6</version>
               </dependency>
-              <dependency>
+              <!-- Commenting out the checkstyle which is not required for cerner  -->
+             <!--  <dependency>
                 <groupId>org.opennms</groupId>
                 <artifactId>org.opennms.checkstyle</artifactId>
                 <version>${project.version}</version>
-              </dependency>
+              </dependency> -->
               <dependency>
                 <groupId>com.github.sevntu.checkstyle</groupId>
                 <artifactId>sevntu-checkstyle-maven-plugin</artifactId>
@@ -1677,11 +1678,12 @@
         <artifactId>opennms-ackd</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
+      <!-- Commenting out the checkstyle which is not required for cerner  -->
+      <!-- <dependency>
         <groupId>org.opennms</groupId>
         <artifactId>org.opennms.checkstyle</artifactId>
         <version>${project.version}</version>
-      </dependency>
+      </dependency> -->
       <dependency>
         <groupId>org.opennms.core</groupId>
         <artifactId>org.opennms.core.api</artifactId>
