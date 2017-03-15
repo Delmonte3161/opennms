@@ -108,8 +108,8 @@ public class SyslogSinkConsumer implements MessageConsumer<SyslogConnection, Sys
         return grokPatternsList;
     }
 
-    public void setGrokPatternsList(List<String> grokPatternsList) {
-        this.grokPatternsList = grokPatternsList;
+    public void setGrokPatternsList(List<String> grokPatternsListValue) {
+        grokPatternsList = grokPatternsListValue;
     }
 
     public SyslogSinkConsumer(MetricRegistry registry) {
@@ -323,6 +323,7 @@ public class SyslogSinkConsumer implements MessageConsumer<SyslogConnection, Sys
                 bufferedReader = reader.readLine();
             }
             grokPatternsList=new ArrayList<String>(grookSet);
+            reader.close();
             return grokPatternsList;
         }
 
