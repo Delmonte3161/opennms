@@ -135,7 +135,7 @@ public class AvailabilityServiceHibernateImpl implements AvailabilityService {
 
         // category specifics
         final List<Integer> nodeIds = getNodes(category);
-        final List<String> serviceNames = category.getServices();
+        final List<String> serviceNames = category.getServiceCollection();
 
         // retrieve the outages associated with the given nodes, only retrieving those that affect our window
         final Map<Integer, List<OnmsOutage>> outagesByNode = getOutages(nodeIds, serviceNames, windowStart, windowEnd);

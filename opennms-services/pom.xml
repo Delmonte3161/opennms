@@ -202,6 +202,12 @@
       <artifactId>opennms-util</artifactId>
       <scope>compile</scope>
     </dependency>
+    <!--
+    <dependency>
+      <groupId>org.opennms.features</groupId>
+      <artifactId>org.opennms.features.phonebook</artifactId>
+    </dependency>
+    -->
     <dependency>
       <groupId>org.opennms.features.collection</groupId>
       <artifactId>org.opennms.features.collection.api</artifactId>
@@ -300,6 +306,11 @@
       <artifactId>jrrd2-dependencies</artifactId>
       <scope>test</scope>
       <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>com.novell.ldap</groupId>
+      <artifactId>jldap</artifactId>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.opennms.dependencies</groupId>

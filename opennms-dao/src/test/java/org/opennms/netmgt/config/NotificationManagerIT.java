@@ -440,7 +440,7 @@ public class NotificationManagerIT implements InitializingBean {
         }
 
         @Override
-        public void update() throws IOException {
+        public void update() throws IOException, MarshalException, ValidationException {
             return;
         }
     }

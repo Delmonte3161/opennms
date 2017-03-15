@@ -29,7 +29,10 @@
 package org.opennms.report.inventory;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,7 +41,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.opennms.core.xml.JaxbUtils;
+import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.ValidationException;
 import org.opennms.netmgt.config.RWSConfig;
 import org.opennms.rancid.ConnectionProperties;
 import org.opennms.rancid.InventoryElement2;
@@ -506,6 +511,7 @@ public class InventoryReportCalculator implements InitializingBean {
             throw new InventoryCalculationException(e);
         }
     }
+    
 
     /**
      * <p>marshal</p>
@@ -513,12 +519,25 @@ public class InventoryReportCalculator implements InitializingBean {
      * @param outputFile a {@link java.io.File} object.
      * @throws org.opennms.report.inventory.InventoryCalculationException if any.
      */
-    public void marshal(File outputFile) throws InventoryCalculationException {
+    public void marshal(File outputFile)
+    throws InventoryCalculationException {
         try {
-            JaxbUtils.marshal(rnbi, outputFile);
+            Writer fileWriter = new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8");
+            Marshaller marshaller = new Marshaller(fileWriter);
+            marshaller.setSuppressNamespaces(true);
+            marshaller.marshal(rnbi);
+            LOG.debug("The xml marshalled from the castor classes is saved in {}", outputFile.getAbsoluteFile());
+            fileWriter.close();
+        } catch (MarshalException me) {
+            LOG.error("MarshalException ", me);
+            throw new InventoryCalculationException(me);
+        } catch (ValidationException ve) {
+            LOG.error("Validation Exception ", ve);
+            throw new InventoryCalculationException(ve);
         } catch (IOException ioe) {
             LOG.error("IO Exception ", ioe);
             throw new InventoryCalculationException(ioe);
         }
+
     }
 }

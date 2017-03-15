@@ -32,11 +32,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
+import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.ValidationException;
 import org.opennms.netmgt.config.CategoryFactory;
+import org.opennms.netmgt.config.categories.Categories;
 import org.opennms.netmgt.config.categories.Category;
-import org.opennms.netmgt.config.categories.CategoryGroup;
+import org.opennms.netmgt.config.categories.Categorygroup;
 import org.opennms.netmgt.config.categories.Catinfo;
 import org.opennms.web.svclayer.dao.CategoryConfigDao;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -55,6 +59,10 @@ public class DefaultCategoryConfigDao implements CategoryConfigDao {
 	public DefaultCategoryConfigDao() {
 		try {
 			CategoryFactory.init();
+		} catch (MarshalException e) {
+			throw new DataRetrievalFailureException("Syntax error in categories file", e);
+		} catch (ValidationException e) {
+			throw new DataRetrievalFailureException("Validation error in categories file", e);
 		} catch (FileNotFoundException e) {
 			throw new DataRetrievalFailureException("Unable to locate categories file", e);
 		} catch (IOException e) {
@@ -78,11 +86,18 @@ public class DefaultCategoryConfigDao implements CategoryConfigDao {
 		
 		List<Category> catList = new ArrayList<Category>();
 		Catinfo catInfo = CategoryFactory.getInstance().getConfig();
-		List<CategoryGroup> catGroupList = catInfo.getCategoryGroups();
+		List<Categorygroup> catGroupList = catInfo.getCategorygroupCollection();
 		if (catGroupList != null) {
-		    for (final CategoryGroup cg : catGroupList) {
-		        catList.addAll(cg.getCategories());
-		    }
+			Iterator<Categorygroup> catIter = catGroupList.iterator();
+			while(catIter.hasNext()){
+				Categorygroup cg = catIter.next();
+				Categories cats = cg.getCategories();
+				Category[] categories = cats.getCategory();
+				int i = 0;
+				for (i = 0; i < categories.length; i++) {
+					catList.add(categories[i]);
+				}
+			}
 		}
 		return catList;
 	}

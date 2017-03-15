@@ -94,21 +94,21 @@ public class FormProcReportController extends AbstractController implements Init
         // Save the global variables into the working report
         report.setTitle(report_title);
         if (show_graphtype == null) {
-            report.setShowGraphtypeButton(false);
+            report.setShow_graphtype_button(false);
         } else {
-            report.setShowGraphtypeButton(true);
+            report.setShow_graphtype_button(true);
         }
         
         if (show_timespan == null) {
-            report.setShowTimespanButton(false);
+            report.setShow_timespan_button(false);
         } else {
-            report.setShowTimespanButton(true);
+            report.setShow_timespan_button(true);
         } 
         
         if (graphs_per_line > 0) {
-            report.setGraphsPerLine(graphs_per_line);
+            report.setGraphs_per_line(graphs_per_line);
         } else {
-            report.setGraphsPerLine(0);
+            report.setGraphs_per_line(0);
         } 
 
         if (Actions.Save.toString().equals(action)) {

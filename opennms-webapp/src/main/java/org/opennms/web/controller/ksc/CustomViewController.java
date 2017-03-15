@@ -238,7 +238,7 @@ public class CustomViewController extends AbstractController implements Initiali
         modelAndView.addObject("title", report.getTitle());
         modelAndView.addObject("resultSets", resultSets);
         
-        if (report.getShowTimespanButton()) {
+        if (report.getShow_timespan_button()) {
             if (overrideTimespan == null || !getKscReportService().getTimeSpans(true).containsKey(overrideTimespan)) {
                 modelAndView.addObject("timeSpan", "none");
             } else {
@@ -250,7 +250,7 @@ public class CustomViewController extends AbstractController implements Initiali
             modelAndView.addObject("timeSpan", null);
         }
 
-        if (report.getShowGraphtypeButton()) {
+        if (report.getShow_graphtype_button()) {
             LinkedHashMap<String, String> graphTypes = new LinkedHashMap<String, String>();
             graphTypes.put("none", "none");
             for (PrefabGraph graphOption : prefabGraphs) {
@@ -270,8 +270,8 @@ public class CustomViewController extends AbstractController implements Initiali
         
         modelAndView.addObject("showCustomizeButton", ( request.isUserInRole( Authentication.ROLE_ADMIN ) || !request.isUserInRole(Authentication.ROLE_READONLY) ) && (request.getRemoteUser() != null));
 
-        if (report.getGraphsPerLine() > 0) {
-            modelAndView.addObject("graphsPerLine", report.getGraphsPerLine());
+        if (report.getGraphs_per_line() > 0) {
+            modelAndView.addObject("graphsPerLine", report.getGraphs_per_line());
         } else {
             modelAndView.addObject("graphsPerLine", getDefaultGraphsPerLine());
         }

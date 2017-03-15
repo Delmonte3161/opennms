@@ -241,6 +241,10 @@ public final class BroadcastEventProcessor implements EventListener {
         
         try {
             notificationStatus = getNotifdConfigManager().getNotificationStatus();
+        } catch (MarshalException e) {
+            LOG.error("onEvent: problem marshalling configuration", e);
+        } catch (ValidationException e) {
+            LOG.error("onEvent: problem validating marsharled configuraion", e);
         } catch (IOException e) {
             LOG.error("onEvent: IO problem marshalling configuration", e);
         }
@@ -279,6 +283,10 @@ public final class BroadcastEventProcessor implements EventListener {
                     createPathOutageEvent(nodeid.intValue(), EventUtils.getParm(event, EventConstants.PARM_NODE_LABEL), cip, csvc, noticeSupressed);
                 }
             }
+        } catch (MarshalException e) {
+            LOG.error("onEvent: problem marshalling configuration", e);
+        } catch (ValidationException e) {
+            LOG.error("onEvent: problem validating marshalled configuration", e);
         } catch (IOException e) {
             LOG.error("onEvent: IO problem marshalling configuration", e);
         }

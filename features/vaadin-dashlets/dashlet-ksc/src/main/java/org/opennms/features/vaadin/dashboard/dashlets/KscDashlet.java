@@ -132,7 +132,7 @@ public class KscDashlet extends AbstractDashlet {
 
                     Report kscReport = kscPerformanceReportFactory.getReportByIndex(kscReportId);
 
-                    columns = kscReport.getGraphsPerLine();
+                    columns = kscReport.getGraphs_per_line();
 
                     if (columns == 0) {
                         columns = 1;

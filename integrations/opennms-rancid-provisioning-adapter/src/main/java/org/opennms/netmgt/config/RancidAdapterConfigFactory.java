@@ -36,6 +36,8 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
+import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.ValidationException;
 import org.opennms.core.utils.ConfigFileConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,13 +72,19 @@ public class RancidAdapterConfigFactory extends RancidAdapterConfigManager {
      *
      * @exception java.io.IOException
      *                Thrown if the specified config file cannot be read
+     * @exception org.exolab.castor.xml.MarshalException
+     *                Thrown if the file does not conform to the schema.
+     * @exception org.exolab.castor.xml.ValidationException
+     *                Thrown if the contents do not match the required schema.
      * @param currentVersion a long.
      * @param reader a {@link java.io.InputStream} object.
      * @param localServer a {@link java.lang.String} object.
      * @param verifyServer a boolean.
+     * @throws org.exolab.castor.xml.MarshalException if any.
+     * @throws org.exolab.castor.xml.ValidationException if any.
      * @throws java.io.IOException if any.
      */
-    public RancidAdapterConfigFactory(long currentVersion, InputStream reader, String localServer, boolean verifyServer) throws IOException {
+    public RancidAdapterConfigFactory(long currentVersion, InputStream reader, String localServer, boolean verifyServer) throws MarshalException, ValidationException, IOException {
         super(reader, localServer, verifyServer);
         m_currentVersion = currentVersion;
     }
@@ -88,9 +96,15 @@ public class RancidAdapterConfigFactory extends RancidAdapterConfigManager {
      *
      * @exception java.io.IOException
      *                Thrown if the specified config file cannot be read
+     * @exception org.exolab.castor.xml.MarshalException
+     *                Thrown if the file does not conform to the schema.
+     * @exception org.exolab.castor.xml.ValidationException
+     *                Thrown if the contents do not match the required schema.
      * @throws java.io.IOException if any.
+     * @throws org.exolab.castor.xml.MarshalException if any.
+     * @throws org.exolab.castor.xml.ValidationException if any.
      */
-    public static synchronized void init() throws IOException {
+    public static synchronized void init() throws IOException, MarshalException, ValidationException {
         if (m_loaded) {
             // init already called - return
             // to reload, reload() will need to be called
@@ -116,13 +130,19 @@ public class RancidAdapterConfigFactory extends RancidAdapterConfigManager {
      *
      * @exception java.io.IOException
      *                Thrown if the specified config file cannot be read/loaded
+     * @exception org.exolab.castor.xml.MarshalException
+     *                Thrown if the file does not conform to the schema.
+     * @exception org.exolab.castor.xml.ValidationException
+     *                Thrown if the contents do not match the required schema.
      * @throws java.io.IOException if any.
+     * @throws org.exolab.castor.xml.MarshalException if any.
+     * @throws org.exolab.castor.xml.ValidationException if any.
      */
-    public static synchronized void reload() throws IOException {
+    public static synchronized void reload() throws IOException, MarshalException, ValidationException {
         init();
         getInstance().update();
     }
-
+        
     /**
      * Return the singleton instance of this factory.
      *
@@ -170,8 +190,10 @@ public class RancidAdapterConfigFactory extends RancidAdapterConfigManager {
      * <p>update</p>
      *
      * @throws java.io.IOException if any.
+     * @throws org.exolab.castor.xml.MarshalException if any.
+     * @throws org.exolab.castor.xml.ValidationException if any.
      */
-    public void update() throws IOException {
+    public void update() throws IOException, MarshalException, ValidationException {
         getWriteLock().lock();
         try {
             final File cfgFile = ConfigFileConstants.getFile(ConfigFileConstants.RANCID_CONFIG_FILE_NAME);

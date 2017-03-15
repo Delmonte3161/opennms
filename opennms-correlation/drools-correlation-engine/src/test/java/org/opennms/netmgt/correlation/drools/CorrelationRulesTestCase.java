@@ -53,7 +53,7 @@ import org.springframework.test.context.ContextConfiguration;
         "classpath:META-INF/opennms/correlation-engine.xml",
         "classpath:test-context.xml"
 })
-@JUnitConfigurationEnvironment(systemProperties={"org.opennms.activemq.broker.disable=true"})
+@JUnitConfigurationEnvironment
 @DirtiesContext
 public abstract class CorrelationRulesTestCase {
 

@@ -64,8 +64,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.xml.sax.ContentHandler;
 
-import com.codahale.metrics.MetricRegistry;
-
 /**
  * Class RuleSet.
  *
@@ -835,10 +833,11 @@ public class RuleSet implements Serializable {
         return true;
     }
 
-    public CorrelationEngine constructEngine(Resource basePath, ApplicationContext appContext, EventIpcManager eventIpcManager, MetricRegistry metricRegistry) {
+    public CorrelationEngine constructEngine(Resource basePath, ApplicationContext appContext, EventIpcManager eventIpcManager) {
         final ApplicationContext configContext = new ConfigFileApplicationContext(basePath, getConfigLocation(), appContext);
 
-        final DroolsCorrelationEngine engine = new DroolsCorrelationEngine(getName(), metricRegistry);
+        final DroolsCorrelationEngine engine = new DroolsCorrelationEngine();
+        engine.setName(getName());
         engine.setAssertBehaviour(getAssertBehaviour());
         engine.setEventProcessingMode(getEventProcessingMode());
         engine.setEventIpcManager(eventIpcManager);

@@ -38,8 +38,9 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
+import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.ValidationException;
 import org.opennms.core.utils.ConfigFileConstants;
-
 /**
  * <p>NotifdConfigFactory class.</p>
  *
@@ -90,8 +91,10 @@ public class NotifdConfigFactory extends NotifdConfigManager {
      *
      * @throws java.io.IOException if any.
      * @throws java.io.FileNotFoundException if any.
+     * @throws org.exolab.castor.xml.MarshalException if any.
+     * @throws org.exolab.castor.xml.ValidationException if any.
      */
-    public static synchronized void init() throws IOException, FileNotFoundException {
+    public static synchronized void init() throws IOException, FileNotFoundException, MarshalException, ValidationException {
         if (!initialized) {
             instance = new NotifdConfigFactory();
             instance.reload();
@@ -104,8 +107,10 @@ public class NotifdConfigFactory extends NotifdConfigManager {
      *
      * @throws java.io.IOException if any.
      * @throws java.io.FileNotFoundException if any.
+     * @throws org.exolab.castor.xml.MarshalException if any.
+     * @throws org.exolab.castor.xml.ValidationException if any.
      */
-    public synchronized void reload() throws IOException, FileNotFoundException {
+    public synchronized void reload() throws IOException, FileNotFoundException, MarshalException, ValidationException {
         m_notifdConfFile = ConfigFileConstants.getFile(ConfigFileConstants.NOTIFD_CONFIG_FILE_NAME);
 
         InputStream configIn = null;
@@ -128,8 +133,10 @@ public class NotifdConfigFactory extends NotifdConfigManager {
      * TODO: Pull up into base class but keep this reference for the
      * webapp until singleton is removed.
      * @throws java.io.IOException if any.
+     * @throws org.exolab.castor.xml.MarshalException if any.
+     * @throws org.exolab.castor.xml.ValidationException if any.
      */
-    public static String getPrettyStatus() throws IOException {
+    public static String getPrettyStatus() throws IOException, MarshalException, ValidationException {
         if (!initialized)
             return "Unknown";
 
@@ -160,12 +167,15 @@ public class NotifdConfigFactory extends NotifdConfigManager {
      * <p>update</p>
      *
      * @throws java.io.IOException if any.
+     * @throws org.exolab.castor.xml.MarshalException if any.
+     * @throws org.exolab.castor.xml.ValidationException if any.
      */
     @Override
-    protected synchronized void update() throws IOException {
+    protected synchronized void update() throws IOException, MarshalException, ValidationException {
         if (m_lastModified != m_notifdConfFile.lastModified()) {
             NotifdConfigFactory.getInstance().reload();
         }
     }
+
 
 }

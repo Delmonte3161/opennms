@@ -32,6 +32,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.ValidationException;
 import org.opennms.netmgt.config.NotifdConfigManager;
 
 /**
@@ -50,8 +52,10 @@ public class MockNotifdConfigManager extends NotifdConfigManager {
     /**
      * @param configString
      * @throws IOException
+     * @throws ValidationException
+     * @throws MarshalException
      */
-    public MockNotifdConfigManager(String configString) throws IOException {
+    public MockNotifdConfigManager(String configString) throws MarshalException, ValidationException, IOException {
         InputStream reader = new ByteArrayInputStream(configString.getBytes("UTF-8"));
         parseXml(reader);
         reader.close();
@@ -61,7 +65,7 @@ public class MockNotifdConfigManager extends NotifdConfigManager {
      * @see org.opennms.netmgt.config.NotifdConfigManager#update()
      */
     @Override
-    protected void update() throws IOException {
+    protected void update() throws IOException, MarshalException, ValidationException {
     }
 
     /* (non-Javadoc)
@@ -75,7 +79,8 @@ public class MockNotifdConfigManager extends NotifdConfigManager {
      * @see org.opennms.netmgt.config.NotifdConfigManager#getNextNotifIdSql()
      */
     @Override
-    public String getNextNotifIdSql() throws IOException {
+    public String getNextNotifIdSql() throws IOException, MarshalException,
+            ValidationException {
         return m_nextNotifIdSql;
     }
     
@@ -84,7 +89,7 @@ public class MockNotifdConfigManager extends NotifdConfigManager {
     }
 
     @Override
-    public String getNextUserNotifIdSql() throws IOException {
+    public String getNextUserNotifIdSql() throws IOException, MarshalException, ValidationException {
         // TODO Auto-generated method stub
         return m_nextUserNotifIdSql;
     }

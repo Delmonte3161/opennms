@@ -108,10 +108,6 @@ public abstract class AbstractCorrelationEngine implements CorrelationEngine {
         }
     }
     
-    public int getPendingTasksCount() {
-        return m_pendingTasks.size();
-    }
-
     /**
      * <p>timerExpired</p>
      *

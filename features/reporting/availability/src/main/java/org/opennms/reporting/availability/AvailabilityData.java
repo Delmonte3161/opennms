@@ -40,12 +40,14 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 
+import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.opennms.core.logging.Logging;
 import org.opennms.netmgt.config.CategoryFactory;
 import org.opennms.netmgt.config.api.CatFactory;
-import org.opennms.netmgt.config.categories.CategoryGroup;
+import org.opennms.netmgt.config.categories.Categorygroup;
 import org.opennms.netmgt.config.categories.Catinfo;
 import org.opennms.reporting.availability.svclayer.AvailabilityDataService;
 import org.opennms.reporting.datablock.Node;
@@ -117,12 +119,14 @@ public class AvailabilityData {
      * @param startDate a {@link java.lang.String} object.
      * @param startYear a {@link java.lang.String} object.
      * @throws java.io.IOException if any.
+     * @throws org.exolab.castor.xml.MarshalException if any.
+     * @throws org.exolab.castor.xml.ValidationException if any.
      * @throws java.lang.Exception if any.
      */
     public void fillReport(String categoryName, Report report,
             String format, String monthFormat,
             String startMonth, String startDate, String startYear)
-            throws IOException,
+            throws IOException, MarshalException, ValidationException,
             Exception {
       
         Calendar cal = new GregorianCalendar();
@@ -147,11 +151,13 @@ public class AvailabilityData {
      * @param monthFormat a {@link java.lang.String} object.
      * @param periodEndDate a {@link java.util.Date} object.
      * @throws java.io.IOException if any.
+     * @throws org.exolab.castor.xml.MarshalException if any.
+     * @throws org.exolab.castor.xml.ValidationException if any.
      * @throws java.lang.Exception if any.
      */
     public void fillReport(String categoryName, Report report,
             String format, String monthFormat, Date periodEndDate)
-            throws IOException,
+            throws IOException, MarshalException, ValidationException,
             Exception {
        generateData(categoryName, report, format, monthFormat, periodEndDate);
     }
@@ -160,7 +166,7 @@ public class AvailabilityData {
     private void generateData(final String categoryName, final Report report,
             final String format, final String monthFormat,
             final Date periodEndDate)
-            throws IOException,
+            throws IOException, MarshalException, ValidationException,
             Exception {
         
         Logging.withPrefix(LOG4J_CATEGORY, new Callable<Void>() {
@@ -181,6 +187,12 @@ public class AvailabilityData {
                 } catch (IOException e) {
                     LOG.error("Initializing CategoryFactory", e);
                     throw e;
+                } catch (MarshalException e) {
+                    LOG.error("Initializing CategoryFactory", e);
+                    throw e;
+                } catch (ValidationException e) {
+                    LOG.error("Initializing CategoryFactory", e);
+                    throw e;
                 }
                 
                 // FIXME There's some magic in here regarding multiple categories in a report
@@ -193,9 +205,9 @@ public class AvailabilityData {
                         int catCount = 0;
                         LOG.debug("catCount {}", catCount);
                         
-                        for(final CategoryGroup cg : config.getCategoryGroups()) {
+                        for(final Categorygroup cg : config.getCategorygroupCollection()) {
                         
-                            for(org.opennms.netmgt.config.categories.Category cat : cg.getCategories()) {
+                            for(org.opennms.netmgt.config.categories.Category cat : cg.getCategories().getCategoryCollection()) {
                 
                                 LOG.debug("CATEGORY {}", cat.getLabel());
                                 catCount++;
@@ -235,7 +247,7 @@ public class AvailabilityData {
      * @param cat
      *            Category
      * @param report
-     *            Report class
+     *            Report Castor class
      * @param format
      *            SVG-specific/all reports
      */
@@ -248,7 +260,7 @@ public class AvailabilityData {
         LOG.debug("Inside populate data Structures");
         try {
 
-            List<String> monitoredServices = new ArrayList<String>(cat.getServices());
+            List<String> monitoredServices = new ArrayList<String>(cat.getServiceCollection());
 
             if (m_availabilityDataService == null) {
                 LOG.debug("DATA SERVICE IS NULL");
@@ -284,8 +296,8 @@ public class AvailabilityData {
                                                                             monitoredServices,
                                                                             report,
                                                                             topOffenders,
-                                                                            cat.getWarningThreshold(),
-                                                                            cat.getNormalThreshold(),
+                                                                            cat.getWarning(),
+                                                                            cat.getNormal(),
                                                                             cat.getComment(),
                                                                             cat.getLabel(),
                                                                             format,

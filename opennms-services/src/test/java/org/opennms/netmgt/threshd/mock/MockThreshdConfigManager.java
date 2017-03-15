@@ -31,22 +31,26 @@ package org.opennms.netmgt.threshd.mock;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.ValidationException;
 import org.opennms.netmgt.config.ThreshdConfigManager;
 
 public class MockThreshdConfigManager extends ThreshdConfigManager {
 
-    public MockThreshdConfigManager(InputStream stream, String localServer, boolean verifyServer) throws IOException  {
+    public MockThreshdConfigManager(InputStream stream, String localServer, boolean verifyServer) throws MarshalException, ValidationException {
         super(stream, localServer, verifyServer);
     }
 
     @Override
-    public void reloadXML() throws IOException {
-        // pass
+    public void reloadXML() throws IOException, MarshalException, ValidationException {
+        // TODO Auto-generated method stub
+
     }
 
     @Override
     protected void saveXML(String xmlString) throws IOException {
-        // pass
+        // TODO Auto-generated method stub
+
     }
 
 }

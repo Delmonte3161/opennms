@@ -33,6 +33,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.ValidationException;
 import org.opennms.core.utils.ConfigFileConstants;
 
 /**
@@ -61,8 +63,10 @@ public class NotificationCommandFactory extends NotificationCommandManager {
      * <p>init</p>
      *
      * @throws java.io.IOException if any.
+     * @throws org.exolab.castor.xml.MarshalException if any.
+     * @throws org.exolab.castor.xml.ValidationException if any.
      */
-    public static synchronized void init() throws IOException {
+    public static synchronized void init() throws IOException, MarshalException, ValidationException {
         if (!initialized) {
             getInstance().update();
             initialized = true;
@@ -86,11 +90,13 @@ public class NotificationCommandFactory extends NotificationCommandManager {
     /**
      * <p>update</p>
      *
+     * @throws org.exolab.castor.xml.MarshalException if any.
+     * @throws org.exolab.castor.xml.ValidationException if any.
      * @throws java.io.FileNotFoundException if any.
      * @throws java.io.IOException if any.
      */
     @Override
-    public void update() throws FileNotFoundException, IOException {
+    public void update() throws MarshalException, ValidationException, FileNotFoundException, IOException {
         InputStream configIn = new FileInputStream(ConfigFileConstants.getFile(ConfigFileConstants.NOTIF_COMMANDS_CONF_FILE_NAME));
         parseXML(configIn);
     }
