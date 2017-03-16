@@ -193,7 +193,10 @@ public class ConvertToEvent {
         // Set event host
         bldr.setHost(InetAddressUtils.getLocalHostName());
 
-        final InetAddress hostAddress = message.getHostAddress();
+        //Getting the host address from syslog message,
+        //If syslog message address is not null set the hostadress
+        //Else adding the source address obtained from headers of syslog packets 
+        final InetAddress hostAddress = (message.getHostAddress()!=null) ? message.getHostAddress():addr;
         
         //Updated the code from foundation-2017
         if (hostAddress != null) {
