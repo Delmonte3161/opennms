@@ -492,5 +492,24 @@ public class SyslogSinkConsumerMessageTest {
 				+ (end - start) / 1000L + "s");
 	}
     
+    @Test
+	public void testCiscoConvertToEvent() throws Exception {
+    	InterfaceToNodeCacheDaoImpl.setInstance(new MockInterfaceToNodeCache());
+		long start = java.util.Calendar.getInstance().getTimeInMillis();
+		syslogMessageString = "<19>Mar 17 14:28:48 CST: %AUTHPRIV-3-SYSTEM_MSG[0]: pam_aaa:Authentication failed from 7.40.16.188 - sshd[20189]";
+	//	for (int i = 0; i < 5000; i++) {
+			ConvertToEvent convertToEvent = new ConvertToEvent(
+					DistPollerDao.DEFAULT_DIST_POLLER_ID,
+					MonitoringLocationDao.DEFAULT_MONITORING_LOCATION_ID,
+					InetAddressUtils.ONE_TWENTY_SEVEN, 9999,
+					syslogMessageString, m_config,
+					SyslogSinkConsumer.parse(ByteBuffer.wrap(syslogMessageString.getBytes())));
+			System.out.println(convertToEvent.getEvent());
+	//	}
+		long end = java.util.Calendar.getInstance().getTimeInMillis();
+		System.out.println("Time Taken: "
+				+ (end - start) / 1000L + "s");
+	}
+    
     
 }
