@@ -308,7 +308,7 @@ public class ConvertToEvent {
         // Using parms provides configurability.
         bldr.setLogMessage(message.getMessage());
 
-        bldr.addParam("rawmessage", fullText);
+        bldr.addParam("rawmessage", data);
         bldr.addParam("syslogmessage", message.getMessage());
         bldr.addParam("severity", "" + priorityTxt);
         bldr.addParam("timestamp", message.getSyslogFormattedDate());
