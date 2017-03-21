@@ -43,8 +43,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.exolab.castor.xml.MarshalException;
-import org.exolab.castor.xml.ValidationException;
 import org.junit.Test;
 import org.opennms.core.test.ConfigurationTestUtils;
 import org.opennms.core.utils.InetAddressUtils;
@@ -78,7 +76,7 @@ public class ConvertToEventTest {
      * @throws IOException
      */
     @Test
-    public void testConvertToEvent() throws MarshalException, ValidationException, IOException {
+    public void testConvertToEvent() throws IOException {
 
         InterfaceToNodeCacheDaoImpl.setInstance(new MockInterfaceToNodeCache());
 
@@ -125,7 +123,7 @@ public class ConvertToEventTest {
     }
 
     @Test
-    public void testCiscoEventConversion() throws MarshalException, ValidationException, IOException {
+    public void testCiscoEventConversion() throws IOException {
 
         InputStream stream = ConfigurationTestUtils.getInputStreamForResource(this, "/etc/syslogd-cisco-configuration.xml");
         SyslogdConfig config = new SyslogdConfigFactory(stream);
