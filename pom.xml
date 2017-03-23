@@ -3,8 +3,7 @@
   <!-- OpenNMS Top-Level POM -->
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opennms</groupId>
-  <artifactId>opennms</artifactId>
-  <version>19.0.0-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>OpenNMS</name>
   <url>http://opennms.org/</url>
@@ -3981,4 +3980,5 @@
       <url>scpexe://repo.opennms.org/var/www/sites/opennms.org/site/repo/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
+  <artifactId>opennms</artifactId>
 </project>
