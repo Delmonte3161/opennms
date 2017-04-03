@@ -32,9 +32,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Month;
@@ -51,6 +54,8 @@ import org.opennms.core.test.ConfigurationTestUtils;
 import org.opennms.core.test.MockLogAppender;
 import org.opennms.core.time.ZonedDateTimeBuilder;
 import org.opennms.netmgt.config.SyslogdConfigFactory;
+import org.opennms.netmgt.dao.api.DistPollerDao;
+import org.opennms.netmgt.dao.api.MonitoringLocationDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -437,5 +442,37 @@ public class SyslogMessageTest {
     	assertEquals(null, message.getProcessId());
     	assertEquals(null, message.getMessageID());
     	assertEquals("Invalid Message", message.getMessage());
+    }
+    
+    
+    
+    @Test
+    public void testCiscoCernerMessage() throws Exception {
+
+    	 InputStream stream = ConfigurationTestUtils.getInputStreamForResource(this,
+                 "/etc/syslogd-radix-configuration.xml");
+        final SyslogdConfigFactory config = new SyslogdConfigFactory(stream);
+
+        byte[] bytes = "<189>: 2017 Mar 4 15:26:19 CST: %ETHPORT-5-IF_DOWN_ERROR_DISABLED: Interface Ethernet103/1/3 is down (Error disabled. Reason:ekeying triggered)Reply'User profile picture'".getBytes(StandardCharsets.US_ASCII);
+
+        DatagramPacket pkt = new DatagramPacket(bytes, bytes.length,
+                                                InetAddress.getLocalHost(),
+                                                SyslogClient.PORT);
+        ByteBuffer data = ByteBuffer.wrap(pkt.getData());
+
+        try {
+            ConvertToEvent convertToEvent = new ConvertToEvent(
+                DistPollerDao.DEFAULT_DIST_POLLER_ID,
+                MonitoringLocationDao.DEFAULT_MONITORING_LOCATION_ID,
+                pkt.getAddress(),
+                pkt.getPort(),
+                data,
+                config
+            );
+            LOG.info("Generated event: {}", convertToEvent.getEvent().toString());
+        } catch (MessageDiscardedException e) {
+            LOG.error("Message Parsing failed", e);
+            fail("Message Parsing failed: " + e.getMessage());
+        }
     }
 }

@@ -29,11 +29,13 @@
 package org.opennms.netmgt.syslogd;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.opennms.core.utils.ConfigFileConstants;
 import org.opennms.netmgt.config.SyslogdConfig;
 
 /**
@@ -50,16 +52,22 @@ public class RadixTreeSyslogParser extends SyslogParser {
 	private static RadixTreeParser radixParser = new RadixTreeParser();
 
 	static {
-		new BufferedReader(new InputStreamReader(RadixTreeSyslogParser.class.getClassLoader().getResourceAsStream("org/opennms/netmgt/syslogd/grok-patterns.txt"))).lines().forEach(pattern -> {
-			// Ignore comments and blank lines
-			if (pattern == null || pattern.trim().length() == 0 || pattern.trim().startsWith("#")) {
-				return;
-			}
-			radixParser.teach(GrokParserStageSequenceBuilder.parseGrok(pattern).toArray(new ParserStage[0]));
-		});
-		// After we have taught all of the patterns to the parser, perform
-		// edge compression to optimize the tree
-		radixParser.performEdgeCompression();
+		try
+		{
+			new BufferedReader(new InputStreamReader(new FileInputStream(ConfigFileConstants.getFile(ConfigFileConstants.GROK_PATTERN_FILE_NAME)))).lines().forEach(pattern -> {
+				// Ignore comments and blank lines
+				if (pattern == null || pattern.trim().length() == 0 || pattern.trim().startsWith("#")) {
+					return;
+				}
+				radixParser.teach(GrokParserStageSequenceBuilder.parseGrok(pattern).toArray(new ParserStage[0]));
+			});
+			// After we have taught all of the patterns to the parser, perform
+			// edge compression to optimize the tree
+			radixParser.performEdgeCompression();
+		}
+		catch (Exception e) {
+		e.printStackTrace();
+		}
 	}
 
 	public RadixTreeSyslogParser(SyslogdConfig config, ByteBuffer syslogString) {

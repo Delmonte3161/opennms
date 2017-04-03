@@ -446,6 +446,11 @@ public abstract class ConfigFileConstants {
      * The config file for the JDBC Data Collector.
      */
     public static final int JDBC_COLLECTION_CONFIG_FILE_NAME;
+    
+    /**
+     * The text file holding all grok patterns.
+     */
+    public static final int GROK_PATTERN_FILE_NAME;
 
     //
     // Initialize the class data. This section is used to initialize the
@@ -570,9 +575,11 @@ public abstract class ConfigFileConstants {
         JDBC_COLLECTION_CONFIG_FILE_NAME = 80;
         
         ENLINKD_CONFIG_FILE_NAME = 81;
+        
+        GROK_PATTERN_FILE_NAME=82;
         // Allocate and build the mapping of identifiers to names
         //
-        FILE_ID_TO_NAME = new String[82];
+        FILE_ID_TO_NAME = new String[83];
 
         FILE_ID_TO_NAME[DB_CONFIG_FILE_NAME] = "opennms-database.xml";
         FILE_ID_TO_NAME[JMS_CONFIG_FILE_NAME] = "opennms-jms.xml";
@@ -663,6 +670,7 @@ public abstract class ConfigFileConstants {
         FILE_ID_TO_NAME[MICROBLOG_CONFIG_FILE_NAME] = "microblog-configuration.xml";
         FILE_ID_TO_NAME[SNMP_ASSET_ADAPTER_CONFIG_FILE_NAME] = "snmp-asset-adapter-configuration.xml";
         FILE_ID_TO_NAME[JDBC_COLLECTION_CONFIG_FILE_NAME] = "jdbc-datacollection-config.xml";
+        FILE_ID_TO_NAME[GROK_PATTERN_FILE_NAME] ="grok-patterns.txt";
     }
 
     /**
