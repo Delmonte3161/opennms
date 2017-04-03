@@ -1,3 +1,14 @@
+# Cisco Variant of Cerner Specific
+<%{INT:facilityPriority}>: %{MONTH:month} %{INT:day} %{INT:hour}:%{INT:minute}:%{INT:second} %{STRING:timezone}: %{STRING:processName}[%{INT:processId}]: %{STRING:message}
+<%{INT:facilityPriority}> %{MONTH:month} %{INT:day} %{INT:hour}:%{INT:minute}:%{INT:second} %{STRING:timezone}: %{STRING:processName}[%{INT:processId}]: %{STRING:message}
+<%{INT:facilityPriority}> %{INT:year} %{MONTH:month} %{INT:day} %{INT:hour}:%{INT:minute}:%{INT:second} %{STRING:timezone}: %{STRING:processName}[%{INT:processId}]: %{STRING:message}
+<%{INT:facilityPriority}>: %{INT:year} %{MONTH:month} %{INT:day} %{INT:hour}:%{INT:minute}:%{INT:second} %{STRING:timezone}: %{STRING:processName}[%{INT:processId}]: %{STRING:message}
+<%{INT:facilityPriority}>: %{INT:year} %{MONTH:month} %{INT:day} %{INT:hour}:%{INT:minute}:%{INT:second} %{STRING:timezone}: %{STRING:processName}: %{STRING:message}
+<%{INT:facilityPriority}>%{MONTH:month} %{INT:day} %{INT:hour}:%{INT:minute}:%{INT:second} %{STRING:timezone}: %{STRING:processName}: %{STRING:message}
+<%{INT:facilityPriority}>: %{MONTH:month} %{INT:day} %{INT:hour}:%{INT:minute}:%{INT:second} %{STRING:timezone}: %{STRING:processName}: %{STRING:message}
+<%{INT:facilityPriority}> %{INT:year} %{MONTH:month} %{INT:day} %{INT:hour}:%{INT:minute}:%{INT:second} %{STRING:timezone}: %{STRING:processName}: %{STRING:message}
+
+
 # RFC 3164 with messageId, time
 <%{INT:facilityPriority}>%{NOSPACE:messageId}: %{MONTH:month} %{INT:day} %{INT:hour}:%{INT:minute}:%{INT:second} %{STRING:hostname} %{NOSPACE:processName}[%{INT:processId}]: %{STRING:message}
 <%{INT:facilityPriority}>%{NOSPACE:messageId}: %{MONTH:month} %{INT:day} %{INT:hour}:%{INT:minute}:%{INT:second} %{STRING:hostname} [%{INT:processId}]: %{STRING:message}
@@ -77,4 +88,8 @@
 
 
 # Netgear variant of RFC 3164 with day of week and no hostname or process info
-<%{INT:facilityPriority}> %{STRING:dayofweek}, %{INT:year}-%{INT:month}-%{INT:day} %{INT:hour}:%{INT:minute}:%{INT:second} - %{STRING:message}
+<%{INT:facilityPriority}> %{INT:dayofweek}, %{INT:year}-%{INT:month}-%{INT:day} %{INT:hour}:%{INT:minute}:%{INT:second} - %{STRING:message}
+
+
+#Generic to make it as unknown
+%{STRING:message}

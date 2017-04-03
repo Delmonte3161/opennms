@@ -324,7 +324,7 @@ public class SyslogdLoadIT implements InitializingBean {
 
         m_eventCounter.waitForFinish(120000);
         
-        assertEquals(1, m_eventCounter.getCount());
+        assertEquals(2, m_eventCounter.getCount());
     }
 
     @Test
@@ -352,7 +352,30 @@ public class SyslogdLoadIT implements InitializingBean {
 
         m_eventCounter.waitForFinish(120000);
         
-        assertEquals(1, m_eventCounter.getCount());
+        assertEquals(2, m_eventCounter.getCount());
+    }
+    
+    @Test
+    public void testCiscoSyslog() throws Exception {
+
+    	 m_eventCounter.anticipate();
+    	
+        InetAddress address = InetAddress.getLocalHost();
+
+        byte[] bytes = "<189>: 2017 Mar 4 15:26:19 CST: %ETHPORT-5-IF_DOWN_ERROR_DISABLED: Interface Ethernet103/1/3 is down (Error disabled. Reason:ekeying triggered)Reply'User profile picture'".getBytes();
+        DatagramPacket pkt = new DatagramPacket(bytes, bytes.length, address, SyslogClient.PORT);
+        SyslogMessageLogDTO messageLog = m_syslogSinkModule.toMessageLog(new SyslogConnection(pkt, false));
+        m_syslogSinkConsumer.handleMessage(messageLog);
+        
+        bytes = "<19>Mar 17 14:28:48 CST: %AUTHPRIV-3-SYSTEM_MSG[0]: pam_aaa:Authentication failed from 7.40.16.188 - sshd[20189]'".getBytes();
+        pkt = new DatagramPacket(bytes, bytes.length, address, SyslogClient.PORT);
+        messageLog = m_syslogSinkModule.toMessageLog(new SyslogConnection(pkt, false));
+        m_syslogSinkConsumer.handleMessage(messageLog);
+
+        m_eventCounter.waitForFinish(120000);
+        
+        assertEquals(2, m_eventCounter.getCount());
+        
     }
 
     @Test

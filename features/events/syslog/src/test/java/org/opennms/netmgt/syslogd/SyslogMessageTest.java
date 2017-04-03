@@ -35,6 +35,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Month;
 import java.util.Calendar;
@@ -382,5 +383,59 @@ public class SyslogMessageTest {
         assertEquals("cfmd", message.getProcessName());
         assertEquals("1317", message.getProcessId());
         assertEquals("CFMD_CCM_DEFECT_RMEP", message.getMessageID());
+    }
+    
+    @Test
+  	public void testCiscoParserExample1() throws Exception {
+  		SyslogMessage message = null;
+  		RadixTreeParser parser = new RadixTreeParser();
+  		parser.teach(GrokParserStageSequenceBuilder.parseGrok("<%{INT:facilityPriority}>: %{INT:year} %{MONTH:month} %{INT:day} %{INT:hour}:%{INT:minute}:%{INT:second} %{STRING:timezone}: %{STRING:processName}: %{STRING:message}").toArray(new ParserStage[0]));
+  		String syslogMessageString =  "<189>: 2017 Mar 4 15:26:19 CST: %ETHPORT-5-IF_DOWN_ERROR_DISABLED: Interface Ethernet103/1/3 is down (Error disabled. Reason:ekeying triggered)Reply'User profile picture'";
+  		message = parser.parse(ByteBuffer
+				.wrap(syslogMessageString.getBytes(StandardCharsets.US_ASCII))).join();
+		assertEquals(SyslogFacility.LOCAL7, message.getFacility());
+		assertEquals(SyslogSeverity.NOTICE, message.getSeverity());
+		assertEquals(null, message.getVersion());
+		assertEquals(null, message.getHostName());
+		assertEquals("%ETHPORT-5-IF_DOWN_ERROR_DISABLED", message.getProcessName());
+		assertEquals(null, message.getProcessId());
+		assertEquals(null, message.getMessageID());
+		assertEquals("Interface Ethernet103/1/3 is down (Error disabled. Reason:ekeying triggered)Reply'User profile picture'", message.getMessage());
+  	}
+    
+    @Test
+    public void testCiscoParserExample2() throws Exception {
+    	SyslogMessage message = null;
+    	RadixTreeParser parser = new RadixTreeParser();
+    	parser.teach(GrokParserStageSequenceBuilder.parseGrok("<%{INT:facilityPriority}>%{MONTH:month} %{INT:day} %{INT:hour}:%{INT:minute}:%{INT:second} %{STRING:timezone}: %{STRING:processName}[%{INT:processId}]: %{STRING:message}").toArray(new ParserStage[0]));
+    	String syslogMessageString =  "<19>Mar 17 14:28:48 CST: %AUTHPRIV-3-SYSTEM_MSG[0]: pam_aaa:Authentication failed from 7.40.16.188 - sshd[20189]";
+    	message = parser.parse(ByteBuffer
+    			.wrap(syslogMessageString.getBytes(StandardCharsets.US_ASCII))).join();
+    	assertEquals(SyslogFacility.MAIL, message.getFacility());
+    	assertEquals(SyslogSeverity.ERROR, message.getSeverity());
+    	assertEquals(null, message.getVersion());
+    	assertEquals(null, message.getHostName());
+    	assertEquals("%AUTHPRIV-3-SYSTEM_MSG", message.getProcessName());
+    	assertEquals("0", message.getProcessId());
+    	assertEquals(null, message.getMessageID());
+    	assertEquals("pam_aaa:Authentication failed from 7.40.16.188 - sshd[20189]", message.getMessage());
+    }
+    
+    @Test
+    public void testGenericExample() throws Exception {
+    	SyslogMessage message = null;
+    	RadixTreeParser parser = new RadixTreeParser();
+    	parser.teach(GrokParserStageSequenceBuilder.parseGrok("%{STRING:message}").toArray(new ParserStage[0]));
+    	String syslogMessageString =  "Invalid Message";
+    	message = parser.parse(ByteBuffer
+    			.wrap(syslogMessageString.getBytes(StandardCharsets.US_ASCII))).join();
+    	assertEquals(SyslogFacility.UNKNOWN, message.getFacility());
+    	assertEquals(SyslogSeverity.UNKNOWN, message.getSeverity());
+    	assertEquals(null, message.getVersion());
+    	assertEquals(null, message.getHostName());
+    	assertEquals(null, message.getProcessName());
+    	assertEquals(null, message.getProcessId());
+    	assertEquals(null, message.getMessageID());
+    	assertEquals("Invalid Message", message.getMessage());
     }
 }
