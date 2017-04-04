@@ -435,8 +435,8 @@ public class BufferParserTest {
 	public void testParseSingleMessage() {
 		RadixTreeParser radixParser = new RadixTreeParser();
 		radixParser.teach(GrokParserStageSequenceBuilder.parseGrok("<%{INT:facilityPriority}>%{NOSPACE:messageId}: %{INT:year}-%{INT:month}-%{INT:day} %{STRING:hostname} %{NOSPACE:processName}: %{STRING:message}").toArray(new ParserStage[0]));
-
-		SyslogMessage message = radixParser.parse(ByteBuffer.wrap("<31>main: 2010-08-19 localhost foo%d: load test %d on tty1".getBytes(StandardCharsets.US_ASCII))).join();
+		String syslogMessage="<31>main: 2010-08-19 localhost foo%d: load test %d on tty1";
+		SyslogMessage message = radixParser.parse(ByteBuffer.wrap(syslogMessage.getBytes(StandardCharsets.US_ASCII))).join();
 		assertNotNull(message);
 		assertEquals("main", message.getMessageID());
 		assertEquals("foo%d", message.getProcessName());
@@ -449,7 +449,7 @@ public class BufferParserTest {
 		assertNull(message.getMillisecond());
 		assertNull(message.getZoneId());
 
-		Event event = ConvertToEvent.toEventBuilder(message, DistPollerDao.DEFAULT_DIST_POLLER_ID, MonitoringLocationDao.DEFAULT_MONITORING_LOCATION_ID).getEvent();
+		Event event = ConvertToEvent.toEventBuilder(message, DistPollerDao.DEFAULT_DIST_POLLER_ID, MonitoringLocationDao.DEFAULT_MONITORING_LOCATION_ID,syslogMessage).getEvent();
 		assertEquals("main", event.getParm("messageid").getValue().getContent());
 		assertEquals("foo%d", event.getParm("process").getValue().getContent());
 	}

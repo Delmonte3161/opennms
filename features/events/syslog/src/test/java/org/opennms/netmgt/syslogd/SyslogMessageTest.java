@@ -38,6 +38,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Month;
@@ -454,6 +455,39 @@ public class SyslogMessageTest {
         final SyslogdConfigFactory config = new SyslogdConfigFactory(stream);
 
         byte[] bytes = "<189>: 2017 Mar 4 15:26:19 CST: %ETHPORT-5-IF_DOWN_ERROR_DISABLED: Interface Ethernet103/1/3 is down (Error disabled. Reason:ekeying triggered)Reply'User profile picture'".getBytes(StandardCharsets.US_ASCII);
+
+        DatagramPacket pkt = new DatagramPacket(bytes, bytes.length,
+                                                InetAddress.getLocalHost(),
+                                                SyslogClient.PORT);
+        ByteBuffer data = ByteBuffer.wrap(pkt.getData());
+
+        try {
+            ConvertToEvent convertToEvent = new ConvertToEvent(
+                DistPollerDao.DEFAULT_DIST_POLLER_ID,
+                MonitoringLocationDao.DEFAULT_MONITORING_LOCATION_ID,
+                pkt.getAddress(),
+                pkt.getPort(),
+                data,
+                config
+            );
+            LOG.info("Generated event: {}", convertToEvent.getEvent().toString());
+        } catch (MessageDiscardedException e) {
+            LOG.error("Message Parsing failed", e);
+            fail("Message Parsing failed: " + e.getMessage());
+        }
+    }
+    
+    
+    @Test
+    public void testSyslogNgMessage() throws Exception {
+    	
+		System.setProperty("opennms.home","/opennms-base-assembly/src/main/filtered/");
+    	
+    	InputStream stream = ConfigurationTestUtils.getInputStreamForResource(this,
+                 "/etc/syslogd-radix-configuration.xml");
+        final SyslogdConfigFactory config = new SyslogdConfigFactory(stream);
+
+        byte[] bytes = "<34> 2017-04-03 10.181.230.67 foo10000: load test 10000 on abc".getBytes(StandardCharsets.US_ASCII);
 
         DatagramPacket pkt = new DatagramPacket(bytes, bytes.length,
                                                 InetAddress.getLocalHost(),

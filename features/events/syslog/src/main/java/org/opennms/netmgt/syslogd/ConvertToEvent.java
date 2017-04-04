@@ -113,7 +113,7 @@ public class ConvertToEvent {
         return buffer;
     }
 
-    public static final EventBuilder toEventBuilder(SyslogMessage message, String systemId, String location) {
+    public static final EventBuilder toEventBuilder(SyslogMessage message, String systemId, String location, String rawMessage) {
         if (message == null) {
             return null;
         }
@@ -169,6 +169,9 @@ public class ConvertToEvent {
 
         bldr.setLogMessage(message.getMessage());
         // Using parms provides configurability.
+        
+        bldr.addParam("rawmessage", rawMessage);
+        
         bldr.addParam("syslogmessage", message.getMessage());
 
         bldr.addParam("severity", priorityTxt);
@@ -268,7 +271,7 @@ public class ConvertToEvent {
 
         // Time to verify UEI matching.
 
-        EventBuilder bldr = toEventBuilder(message, systemId, location);
+        EventBuilder bldr = toEventBuilder(message, systemId, location,new String(incoming.array()));
 
         final List<UeiMatch> ueiMatch = (config.getUeiList() == null ? Collections.emptyList() : config.getUeiList().getUeiMatchCollection());
         for (final UeiMatch uei : ueiMatch) {
