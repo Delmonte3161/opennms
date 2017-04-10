@@ -1,0 +1,3 @@
+-> Event listeners publishes messages on kafka
+-> Event enricher consumes off from kafka, loads OnmsNode from cache and publishes the enriched JSON OnmsEvent
+	on the kafka
