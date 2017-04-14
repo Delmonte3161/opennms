@@ -107,6 +107,10 @@
           <groupId>org.opennms</groupId>
           <artifactId>opennms-icmp-jna</artifactId>
         </dependency>
+        <dependency>
+          <groupId>org.opennms</groupId>
+          <artifactId>opennms-icmp-best</artifactId>
+        </dependency>
       </dependencies>
     </profile>
   </profiles>
@@ -203,6 +207,14 @@
       <scope>${onmsLibScope}</scope>
     </dependency>
 
+    <!-- Discovery -->
+    <dependency>
+      <groupId>org.opennms.features</groupId>
+      <artifactId>org.opennms.features.discovery</artifactId>
+      <version>${project.version}</version>
+      <scope>${onmsLibScope}</scope>
+    </dependency>
+
     <!-- CORS support -->
     <dependency>
       <groupId>org.ebaysf.web</groupId>
@@ -230,6 +242,11 @@
     <dependency>
       <groupId>org.opennms</groupId>
       <artifactId>opennms-icmp-jna</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opennms</groupId>
+      <artifactId>opennms-icmp-best</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -43,9 +43,17 @@ public class EchoRequest implements RpcRequest {
 
     @XmlAttribute(name="message")
     private String message;
-    
+
     @XmlAttribute(name="location")
     private String location;
+
+    @XmlAttribute(name="delay")
+    private Long delay;
+
+    @XmlAttribute(name="throw")
+    private boolean shouldThrow;
+
+    private Long timeToLiveMs;
 
     public EchoRequest() { }
 
@@ -70,14 +78,34 @@ public class EchoRequest implements RpcRequest {
         return location;
     }
 
+    public void setTimeToLiveMs(Long timeToLiveMs) {
+        this.timeToLiveMs = timeToLiveMs;
+    }
+
     @Override
     public Long getTimeToLiveMs() {
-        return null;
+        return timeToLiveMs;
+    }
+
+    public void setDelay(Long delay) {
+        this.delay = delay;
+    }
+
+    public Long getDelay() {
+        return delay;
+    }
+
+    public void shouldThrow(boolean shouldThrow) {
+        this.shouldThrow = shouldThrow;
+    }
+
+    public boolean shouldThrow() {
+        return shouldThrow;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(message);
+        return Objects.hash(message, location, delay, shouldThrow);
     }
 
     @Override
@@ -89,11 +117,15 @@ public class EchoRequest implements RpcRequest {
         if (getClass() != obj.getClass())
             return false;
         final EchoRequest other = (EchoRequest) obj;
-        return Objects.equals(this.message, other.message);
+        return Objects.equals(this.message, other.message) &&
+                Objects.equals(this.location, other.location) &&
+                Objects.equals(this.delay, other.delay) &&
+                Objects.equals(this.shouldThrow, other.shouldThrow);
     }
 
     @Override
     public String toString() {
-        return String.format("EchoRequest[message=%s]", message);
+        return String.format("EchoRequest[message=%s, location=%s, delay=%s, shouldThrow=%s]",
+                message, location, delay, shouldThrow);
     }
 }

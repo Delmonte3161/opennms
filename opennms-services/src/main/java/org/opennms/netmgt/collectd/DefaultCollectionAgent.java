@@ -1,4 +1,3 @@
-
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
@@ -342,17 +341,9 @@ public class DefaultCollectionAgent extends InetNetworkInterface implements Snmp
         return "Agent[nodeid = "+getNodeId()+" ipaddr= "+getHostAddress()+']';
     }
 
-    /* (non-Javadoc)
-     * @see org.opennms.netmgt.collectd.CollectionAgent#getAgentConfig()
-     */
-    /**
-     * <p>getAgentConfig</p>
-     *
-     * @return a {@link org.opennms.netmgt.snmp.SnmpAgentConfig} object.
-     */
     @Override
     public SnmpAgentConfig getAgentConfig() {
-        return SnmpPeerFactory.getInstance().getAgentConfig(getAddress());
+        return SnmpPeerFactory.getInstance().getAgentConfig(getAddress(), getLocationName());
     }
     
     private Set<SnmpIfData> getSnmpInterfaceData() {

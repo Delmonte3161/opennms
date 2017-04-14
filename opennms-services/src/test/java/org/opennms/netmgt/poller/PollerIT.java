@@ -33,6 +33,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -67,12 +68,12 @@ import org.opennms.netmgt.dao.mock.MockEventIpcManager;
 import org.opennms.netmgt.dao.mock.MockEventIpcManager.SendNowHook;
 import org.opennms.netmgt.eventd.AbstractEventUtil;
 import org.opennms.netmgt.events.api.EventConstants;
+import org.opennms.netmgt.icmp.proxy.LocationAwarePingClient;
 import org.opennms.netmgt.mock.MockElement;
 import org.opennms.netmgt.mock.MockEventUtil;
 import org.opennms.netmgt.mock.MockInterface;
 import org.opennms.netmgt.mock.MockNetwork;
 import org.opennms.netmgt.mock.MockNode;
-import org.opennms.netmgt.mock.MockOutageConfig;
 import org.opennms.netmgt.mock.MockPollerConfig;
 import org.opennms.netmgt.mock.MockService;
 import org.opennms.netmgt.mock.MockService.SvcMgmtStatus;
@@ -148,6 +149,8 @@ public class PollerIT implements TemporaryDatabaseAware<MockDatabase> {
     @Autowired
     private LocationAwarePollerClient m_locationAwarePollerClient;
 
+    private LocationAwarePingClient m_locationAwarePingClient;
+
     //
     // SetUp and TearDown
     //
@@ -217,12 +220,15 @@ public class PollerIT implements TemporaryDatabaseAware<MockDatabase> {
         m_eventMgr.setSynchronous(false);
         m_eventMgr.setNumSchedulerThreads(2);
 
+        m_locationAwarePingClient = mock(LocationAwarePingClient.class);
+
         DefaultPollContext pollContext = new DefaultPollContext();
         pollContext.setEventManager(m_eventMgr);
         pollContext.setLocalHostName("localhost");
         pollContext.setName("Test.DefaultPollContext");
         pollContext.setPollerConfig(m_pollerConfig);
         pollContext.setQueryManager(m_queryManager);
+        pollContext.setLocationAwarePingClient(m_locationAwarePingClient);
 
         PollableNetwork network = new PollableNetwork(pollContext);
 
@@ -236,15 +242,6 @@ public class PollerIT implements TemporaryDatabaseAware<MockDatabase> {
         m_poller.setPollerConfig(m_pollerConfig);
         m_poller.setPollOutagesConfig(m_pollerConfig);
         m_poller.setLocationAwarePollerClient(m_locationAwarePollerClient);
-
-        MockOutageConfig config = new MockOutageConfig();
-        config.setGetNextOutageID(m_db.getNextOutageIdStatement());
-
-        // m_outageMgr = new OutageManager();
-        // m_outageMgr.setEventMgr(m_eventMgr);
-        // m_outageMgr.setOutageMgrConfig(config);
-        // m_outageMgr.setDbConnectionFactory(m_db);
-
     }
 
     @After
@@ -1578,6 +1575,39 @@ public class PollerIT implements TemporaryDatabaseAware<MockDatabase> {
 
         // We shouldn't receive any other events
         verifyAnticipated(2000, true);
+    }
+
+    /**
+     * Test for NMS-9112
+     */
+    @Test
+    public void testNoInvalidPollsAfterNodeCategoryMembershipChanged() throws InterruptedException {
+        m_pollerConfig.setNodeOutageProcessingEnabled(true);
+
+        MockNode node = m_network.getNode(1);
+
+        // Start the poller
+        startDaemons();
+
+        // Send a uei.opennms.org/nodes/nodeCategoryMembershipChanged
+        // This will remove, add or reschedule services for the node as necessary
+        EventBuilder eventBuilder = MockEventUtil.createEventBuilder("Test", EventConstants.NODE_CATEGORY_MEMBERSHIP_CHANGED_EVENT_UEI);
+        eventBuilder.setNodeid(node.getNodeId());
+        Event nodeCatMemChangedEvent = eventBuilder.getEvent();
+        m_eventMgr.sendEventToListeners(nodeCatMemChangedEvent);
+
+        // Delete the node and send a nodeDeleted event
+        m_network.removeElement(node);
+        Event deleteEvent = node.createDeleteEvent();
+        m_eventMgr.sendEventToListeners(deleteEvent);
+
+        // Wait a little long than a polling cycle
+        sleep(3000);
+        m_network.resetInvalidPollCount();
+
+        // Sleep some more and verify that no invalid polls have occurred
+        sleep(3000);
+        assertEquals("Received a poll for an element that doesn't exist", 0, m_network.getInvalidPollCount());
     }
 
     //

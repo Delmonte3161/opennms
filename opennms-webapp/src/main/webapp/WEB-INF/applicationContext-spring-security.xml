@@ -32,6 +32,8 @@
 
     <!-- Allow Minions to access the configuration endpoints -->
     <intercept-url pattern="/rest/config/**" method="GET" access="ROLE_MINION,ROLE_REST,ROLE_ADMIN"/>
+    <!-- Allow Minions to access the server info -->
+    <intercept-url pattern="/rest/info" method="GET" access="ROLE_MINION,ROLE_REST,ROLE_ADMIN,ROLE_MOBILE,ROLE_USER"/>
 
     <!-- read-only calls should be allowed for any user -->
     <intercept-url pattern="/rest/**" method="GET" access="ROLE_REST,ROLE_ADMIN,ROLE_MOBILE,ROLE_USER"/>
@@ -62,6 +64,10 @@
 
   <!-- Only use BASIC auth for the RESTful API v2 -->
   <http pattern="/api/v2/**" realm="OpenNMS Realm">
+
+    <!-- Allow users to POST to the Geolocation API, which is read-only -->
+    <intercept-url pattern="/api/v2/geolocation" method="POST" access="ROLE_REST,ROLE_ADMIN,ROLE_USER"/>
+
     <!-- OPTIONS pre-flight requests should always be accepted -->
     <intercept-url pattern="/api/v2/**" method="OPTIONS" access="ROLE_ANONYMOUS,ROLE_REST,ROLE_ADMIN,ROLE_USER,ROLE_MOBILE"/>
 
@@ -152,6 +158,7 @@
         <beans:property name="authenticationManager" ref="authenticationManager"/>
         <beans:property name="authenticationFailureHandler" ref="failureHandler"/>
         <beans:property name="authenticationSuccessHandler" ref="successHandler"/>
+        <beans:property name="postOnly" value="false"/>
   </beans:bean>
 
     <beans:bean id="successHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">

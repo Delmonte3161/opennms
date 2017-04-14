@@ -32,6 +32,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.net.MalformedURLException;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -71,7 +73,7 @@ public abstract class VmwareRequisitionTool {
         URL url = new URL(urlString);
 
         // Parse vmware-config.xml and retrieve the credentials to avoid initialize Spring
-        if (url.getUserInfo() == null) {
+        if ( ! url.getQuery().contains("username") && url.getUserInfo() == null ) {
             File cfg = new File(ConfigFileConstants.getFilePathString(), "vmware-config.xml");
             if (cfg.exists()) {
                 String username = null;
@@ -86,10 +88,8 @@ public abstract class VmwareRequisitionTool {
                 if (username == null || password == null) {
                     throw new IllegalArgumentException("Can't retrieve credentials for " + url.getHost() + " from " + cfg);
                 }
-                int i = urlString.lastIndexOf("//");
-                if (i > 0) {
-                    urlString = urlString.substring(0, i + 2) + username + ':' + password + '@' + urlString.substring(i + 2);
-                }
+                // Add credentials to URL
+                urlString = urlString + ";username=" + username + ";password=" + password;
                 url = new URL(urlString);
             }
         }
@@ -111,7 +111,7 @@ public abstract class VmwareRequisitionTool {
             System.err.println("Couldn't generate requisition from " +  urlString);
             System.exit(1);
         } else {
-            System.out.println(IOUtils.toString(is, "UTF-8"));
+            System.out.println(IOUtils.toString(is, StandardCharsets.UTF_8));
         }
     }
 

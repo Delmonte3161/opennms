@@ -74,6 +74,9 @@ public enum SyslogSeverity {
 
     public static SyslogSeverity getSeverity(final int severity) {
         final SyslogSeverity[] severities = SyslogSeverity.values();
+		if (severity == 99) {
+			return severities[(severities.length) - 1];
+		}
         if (severities.length < severity) {
             return null;
         }
@@ -81,6 +84,9 @@ public enum SyslogSeverity {
     }
     
     public static SyslogSeverity getSeverityForCode(final int code) {
+		if (code == 99) {
+			return getSeverity(code);
+		}
         return getSeverity(code & MASK);
     }
 }

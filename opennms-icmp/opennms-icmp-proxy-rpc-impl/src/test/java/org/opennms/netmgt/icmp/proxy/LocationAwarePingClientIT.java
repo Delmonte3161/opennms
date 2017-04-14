@@ -42,19 +42,15 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.opennms.core.rpc.api.RpcModule;
 import org.opennms.core.spring.BeanUtils;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.test.activemq.ActiveMQBroker;
 import org.opennms.core.test.camel.CamelBlueprintTest;
 import org.opennms.minion.core.api.MinionIdentity;
-import org.opennms.netmgt.icmp.Pinger;
-import org.opennms.netmgt.icmp.jna.JnaPinger;
 import org.opennms.netmgt.model.OnmsDistPoller;
 import org.opennms.test.JUnitConfigurationEnvironment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
 
 @RunWith(OpenNMSJUnit4ClassRunner.class)
@@ -69,11 +65,6 @@ import org.springframework.test.context.ContextConfiguration;
 @JUnitConfigurationEnvironment
 public class LocationAwarePingClientIT extends CamelBlueprintTest {
 
-    @Bean
-    public Pinger createPinger() {
-        return new JnaPinger();
-    }
-
     private static final String REMOTE_LOCATION_NAME = "remote";
 
     @ClassRule
@@ -81,9 +72,6 @@ public class LocationAwarePingClientIT extends CamelBlueprintTest {
 
     @Autowired
     private OnmsDistPoller identity;
-
-    @Autowired
-    private PingProxyRpcModule pingProxyRpcModule;
 
     @Autowired
     @Qualifier("queuingservice")
@@ -111,17 +99,11 @@ public class LocationAwarePingClientIT extends CamelBlueprintTest {
         Properties props = new Properties();
         props.setProperty("alias", "opennms.broker");
         services.put(Component.class.getName(), new KeyValueHolder<>(queuingservice, props));
-        services.put(RpcModule.class.getName(), new KeyValueHolder<>(pingProxyRpcModule, new Properties()));
     }
 
     @Override
     protected String getBlueprintDescriptor() {
         return "classpath:/OSGI-INF/blueprint/blueprint-rpc-server.xml";
-    }
-
-    @Override
-    public boolean isCreateCamelContextPerClass() {
-        return true;
     }
 
     @Before

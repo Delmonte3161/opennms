@@ -32,9 +32,12 @@ import static org.junit.Assert.assertEquals;
 import static org.opennms.core.utils.InetAddressUtils.addr;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -44,6 +47,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.opennms.core.ipc.sink.mock.MockMessageDispatcherFactory;
 import org.opennms.core.spring.BeanUtils;
 import org.opennms.core.test.MockLogAppender;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
@@ -53,12 +57,16 @@ import org.opennms.netmgt.config.SyslogdConfigFactory;
 import org.opennms.netmgt.dao.api.DistPollerDao;
 import org.opennms.netmgt.dao.mock.MockEventIpcManager;
 import org.opennms.netmgt.model.events.EventBuilder;
+import org.opennms.netmgt.syslogd.api.SyslogConnection;
+import org.opennms.netmgt.syslogd.api.SyslogMessageLogDTO;
 import org.opennms.netmgt.xml.event.Event;
 import org.opennms.test.JUnitConfigurationEnvironment;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.codahale.metrics.MetricRegistry;
 
 @RunWith(OpenNMSJUnit4ClassRunner.class)
 @ContextConfiguration(locations={
@@ -142,7 +150,12 @@ public class Nms4335IT implements InitializingBean {
             m_config = new SyslogdConfigFactory(stream);
 
             m_syslogd = new Syslogd();
-            m_syslogd.setSyslogReceiver(new SyslogReceiverJavaNetImpl(m_config));
+
+            SyslogReceiverJavaNetImpl receiver = new SyslogReceiverJavaNetImpl(m_config);
+            receiver.setDistPollerDao(m_distPollerDao);
+            receiver.setMessageDispatcherFactory(new MockMessageDispatcherFactory<>());
+
+            m_syslogd.setSyslogReceiver(receiver);
             m_syslogd.init();
 
         } finally {
@@ -183,11 +196,11 @@ public class Nms4335IT implements InitializingBean {
      * @param expectedUEI The expected UEI of the resulting event
      * @param expectedLogMsg The expected contents of the logmsg for the resulting event 
      * 
-     * @throws UnknownHostException 
      * @throws InterruptedException 
      * @throws ExecutionException 
+     * @throws IOException 
      */
-    private List<Event> doMessageTest(String testPDU, String expectedHost, String expectedUEI, String expectedLogMsg) throws UnknownHostException, InterruptedException, ExecutionException {
+    private List<Event> doMessageTest(String testPDU, String expectedHost, String expectedUEI, String expectedLogMsg) throws InterruptedException, ExecutionException, IOException {
         SyslogdTestUtils.startSyslogdGracefully(m_syslogd);
         
         final EventBuilder expectedEventBldr = new EventBuilder(expectedUEI, "syslogd");
@@ -196,10 +209,23 @@ public class Nms4335IT implements InitializingBean {
         expectedEventBldr.setLogMessage(expectedLogMsg);
     
         m_eventIpcManager.getEventAnticipator().anticipateEvent(expectedEventBldr.getEvent());
-        
+
+        final SyslogSinkConsumer syslogSinkConsumer = new SyslogSinkConsumer(new MetricRegistry());
+        syslogSinkConsumer.setDistPollerDao(m_distPollerDao);
+        syslogSinkConsumer.setSyslogdConfig(m_config);
+        syslogSinkConsumer.setEventForwarder(m_eventIpcManager);
+        SyslogSinkConsumerTest.grookPatternList = new ArrayList<String>(SyslogSinkConsumerTest.setGrookPatternList(new File(
+                                                                                                                            this.getClass().getResource("/etc/syslogd-configuration.properties").getPath())));
+        syslogSinkConsumer.setGrokPatternsList(SyslogSinkConsumerTest.grookPatternList);
+
+
+        final SyslogSinkModule syslogSinkModule = syslogSinkConsumer.getModule();
+
         final SyslogClient sc = new SyslogClient(null, 10, SyslogClient.LOG_DAEMON, addr("127.0.0.1"));
         final DatagramPacket pkt = sc.getPacket(SyslogClient.LOG_DEBUG, testPDU);
-        new SyslogConnectionHandlerDefaultImpl().handleSyslogConnection(new SyslogConnection(pkt, m_config, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation()));
+
+        final SyslogMessageLogDTO messageLog = syslogSinkModule.toMessageLog(new SyslogConnection(pkt, false));
+        syslogSinkConsumer.handleMessage(messageLog);
 
         m_eventIpcManager.getEventAnticipator().verifyAnticipated(5000,0,0,0,0);
         final Event receivedEvent = m_eventIpcManager.getEventAnticipator().getAnticipatedEventsReceived().get(0);

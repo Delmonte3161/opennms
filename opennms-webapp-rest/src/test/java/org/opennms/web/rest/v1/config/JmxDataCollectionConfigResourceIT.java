@@ -7,16 +7,16 @@
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published
+ * it under the terms of the GNU Affero General Public License as published
  * by the Free Software Foundation, either version 3 of the License,
  * or (at your option) any later version.
  *
  * OpenNMS(R) is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with OpenNMS(R).  If not, see:
  *      http://www.gnu.org/licenses/
  *
@@ -87,11 +87,11 @@ public class JmxDataCollectionConfigResourceIT extends AbstractSpringJerseyRestT
 
         assertEquals("jsr160", config.getJmxCollection("jsr160").getName());
         assertEquals(300, config.getJmxCollection("jsr160").getRrd().getStep());
-        assertEquals(37, config.getJmxCollection("jsr160").getMbeanCount());
+        assertEquals(38, config.getJmxCollection("jsr160").getMbeanCount());
 
         assertEquals("jmx-minion", config.getJmxCollection("jmx-minion").getName());
         assertEquals(300, config.getJmxCollection("jmx-minion").getRrd().getStep());
-        assertEquals(12, config.getJmxCollection("jmx-minion").getMbeanCount());
+        assertEquals(10, config.getJmxCollection("jmx-minion").getMbeanCount());
 
         assertEquals("jmx-cassandra30x", config.getJmxCollection("jmx-cassandra30x").getName());
         assertEquals(300, config.getJmxCollection("jmx-cassandra30x").getRrd().getStep());

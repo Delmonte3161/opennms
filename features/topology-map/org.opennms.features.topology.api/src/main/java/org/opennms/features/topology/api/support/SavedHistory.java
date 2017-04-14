@@ -29,15 +29,13 @@
 package org.opennms.features.topology.api.support;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -54,8 +52,6 @@ import org.opennms.features.topology.api.GraphContainer;
 import org.opennms.features.topology.api.HistoryOperation;
 import org.opennms.features.topology.api.Layout;
 import org.opennms.features.topology.api.Point;
-import org.opennms.features.topology.api.support.breadcrumbs.Breadcrumb;
-import org.opennms.features.topology.api.support.breadcrumbs.BreadcrumbCriteria;
 import org.opennms.features.topology.api.topo.CollapsibleCriteria;
 import org.opennms.features.topology.api.topo.Criteria;
 import org.opennms.features.topology.api.topo.Vertex;
@@ -63,7 +59,6 @@ import org.opennms.features.topology.api.topo.VertexRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 /**
@@ -96,10 +91,6 @@ public class SavedHistory {
     @XmlJavaTypeAdapter(VertexRefAdapter.class)
     private Set<VertexRef> m_focusVertices = Sets.newHashSet();
 
-    @XmlElementWrapper(name="breadcrumbs")
-    @XmlElement(name="breadcrumb")
-    private List<Breadcrumb> m_breadcrumbs = Lists.newArrayList();
-
     /**
      * A map of key-value settings for the HistoryOperation components that are registered.
      */
@@ -118,9 +109,7 @@ public class SavedHistory {
             saveLocations(graphContainer.getGraph()),
             getUnmodifiableSet(graphContainer.getSelectionManager().getSelectedVertexRefs()),
             getFocusVertices(graphContainer),
-            getOperationSettings(graphContainer, operations),
-            getBreadcrumbs(graphContainer)
-        );
+            getOperationSettings(graphContainer, operations));
     }
 
     SavedHistory(
@@ -129,15 +118,13 @@ public class SavedHistory {
             Map<VertexRef,Point> locations,
             Set<VertexRef> selectedVertices,
             Set<VertexRef> focusVertices,
-            Map<String,String> operationSettings,
-            List<Breadcrumb> breadcrumbs) {
+            Map<String,String> operationSettings) {
         m_szl = szl;
         m_boundBox = box;
         m_locations = locations;
         m_selectedVertices = selectedVertices;
         m_focusVertices = focusVertices;
         m_settings.putAll(operationSettings);
-        m_breadcrumbs = Objects.requireNonNull(breadcrumbs);
         LOG.debug("Created " + toString());
     }
 
@@ -154,71 +141,33 @@ public class SavedHistory {
         // Add a CRC of all of the key-value pairs in m_settings to make the fragment unique
         CRC32 settingsCrc = new CRC32();
         for (Map.Entry<String,String> entry : m_settings.entrySet()) {
-            try {
-                settingsCrc.update(entry.getKey().getBytes("UTF-8"));
-                settingsCrc.update(entry.getValue().getBytes("UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                // Impossible on modern JVMs
-                LOG.error(e.getMessage(), e);
-            }
+            settingsCrc.update(entry.getKey().getBytes(StandardCharsets.UTF_8));
+            settingsCrc.update(entry.getValue().getBytes(StandardCharsets.UTF_8));
         }
         retval.append(String.format(",(%X)", settingsCrc.getValue()));
 
         CRC32 locationsCrc = new CRC32();
         for(Map.Entry<VertexRef, Point> entry : m_locations.entrySet()) {
-            try {
-                locationsCrc.update(entry.getKey().getId().getBytes("UTF-8"));
-                //TODO cast to int for now
-                locationsCrc.update((int)entry.getValue().getX());
-                locationsCrc.update((int)entry.getValue().getY());
-            } catch(UnsupportedEncodingException e) {
-                // Impossible on modern JVMs
-                LOG.error(e.getMessage(), e);
-            }
+            locationsCrc.update(entry.getKey().getId().getBytes(StandardCharsets.UTF_8));
+            //TODO cast to int for now
+            locationsCrc.update((int)entry.getValue().getX());
+            locationsCrc.update((int)entry.getValue().getY());
         }
         retval.append(String.format(",(%X)", locationsCrc.getValue()));
 
         CRC32 selectionsCrc = new CRC32();
         for(VertexRef entry : m_selectedVertices) {
-            try {
-                selectionsCrc.update(entry.getNamespace().getBytes("UTF-8"));
-                selectionsCrc.update(entry.getId().getBytes("UTF-8"));
-            } catch(UnsupportedEncodingException e) {
-                // Impossible on modern JVMs
-                LOG.error(e.getMessage(), e);
-            }
+            selectionsCrc.update(entry.getNamespace().getBytes(StandardCharsets.UTF_8));
+            selectionsCrc.update(entry.getId().getBytes(StandardCharsets.UTF_8));
         }
         retval.append(String.format(",(%X)", selectionsCrc.getValue()));
 
         CRC32 focusCrc = new CRC32();
         for(VertexRef entry : m_focusVertices) {
-            try {
-                focusCrc.update(entry.getNamespace().getBytes("UTF-8"));
-                focusCrc.update(entry.getId().getBytes("UTF-8"));
-            } catch(UnsupportedEncodingException e) {
-                // Impossible on modern JVMs
-                LOG.error(e.getMessage(), e);
-            }
+            focusCrc.update(entry.getNamespace().getBytes(StandardCharsets.UTF_8));
+            focusCrc.update(entry.getId().getBytes(StandardCharsets.UTF_8));
         }
         retval.append(String.format(",(%X)", focusCrc.getValue()));
-
-        CRC32 breadcrumbCrc = new CRC32();
-        for (Breadcrumb eachBreadcrumb : m_breadcrumbs) {
-            try {
-                breadcrumbCrc.update(eachBreadcrumb.getLabel().getBytes("UTF-8"));
-                if (eachBreadcrumb.getTargetNamespace() != null) {
-                    breadcrumbCrc.update(eachBreadcrumb.getTargetNamespace().getBytes("UTF-8"));
-                }
-                if (eachBreadcrumb.getSourceVertex() != null) {
-                    breadcrumbCrc.update(eachBreadcrumb.getSourceVertex().toString().getBytes("UTF-8"));
-                }
-            } catch (UnsupportedEncodingException e) {
-                // Impossible on modern JVMs
-                LOG.error(e.getMessage(), e);
-            }
-        }
-        retval.append(String.format(",(%X)", breadcrumbCrc.getValue()));
-
         return retval.toString();
     }
 
@@ -237,7 +186,6 @@ public class SavedHistory {
         // which results in a graphContainer.clearCriteria()
         applyVerticesInFocus(m_focusVertices, graphContainer);
         applySavedLocations(m_locations, graphContainer.getGraph().getLayout());
-        applyBreadcrumbs(m_breadcrumbs, graphContainer);
         graphContainer.setSemanticZoomLevel(getSemanticZoomLevel());
         graphContainer.getSelectionManager().setSelectedVertexRefs(m_selectedVertices); // Apply the selected vertices
         graphContainer.getMapViewManager().setBoundingBox(getBoundingBox());
@@ -269,14 +217,6 @@ public class SavedHistory {
             }
             retval.append("}");
         }
-        if (m_breadcrumbs.size() > 0) {
-            retval.append(",breadcrumbs->{");
-            retval.append(m_breadcrumbs
-                    .stream()
-                    .map(b -> String.format("[label=%s,targetNamespace=%s,sourceVertex=%s]", b.getLabel(), b.getTargetNamespace(), b.getSourceVertex() == null ? null : b.getSourceVertex().toString()))
-                    .collect(Collectors.joining(",")));
-            retval.append("}");
-        }
         return retval.toString();
     }
 
@@ -306,18 +246,6 @@ public class SavedHistory {
         return retVal;
     }
 
-    private static List<Breadcrumb> getBreadcrumbs(GraphContainer graphContainer) {
-        final BreadcrumbCriteria criteria = graphContainer.findSingleCriteria(BreadcrumbCriteria.class);
-        final List<Breadcrumb> breadcrumbs = Lists.newArrayList();
-        if (criteria != null) {
-            criteria.getBreadcrumbs().forEach(eachBreadcrumb -> {
-                Breadcrumb clone = new Breadcrumb(eachBreadcrumb.getLabel(), eachBreadcrumb.getTargetNamespace(), eachBreadcrumb.getSourceVertex());
-                breadcrumbs.add(clone);
-            });
-        }
-        return breadcrumbs;
-    }
-
     private static Map<VertexRef,Point> saveLocations(Graph graph) {
         Collection<? extends Vertex> vertices = graph.getDisplayVertices();
         Map<VertexRef,Point> locations = new HashMap<>();
@@ -339,11 +267,5 @@ public class SavedHistory {
         for(VertexRef ref : locations.keySet()) {
             layout.setLocation(ref, locations.get(ref));
         }
-    }
-
-    private static void applyBreadcrumbs(List<Breadcrumb> breadcrumbs, GraphContainer graphContainer) {
-        BreadcrumbCriteria breadcrumbCriteria = VertexHopGraphProvider.VertexHopCriteria.getSingleCriteriaForGraphContainer(graphContainer, BreadcrumbCriteria.class, true);
-        breadcrumbCriteria.clear();
-        breadcrumbs.forEach(breadcrumb -> breadcrumbCriteria.setNewRoot(breadcrumb));
     }
 }

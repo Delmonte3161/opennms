@@ -56,7 +56,6 @@ public class FeatureInstallKarafIT extends KarafTestCase {
         installFeature("atomikos");
         installFeature("batik");
         installFeature("c3p0");
-        installFeature("castor");
         installFeature("commons-beanutils");
         installFeature("commons-cli");
         installFeature("commons-codec");
@@ -122,6 +121,7 @@ public class FeatureInstallKarafIT extends KarafTestCase {
         installFeature("opennms-icmp-jna");
         installFeature("opennms-icmp-jni");
         installFeature("opennms-icmp-jni6");
+        installFeature("opennms-icmp-best");
         installFeature("opennms-javamail");
         installFeature("opennms-model");
         installFeature("opennms-poller-api");

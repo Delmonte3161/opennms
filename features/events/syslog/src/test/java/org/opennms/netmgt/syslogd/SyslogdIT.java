@@ -33,9 +33,12 @@ import static org.junit.Assert.assertTrue;
 import static org.opennms.core.utils.InetAddressUtils.addr;
 import static org.opennms.core.utils.InetAddressUtils.str;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +49,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.opennms.core.ipc.sink.mock.MockMessageDispatcherFactory;
 import org.opennms.core.spring.BeanUtils;
 import org.opennms.core.test.ConfigurationTestUtils;
 import org.opennms.core.test.MockLogAppender;
@@ -58,6 +62,8 @@ import org.opennms.netmgt.config.syslogd.UeiMatch;
 import org.opennms.netmgt.dao.api.DistPollerDao;
 import org.opennms.netmgt.dao.mock.MockEventIpcManager;
 import org.opennms.netmgt.model.events.EventBuilder;
+import org.opennms.netmgt.syslogd.api.SyslogConnection;
+import org.opennms.netmgt.syslogd.api.SyslogMessageLogDTO;
 import org.opennms.netmgt.xml.event.Event;
 import org.opennms.netmgt.xml.event.Parm;
 import org.opennms.test.JUnitConfigurationEnvironment;
@@ -65,6 +71,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.codahale.metrics.MetricRegistry;
 
 @RunWith(OpenNMSJUnit4ClassRunner.class)
 @ContextConfiguration(locations={
@@ -77,6 +85,8 @@ import org.springframework.transaction.annotation.Transactional;
         "classpath:/META-INF/opennms/applicationContext-eventDaemon.xml",
         "classpath:/META-INF/opennms/applicationContext-eventUtil.xml",
         "classpath:/META-INF/opennms/mockEventIpcManager.xml",
+        "classpath:/META-INF/opennms/mockSinkConsumerManager.xml",
+        "classpath:/META-INF/opennms/mockMessageDispatcherFactory.xml",
         "classpath:/META-INF/opennms/applicationContext-syslogDaemon.xml"
 })
 @JUnitConfigurationEnvironment
@@ -94,6 +104,13 @@ public class SyslogdIT implements InitializingBean {
 
     @Autowired
     private DistPollerDao m_distPollerDao;
+
+    @Autowired
+    private MockMessageDispatcherFactory<SyslogConnection, SyslogMessageLogDTO> m_messageDispatcherFactory;
+
+    private SyslogSinkConsumer m_syslogSinkConsumer;
+
+    private SyslogSinkModule m_syslogSinkModule;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -131,9 +148,20 @@ public class SyslogdIT implements InitializingBean {
         assertTrue(foundBeer);
         assertTrue(foundMalt);
 
+        m_syslogSinkConsumer = new SyslogSinkConsumer(new MetricRegistry());
+        m_syslogSinkConsumer.setDistPollerDao(m_distPollerDao);
+        m_syslogSinkConsumer.setSyslogdConfig(m_config);
+        m_syslogSinkConsumer.setEventForwarder(m_eventIpcManager);
+        m_syslogSinkModule = m_syslogSinkConsumer.getModule();
+        m_messageDispatcherFactory.setConsumer(m_syslogSinkConsumer);
+        SyslogSinkConsumerTest.grookPatternList = new ArrayList<String>(SyslogSinkConsumerTest.setGrookPatternList(new File(
+                                                                                                                            this.getClass().getResource("/etc/syslogd-configuration.properties").getPath())));
+        m_syslogSinkConsumer.setGrokPatternsList(SyslogSinkConsumerTest.grookPatternList);
+
+
         SyslogReceiverJavaNetImpl receiver = new SyslogReceiverJavaNetImpl(m_config);
         receiver.setDistPollerDao(m_distPollerDao);
-        receiver.setSyslogConnectionHandlers(new SyslogConnectionHandlerDefaultImpl());
+        receiver.setMessageDispatcherFactory(m_messageDispatcherFactory);
         m_syslogd.setSyslogReceiver(receiver);
         m_syslogd.init();
         SyslogdTestUtils.startSyslogdGracefully(m_syslogd);
@@ -154,21 +182,24 @@ public class SyslogdIT implements InitializingBean {
      * @param expectedUEI The expected UEI of the resulting event
      * @param expectedLogMsg The expected contents of the logmsg for the resulting event 
      * 
-     * @throws UnknownHostException 
      * @throws InterruptedException 
      * @throws ExecutionException 
+     * @throws IOException 
      */
-    private List<Event> doMessageTest(String testPDU, String expectedHost, String expectedUEI, String expectedLogMsg) throws UnknownHostException, InterruptedException, ExecutionException {
+    private List<Event> doMessageTest(String testPDU, String expectedHost, String expectedUEI, String expectedLogMsg) throws InterruptedException, ExecutionException, IOException {
         final EventBuilder expectedEventBldr = new EventBuilder(expectedUEI, "syslogd");
         expectedEventBldr.setInterface(addr(expectedHost));
         expectedEventBldr.setLogDest("logndisplay");
         expectedEventBldr.setLogMessage(expectedLogMsg);
+        
+        m_eventIpcManager.reset();
     
         m_eventIpcManager.getEventAnticipator().anticipateEvent(expectedEventBldr.getEvent());
         
         final SyslogClient sc = new SyslogClient(null, 10, SyslogClient.LOG_DAEMON, InetAddressUtils.ONE_TWENTY_SEVEN);
         final DatagramPacket pkt = sc.getPacket(SyslogClient.LOG_DEBUG, testPDU);
-        new SyslogConnectionHandlerDefaultImpl().handleSyslogConnection(new SyslogConnection(pkt, m_config, m_distPollerDao.whoami().getId(), m_distPollerDao.whoami().getLocation()));
+        SyslogMessageLogDTO messageLog = m_syslogSinkModule.toMessageLog(new SyslogConnection(pkt, false));
+        m_syslogSinkConsumer.handleMessage(messageLog);
 
         m_eventIpcManager.getEventAnticipator().verifyAnticipated(5000,0,0,0,0);
         final Event receivedEvent = m_eventIpcManager.getEventAnticipator().getAnticipatedEventsReceived().get(0);
@@ -177,7 +208,7 @@ public class SyslogdIT implements InitializingBean {
         return m_eventIpcManager.getEventAnticipator().getAnticipatedEventsReceived();
     }
     
-	private List<Event> doMessageTest(String testPDU, String expectedHost, String expectedUEI, String expectedLogMsg, Map<String,String> expectedParams) throws UnknownHostException, InterruptedException, ExecutionException {
+	private List<Event> doMessageTest(String testPDU, String expectedHost, String expectedUEI, String expectedLogMsg, Map<String,String> expectedParams) throws InterruptedException, ExecutionException, IOException {
     	final List<Event> receivedEvents = doMessageTest(testPDU, expectedHost, expectedUEI, expectedLogMsg);
 
         final Map<String,String> actualParms = new HashMap<String,String>();
@@ -366,11 +397,18 @@ public class SyslogdIT implements InitializingBean {
     }
 
     @Test
-    public void testRegexUEIRewrite() throws Exception {
+    public void testRegexUEIRewrite()  {
+        try
+        {
         MockLogAppender.setupLogging(true, "TRACE");
         doMessageTest("2007-01-01 localhost foo: 100 out of 666 tests failed for bar",
                       str(InetAddressUtils.ONE_TWENTY_SEVEN), "uei.opennms.org/tests/syslogd/regexUeiRewriteTest",
                       "100 out of 666 tests failed for bar");
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
     }
     
     @Test
@@ -427,6 +465,7 @@ public class SyslogdIT implements InitializingBean {
 
     @Test
     public void testRegexUEIWithOnlyUserSpecifiedParameterAssignments() throws InterruptedException, UnknownHostException {
+       
         final String testPDU = "2007-01-01 127.0.0.1 tea: Secretly replaced cmiskell's tea with 666 ferrets";
         final String testUEI = "uei.opennms.org/tests/syslogd/regexParameterAssignmentTest/userSpecifiedOnly";
         final String testMsg = "Secretly replaced cmiskell's tea with 666 ferrets";

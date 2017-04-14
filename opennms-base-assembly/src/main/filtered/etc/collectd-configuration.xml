@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-<?castor class-name="org.opennms.netmgt.collectd.CollectdConfiguration"?>
 <collectd-configuration
         threads="50">
 
@@ -83,7 +82,22 @@
             <parameter key="thresholding-enabled" value="true"/>
         </service>
     </package>
+        <package name="vmware6">
+        <filter><![CDATA[(IPADDR != '0.0.0.0') & (categoryName == 'VMware6')]]></filter>
+        <service name="VMware-VirtualMachine" interval="300000" user-defined="false" status="on">
+            <parameter key="collection" value="default-VirtualMachine6"/>
+            <parameter key="thresholding-enabled" value="true"/>
+        </service>
 
+        <service name="VMware-HostSystem" interval="300000" user-defined="false" status="on">
+            <parameter key="collection" value="default-HostSystem6"/>
+            <parameter key="thresholding-enabled" value="true"/>
+        </service>
+        <service name="VMwareCim-HostSystem" interval="300000" user-defined="false" status="on">
+            <parameter key="collection" value="default-ESX-HostSystem"/>
+            <parameter key="thresholding-enabled" value="true"/>
+        </service>
+    </package>
     <package name="example1">
         <filter>IPADDR != '0.0.0.0'</filter>
         <include-range begin="1.1.1.1" end="254.254.254.254"/>
@@ -104,7 +118,6 @@
             <parameter key="thresholding-enabled" value="true"/>
         </service>
 
-        <!-- TODO: Rename to 'JMX-OpenNMS' -->
         <service name="OpenNMS-JVM" interval="300000" user-defined="false" status="on">
             <parameter key="port" value="18980"/>
             <parameter key="retry" value="2"/>
@@ -167,7 +180,6 @@
     <collector service="VMware-HostSystem" class-name="org.opennms.netmgt.collectd.VmwareCollector"/>
     <collector service="VMwareCim-HostSystem" class-name="org.opennms.netmgt.collectd.VmwareCimCollector"/>
 
-    <!-- TODO: Rename to 'JMX-OpenNMS' -->
     <collector service="OpenNMS-JVM" class-name="org.opennms.netmgt.collectd.Jsr160Collector"/>
     <collector service="JMX-Minion" class-name="org.opennms.netmgt.collectd.Jsr160Collector"/>
     <collector service="JMX-Cassandra" class-name="org.opennms.netmgt.collectd.Jsr160Collector"/>

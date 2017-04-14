@@ -38,6 +38,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import org.opennms.netmgt.snmp.CollectionTracker;
 import org.opennms.netmgt.snmp.SnmpAgentConfig;
@@ -53,7 +56,6 @@ import org.opennms.netmgt.snmp.SnmpValue;
 import org.opennms.netmgt.snmp.SnmpValueFactory;
 import org.opennms.netmgt.snmp.SnmpWalker;
 import org.opennms.netmgt.snmp.TrapNotificationListener;
-import org.opennms.netmgt.snmp.TrapProcessorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snmp4j.CommandResponderEvent;
@@ -85,7 +87,14 @@ public class Snmp4JStrategy implements SnmpStrategy {
 
     private static final transient Logger LOG = LoggerFactory.getLogger(Snmp4JStrategy.class);
 
-    private static Map<TrapNotificationListener, RegistrationInfo> s_registrations = new HashMap<TrapNotificationListener, RegistrationInfo>();
+    private static final ExecutorService REAPER_EXECUTOR = Executors.newSingleThreadExecutor(new ThreadFactory() {
+        @Override
+        public Thread newThread(Runnable r) {
+            return new Thread(r, "SNMP4J-Session-Reaper");
+        }
+    });
+
+    private static Map<TrapNotificationListener, RegistrationInfo> s_registrations = new HashMap<>();
 
     private static boolean s_initialized = false;
 
@@ -306,9 +315,18 @@ public class Snmp4JStrategy implements SnmpStrategy {
                                 future.complete(processResponse(agentConfig, responseEvent));
                             } catch (IOException e) {
                                 future.completeExceptionally(e);
+                            } finally {
+                                // Close the tracker using a separate thread
+                                // This allows the SnmpWalker to clean up properly instead
+                                // of interrupting execution as it's executing the callback
+                                REAPER_EXECUTOR.submit(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        closeQuietly(session);
+                                    }
+                                });
                             }
                         }
-                        closeQuietly(session);
                     }
                 });
             } else {
@@ -471,12 +489,12 @@ public class Snmp4JStrategy implements SnmpStrategy {
         
     }
 
-        @Override
-    public void registerForTraps(final TrapNotificationListener listener, final TrapProcessorFactory processorFactory, InetAddress address, int snmpTrapPort, List<SnmpV3User> snmpUsers) throws IOException {
+    @Override
+    public void registerForTraps(final TrapNotificationListener listener, InetAddress address, int snmpTrapPort, List<SnmpV3User> snmpUsers) throws IOException {
     	final RegistrationInfo info = new RegistrationInfo(listener, address, snmpTrapPort);
         
-    	final Snmp4JTrapNotifier m_trapHandler = new Snmp4JTrapNotifier(listener, processorFactory);
-        info.setHandler(m_trapHandler);
+    	final Snmp4JTrapNotifier trapNotifier = new Snmp4JTrapNotifier(listener);
+        info.setHandler(trapNotifier);
 
         final UdpAddress udpAddress;
         if (address == null) {
@@ -487,10 +505,15 @@ public class Snmp4JStrategy implements SnmpStrategy {
 
         // Set socket option SO_REUSEADDR so that we can bind to the port even if it
         // has recently been closed by passing 'true' as the second argument here.
-        final TransportMapping<UdpAddress> transport = new DefaultUdpTransportMapping(udpAddress, true);
+        final DefaultUdpTransportMapping transport = new DefaultUdpTransportMapping(udpAddress, true);
+        // Increase the receive buffer for the socket
+        LOG.debug("Attempting to set receive buffer size to {}", Integer.MAX_VALUE);
+        transport.setReceiveBufferSize(Integer.MAX_VALUE);
+        LOG.debug("Actual receive buffer size is {}", transport.getReceiveBufferSize());
+
         info.setTransportMapping(transport);
         Snmp snmp = new Snmp(transport);
-        snmp.addCommandResponder(m_trapHandler);
+        snmp.addCommandResponder(trapNotifier);
 
         if (snmpUsers != null) {
             for (SnmpV3User user : snmpUsers) {
@@ -527,29 +550,29 @@ public class Snmp4JStrategy implements SnmpStrategy {
         snmp.listen();
     }
     
-        @Override
-    public void registerForTraps(final TrapNotificationListener listener, final TrapProcessorFactory processorFactory, InetAddress address, int snmpTrapPort) throws IOException {
-        registerForTraps(listener, processorFactory, address, snmpTrapPort, null);
+    @Override
+    public void registerForTraps(final TrapNotificationListener listener, InetAddress address, int snmpTrapPort) throws IOException {
+        registerForTraps(listener, address, snmpTrapPort, null);
     }
 
-        @Override
-    public void registerForTraps(final TrapNotificationListener listener, final TrapProcessorFactory processorFactory, final int snmpTrapPort) throws IOException {
-    	registerForTraps(listener, processorFactory, null, snmpTrapPort);
+    @Override
+    public void registerForTraps(final TrapNotificationListener listener, final int snmpTrapPort) throws IOException {
+    	registerForTraps(listener, null, snmpTrapPort);
     }
 
-        @Override
+    @Override
     public void unregisterForTraps(final TrapNotificationListener listener, InetAddress address, int snmpTrapPort) throws IOException {
         RegistrationInfo info = s_registrations.remove(listener);
         closeQuietly(info.getSession());
     }
 
-        @Override
+    @Override
     public void unregisterForTraps(final TrapNotificationListener listener, final int snmpTrapPort) throws IOException {
         RegistrationInfo info = s_registrations.remove(listener);
         closeQuietly(info.getSession());
     }
 
-        @Override
+    @Override
     public SnmpV1TrapBuilder getV1TrapBuilder() {
         return new Snmp4JV1TrapBuilder(this);
     }
@@ -641,7 +664,7 @@ public class Snmp4JStrategy implements SnmpStrategy {
 
     }
 
-    private void closeQuietly(Snmp session) {
+    private static void closeQuietly(Snmp session) {
         if (session == null) {
             return;
         }

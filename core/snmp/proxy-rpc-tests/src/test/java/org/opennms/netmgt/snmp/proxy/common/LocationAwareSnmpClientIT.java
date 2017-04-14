@@ -39,8 +39,7 @@ import java.util.concurrent.ExecutionException;
 import org.apache.camel.Component;
 import org.apache.camel.util.KeyValueHolder;
 import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opennms.core.rpc.api.RpcModule;
@@ -85,8 +84,8 @@ public class LocationAwareSnmpClientIT extends CamelBlueprintTest {
 
     private static final String REMOTE_LOCATION_NAME = "remote";
 
-    @Rule
-    public ActiveMQBroker broker = new ActiveMQBroker();
+    @ClassRule
+    public static ActiveMQBroker broker = new ActiveMQBroker();
 
     @Autowired
     private OnmsDistPoller identity;
@@ -121,17 +120,12 @@ public class LocationAwareSnmpClientIT extends CamelBlueprintTest {
         Properties props = new Properties();
         props.setProperty("alias", "opennms.broker");
         services.put(Component.class.getName(), new KeyValueHolder<Object, Dictionary>(queuingservice, props));
-        services.put(RpcModule.class.getName(), new KeyValueHolder<Object, Dictionary>(new SnmpProxyRpcModule(), new Properties()));
+        services.put(RpcModule.class.getName(), new KeyValueHolder<Object, Dictionary>(SnmpProxyRpcModule.INSTANCE, new Properties()));
     }
 
     @Override
     protected String getBlueprintDescriptor() {
-        return "classpath:/OSGI-INF/blueprint/blueprint-rpc-server.xml";
-    }
-
-    @Override
-    public boolean isCreateCamelContextPerClass() {
-        return true;
+        return "blueprint-empty-camel-context.xml";
     }
 
     @Before
@@ -152,9 +146,10 @@ public class LocationAwareSnmpClientIT extends CamelBlueprintTest {
     public void canWalkIpAddressTableDirectly() throws InterruptedException {
         // Gather the list of IP addresses
         final IPAddressGatheringTracker tracker = new IPAddressGatheringTracker();
-        SnmpWalker walker = SnmpUtils.createWalker(agentConfig, tracker.getDescription(), tracker);
-        walker.start();
-        walker.waitFor();
+        try(SnmpWalker walker = SnmpUtils.createWalker(agentConfig, tracker.getDescription(), tracker)) {
+            walker.start();
+            walker.waitFor();
+        }
         ExpectedResults.compareToKnownIpAddressList(tracker.getIpAddresses());
 
         // Now determine their interface indices using a different type of tracker
@@ -163,9 +158,10 @@ public class LocationAwareSnmpClientIT extends CamelBlueprintTest {
             ipAddrs.add(new SnmpInstId(InetAddressUtils.toOid(InetAddressUtils.addr(ipAddr))));
         }
         IpAddrTable ipAddrTable = new IpAddrTable(agentConfig.getAddress(), ipAddrs);
-        walker = SnmpUtils.createWalker(agentConfig, "ipAddrTable", ipAddrTable);
-        walker.start();
-        walker.waitFor();
+        try(SnmpWalker walker = SnmpUtils.createWalker(agentConfig, "ipAddrTable", ipAddrTable)) {
+            walker.start();
+            walker.waitFor();
+        }
         ExpectedResults.compareToKnownIfIndices(ipAddrTable.getIfIndices());
     }
 
@@ -232,7 +228,6 @@ public class LocationAwareSnmpClientIT extends CamelBlueprintTest {
      * This should invoke the route in the Camel context initialize in this blueprint.
      */
     @Test(timeout=60000)
-    @Ignore("flapping with NPE at org.springframework.jms.support.JmsAccessor.createSession(JmsAccessor.java:197)")
     public void canWalkIpAddressTableViaAnotherLocation() throws Exception {
         assertNotEquals(REMOTE_LOCATION_NAME, identity.getLocation());
 

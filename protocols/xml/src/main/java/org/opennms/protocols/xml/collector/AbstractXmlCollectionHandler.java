@@ -39,6 +39,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -71,6 +72,7 @@ import org.opennms.netmgt.collection.api.CollectionAgent;
 import org.opennms.netmgt.collection.api.CollectionException;
 import org.opennms.netmgt.collection.api.CollectionResource;
 import org.opennms.netmgt.collection.api.ServiceCollector;
+import org.opennms.netmgt.collection.support.ConstantTimeKeeper;
 import org.opennms.netmgt.collection.support.PersistAllSelectorStrategy;
 import org.opennms.netmgt.config.DataCollectionConfigFactory;
 import org.opennms.netmgt.config.datacollection.PersistenceSelectorStrategy;
@@ -450,7 +452,7 @@ public abstract class AbstractXmlCollectionHandler implements XmlCollectionHandl
                     String objStr = obj.toString();
                     try {
                         //NMS-7381 - if pulling from asset info you'd expect to not have to encode reserved words yourself.  
-                        objStr = URLEncoder.encode(obj.toString(), "UTF-8");
+                        objStr = URLEncoder.encode(obj.toString(), StandardCharsets.UTF_8.name());
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
@@ -502,15 +504,15 @@ public abstract class AbstractXmlCollectionHandler implements XmlCollectionHandl
         factory.setNamespaceAware(true);
         DocumentBuilder builder = factory.newDocumentBuilder();
         StringWriter writer = new StringWriter();
-        IOUtils.copy(is, writer, "UTF-8");
+        IOUtils.copy(is, writer, StandardCharsets.UTF_8);
         String contents = writer.toString();
-        Document doc = builder.parse(IOUtils.toInputStream(contents, "UTF-8"));
+        Document doc = builder.parse(IOUtils.toInputStream(contents, StandardCharsets.UTF_8));
         // Ugly hack to deal with DOM & XPath 1.0's battle royale 
         // over handling namespaces without a prefix. 
         if(doc.getNamespaceURI() != null && doc.getPrefix() == null){
             factory.setNamespaceAware(false);
             builder = factory.newDocumentBuilder();
-            doc = builder.parse(IOUtils.toInputStream(contents, "UTF-8"));
+            doc = builder.parse(IOUtils.toInputStream(contents, StandardCharsets.UTF_8));
         }
         return doc;
     }

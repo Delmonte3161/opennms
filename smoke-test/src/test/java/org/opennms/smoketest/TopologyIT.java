@@ -33,16 +33,21 @@ import static org.junit.Assert.assertEquals;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.opennms.features.topology.link.Layout;
+import org.opennms.features.topology.link.TopologyProvider;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
@@ -59,53 +64,9 @@ import com.google.common.collect.Lists;
  */
 public class TopologyIT extends OpenNMSSeleniumTestCase {
 
+    private static final Logger LOG = LoggerFactory.getLogger(TopologyIT.class);
+
     private TopologyUIPage topologyUiPage;
-
-    /**
-     * All known layout algorithms.
-     */
-    public static enum Layout {
-        CIRCLE("Circle Layout"),
-        D3("D3 Layout"),
-        FR("FR Layout"),
-        HIERARCHY("Hierarchy Layout"),
-        ISOM("ISOM Layout"),
-        KK("KK Layout"),
-        REAL("Real Ultimate Layout"),
-        SPRING("Spring Layout");
-
-        private final String label;
-
-        Layout(String label) {
-            this.label = Objects.requireNonNull(label);
-        }
-
-        public String getLabel() {
-            return label;
-        }
-
-        public static Layout createFromLabel(String label) {
-            for (Layout eachLayout : values()) {
-                if (eachLayout.getLabel().equals(label)) {
-                    return eachLayout;
-                }
-            }
-            return null;
-        }
-    }
-
-    /**
-     * All known topology providers.
-     */
-    public interface TopologyProvider {
-
-        TopologyProvider APPLICATION = () -> "Application";
-        TopologyProvider BUSINESSSERVICE = () -> "Business Services";
-        TopologyProvider VMWARE = () -> "VMware";
-        TopologyProvider ENLINKD = () -> "Enhanced Linkd";
-
-        String getLabel();
-    }
 
     /**
      * Represents a vertex that is focused using
@@ -203,7 +164,12 @@ public class TopologyIT extends OpenNMSSeleniumTestCase {
         }
 
         public void select() {
-            getElement().findElement(By.xpath("//*[@class='svgIconOverlay']")).click();
+            testCase.waitUntil(null, null, new Callable<Boolean>() {
+                @Override public Boolean call() throws Exception {
+                    getElement().findElement(By.xpath("//*[@class='svgIconOverlay']")).click();
+                    return true;
+                }
+            });
         }
 
         private WebElement getElement() {
@@ -226,6 +192,26 @@ public class TopologyIT extends OpenNMSSeleniumTestCase {
             } finally {
                 testCase.setImplicitWait();
             }
+        }
+    }
+
+    public static class PingWindow {
+        private final OpenNMSSeleniumTestCase testCase;
+        private final ContextMenu contextMenu;
+
+        private PingWindow(OpenNMSSeleniumTestCase testCase, ContextMenu contextMenu) {
+            this.testCase = Objects.requireNonNull(testCase);
+            this.contextMenu = Objects.requireNonNull(contextMenu);
+        }
+
+        private PingWindow open() {
+            contextMenu.click("Ping");
+            testCase.findElementByXpath("//div[@class='popupContent']//div[@class='v-window-header' and contains(text(), 'Ping')]");
+            return this;
+        }
+
+        public void close() {
+            testCase.findElementByXpath("//div[@class='v-window-closebox']").click();
         }
     }
 
@@ -259,6 +245,18 @@ public class TopologyIT extends OpenNMSSeleniumTestCase {
                     testCase.setImplicitWait();
                 }
             }
+        }
+
+        public void addToFocus() {
+            click("Add To Focus");
+        }
+
+        public void setAsFocus() {
+            click("Set As Focal Point");
+        }
+
+        public PingWindow ping() {
+            return new PingWindow(testCase, this).open();
         }
     }
 
@@ -319,14 +317,17 @@ public class TopologyIT extends OpenNMSSeleniumTestCase {
             resetMenu();
             Actions actions = new Actions(testCase.m_driver);
             for (String label : labels) {
-                WebElement menuElement = getMenubarElement(label);
-                actions.moveToElement(menuElement);
-                menuElement.click();
-                // we should wait, otherwise the menu has not yet updated
                 try {
+                    WebElement menuElement = getMenubarElement(label);
+                    actions.moveToElement(menuElement);
+                    menuElement.click();
+                    // we should wait, otherwise the menu has not yet updated
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     throw Throwables.propagate(e);
+                } catch (Throwable e) {
+                    LOG.error("Unexpected exception while clicking on menu item {}", label, e);
+                    throw e;
                 }
             }
             return this;
@@ -351,10 +352,20 @@ public class TopologyIT extends OpenNMSSeleniumTestCase {
         }
 
         public TopologyUIPage setAutomaticRefresh(boolean enabled) {
+            LOG.info("setAutomaticRefresh: {} refresh", enabled ? "enabling" : "disabling");
             boolean alreadyEnabled = isMenuItemChecked("Automatic Refresh", "View");
             if ((alreadyEnabled && !enabled) || (!alreadyEnabled && enabled)) {
+                LOG.info("setAutomaticRefresh: toggling setting to {} refresh", enabled ? "enable" : "disable");
                 clickOnMenuItemsWithLabels("View", "Automatic Refresh");
+            } else {
+                LOG.info("setAutomaticRefresh: refresh is already {}", enabled ? "enabled" : "disabled");
             }
+            return this;
+        }
+
+        public TopologyUIPage refreshNow() {
+            testCase.findElementById("refreshNow").click();
+            waitForTransition();
             return this;
         }
 
@@ -384,6 +395,20 @@ public class TopologyIT extends OpenNMSSeleniumTestCase {
                 testCase.setImplicitWait();
             }
             return verticesInFocus;
+        }
+
+        public List<VisibleVertex> getNotFocusedVertices() {
+            final List<FocusedVertex> focusedVertices = getFocusedVertices();
+            final List<VisibleVertex> notFocusedVertices = getVisibleVertices()
+                    .stream()
+                    // Remove all vertices from "visible vertices list" if it is already in focus
+                    .filter(visibleVertex ->
+                        !focusedVertices.stream()
+                                .filter(focusedVertex -> focusedVertex.getLabel().equals(visibleVertex.getLabel()))
+                                .findAny()
+                                .isPresent())
+                    .collect(Collectors.toList());
+            return notFocusedVertices;
         }
 
         public List<VisibleVertex> getVisibleVertices() {
@@ -551,6 +576,46 @@ public class TopologyIT extends OpenNMSSeleniumTestCase {
                 testCase.setImplicitWait();
             }
         }
+
+        public SaveLayoutButton getSaveLayoutButton() {
+            return new SaveLayoutButton(testCase);
+        }
+
+        public boolean isSimulationModeEnabled() {
+            try {
+                testCase.setImplicitWait(1, TimeUnit.SECONDS);
+                testCase.findElementByXpath("//*[@id='info-panel-component']//div[text() = 'Simulation Mode Enabled']");
+                return true;
+            } catch (org.openqa.selenium.NoSuchElementException e) {
+                return false;
+            } finally {
+                testCase.setImplicitWait();
+            }
+        }
+    }
+
+    public static class SaveLayoutButton {
+        private final OpenNMSSeleniumTestCase testCase;
+
+        private SaveLayoutButton(OpenNMSSeleniumTestCase testCase) {
+            this.testCase = Objects.requireNonNull(testCase);
+        }
+
+        public boolean isEnabled() {
+            String disabled = getButton().getAttribute("aria-disabled");
+            return !"true".equalsIgnoreCase(disabled);
+        }
+
+        public void click() {
+            getButton().click();
+            waitForTransition();
+        }
+
+        private WebElement getButton() {
+            WebElement saveLayerButton = testCase.findElementById("saveLayerButton");
+            Objects.requireNonNull(saveLayerButton);
+            return saveLayerButton;
+        }
     }
 
     public static class TopologyUISearchResults {
@@ -615,6 +680,34 @@ public class TopologyIT extends OpenNMSSeleniumTestCase {
             .setAutomaticRefresh(true)
             .setAutomaticRefresh(false)
             .setAutomaticRefresh(true);
+    }
+
+    // Verifies that the ping operation is available. See NMS-9019
+    @Test
+    public void verifyPingOperation() {
+        // Create Dummy Node
+        final String foreignSourceXML = "<foreign-source name=\"" + OpenNMSSeleniumTestCase.REQUISITION_NAME + "\">\n" +
+                "<scan-interval>1d</scan-interval>\n" +
+                "<detectors/>\n" +
+                "<policies/>\n" +
+                "</foreign-source>";
+        createForeignSource(REQUISITION_NAME, foreignSourceXML);
+        final String requisitionXML = "<model-import foreign-source=\"" + OpenNMSSeleniumTestCase.REQUISITION_NAME + "\">" +
+                "   <node foreign-id=\"tests\" node-label=\"Dummy Node\">" +
+                "       <interface ip-addr=\"127.0.0.1\" status=\"1\" snmp-primary=\"N\">" +
+                "           <monitored-service service-name=\"ICMP\"/>" +
+                "       </interface>" +
+                "   </node>" +
+                "</model-import>";
+        createRequisition(REQUISITION_NAME, requisitionXML, 1);
+
+        // Find Node and try select ping from context menu
+        topologyUiPage.selectTopologyProvider(TopologyProvider.ENLINKD);
+        topologyUiPage.clearFocus();
+        topologyUiPage.refreshNow();
+        topologyUiPage.search("Dummy Node").selectItemThatContains("Dummy Node");
+        PingWindow pingWindow = topologyUiPage.findVertex("Dummy Node").contextMenu().ping();
+        pingWindow.close();
     }
 
     /**

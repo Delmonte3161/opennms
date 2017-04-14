@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -47,6 +48,7 @@ import org.opennms.netmgt.model.OnmsIpInterface;
 import org.opennms.netmgt.model.OnmsNode;
 import org.opennms.netmgt.model.OnmsSnmpInterface;
 import org.opennms.netmgt.model.SurveillanceStatus;
+import org.opennms.netmgt.model.monitoringLocations.OnmsMonitoringLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,6 +162,17 @@ public class MockNodeDao extends AbstractMockDao<OnmsNode, Integer> implements N
     }
 
     @Override
+    public String getLocationForId(final Integer id) {
+        final OnmsNode node = get(id);
+        if (node == null) {
+            return null;
+        } else {
+            OnmsMonitoringLocation onmsMonitoringLocation = node.getLocation();
+            return onmsMonitoringLocation == null ? null : onmsMonitoringLocation.getLocationName();
+        }
+    }
+
+    @Override
     public List<OnmsNode> findByLabel(final String label) {
         final List<OnmsNode> nodes = new ArrayList<OnmsNode>();
         for (final OnmsNode node : findAll()) {
@@ -241,7 +254,7 @@ public class MockNodeDao extends AbstractMockDao<OnmsNode, Integer> implements N
     public List<OnmsNode> findByForeignSource(final String foreignSource) {
         final List<OnmsNode> nodes = new ArrayList<OnmsNode>();
         for (final OnmsNode node : findAll()) {
-            if (foreignSource.equals(node.getForeignSource())) {
+            if (Objects.equals(foreignSource, node.getForeignSource())) {
                 nodes.add(node);
             }
         }
@@ -375,7 +388,7 @@ public class MockNodeDao extends AbstractMockDao<OnmsNode, Integer> implements N
     public List<OnmsNode> findByForeignSourceAndIpAddress(final String foreignSource, final String ipAddress) {
         final List<OnmsNode> nodes = new ArrayList<OnmsNode>();
         for (final OnmsNode node : findAll()) {
-            if (foreignSource.equals(node.getForeignSource())) {
+            if (Objects.equals(foreignSource, node.getForeignSource())) {
                 final OnmsIpInterface iface = node.getIpInterfaceByIpAddress(ipAddress);
                 if (iface != null) nodes.add(node);
                 continue;

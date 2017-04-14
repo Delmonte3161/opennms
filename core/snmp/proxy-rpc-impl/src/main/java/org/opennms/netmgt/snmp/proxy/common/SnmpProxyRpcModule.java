@@ -1,3 +1,31 @@
+/*******************************************************************************
+ * This file is part of OpenNMS(R).
+ *
+ * Copyright (C) 2016-2017 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2017 The OpenNMS Group, Inc.
+ *
+ * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
+ *
+ * OpenNMS(R) is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * OpenNMS(R) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with OpenNMS(R).  If not, see:
+ *      http://www.gnu.org/licenses/
+ *
+ * For more information contact:
+ *     OpenNMS(R) Licensing <license@opennms.org>
+ *     http://www.opennms.org/
+ *     http://www.opennms.com/
+ *******************************************************************************/
+
 package org.opennms.netmgt.snmp.proxy.common;
 
 import java.util.ArrayList;
@@ -6,6 +34,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 
 import org.opennms.core.rpc.xml.AbstractXmlRpcModule;
@@ -29,7 +60,16 @@ import org.opennms.netmgt.snmp.SnmpWalker;
  */
 public class SnmpProxyRpcModule extends AbstractXmlRpcModule<SnmpRequestDTO, SnmpMultiResponseDTO> {
 
+    public static final SnmpProxyRpcModule INSTANCE = new SnmpProxyRpcModule();
+
     public static final String RPC_MODULE_ID = "SNMP";
+
+    private static final ExecutorService REAPER_EXECUTOR = Executors.newSingleThreadExecutor(new ThreadFactory() {
+        @Override
+        public Thread newThread(Runnable r) {
+            return new Thread(r, "SNMP-Proxy-RPC-Session-Reaper");
+        }
+    });
 
     public SnmpProxyRpcModule() {
         super(SnmpRequestDTO.class, SnmpMultiResponseDTO.class);
@@ -46,11 +86,13 @@ public class SnmpProxyRpcModule extends AbstractXmlRpcModule<SnmpRequestDTO, Snm
                 return m;
             });
         }
-        CompletableFuture<Collection<SnmpResponseDTO>> future = walk(request, request.getWalkRequest());
-        combinedFuture = combinedFuture.thenCombine(future, (m,s) -> {
-            m.getResponses().addAll(s);
-            return m;
-        });
+        if (request.getWalkRequest().size() > 0) {
+            CompletableFuture<Collection<SnmpResponseDTO>> future = walk(request, request.getWalkRequest());
+            combinedFuture = combinedFuture.thenCombine(future, (m,s) -> {
+                m.getResponses().addAll(s);
+                return m;
+            });
+        }
         return combinedFuture;
     }
 
@@ -96,10 +138,22 @@ public class SnmpProxyRpcModule extends AbstractXmlRpcModule<SnmpRequestDTO, Snm
         walker.setCallback(new SnmpWalkCallback() {
             @Override
             public void complete(SnmpWalker tracker, Throwable t) {
-                if (t != null) {
-                    future.completeExceptionally(t);
-                } else {
-                    future.complete(responsesByCorrelationId.values());
+                try {
+                    if (t != null) {
+                        future.completeExceptionally(t);
+                    } else {
+                        future.complete(responsesByCorrelationId.values());
+                    }
+                } finally {
+                    // Close the tracker using a separate thread
+                    // This allows the SnmpWalker to clean up properly instead
+                    // of interrupting execution as it's executing the callback
+                    REAPER_EXECUTOR.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            tracker.close();
+                        }
+                    });
                 }
             }
         });
@@ -131,6 +185,11 @@ public class SnmpProxyRpcModule extends AbstractXmlRpcModule<SnmpRequestDTO, Snm
             responseDTO.setResults(results);
             return responseDTO;
         });
+    }
+
+    @Override
+    public SnmpMultiResponseDTO createResponseWithException(Throwable ex) {
+        return new SnmpMultiResponseDTO(ex);
     }
 
     @Override

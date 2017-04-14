@@ -32,9 +32,13 @@ import java.util.Objects;
 
 import org.opennms.core.ipc.sink.api.SinkModule;
 import org.opennms.core.xml.XmlHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.opennms.core.ipc.sink.api.Message;
 
-public abstract class AbstractXmlSinkModule<T extends Message> implements SinkModule<T> {
+public abstract class AbstractXmlSinkModule<S extends Message, T extends Message> implements SinkModule<S, T> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractXmlSinkModule.class);
 
     private final Class<T> messageClazz;
 
@@ -58,6 +62,18 @@ public abstract class AbstractXmlSinkModule<T extends Message> implements SinkMo
         return getXmlHandler().unmarshal(message);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        return getClass() == obj.getClass();
+    }
+
     private XmlHandler<T> getXmlHandler() {
         XmlHandler<T> xmlHandler = messageXmlHandler.get();
         if (xmlHandler == null) {
@@ -71,10 +87,11 @@ public abstract class AbstractXmlSinkModule<T extends Message> implements SinkMo
         try {
             return new XmlHandler<>(clazz);
         } catch (Throwable t) {
-            // This is a work-around for some failure in the Minion container
+            // NMS-8793: This is a work-around for some failure in the Minion container
             // When invoked for the first time, the creation may fail due to
             // errors of the form "invalid protocol handler: mvn", but subsequent
             // calls always seem to work
+            LOG.warn("Creating the XmlHandler failed. Retrying.", t);
             return new XmlHandler<>(clazz);
         }
     }

@@ -99,6 +99,9 @@
     <logger name="org.apache.bsf" additivity="false" level="INFO">
       <appender-ref ref="RoutingAppender"/>
     </logger>
+    <logger name="org.apache.camel.component.jms" additivity="false" level="INFO">
+      <appender-ref ref="RoutingAppender"/>
+    </logger>
     <logger name="org.apache.commons" additivity="false" level="WARN">
       <appender-ref ref="RoutingAppender"/>
     </logger>
@@ -112,9 +115,6 @@
       <appender-ref ref="RoutingAppender"/>
     </logger>
     <logger name="org.eclipse.jetty.webapp" additivity="false" level="INFO">
-      <appender-ref ref="RoutingAppender"/>
-    </logger>
-    <logger name="org.exolab.castor" additivity="false" level="INFO">
       <appender-ref ref="RoutingAppender"/>
     </logger>
     <logger name="org.gwtwidgets" additivity="false" level="INFO">
@@ -142,6 +142,9 @@
       <appender-ref ref="RoutingAppender"/>
     </logger>
     <logger name="com.datastax.driver" additivity="false" level="INFO">
+      <appender-ref ref="RoutingAppender"/>
+    </logger>
+    <logger name="org.snmp4j.transport" additivity="false" level="ERROR">
       <appender-ref ref="RoutingAppender"/>
     </logger>
 
@@ -177,6 +180,7 @@
         <KeyValuePair key="eventd"               value="DEBUG" />
         <KeyValuePair key="event-translator"     value="DEBUG" />
         <KeyValuePair key="icmp"                 value="DEBUG" />
+        <KeyValuePair key="ipc"                  value="DEBUG" />
         <KeyValuePair key="jetty-server"         value="DEBUG" />
         <KeyValuePair key="enlinkd"              value="DEBUG" />
         <KeyValuePair key="manager"              value="DEBUG" />

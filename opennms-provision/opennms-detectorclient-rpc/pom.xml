@@ -115,11 +115,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.opennms</groupId>
       <artifactId>opennms-dao</artifactId>
       <scope>test</scope>
@@ -132,6 +127,11 @@
     <dependency>
       <groupId>org.opennms</groupId>
       <artifactId>opennms-icmp-jna</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opennms</groupId>
+      <artifactId>opennms-icmp-best</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

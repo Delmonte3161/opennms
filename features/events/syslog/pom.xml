@@ -42,21 +42,6 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>blueprint-syslog-handler-default.xml</file>
-                  <type>xml</type>
-                  <classifier>blueprint-syslog-handler-default</classifier>
-                </artifact>
-                <artifact>
-                  <file>blueprint-syslog-handler-kafka.xml</file>
-                  <type>xml</type>
-                  <classifier>blueprint-syslog-handler-kafka</classifier>
-                </artifact>
-                <artifact>
-                  <file>blueprint-syslog-handler-minion.xml</file>
-                  <type>xml</type>
-                  <classifier>blueprint-syslog-handler-minion</classifier>
-                </artifact>
-                <artifact>
                   <file>blueprint-syslog-listener-javanet.xml</file>
                   <type>xml</type>
                   <classifier>blueprint-syslog-listener-javanet</classifier>
@@ -65,16 +50,6 @@
                   <file>blueprint-syslog-listener-camel-netty.xml</file>
                   <type>xml</type>
                   <classifier>blueprint-syslog-listener-camel-netty</classifier>
-                </artifact>
-                <artifact>
-                  <file>blueprint-syslog-listener-nio.xml</file>
-                  <type>xml</type>
-                  <classifier>blueprint-syslog-listener-nio</classifier>
-                </artifact>
-                <artifact>
-                  <file>blueprint-syslog-handler-kafka-default.xml</file>
-                  <type>xml</type>
-                  <classifier>blueprint-syslog-handler-kafka-default</classifier>
                 </artifact>
               </artifacts>
             </configuration>
@@ -106,46 +81,17 @@
       <artifactId>opennms-dao-api</artifactId>
     </dependency>
     <dependency>
-        <groupId>io.dropwizard.metrics</groupId>
-        <artifactId>metrics-core</artifactId>
-        <version>${dropwizardMetricsVersion}</version>
+      <groupId>org.opennms.core.ipc.sink</groupId>
+      <artifactId>org.opennms.core.ipc.sink.xml</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.lmax</groupId>
-      <artifactId>disruptor</artifactId>
-      <version>${lmaxDisruptorVersion}</version>
+      <groupId>io.dropwizard.metrics</groupId>
+      <artifactId>metrics-core</artifactId>
+      <version>${dropwizardMetricsVersion}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.camel</groupId>
-      <artifactId>camel-kafka</artifactId>
-      <version>${camelVersion}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.sun.xml.bind</groupId>
-          <artifactId>jaxb-impl</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>log4j</groupId>
-          <artifactId>log4j</artifactId>
-        </exclusion>
-        <!-- snappy-java has OSGi loading problems because of JNI bits -->
-        <exclusion>
-          <groupId>org.xerial.snappy</groupId>
-          <artifactId>snappy-java</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.opennms</groupId>
@@ -176,12 +122,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.opennms.features.executor-factory</groupId>
-      <artifactId>org.opennms.features.executor-factory.cassandra</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.opennms.features.minion</groupId>
       <artifactId>core-api</artifactId>
       <version>${project.version}</version>
@@ -190,6 +130,11 @@
     <dependency>
       <groupId>org.opennms</groupId>
       <artifactId>opennms-icmp-jna</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opennms</groupId>
+      <artifactId>opennms-icmp-best</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -212,25 +157,49 @@
       <artifactId>org.opennms.core.test-api.camel</artifactId>
       <scope>test</scope>
     </dependency>
-    
-    <!-- HZN-742 -->
     <dependency>
-	 <groupId>org.apache.curator</groupId>
-	 <artifactId>curator-test</artifactId>
-	 <version>${curatorVersion}</version>
-	 <scope>test</scope>
-	 <exclusions>
-	 	<exclusion>
-	 		<artifactId>log4j</artifactId>
-	 		<groupId>log4j</groupId>
-	 	</exclusion>
-	 	<exclusion>
-	 		<artifactId>slf4j-log4j12</artifactId>
-	 		<groupId>org.slf4j</groupId>
-	 	</exclusion>
-	 </exclusions>
+      <groupId>org.opennms.core.ipc.sink</groupId>
+      <artifactId>org.opennms.core.ipc.sink.mock-impl</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
-
-	<!-- end of  HZN-742-->
+    <dependency>
+      <groupId>org.opennms.core.ipc.sink</groupId>
+      <artifactId>org.opennms.core.ipc.sink.common</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opennms.core.test-api</groupId>
+      <artifactId>org.opennms.core.test-api.xml</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.jayway.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Dependency added to support all Date format -->
+	<dependency>
+		<groupId>com.joestelmach</groupId>
+		<artifactId>natty</artifactId>
+		<version>0.12</version>
+		<exclusions>
+			<exclusion>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+			</exclusion>
+			<exclusion>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+			</exclusion>
+		</exclusions>
+	</dependency>
   </dependencies>
 </project>

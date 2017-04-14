@@ -63,7 +63,7 @@ public class CustomSyslogParser extends SyslogParser {
 
     @Override
     public SyslogMessage parse() throws SyslogParserException {
-        LOG.info("Message Parse start");
+        LOG.debug("Message parse start");
         final SyslogMessage syslogMessage = new SyslogMessage();
         syslogMessage.setParserClass(getClass());
 
@@ -116,7 +116,7 @@ public class CustomSyslogParser extends SyslogParser {
                 try {
                     timestamp = SyslogTimeStamp.getInstance().format(new Date());
                 } catch (final IllegalArgumentException ex) {
-                    LOG.debug("ERROR INTERNAL DATE ERROR!");
+                    LOG.debug("ERROR INTERNAL DATE ERROR! ",ex);
                     timestamp = "";
                 }
             }
@@ -194,7 +194,7 @@ public class CustomSyslogParser extends SyslogParser {
         syslogMessage.setProcessName(processName);
         syslogMessage.setMessage(message.trim());
 
-        LOG.info("Message Parse End");
+        LOG.debug("Message parse end");
         return syslogMessage;
     }
 

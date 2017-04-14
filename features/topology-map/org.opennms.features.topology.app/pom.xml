@@ -61,7 +61,18 @@
         </dependency>
         <dependency>
             <groupId>org.opennms.features.topology</groupId>
+            <artifactId>org.opennms.features.topology.link</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.features.topology</groupId>
             <artifactId>org.opennms.features.topology.api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.features.topology</groupId>
+            <artifactId>org.opennms.features.topology.persistence.api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -108,13 +119,19 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.opennms.features.geocoder</groupId>
-            <artifactId>org.opennms.features.geocoder.api</artifactId>
+            <groupId>org.opennms.features.geolocation</groupId>
+            <artifactId>org.opennms.features.geolocation.api</artifactId>
+            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -29,14 +29,12 @@
 package org.opennms.netmgt.poller.monitors;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.Inet4Address;
-import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -231,13 +229,8 @@ public class PageSequenceMonitor extends AbstractServiceMonitor {
 
         @Override
         public void setQueryParameters(final List<NameValuePair> parms) {
-            try {
-                final UrlEncodedFormEntity entity = new UrlEncodedFormEntity(parms, "UTF-8");
-                this.setEntity(entity);
-            } catch (final UnsupportedEncodingException e) {
-                // Should never happen
-                LOG.debug("Unsupported encoding", e);
-            }
+            final UrlEncodedFormEntity entity = new UrlEncodedFormEntity(parms, StandardCharsets.UTF_8);
+            this.setEntity(entity);
         }
     }
 
@@ -252,9 +245,9 @@ public class PageSequenceMonitor extends AbstractServiceMonitor {
             URI uri = this.getURI();
             URI uriWithQueryString = null;
             try {
-                String query = URLEncodedUtils.format(parms, "UTF-8");
+                String query = URLEncodedUtils.format(parms, StandardCharsets.UTF_8);
                 URIBuilder ub = new URIBuilder(uri);
-                final List<NameValuePair> params = URLEncodedUtils.parse(query, Charset.forName("UTF-8"));
+                final List<NameValuePair> params = URLEncodedUtils.parse(query, StandardCharsets.UTF_8);
                 if (!params.isEmpty()) {
                     ub.setParameters(params);
                 }
@@ -499,7 +492,7 @@ public class PageSequenceMonitor extends AbstractServiceMonitor {
             ub.setHost(host);
             ub.setPort(getPort());
             ub.setPath(getPath(seqProps, svcProps));
-            final List<NameValuePair> params = URLEncodedUtils.parse(getQuery(seqProps, svcProps), Charset.forName("UTF-8"));
+            final List<NameValuePair> params = URLEncodedUtils.parse(getQuery(seqProps, svcProps), StandardCharsets.UTF_8);
             if (!params.isEmpty()) {
                 ub.setParameters(params);
             }
@@ -525,17 +518,6 @@ public class PageSequenceMonitor extends AbstractServiceMonitor {
 
         private String getHost(Properties... p) {
             return PropertiesUtils.substitute(m_page.getHost(), p);
-        }
-
-        private Properties getServiceProperties(MonitoredService svc) {
-            final InetAddress addr = InetAddressUtils.addr(svc.getIpAddr());
-            boolean requireBrackets = addr != null && addr instanceof Inet6Address && !svc.getIpAddr().startsWith("[");
-            Properties properties = new Properties();
-            properties.put("ipaddr", requireBrackets ? "[" + svc.getIpAddr() + "]" : svc.getIpAddr());
-            properties.put("nodeid", svc.getNodeId());
-            properties.put("nodelabel", svc.getNodeLabel());
-            properties.put("svcname", svc.getSvcName());
-            return properties;
         }
 
         private String getUserInfo() {

@@ -35,17 +35,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.Inet4Address;
-import java.net.InetSocketAddress;
 import java.util.Date;
 
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
 import org.opennms.core.criteria.Criteria;
 import org.opennms.core.criteria.CriteriaBuilder;
@@ -57,88 +49,24 @@ import org.opennms.netmgt.dao.hibernate.NodeDaoHibernate;
 import org.opennms.netmgt.model.OnmsEvent;
 import org.opennms.netmgt.model.OnmsNode;
 import org.opennms.netmgt.model.minion.OnmsMinion;
-import org.opennms.smoketest.NullTestEnvironment;
-import org.opennms.smoketest.OpenNMSSeleniumTestCase;
 import org.opennms.smoketest.utils.DaoUtils;
-import org.opennms.smoketest.utils.HibernateDaoFactory;
 import org.opennms.test.system.api.NewTestEnvironment.ContainerAlias;
-import org.opennms.test.system.api.TestEnvironment;
-import org.opennms.test.system.api.TestEnvironmentBuilder;
-import org.opennms.test.system.api.utils.SshClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Verifies that syslog messages sent to the Minion generate
  * events in OpenNMS.
  *
+ * @author Seth
  * @author jwhite
  */
-public class SyslogTest {
-    private static final Logger LOG = LoggerFactory.getLogger(SyslogTest.class);
-
-    private static TestEnvironment minionSystem;
-
-    private HibernateDaoFactory daoFactory;
-
-    @ClassRule
-    public static final TestEnvironment getTestEnvironment() {
-        if (!OpenNMSSeleniumTestCase.isDockerEnabled()) {
-            return new NullTestEnvironment();
-        }
-        try {
-            final TestEnvironmentBuilder builder = TestEnvironment.builder().all();
-            builder.withOpenNMSEnvironment()
-                    .addFile(SyslogTest.class.getResource("/eventconf.xml"), "etc/eventconf.xml")
-                    .addFile(SyslogTest.class.getResource("/events/Cisco.syslog.events.xml"), "etc/events/Cisco.syslog.events.xml")
-                    .addFile(SyslogTest.class.getResource("/syslogd-configuration.xml"), "etc/syslogd-configuration.xml")
-                    .addFile(SyslogTest.class.getResource("/syslog/Cisco.syslog.xml"), "etc/syslog/Cisco.syslog.xml");
-            OpenNMSSeleniumTestCase.configureTestEnvironment(builder);
-            minionSystem = builder.build();
-            return minionSystem;
-        } catch (final Throwable t) {
-            throw new RuntimeException(t);
-        }
-    }
-
-    @Before
-    public void checkForDocker() {
-        Assume.assumeTrue(OpenNMSSeleniumTestCase.isDockerEnabled());
-    }
-
-    @Before
-    public void enableSyslog() throws Exception {
-        // Install the handler on the OpenNMS system (this should probably be installed by default)
-        final InetSocketAddress sshAddr = minionSystem.getServiceAddress(ContainerAlias.OPENNMS, 8101);
-        try (
-                final SshClient sshClient = new SshClient(sshAddr, "admin", "admin");
-        ) {
-            PrintStream pipe = sshClient.openShell();
-            // Install the syslog and trap handler features
-            pipe.println("features:install opennms-syslogd-handler-default opennms-trapd-handler-default");
-            pipe.println("features:list -i");
-            pipe.println("logout");
-            try {
-                await().atMost(2, MINUTES).until(sshClient.isShellClosedCallable());
-            } finally {
-                LOG.info("Karaf output:\n{}", sshClient.getStdout());
-            }
-        }
-    }
-
-    @Before
-    public void setup() {
-        // Connect to the postgresql container
-        final InetSocketAddress pgsql = minionSystem.getServiceAddress(ContainerAlias.POSTGRES, 5432);
-        this.daoFactory = new HibernateDaoFactory(pgsql);
-    }
+public class SyslogTest extends AbstractSyslogTest {
 
     @Test
     public void canReceiveSyslogMessages() throws Exception {
         final Date startOfTest = new Date();
 
         // Send a syslog packet to the Minion syslog listener
-        this.sendMessage("myhost");
+        sendMessage(ContainerAlias.MINION, "myhost", 1);
 
         // Parsing the message correctly relies on the customized syslogd-configuration.xml that is part of the OpenNMS image
         final EventDao eventDao = this.daoFactory.getDao(EventDaoHibernate.class);
@@ -156,7 +84,7 @@ public class SyslogTest {
     public void testNewSuspect() throws Exception {
         final Date startOfTest = new Date();
 
-        final String sender = minionSystem.getContainerInfo(ContainerAlias.SNMPD).networkSettings().ipAddress();
+        final String sender = testEnvironment.getContainerInfo(ContainerAlias.SNMPD).networkSettings().ipAddress();
 
         // Wait for the minion to show up
         await().atMost(90, SECONDS).pollInterval(5, SECONDS)
@@ -168,7 +96,7 @@ public class SyslogTest {
                       is(1));
 
         // Send the initial message
-        this.sendMessage(sender);
+        sendMessage(ContainerAlias.MINION, sender, 1);
 
         // Wait for the syslog message
         await().atMost(1, MINUTES).pollInterval(5, SECONDS)
@@ -209,7 +137,7 @@ public class SyslogTest {
                       notNullValue());
 
         // Send the second message
-        this.sendMessage(sender);
+        sendMessage(ContainerAlias.MINION, sender, 1);
 
         // Wait for the second message with the node assigned
         await().atMost(1, MINUTES).pollInterval(5, SECONDS)
@@ -220,14 +148,5 @@ public class SyslogTest {
                                                              .eq("node", node)
                                                              .toCriteria()),
                       is(1));
-    }
-
-    private void sendMessage(final String host) throws IOException {
-        final InetSocketAddress syslogAddr = minionSystem.getServiceAddress(ContainerAlias.MINION, 1514, "udp");
-        byte[] message = ("<190>Mar 11 08:35:17 " + host + " 30128311: Mar 11 08:35:16.844 CST: %SEC-6-IPACCESSLOGP: list in110 denied tcp 192.168.10.100(63923) -> 192.168.11.128(1521), 1 packet\n").getBytes();
-        DatagramPacket packet = new DatagramPacket(message, message.length, syslogAddr.getAddress(), syslogAddr.getPort());
-        DatagramSocket dsocket = new DatagramSocket();
-        dsocket.send(packet);
-        dsocket.close();
     }
 }
