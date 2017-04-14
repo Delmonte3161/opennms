@@ -192,9 +192,9 @@ function main()
         esac
     done
 
-    if[ -z "$RELEASE" ] ; then
+    if[ -z "$RELEASE" ]; then
     RELEASE=$RELEASE_MAJOR
-    if [ "$RELEASE_MAJOR" = 0 ] ; then
+    if [ "$RELEASE_MAJOR" = 0 ]; then
         RELEASE=${RELEASE_MAJOR}.${RELEASE_MINOR}.${RELEASE_MICRO}
     fi
     fi
