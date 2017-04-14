@@ -75,14 +75,15 @@ public class KafkaEventProducer
     {
         String message = exchange.getIn().getBody( String.class );
 
-        LOG.info( "OnmsEvent json body received: {}", message );
+        LOG.info( Thread.currentThread().getName() + " OnmsEvent json body received: {}", message );
+        /* LOG.debug( Thread.currentThread().getName() + " Onmsevent message received" ); */
         final ProducerRecord<String, String> record = new ProducerRecord<>( topic, message );
         try
         {
             final Future<RecordMetadata> future = producer.send( record );
 
             RecordMetadata recordMetaData = future.get();
-            LOG.info( "RecordMetaData: " + recordMetaData.toString() );
+            LOG.info( Thread.currentThread().getName() + " RecordMetaData: " + recordMetaData.toString() );
         }
         catch ( InterruptedException e )
         {

@@ -41,9 +41,9 @@ public class EventForwarder extends DefaultDispatcher implements CamelEventForwa
     @Override
     public void sendNow( Event event )
     {
-        LOG.info( "Event " + event.getDbid() + " with uei " + event.getUei() + " received" );
+        /*LOG.info( Thread.currentThread().getName() + " Event " + event.getDbid() + " with uei " + event.getUei() + " received" );*/
         m_proxy.sendNow( event );
-        LOG.info( "Event " + event.getDbid() + " with uei " + event.getUei() + " forwarded via the forwarder" );
+        LOG.info( Thread.currentThread().getName() + " Event " + event.getDbid() + " with uei " + event.getUei() + " forwarded via the forwarder" );
     }
 
     @Override

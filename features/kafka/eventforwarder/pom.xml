@@ -128,6 +128,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.opennms</groupId>
+            <artifactId>opennms-alarm-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.opennms.core.ipc.sink</groupId>
             <artifactId>org.opennms.core.ipc.sink.common</artifactId>
             <version>${project.version}</version>

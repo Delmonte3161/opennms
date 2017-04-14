@@ -20,17 +20,17 @@ import org.springframework.util.Assert;
 public class KafkaForwardingEventListener implements EventListener
 {
 
-    private static final Logger          LOG                  = LoggerFactory
+    private static final Logger               LOG                      = LoggerFactory
                     .getLogger( KafkaForwardingEventListener.class );
 
-    private volatile CamelEventForwarder eventForwarder;
-    private volatile EventIpcManager     eventIpcManager;
-    private volatile NodeDao             nodeDao;
-    private volatile TransactionTemplate transactionTemplate;
-    private volatile boolean             logAllEvents         = false;
+    private volatile CamelEventForwarder      eventForwarder;
+    private volatile EventIpcManager          eventIpcManager;
+    private volatile NodeDao                  nodeDao;
+    private volatile TransactionTemplate      transactionTemplate;
+    private volatile boolean                  logAllEvents             = false;
 
-    String                               kafkaForwarderEvents = "";
-    String[]                             kafkaEvents          = null;
+    String                                    kafkaForwarderEvents     = "";
+    String[]                                  kafkaEvents              = null;
 
     public CamelEventForwarder getEventForwarder()
     {
@@ -142,9 +142,10 @@ public class KafkaForwardingEventListener implements EventListener
     @Override
     public void onEvent( final Event event )
     {
-        // only process events persisted to database
+        // only process events persisted to database or if logAllEvents = true
         if ( logAllEvents || (event.getDbid() != null && event.getDbid() > 0) )
         {
+            LOG.debug( Thread.currentThread().getName() + " Event received in EventListener: " + event.getDbid() );
             // Send the event to the event forwarder
             eventForwarder.sendNow( event );
         }
