@@ -53,7 +53,6 @@ public class EventEnricher
         try
         {
             OnmsNode onmsNode = null;
-            OnmsAlarm onmsAlarm = null;
 
             Object incoming = in.getBody();
             if ( incoming instanceof BeanInvocation )
@@ -71,73 +70,35 @@ public class EventEnricher
 
                     LOG.info( Thread.currentThread().getName() + " Event received in EventEnricher: "
                                     + event.getDbid() );
-                    /*
-                     * LOG.info( "******EVENT******" ); LOG.info( event.toString() ); LOG.info(
-                     * "Fetching node from cache" );
-                     */
+
                     onmsNode = cache.getEntry( event.getNodeid() );
 
                     // No null checks performed on the node fetched. No null values are cached
-
                     LOG.info( Thread.currentThread().getName() + " Node fetched from the cache: "
                                     + onmsNode.getNodeId() );
 
-                    /*
-                     * LOG.info( "******NODE******" ); LOG.info( onmsNode.toString() ); LOG.info(
-                     * "Categories size: " + (onmsNode.getCategories() == null ? null :
-                     * onmsNode.getCategories().size()) ); if ( onmsNode.getCategories() != null ) {
-                     * LOG.info( "*************Categories info*************" ); for ( OnmsCategory
-                     * category : onmsNode.getCategories() ) LOG.info( "Category : " +
-                     * category.getId() + " : " + category.getName() + " : " +
-                     * category.getDescription() ); }
-                     */
+                    OnmsEvent onmsEvent = EventEnricherUtils.getOnmsEvent( event );
+                    LOG.debug( Thread.currentThread().getName()
+                                    + " *************Details of enriched event*************" );
 
-                    AlarmData alarmData = event.getAlarmData();
-                    LOG.info( Thread.currentThread().getName() + " Fetched alarm data " );
-
-                    String onmsAlarmJsonString = "";
+                    String onmsEventJsonString = marshall( onmsEvent );
 
                     String onmsNodeJsonString = marshall( onmsNode );
+
                     StringBuilder sb = new StringBuilder();
+                    sb.append( onmsEventJsonString ).append( "\n" ).append( onmsNodeJsonString ).append( "\n" );
+
+                    AlarmData alarmData = event.getAlarmData();
 
                     if ( alarmData != null )
                     {
+                        LOG.debug( Thread.currentThread().getName() + " Fetched alarm data " );
                         LOG.debug( Thread.currentThread().getName() + " Clearkey: " + alarmData.getClearKey() );
                         LOG.debug( Thread.currentThread().getName() + " Reductionkey: " + alarmData.getReductionKey() );
 
-                        onmsAlarmJsonString = getOnmsAlarmJsonString( alarmData.getReductionKey() );
-                        sb.append( onmsAlarmJsonString ).append( "\n" ).append( onmsNodeJsonString );
+                        String onmsAlarmJsonString = marshall( alarmData );
+                        sb.append( onmsAlarmJsonString );
                     }
-                    else
-                    {
-                        OnmsEvent onmsEvent = EventEnricherUtils.getOnmsEvent( event );
-
-                        LOG.debug( Thread.currentThread().getName()
-                                        + " *************Details of enriched event*************" );
-
-                        String onmsEventJsonString = marshall( onmsEvent );
-
-                        sb.append( onmsEventJsonString ).append( "\n" ).append( onmsNodeJsonString );
-
-                        LOG.debug( Thread.currentThread().getName() + " Event id: " + onmsEvent.getId()
-                                        + " Create time: " + onmsEvent.getEventCreateTime() );
-                    }
-
-                    /*
-                     * LOG.debug( "Serialized OnmsEvent: " ); LOG.debug( onmsEventJsonString );
-                     */
-
-                    // LOG.debug( "Serialized OnmsNode: " );
-                    /*
-                     * LOG.debug( onmsNodeJsonString );
-                     * 
-                     * LOG.debug( "Serialized OnmsAlarm: " ); LOG.debug( onmsAlarmJsonString );
-                     * 
-                     * LOG.info( "***************OnmsEvent converted to JSON string***************"
-                     * );
-                     * 
-                     * LOG.info( sb.toString() );
-                     */
 
                     exchange.getOut().setBody( sb.toString() );
                 }
@@ -146,10 +107,6 @@ public class EventEnricher
         catch ( NodeNotFoundException e )
         {
             LOG.error( "No node in database: ", e );
-        }
-        catch ( JAXBException e )
-        {
-            LOG.error( "Marshall exception: ", e );
         }
 
         Long endTime = System.currentTimeMillis();
@@ -170,28 +127,7 @@ public class EventEnricher
             @Override
             protected void doInTransactionWithoutResult( TransactionStatus transactionStatus )
             {
-                onmsAlarm = alarmDao.findByReductionKey( reductionKey );
-                if ( onmsAlarm != null )
-                {
-                    LOG.debug( "********OnmsAlarm fetched from database: Alarm details********" );
-                    LOG.debug( "AlarmId: " + onmsAlarm.getId() );
-                    LOG.debug( "Reductionkey: " + onmsAlarm.getReductionKey() );
-                    LOG.debug( "Event uei: " + onmsAlarm.getUei() );
-
-                    try
-                    {
-                        onmsAlarmJsonString = marshall( onmsAlarm );
-                    }
-                    catch ( JAXBException e )
-                    {
-                        LOG.error( "OnmsAlarm marshall exception: ", e );
-                        onmsAlarmJsonString = "";
-                    }
-                }
-                else
-                {
-                    LOG.info( "No alarm exists for reductionkey: " + reductionKey );
-                }
+                onmsAlarmJsonString = marshall( onmsAlarm );
             }
         } );
 
@@ -205,22 +141,30 @@ public class EventEnricher
      * @return
      * @throws JAXBException
      */
-    protected String marshall( Serializable onmsEntity ) throws JAXBException
+    protected String marshall( Serializable onmsEntity )
     {
+        try
+        {
+            Map<String, Object> properties = new HashMap<>();
+            properties.put( MarshallerProperties.MEDIA_TYPE, "application/json" );
+            properties.put( MarshallerProperties.JSON_MARSHAL_EMPTY_COLLECTIONS, false );
 
-        Map<String, Object> properties = new HashMap<>();
-        properties.put( MarshallerProperties.MEDIA_TYPE, "application/json" );
-        properties.put( MarshallerProperties.JSON_MARSHAL_EMPTY_COLLECTIONS, false );
+            // Create jaxb context
+            JAXBContext jc = JAXBContext.newInstance( new Class[] { OnmsEvent.class, OnmsNode.class, AlarmData.class },
+                                                      properties );
 
-        // Create jaxb context
-        JAXBContext jc = JAXBContext.newInstance( new Class[] { OnmsNode.class, OnmsAlarm.class }, properties );
+            Marshaller marshaller = jc.createMarshaller();
+            marshaller.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, true );
 
-        Marshaller marshaller = jc.createMarshaller();
-        marshaller.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, true );
-
-        Writer stringWriter = new StringWriter();
-        marshaller.marshal( onmsEntity, stringWriter );
-        return stringWriter.toString();
+            Writer stringWriter = new StringWriter();
+            marshaller.marshal( onmsEntity, stringWriter );
+            return stringWriter.toString();
+        }
+        catch ( JAXBException e )
+        {
+            LOG.error( "Error marshalling " + onmsEntity, e );
+            return "";
+        }
     }
 
     /* Getters and setters */

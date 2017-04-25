@@ -1,0 +1,19 @@
+{
+   "node" : {
+      "foreignId" : "dockeronmsdev",
+      "foreignSource" : "Minions",
+      "label" : "dockeronmsdev",
+      "id" : "1",
+      "type" : "A",
+      "assetRecord" : {
+         "category" : "Unspecified",
+         "lastModifiedBy" : "",
+         "lastModifiedDate" : "2017-03-21T14:39:53-05:00"
+      },
+      "categories" : [ ],
+      "createTime" : "2017-03-21T14:39:53-05:00",
+      "labelSource" : "U",
+      "location" : "dockeronmsdev",
+      "sysObjectId" : "sys-object-oid"
+   }
+}

@@ -1,0 +1,8 @@
+{
+   "alarm-data" : {
+      "reduction-key" : "uei.opennms.org/KafkaTestEvent/OK::1:127.0.0.1",
+      "alarm-type" : 3,
+      "auto-clean" : false,
+      "update-field" : [ ]
+   }
+}

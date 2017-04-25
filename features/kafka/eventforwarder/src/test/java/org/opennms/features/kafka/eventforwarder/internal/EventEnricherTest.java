@@ -1,18 +1,33 @@
 package org.opennms.features.kafka.eventforwarder.internal;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.when;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
+import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
+import org.apache.camel.Message;
+import org.apache.camel.component.bean.BeanInvocation;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.impl.DefaultExchange;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opennms.netmgt.model.OnmsAlarm;
+import org.opennms.netmgt.model.OnmsAssetRecord;
 import org.opennms.netmgt.model.OnmsDistPoller;
-import org.opennms.netmgt.model.OnmsEvent;
 import org.opennms.netmgt.model.OnmsNode;
 import org.opennms.netmgt.model.OnmsNode.NodeLabelSource;
 import org.opennms.netmgt.model.OnmsNode.NodeType;
@@ -22,21 +37,29 @@ import org.opennms.netmgt.xml.event.Event;
 import org.opennms.netmgt.xml.event.Logmsg;
 import org.opennms.netmgt.xml.event.Snmp;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class EventEnricherTest
 {
 
-    private static EventEnricher eventEnricher = null;
-    private static Event         event         = null;
-    private static OnmsNode      onmsNode      = null;
-    private static OnmsAlarm     onmsAlarm     = null;
+    private static EventEnricher  eventEnricher  = null;
+    private static Event          event          = null;
+    private static OnmsNode       onmsNode       = null;
+    private static OnmsAlarm      onmsAlarm      = null;
+    private static AlarmData      alarmData      = null;
 
-    private static DateFormat    dateFormat    = new SimpleDateFormat( "EEE MMM d HH:mm:ss z yyyy" );
+    private static ObjectMapper   objectMapper   = null;
+
+    private static DateFormat     dateFormat     = new SimpleDateFormat( "EEE MMM d HH:mm:ss z yyyy" );
     // private List<Parm> parms = new ArrayList<>();
+
+    private static BeanInvocation beanInvocation = null;
 
     @BeforeClass
     public static void setupBefore() throws ParseException
     {
         eventEnricher = new EventEnricher();
+        objectMapper = new ObjectMapper();
 
         // Setting test event parameters
         event = new Event();
@@ -73,7 +96,8 @@ public class EventEnricherTest
         event.setIfAlias( null );
         event.setMouseovertext( "mouse-over-text" );
 
-        AlarmData alarmData = new AlarmData();
+        alarmData = new AlarmData();
+
         alarmData.setReductionKey( "uei.opennms.org/KafkaTestEvent/OK::1:127.0.0.1" );
         alarmData.setAlarmType( 3 );
         alarmData.setClearKey( null );
@@ -85,6 +109,12 @@ public class EventEnricherTest
 
         // setting test onmsNode properties
         onmsNode = new OnmsNode();
+        onmsNode.setCreateTime( dateFormat.parse( "Tue Mar 21 19:39:53 UTC 2017" ) );
+
+        OnmsAssetRecord onmsAssetRecord = new OnmsAssetRecord();
+        onmsAssetRecord.setLastModifiedDate( dateFormat.parse( "Tue Mar 21 19:39:53 UTC 2017" ) );
+        onmsNode.setAssetRecord( onmsAssetRecord );
+
         onmsNode.setId( 1 );
         onmsNode.setLocation( new OnmsMonitoringLocation( "dockeronmsdev", null ) );
         onmsNode.setForeignSource( "Minions" );
@@ -92,7 +122,7 @@ public class EventEnricherTest
         onmsNode.setLabelSource( NodeLabelSource.USER );
         onmsNode.setLabel( "dockeronmsdev" );
         onmsNode.setParent( null );
-        onmsNode.setCreateTime( new Date() );
+        onmsNode.setCreateTime( dateFormat.parse( "Tue Mar 21 19:39:53 UTC 2017" ) );
         onmsNode.setSysObjectId( "sys-object-oid" );
         onmsNode.setSysName( null );
         onmsNode.setSysDescription( null );
@@ -117,31 +147,108 @@ public class EventEnricherTest
         onmsAlarm.setDistPoller( distPoller );
         onmsAlarm.setNode( onmsNode );
         onmsAlarm.setLastEvent( EventEnricherUtils.getOnmsEvent( event ) );
+
+        beanInvocation = new BeanInvocation();
+
+        Object[] args = new Object[1];
+        args[0] = event;
+        beanInvocation.setArgs( args );
     }
 
     @AfterClass
     public static void setupAfter()
     {
         eventEnricher = null;
+        objectMapper = null;
         event = null;
         onmsNode = null;
         onmsAlarm = null;
+        beanInvocation = null;
+    }
+
+    // Create a test CamelExchange based on default CamelContext
+    private Exchange createExchange()
+    {
+        CamelContext context = new DefaultCamelContext();
+        Exchange exchange = new DefaultExchange( context );
+        populateExchange( exchange );
+        return exchange;
+    }
+
+    // Populate Camel exchange with test body
+    private void populateExchange( Exchange exchange )
+    {
+        assertNotNull( "Exchange cannot be null. No exchange created", exchange );
+        Message in = exchange.getIn();
+        in.setBody( beanInvocation );
     }
 
     @Test
-    public void testGetOnmsEventAsJson() throws JAXBException
+    public void testNodeMarshall() throws JAXBException, IOException
     {
+        FileReader fr = new FileReader( "src/test/resources/nodejsonstring.txt" );
+        BufferedReader br = new BufferedReader( fr );
+        StringBuilder sb = new StringBuilder();
+        String currLine = null;
+        while ( (currLine = br.readLine()) != null )
+        {
+            sb.append( currLine );
+        }
 
-        OnmsEvent onmsEvent = EventEnricherUtils.getOnmsEvent( event );
+        br.close();
 
-        String onmsEventJsonString = eventEnricher.marshall( onmsEvent );
-        String onmsNodeJsonString = eventEnricher.marshall( onmsNode );
-        String onmsAlarmJsonString = eventEnricher.marshall( onmsAlarm );
+        String nodeJsonString = eventEnricher.marshall( onmsNode );
 
-        /*
-         * StringBuilder sb = new StringBuilder(); sb.append( onmsEventJsonString ).append( "\n"
-         * ).append( onmsNodeJsonString ).append( "\n" ) .append( onmsAlarmJsonString );
-         */
-        System.out.println( onmsAlarmJsonString );
+        Map<String, Object> m1 = (Map<String, Object>) (objectMapper.readValue( sb.toString(), Map.class ));
+        Map<String, Object> m2 = (Map<String, Object>) (objectMapper.readValue( nodeJsonString, Map.class ));
+        assertTrue( m1.equals( m2 ) );
+    }
+
+    @Test
+    public void testAlarmMarshall() throws IOException, JAXBException
+    {
+        FileReader fr = new FileReader( "src/test/resources/alarmjsonstring.txt" );
+        BufferedReader br = new BufferedReader( fr );
+        StringBuilder sb = new StringBuilder();
+        String currLine = null;
+        while ( (currLine = br.readLine()) != null )
+        {
+            sb.append( currLine );
+        }
+
+        br.close();
+
+        String alarmJsonString = eventEnricher.marshall( alarmData );
+        Map<String, Object> m1 = (Map<String, Object>) (objectMapper.readValue( sb.toString(), Map.class ));
+        Map<String, Object> m2 = (Map<String, Object>) (objectMapper.readValue( alarmJsonString, Map.class ));
+        assertTrue( m1.equals( m2 ) );
+    }
+
+    @Test
+    public void testProcess() throws NodeNotFoundException, IOException
+    {
+        NodeCache cache = Mockito.mock( NodeCache.class );
+        eventEnricher.setCache( cache );
+        when( cache.getEntry( anyLong() ) ).thenReturn( onmsNode );
+
+        Exchange exchange = createExchange();
+        eventEnricher.process( exchange );
+
+        String jsonString = (String) exchange.getOut().getBody();
+
+        FileReader fr = new FileReader( "src/test/resources/json.txt" );
+        BufferedReader br = new BufferedReader( fr );
+        StringBuilder sb = new StringBuilder();
+        String currLine = null;
+        while ( (currLine = br.readLine()) != null )
+        {
+            sb.append( currLine );
+        }
+
+        br.close();
+
+        Map<String, Object> m1 = (Map<String, Object>) (objectMapper.readValue( sb.toString(), Map.class ));
+        Map<String, Object> m2 = (Map<String, Object>) (objectMapper.readValue( jsonString, Map.class ));
+        assertTrue( m1.equals( m2 ) );
     }
 }

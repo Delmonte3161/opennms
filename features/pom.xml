@@ -140,6 +140,8 @@
     
     <!-- Internal Plugins Descriptor -->
     <module>internal-plugins-descriptor</module>
-    
+
+    <!-- Kafka event-forwarder -->
+    <module>kafka</module>
   </modules>
 </project>

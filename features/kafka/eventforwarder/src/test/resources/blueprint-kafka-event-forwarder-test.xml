@@ -16,7 +16,7 @@
 ">
 
     <!-- Configuration properties -->
-    <cm:property-placeholder id="kafkaEventForwarderProperties" persistent-id="org.opennms.features.kafka.eventforwarder"
+    <cm:property-placeholder id="kafkaEventForwarderProperties" persistent-id="org.opennms.features.kafka.eventforwarder.osgi"
         update-strategy="reload">
         <cm:default-properties>
             <cm:property name="logAllEvents" value="false" />
@@ -27,24 +27,29 @@
             <cm:property name="queueSize" value="1000" />
             <cm:property name="queueTimeout" value="0" /> <!-- Disable timeout by default -->
             <cm:property name="blockWhenFull" value="true" />
+            <cm:property name="topic" value="fast-messages" />
+            <cm:property name="kafkaForwarderEvents" value="uei.opennms.org/KafkaTestEvent/OK,uei.opennms.org/syslogd/user/Info" />
         </cm:default-properties>
     </cm:property-placeholder>
 
-    <bean id="eventListener" class="org.opennms.features.kafka.eventforwarder.KafkaForwardingEventListener" init-method="init"
-        destroy-method="destroy">
-        <property name="eventIpcManager" ref="eventIpcManager" />
-        <property name="eventForwarder" ref="eventForwarder" />
-        <property name="logAllEvents" value="${logAllEvents}" />
-    </bean>
 
     <reference id="alarmDao" interface="org.opennms.netmgt.dao.api.AlarmDao" availability="mandatory" />
     <reference id="eventIpcManager" interface="org.opennms.netmgt.events.api.EventIpcManager" availability="mandatory" />
     <reference id="nodeDao" interface="org.opennms.netmgt.dao.api.NodeDao" availability="mandatory" />
     <reference id="transactionOperations" interface="org.springframework.transaction.support.TransactionOperations"
         availability="mandatory" />
+    <reference id="configAdmin" interface="org.osgi.service.cm.ConfigurationAdmin" />
+
+    <bean id="eventListener" class="org.opennms.features.kafka.eventforwarder.KafkaForwardingEventListener" init-method="init"
+        destroy-method="destroy">
+        <property name="eventIpcManager" ref="eventIpcManager" />
+        <property name="eventForwarder" ref="eventForwarder" />
+        <property name="logAllEvents" value="${logAllEvents}" />
+        <property name="kafkaForwarderEvents" value="${kafkaForwarderEvents}" />
+    </bean>
 
     <!-- Eventforwarder that sends the incoming OnmsEvent to a camel route for further enrichment of the event -->
-    <bean id="eventForwarder" class="org.opennms.features.kafka.eventforwarder.internal.KafkaEventForwarder">
+    <bean id="eventForwarder" class="org.opennms.features.kafka.eventforwarder.internal.EventForwarder">
         <argument value="seda:kafkaForwardEvent?size=${queueSize}&amp;timeout=${queueTimeout}&amp;blockWhenFull=${blockWhenFull}" />
     </bean>
 
@@ -61,13 +66,19 @@
         <property name="transactionOperations" ref="transactionOperations" />
     </bean>
 
+    <!-- KafkaEventProducer initialization -->
+    <bean id="kafkaEventProducer" class="org.opennms.features.kafka.eventforwarder.internal.KafkaEventProducer"
+        init-method="init">
+        <property name="configAdmin" ref="configAdmin" />
+        <property name="topic" value="${topic}" />
+    </bean>
+
     <!-- ************************************** Camel Context ************************************** -->
 
     <camelContext autoStartup="true" id="kafkaEventForwarder" xmlns="http://camel.apache.org/schema/blueprint">
-        <!-- <dataFormats> <json id="jackson" library="Jackson" unmarshalTypeName="org.opennms.netmgt.model.OnmsEvent" /> </dataFormats> -->
 
         <propertyPlaceholder id="properties" location="blueprint:kafkaEventForwarderProperties" />
-        
+
         <onException>
             <exception>java.lang.Exception</exception>
             <redeliveryPolicy maximumRedeliveries="10" delayPattern="2:30000;4:60000;6:120000" />
@@ -75,22 +86,19 @@
 
         <route id="eventsFromOpennms" autoStartup="true" startupOrder="1">
             <from uri="seda:kafkaForwardEvent?concurrentConsumers={{concurrentConsumers}}&amp;size={{queueSize}}" />
-            <to uri="seda:KAFKA_PRE?size={{queueSize}}&amp;timeout={{queueTimeout}}&amp;blockWhenFull={{blockWhenFull}}" />
-        </route>
-
-        <route id="enrichOpennmsEvents" autoStartup="true" startupOrder="2">
-            <from uri="seda:KAFKA_PRE?concurrentConsumers={{concurrentConsumers}}&amp;size={{queueSize}}" />
             <bean ref="eventEnricher" method="process" />
             <to uri="seda:KAFKA?size={{queueSize}}&amp;timeout={{queueTimeout}}&amp;blockWhenFull={{blockWhenFull}}" />
         </route>
 
-        <!-- <route id="alarmsFromOpennms" autoStartup="true" startupOrder="3"> <from uri="seda:elasticsearchForwardAlarm?concurrentConsumers={{concurrentConsumers}}&amp;size={{queueSize}}" 
-            /> <to uri="seda:ES_PRE?size={{queueSize}}&amp;timeout={{queueTimeout}}&amp;blockWhenFull={{blockWhenFull}}" /> </route> <route 
-            id="enrichAlarmsAndEvents" autoStartup="true" startupOrder="4"> <from uri="seda:ES_PRE?concurrentConsumers={{concurrentConsumers}}&amp;size={{queueSize}}" 
-            /> <bean ref="elasticsearchHeaders" method="process" /> <to uri="seda:ES?size={{queueSize}}&amp;timeout={{queueTimeout}}&amp;blockWhenFull={{blockWhenFull}}" 
-            /> </route> <route id="toElasticsearch" autoStartup="true" startupOrder="5" errorHandlerRef="noErrorHandler"> <from uri="seda:ES?concurrentConsumers={{concurrentConsumers}}&amp;size={{queueSize}}" 
-            /> <log loggingLevel="DEBUG" message="ES: ${body.toString()}" /> <to uri="elasticsearch://{{elasticsearchCluster}}?operation=INDEX&amp;ip={{elasticsearchIp}}&amp;port={{elasticsearchTransportPort}}" 
+        <!-- <route id="enrichOpennmsEvents" autoStartup="true" startupOrder="2"> <from uri="seda:KAFKA_PRE?concurrentConsumers={{concurrentConsumers}}&amp;size={{queueSize}}" 
+            /> <bean ref="eventEnricher" method="process" /> <bean ref="kafkaEventProducer" method="dispatch" /> <to uri="seda:KAFKA?size={{queueSize}}&amp;timeout={{queueTimeout}}&amp;blockWhenFull={{blockWhenFull}}" 
             /> </route> -->
+
+        <route id="eventsToKafka" autoStartup="true" startupOrder="2">
+            <from
+                uri="seda:KAFKA?concurrentConsumers={{concurrentConsumers}}&amp;size={{queueSize}}&amp;timeout={{queueTimeout}}&amp;blockWhenFull={{blockWhenFull}}" />
+            <bean ref="kafkaEventProducer" method="dispatch" />
+        </route>
 
     </camelContext>
 

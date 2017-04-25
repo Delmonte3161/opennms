@@ -12,6 +12,5 @@
  * kafkaEevntProducer.init(); }
  * 
  * @Test public void testInit() { kafkaEevntProducer.dispatch(); }
- * 
  * }
  */

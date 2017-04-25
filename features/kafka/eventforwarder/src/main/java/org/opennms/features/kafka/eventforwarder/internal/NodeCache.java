@@ -41,12 +41,16 @@ public class NodeCache
     {
     }
 
+    @SuppressWarnings( "unchecked" )
     public void init()
     {
         if ( cache == null )
         {
             LOG.info( "initializing node data cache (TTL=" + MAX_TTL + "m, MAX_SIZE=" + MAX_SIZE + ")" );
+
+            @SuppressWarnings( "rawtypes" )
             CacheBuilder cacheBuilder = CacheBuilder.newBuilder();
+
             if ( MAX_TTL > 0 )
             {
                 cacheBuilder.expireAfterWrite( MAX_TTL, TimeUnit.MINUTES );

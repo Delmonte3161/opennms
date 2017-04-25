@@ -14,23 +14,23 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
 /**
- * This event sends incoming events to an {@link EventForwarder} that uses Camel+Kafka to forward
+ * This listener sends incoming events to an {@link EventForwarder} that uses Camel+Kafka to forward
  * events to an external Kafka messaging bus.
  */
 public class KafkaForwardingEventListener implements EventListener
 {
 
-    private static final Logger               LOG                      = LoggerFactory
+    private static final Logger          LOG                  = LoggerFactory
                     .getLogger( KafkaForwardingEventListener.class );
 
-    private volatile CamelEventForwarder      eventForwarder;
-    private volatile EventIpcManager          eventIpcManager;
-    private volatile NodeDao                  nodeDao;
-    private volatile TransactionTemplate      transactionTemplate;
-    private volatile boolean                  logAllEvents             = false;
+    private volatile CamelEventForwarder eventForwarder;
+    private volatile EventIpcManager     eventIpcManager;
+    private volatile NodeDao             nodeDao;
+    private volatile TransactionTemplate transactionTemplate;
+    private volatile boolean             logAllEvents         = false;
 
-    String                                    kafkaForwarderEvents     = "";
-    String[]                                  kafkaEvents              = null;
+    String                               kafkaForwarderEvents = "";
+    String[]                             kafkaEvents          = null;
 
     public CamelEventForwarder getEventForwarder()
     {
@@ -142,8 +142,11 @@ public class KafkaForwardingEventListener implements EventListener
     @Override
     public void onEvent( final Event event )
     {
-        // only process events persisted to database or if logAllEvents = true
-        if ( logAllEvents || (event.getDbid() != null && event.getDbid() > 0) )
+        /*
+         * Only process action-able events and either those events which are persisted to database
+         * or if logAllEvents property is set to true
+         */
+        if ( (logAllEvents || (event.getDbid() != null && event.getDbid() > 0)) && (event.getAlarmData() != null) )
         {
             LOG.debug( Thread.currentThread().getName() + " Event received in EventListener: " + event.getDbid() );
             // Send the event to the event forwarder

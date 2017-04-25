@@ -1,0 +1,45 @@
+{
+   "event" : {
+      "id" : 751,
+      "severity" : "NORMAL",
+      "createTime" : "2017-03-21T14:39:53-05:00",
+      "description" : "Test event to verfiy OpenNMS-Kafka integration",
+      "host" : "dockeronmsdev5.novalocal",
+      "logMessage" : "Test default event to verify eventlistener to eventforwarder integration.",
+      "mouseOverText" : "mouse-over-text",
+      "operatorInstructions" : "operator-instruction",
+      "pathOutage" : "path-outage",
+      "snmpHost" : "snmp-host",
+      "source" : "perl_send_event",
+      "time" : "2017-03-21T14:39:53-05:00",
+      "uei" : "uei.opennms.org/KafkaTestEvent/OK",
+      "ifIndex" : 0
+   }
+}
+{
+   "node" : {
+      "foreignId" : "dockeronmsdev",
+      "foreignSource" : "Minions",
+      "label" : "dockeronmsdev",
+      "id" : "1",
+      "type" : "A",
+      "assetRecord" : {
+         "category" : "Unspecified",
+         "lastModifiedBy" : "",
+         "lastModifiedDate" : "2017-03-21T14:39:53-05:00"
+      },
+      "categories" : [ ],
+      "createTime" : "2017-03-21T14:39:53-05:00",
+      "labelSource" : "U",
+      "location" : "dockeronmsdev",
+      "sysObjectId" : "sys-object-oid"
+   }
+}
+{
+   "alarm-data" : {
+      "reduction-key" : "uei.opennms.org/KafkaTestEvent/OK::1:127.0.0.1",
+      "alarm-type" : 3,
+      "auto-clean" : false,
+      "update-field" : [ ]
+   }
+}
