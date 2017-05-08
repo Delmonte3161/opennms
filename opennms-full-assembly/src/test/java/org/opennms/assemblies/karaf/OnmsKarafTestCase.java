@@ -59,7 +59,7 @@ public class OnmsKarafTestCase extends KarafTestCase {
 				.groupId("org.opennms.container")
 				.artifactId("org.opennms.container.karaf")
 				.type("tar.gz")
-				.version("1.2-cernermef");
+				.version("1.2.0-cernermef");
 	}
 
 	/**

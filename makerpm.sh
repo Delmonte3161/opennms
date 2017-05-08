@@ -126,7 +126,7 @@ function extraInfo2()
 function version()
 {
     grep '<version>' pom.xml | \
-    sed -e 's,^[^>]*>,,' -e 's,<.*$,,' -e 's,-[^-]*-SNAPSHOT$,,' -e 's,-SNAPSHOT$,,' -e 's,-testing$,,' -e 's,-,.,g' | \
+    sed -e 's,^[^>]*>,,' -e 's,<.*$,,' -e 's,-[^-]*-SNAPSHOT$,,' -e 's,-SNAPSHOT$,,' -e 's,-cernermef$,,' -e 's,-[^-]*-cernermef$,,' -e 's,-testing$,,' -e 's,-,.,g' | \
     head -n 1
 }
 

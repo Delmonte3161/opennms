@@ -5,7 +5,7 @@
 ~~~~
 project groupId: org.opennms.plugins
 project name:    alarm-change-notifier
-version:         1.2-cernermef
+version:         1.2.0-cernermef
 ~~~~
 
 ## Description
@@ -77,10 +77,10 @@ ssh -p 8101 admin@localhost
 to install the feature in karaf use
 
 ~~~~
-karaf@root> features:addurl mvn:org.opennms.plugins/alarm-change-notifier/1.2-cernermef/xml/features
+karaf@root> features:addurl mvn:org.opennms.plugins/alarm-change-notifier/1.2.0-cernermef/xml/features
 karaf@root> features:install alarm-change-notifier
 
-(or features:install alarm-change-notifier/1.2-cernermef for a specific version of the feature)
+(or features:install alarm-change-notifier/1.2.0-cernermef for a specific version of the feature)
 ~~~~
 
 

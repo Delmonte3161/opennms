@@ -53,7 +53,7 @@
     <dependency>
       <groupId>org.opennms</groupId>
       <artifactId>opennms-rrd-tcp</artifactId>
-      <version>1.2-cernermef</version>
+      <version>1.2.0-cernermef</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

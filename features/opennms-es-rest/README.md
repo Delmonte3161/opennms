@@ -4,7 +4,7 @@
 ~~~~
 project groupId: org.opennms.plugins
 project name:    opennms-es-rest
-version:         1.2-cernermef
+version:         1.2.0-cernermef
 ~~~~
 
 ### Description
@@ -30,10 +30,10 @@ To install the feature in karaf use
 
 ~~~~
 
-karaf@root> features:addurl mvn:org.opennms.plugins/opennms-es-rest/1.2-cernermef/xml/features
+karaf@root> features:addurl mvn:org.opennms.plugins/opennms-es-rest/1.2.0-cernermef/xml/features
 karaf@root> features:install opennms-es-rest
 
-(or features:install opennms-es-rest/1.2-cernermef for a specific version of the feature)
+(or features:install opennms-es-rest/1.2.0-cernermef for a specific version of the feature)
 ~~~~
 
 Example searches to use in Kibana Sense
