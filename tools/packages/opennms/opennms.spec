@@ -191,7 +191,7 @@ embedded in the main core process.
 Summary:	Remote Poller webapp
 Group:		Applications/System
 Requires:	%{name}-webapp-jetty = %{version}-%{release}
-Conflicts:	%{name}-webapp-jetty < 19.0.0-0
+Conflicts:	%{name}-webapp-jetty < 1.2.0-0
 
 %description webapp-remoting
 The JNLP application that provides the Remote Poller.
