@@ -193,10 +193,9 @@ function main()
     done
 
     if [ -z "$RELEASE" ]; then
-    RELEASE=$RELEASE_MAJOR
-    if [ "$RELEASE_MAJOR" = 0 ]; then
         RELEASE=${RELEASE_MAJOR}.${RELEASE_MINOR}.${RELEASE_MICRO}
-    fi
+    else
+        RELEASE=${RELEASE_MAJOR}.${RELEASE}.${RELEASE_MICRO}
     fi
 
     EXTRA_INFO=$(extraInfo)
