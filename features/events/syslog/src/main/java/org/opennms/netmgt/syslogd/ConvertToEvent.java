@@ -311,7 +311,7 @@ public class ConvertToEvent {
         bldr.addParam("rawmessage", data);
         bldr.addParam("syslogmessage", message.getMessage());
         bldr.addParam("severity", "" + priorityTxt);
-        bldr.addParam("timestamp", message.getSyslogFormattedDate());
+        bldr.addParam("timestamp", message.getDate().toString());
         
         if (message.getProcessName() != null) {
             bldr.addParam("process", message.getProcessName());
