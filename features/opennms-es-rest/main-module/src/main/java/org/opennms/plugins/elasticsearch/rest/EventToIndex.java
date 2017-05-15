@@ -629,7 +629,7 @@ public class EventToIndex implements AutoCloseable {
 				body.put("p_" + parm.getParmName(), parm.getValue().getContent());
 			}
 		}
-		body.put("p_timestamp" ,DatatypeConverter.printDateTime(cal));
+		body.put("p_timestamp" ,cal.getTime().toString());
 		// remove old and new alarm values parms if not needed
 		if(! archiveNewAlarmValues){
 			body.remove("p_"+OLD_ALARM_VALUES);
