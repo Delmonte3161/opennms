@@ -29,6 +29,8 @@
 package org.opennms.plugins.elasticsearch.rest;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -595,14 +597,11 @@ public class EventToIndex implements AutoCloseable {
 		body.put("eventuei",event.getUei());
 
 		Calendar cal=Calendar.getInstance();
-		if (event.getTime()==null) {
+		if (event.getCreationTime()==null) {
 			if(LOG.isDebugEnabled()) LOG.debug("using local time because no event creation time for event.toString: "+ event.toString());
 			cal.setTime(new Date());
 
-		} else 	cal.setTime(event.getTime()); // javax.xml.bind.DatatypeConverter.parseDateTime("2010-01-01T12:00:00Z");
-
-
-		body.put("@timestamp", DatatypeConverter.printDateTime(cal));
+		} else 	cal.setTime(event.getCreationTime()); // javax.xml.bind.DatatypeConverter.parseDateTime("2010-01-01T12:00:00Z");
 
 		body.put("dow", Integer.toString(cal.get(Calendar.DAY_OF_WEEK)));
 		body.put("hour",Integer.toString(cal.get(Calendar.HOUR_OF_DAY)));
@@ -621,10 +620,16 @@ public class EventToIndex implements AutoCloseable {
 		body.put("host",event.getHost());
 
 		//get params from event
-		for(Parm parm : event.getParmCollection()) {
-			body.put("p_" + parm.getParmName(), parm.getValue().getContent());
+		for (Parm parm : event.getParmCollection()) {
+			if (parm.getParmName().equalsIgnoreCase("timestamp")) {
+				Calendar eventcreateCal = Calendar.getInstance();
+				eventcreateCal.setTime(tokenizeRfcDate(parm.getValue().getContent()));
+				body.put("@timestamp", DatatypeConverter.printDateTime(eventcreateCal));
+			} else {
+				body.put("p_" + parm.getParmName(), parm.getValue().getContent());
+			}
 		}
-
+		body.put("p_timestamp" ,DatatypeConverter.printDateTime(cal));
 		// remove old and new alarm values parms if not needed
 		if(! archiveNewAlarmValues){
 			body.remove("p_"+OLD_ALARM_VALUES);
@@ -636,7 +641,7 @@ public class EventToIndex implements AutoCloseable {
 
 		body.put("interface", event.getInterface());
 		body.put("logmsg", ( event.getLogmsg()!=null ? event.getLogmsg().getContent() : null ));
-		body.put("logmsgdest", ( event.getLogmsg()!=null ? event.getLogmsg().getDest() : null ));
+ 		body.put("logmsgdest", ( event.getLogmsg()!=null ? event.getLogmsg().getDest() : null ));
 
 		if(event.getNodeid()!=null){
 			body.put("nodeid", Long.toString(event.getNodeid()));
@@ -685,6 +690,18 @@ public class EventToIndex implements AutoCloseable {
 		Index index = builder.build();
 
 		return index;
+	}
+	
+	private Date tokenizeRfcDate(String dateString)  {
+		DateFormat eventDate=new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+		try {
+			return eventDate.parse(dateString);
+		} catch (java.text.ParseException e) {
+			LOG.error("cannot parse given event date,Hence passing current date");
+			return Calendar.getInstance().getTime();
+		}
+
+
 	}
 
 	/**
