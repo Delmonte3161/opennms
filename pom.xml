@@ -1263,8 +1263,7 @@
     <atomikosVersion>3.9.2</atomikosVersion>
     <batikVersion>1.7</batikVersion>
     <bsfVersion>2.4.0</bsfVersion>
-    <camelVersion>2.14.1</camelVersion>
-    <elasticsearchVersion>1.0.0_4</elasticsearchVersion>
+    <camelVersion>2.14.4</camelVersion>
     <cloverVersion>3.2.0</cloverVersion>
     <commonsBeanutilsVersion>1.8.3</commonsBeanutilsVersion>
     <commonsCodecVersion>1.10</commonsCodecVersion>
@@ -1279,7 +1278,7 @@
     <commonsValidatorVersion>1.3.1</commonsValidatorVersion>
     <c3p0Version>0.9.5.2</c3p0Version>
     <curatorVersion>3.2.1</curatorVersion>
-    <cxfVersion>3.1.7</cxfVersion>
+    <cxfVersion>3.1.9</cxfVersion>
     <dnsjavaVersion>2.1.3</dnsjavaVersion>
     <dropwizardMetricsVersion>3.1.2</dropwizardMetricsVersion>
     <ecjVersion>4.4.2</ecjVersion>
@@ -1340,9 +1339,9 @@
     <wsdl4jVersion>1.6.3</wsdl4jVersion>
     <wsmanVersion>1.2.2</wsmanVersion>
 
-    <springVersion>4.0.7.RELEASE_1</springVersion>
+    <springVersion>4.1.6.RELEASE_1</springVersion>
     <!-- ALWAYS change aspectj to match the version referenced in the spring poms -->
-    <aspectjVersion>1.7.4</aspectjVersion>
+    <aspectjVersion>1.8.5</aspectjVersion>
     <springWebFlowVersion>2.3.4.RELEASE</springWebFlowVersion>
     <springSecurityVersion>3.2.7.RELEASE</springSecurityVersion>
     <springLdapVersion>${springSecurityVersion}</springLdapVersion>
@@ -1948,6 +1947,11 @@
       <dependency>
         <groupId>org.opennms.features.collection</groupId>
         <artifactId>org.opennms.features.collection.persistence.rrd</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.opennms.features.collection</groupId>
+        <artifactId>org.opennms.features.collection.persistence.tcp</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -2884,6 +2888,16 @@
         <groupId>axis</groupId>
         <artifactId>axis-saaj</artifactId>
         <version>1.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-jms</artifactId>
+        <version>${camelVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-spring</artifactId>
+        <version>${camelVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
