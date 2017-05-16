@@ -602,7 +602,9 @@ public class EventToIndex implements AutoCloseable {
 			cal.setTime(new Date());
 
 		} else 	cal.setTime(event.getCreationTime()); // javax.xml.bind.DatatypeConverter.parseDateTime("2010-01-01T12:00:00Z");
-
+		if (!event.getSource().equalsIgnoreCase("syslogd")) {
+			body.put("@timestamp", DatatypeConverter.printDateTime(cal));
+		}
 		body.put("dow", Integer.toString(cal.get(Calendar.DAY_OF_WEEK)));
 		body.put("hour",Integer.toString(cal.get(Calendar.HOUR_OF_DAY)));
 		body.put("dom", Integer.toString(cal.get(Calendar.DAY_OF_MONTH))); 
