@@ -67,7 +67,7 @@ public class SyslogKafkaElasticsearch5Test extends AbstractSyslogTest {
     @Test
     public void testMinionSyslogsOverKafkaToEsRest() throws Exception {
         Date startOfTest = new Date();
-        int numMessages = 10000;
+        int numMessages = 1000;
         int packetsPerSecond = 500;
 
         InetSocketAddress minionSshAddr = testEnvironment.getServiceAddress(ContainerAlias.MINION, 8201);
@@ -114,7 +114,7 @@ public class SyslogKafkaElasticsearch5Test extends AbstractSyslogTest {
         }
 
         // Make sure that this evenly divides into the numMessages
-        final int chunk = 500;
+        final int chunk = 100;
         // Make sure that this is an even multiple of chunk
         final int logEvery = 1000;
 
