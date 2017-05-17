@@ -61,7 +61,7 @@ public class CamelMessageConsumerManager extends AbstractMessageConsumerManager 
     }
 
     @Override
-    protected synchronized void startConsumingForModule(SinkModule<?, Message> module) throws Exception {
+    public void startConsumingForModule(SinkModule<?, Message> module) throws Exception {
         if (!routeIdsByModule.containsKey(module)) {
             LOG.info("Creating route for module: {}", module);
             final DynamicIpcRouteBuilder routeBuilder = new DynamicIpcRouteBuilder(context, this, module);
@@ -71,10 +71,10 @@ public class CamelMessageConsumerManager extends AbstractMessageConsumerManager 
     }
 
     @Override
-    protected synchronized void stopConsumingForModule(SinkModule<?, Message> module) throws Exception {
+    public void stopConsumingForModule(SinkModule<?, Message> module) throws Exception {
         if (routeIdsByModule.containsKey(module)) {
             LOG.info("Destroying route for module: {}", module);
-            final String routeId = routeIdsByModule.remove(module);
+            final String routeId = routeIdsByModule.get(module);
             context.stopRoute(routeId);
             context.removeRoute(routeId);
         }
