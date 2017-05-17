@@ -67,7 +67,7 @@ public class SyslogKafkaElasticsearch2Test extends AbstractSyslogTest {
     @Test
     public void testMinionSyslogsOverKafkaToEsRest() throws Exception {
         Date startOfTest = new Date();
-        int numMessages = 10000;
+        int numMessages = 100;
         int packetsPerSecond = 500;
 
         InetSocketAddress minionSshAddr = testEnvironment.getServiceAddress(ContainerAlias.MINION, 8201);
@@ -107,7 +107,7 @@ public class SyslogKafkaElasticsearch2Test extends AbstractSyslogTest {
         LOG.info("Resetting statistics");
         resetRouteStatistics(opennmsSshAddr, minionSshAddr);
         // Warm up the routes
-        sendMessage(ContainerAlias.MINION, sender, 100);
+       // sendMessage(ContainerAlias.MINION, sender, 100);
 
         for (int i = 0; i < 20; i++) {
             LOG.info("Slept for " + i + " seconds");
@@ -115,7 +115,7 @@ public class SyslogKafkaElasticsearch2Test extends AbstractSyslogTest {
         }
 
         // Make sure that this evenly divides into the numMessages
-        final int chunk = 500;
+        final int chunk = 1;
         // Make sure that this is an even multiple of chunk
         final int logEvery = 1000;
 
@@ -136,6 +136,6 @@ public class SyslogKafkaElasticsearch2Test extends AbstractSyslogTest {
         }
 
         // 100 warm-up messages plus ${numMessages} messages
-        pollForElasticsearchEventsUsingJest(esRestAddr, 100 + numMessages);
+        pollForElasticsearchEventsUsingJest(esRestAddr,numMessages);
     }
 }
