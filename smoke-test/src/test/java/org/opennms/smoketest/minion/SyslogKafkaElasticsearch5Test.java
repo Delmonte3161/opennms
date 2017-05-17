@@ -98,9 +98,6 @@ public class SyslogKafkaElasticsearch5Test extends AbstractSyslogTest {
 
         LOG.info("Warming up syslog routes by sending 100 packets");
 
-        // Warm up the routes
-        sendMessage(ContainerAlias.MINION, sender, 100);
-
         for (int i = 0; i < 10; i++) {
             LOG.info("Slept for " + i + " seconds");
             Thread.sleep(1000);
@@ -108,10 +105,12 @@ public class SyslogKafkaElasticsearch5Test extends AbstractSyslogTest {
 
         LOG.info("Resetting statistics");
         resetRouteStatistics(opennmsSshAddr, minionSshAddr);
+        // Warm up the routes
+        sendMessage(ContainerAlias.MINION, sender, 100);
 
         for (int i = 0; i < 20; i++) {
             LOG.info("Slept for " + i + " seconds");
-            Thread.sleep(1000);
+            Thread.sleep(2000);
         }
 
         // Make sure that this evenly divides into the numMessages
