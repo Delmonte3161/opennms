@@ -29,7 +29,13 @@
 package org.opennms.netmgt.provision.dns.client.rpc;
 
 import java.net.InetAddress;
+import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
+
+import javax.naming.Context;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
 
 import org.opennms.core.rpc.xml.AbstractXmlRpcModule;
 import org.opennms.core.utils.InetAddressUtils;
@@ -62,7 +68,30 @@ public class DnsLookupClientRpcModule extends AbstractXmlRpcModule<DnsLookupRequ
             if (queryType.equals(QueryType.LOOKUP)) {
                 dto.setHostResponse(addr.getHostAddress());
             } else if (queryType.equals(QueryType.REVERSE_LOOKUP)) {
-                dto.setHostResponse(addr.getCanonicalHostName());
+				String hostname = addr.getCanonicalHostName();
+				if (hostname.equals(addr.getHostAddress())) {
+					// InetAddress failed to reverselookup. Could because of missing A record.
+					String[] octets = addr.getHostAddress().split("\\.");
+					String hostAddr = String.join(".", octets[3], octets[2], octets[1], octets[0], "in-addr.arpa");
+
+					Properties props = new Properties();
+					props.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.dns.DnsContextFactory");
+					DirContext dirContext = new InitialDirContext(props);
+					
+					try {
+						Attributes attrs = dirContext.getAttributes(hostAddr, new String[] { "PTR" });
+
+						if (attrs.get("PTR") != null && attrs.get("PTR").get() != null) {
+							dto.setHostResponse(((String)attrs.get("PTR").get()).replaceAll("\\.$", ""));
+						} else {
+							dto.setHostResponse(hostname);
+						}
+					} catch (Exception e) {
+						dto.setHostResponse(hostname);
+					}
+				} else {
+					dto.setHostResponse(hostname);
+				}
             }
             future.complete(dto);
         } catch (Exception e) {
