@@ -812,6 +812,10 @@ public class EventToIndex implements AutoCloseable {
 				//decode event parms into alarm record
 				List<Parm> params = EventParameterUtils.decode(value);
 				for(Parm parm : params) {
+					/*
+					 * We haven't seen these events. Not expecting these to contain
+					 * any field with period in its name. Adding a check just in case. 
+					 */
 					body.put("p_" + parm.getParmName().replace('.', '_'), parm.getValue().getContent());
 				}
 			} else if((ALARM_SEVERITY_PARAM.equals(key) && value!=null)){ 
