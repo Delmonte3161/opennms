@@ -314,6 +314,45 @@ public abstract class AbstractSyslogTest {
         });
     }
 
+    public static Integer pollForElasticsearchEventsUsingJestAndReturnValue(InetSocketAddress esTransportAddr, int numMessages) {
+            JestClient client = null;
+            try {
+                JestClientFactory factory = new JestClientFactory();
+                factory.setHttpClientConfig(new HttpClientConfig.Builder(String.format("http://%s:%d", esTransportAddr.getHostString(), esTransportAddr.getPort()))
+                    .multiThreaded(true)
+                    .build());
+                client = factory.getObject();
+
+                SearchResult response = client.execute(
+                    new Search.Builder(new SearchSourceBuilder()
+                        .query(QueryBuilders.matchQuery("eventuei", "uei.opennms.org/vendor/cisco/syslog/SEC-6-IPACCESSLOGP/aclDeniedIPTraffic"))
+                        .toString()
+                    )
+                        .addIndex("opennms*")
+                        .build()
+                );
+
+                LOG.debug("SEARCH RESPONSE: {}", response.toString());
+
+                // Sometimes, the first warm-up message is successful so treat both message counts as valid
+//                assertTrue("ES search hits was not equal to " + numMessages + ": " + response.getTotal(),
+//                    (numMessages == response.getTotal())
+//                );
+                //assertEquals("Event UEI did not match", "uei.opennms.org/vendor/cisco/syslog/SEC-6-IPACCESSLOGP/aclDeniedIPTraffic", response.getHits().getAt(0).getSource().get("eventuei"));
+                //assertEquals("Event IP address did not match", "4.2.2.2", response.getHits().getAt(0).getSource().get("ipaddr"));
+                return response.getTotal();
+                
+                
+            } catch (Throwable e) {
+                LOG.warn(e.getMessage(), e);
+                return 0;
+            } finally {
+                if (client != null) {
+                    client.shutdownClient();
+                }
+            }
+    }
+    
     /**
      * Use a {@link DatagramChannel} to send a number of syslog messages to the Minion host.
      * 
