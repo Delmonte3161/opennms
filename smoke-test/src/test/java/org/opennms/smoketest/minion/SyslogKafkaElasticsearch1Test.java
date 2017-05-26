@@ -158,12 +158,15 @@ public class SyslogKafkaElasticsearch1Test extends AbstractSyslogTest {
                 start = System.currentTimeMillis();
             }
         }
-       
+       int resendCount = 0;
        while(pollForElasticsearchEventsUsingJestAndReturnValue(esRestAddr,numMessages) == 0){
+    	   LOG.info("#########Resending:"+resendCount++);
     	   sendMessage(ContainerAlias.MINION, sender, chunk);
+    	   Thread.sleep(60000);
        }
 
         // 100 warm-up messages plus ${numMessages} messages
-        pollForElasticsearchEventsUsingJest(esRestAddr,numMessages);
+        //pollForElasticsearchEventsUsingJest(esRestAddr,numMessages);
+       LOG.info("Completed$$$$$$$$$$$$$$$$$$$$$$$$$$");
     }
 }

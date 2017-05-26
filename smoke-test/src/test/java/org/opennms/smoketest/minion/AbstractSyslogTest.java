@@ -92,7 +92,7 @@ public abstract class AbstractSyslogTest {
     public TestEnvironment testEnvironment = getTestEnvironment();
 
     @Rule
-    public Timeout timeout = new Timeout(20, TimeUnit.MINUTES);
+    public Timeout timeout = new Timeout(40, TimeUnit.MINUTES);
 
     protected HibernateDaoFactory daoFactory;
 
@@ -340,6 +340,7 @@ public abstract class AbstractSyslogTest {
 //                );
                 //assertEquals("Event UEI did not match", "uei.opennms.org/vendor/cisco/syslog/SEC-6-IPACCESSLOGP/aclDeniedIPTraffic", response.getHits().getAt(0).getSource().get("eventuei"));
                 //assertEquals("Event IP address did not match", "4.2.2.2", response.getHits().getAt(0).getSource().get("ipaddr"));
+                LOG.debug("Count:", response.getTotal());
                 return response.getTotal();
                 
                 
