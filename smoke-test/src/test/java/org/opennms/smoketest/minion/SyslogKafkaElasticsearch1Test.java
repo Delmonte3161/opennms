@@ -30,6 +30,7 @@ package org.opennms.smoketest.minion;
 import static com.jayway.awaitility.Awaitility.await;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertTrue;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -160,13 +161,17 @@ public class SyslogKafkaElasticsearch1Test extends AbstractSyslogTest {
         }
        int resendCount = 0;
        while(pollForElasticsearchEventsUsingJestAndReturnValue(esRestAddr,numMessages) == 0){
-    	   LOG.info("#########Resending:"+resendCount++);
+    	   LOG.info("Resending Packets:"+resendCount++);
     	   sendMessage(ContainerAlias.MINION, sender, chunk);
     	   Thread.sleep(60000);
+     	   if(resendCount>30){
+     		   break;
+     	   }
        }
 
         // 100 warm-up messages plus ${numMessages} messages
         //pollForElasticsearchEventsUsingJest(esRestAddr,numMessages);
-       LOG.info("Completed$$$$$$$$$$$$$$$$$$$$$$$$$$");
+       assertTrue(resendCount<30);
+       LOG.info("Completed Test");
     }
 }
