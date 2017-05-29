@@ -82,9 +82,9 @@ public class MetaTopologySelectorOperation extends AbstractCheckedOperation {
 	    LOG.debug("Active provider is: {}", m_metaTopologyProvider);
 
         // only change if provider changed
-	    final String currentMetaTopologyId = container.getMetaTopologyId();
-        if(currentMetaTopologyId == null || !currentMetaTopologyId.equals(m_metaTopologyProvider.getId())) {
-            container.setMetaTopologyId(m_metaTopologyProvider.getId());
+	    final MetaTopologyProvider currentMetaTopologyProvider = container.getMetaTopologyProvider();
+        if(currentMetaTopologyProvider == null || !currentMetaTopologyProvider.equals(m_metaTopologyProvider)) {
+            container.setMetaTopologyProvider(m_metaTopologyProvider);
 			container.selectTopologyProvider(m_metaTopologyProvider.getDefaultGraphProvider(), callbacks);
         }
     }
@@ -101,8 +101,8 @@ public class MetaTopologySelectorOperation extends AbstractCheckedOperation {
 
     @Override
     protected boolean isChecked(GraphContainer container) {
-        final String activeMetaTopologyProviderId = container.getMetaTopologyId();
-        return m_metaTopologyProvider.getId().equals(activeMetaTopologyProviderId);
+        final MetaTopologyProvider activeMetaTopologyProvider = container.getMetaTopologyProvider();
+        return m_metaTopologyProvider.equals(activeMetaTopologyProvider);
     }
 
     @Override
@@ -110,7 +110,7 @@ public class MetaTopologySelectorOperation extends AbstractCheckedOperation {
         return ImmutableMap
                 .<String, String>builder()
                 .put(getClass().getName() + "." + getLabel(), Boolean.toString(isChecked(container)))
-                .put(getClass().getName() + ".selectedLayer", container.getTopologyServiceClient().getNamespace())
+                .put(getClass().getName() + ".selectedLayer", container.getBaseTopology().getVertexNamespace())
                 .build();
     }
 
@@ -123,12 +123,12 @@ public class MetaTopologySelectorOperation extends AbstractCheckedOperation {
 
         // Select the according layer
         final String selectedLayer = settings.get(getClass().getName() + ".selectedLayer");
-        if (container.getMetaTopologyId() != null
+        if (container.getMetaTopologyProvider() != null
                 && !Strings.isNullOrEmpty(selectedLayer)
-                && !selectedLayer.equals(container.getTopologyServiceClient().getNamespace())) {
+                && !selectedLayer.equals(container.getBaseTopology().getVertexNamespace())) {
             // Find provider for selected layer and select
-            container.getTopologyServiceClient().getGraphProviders().stream()
-                    .filter(p -> p.getNamespace().equals(selectedLayer))
+            container.getMetaTopologyProvider().getGraphProviders().stream()
+                    .filter(p -> p.getVertexNamespace().equals(selectedLayer))
                     .findFirst()
                     .ifPresent(p -> container.selectTopologyProvider(p));
         }

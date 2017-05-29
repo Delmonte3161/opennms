@@ -30,7 +30,6 @@ package org.opennms.netmgt.config.httpdatacollection;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -90,13 +89,6 @@ public class Rrd implements Serializable {
 
     @XmlAttribute(name = "step", required = true)
     protected int step;
-
-    public Rrd() {}
-
-    public Rrd(final Integer step, final String... rras) {
-        setStep(step);
-        rra = Arrays.asList(rras);
-    }
 
     /**
      * Gets the value of the rra property.

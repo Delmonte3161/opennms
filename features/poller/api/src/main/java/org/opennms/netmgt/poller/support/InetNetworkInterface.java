@@ -30,10 +30,8 @@ package org.opennms.netmgt.poller.support;
 
 import java.io.Serializable;
 import java.net.InetAddress;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.opennms.netmgt.poller.NetworkInterface;
 
@@ -109,12 +107,7 @@ public class InetNetworkInterface implements NetworkInterface<InetAddress>, Seri
     public InetAddress getAddress() {
         return m_address;
     }
-
-    @Override
-    public Set<String> getAttributeNames() {
-        return m_properties != null ? m_properties.keySet() : Collections.emptySet();
-    }
-
+    
     /**
      * {@inheritDoc}
      *

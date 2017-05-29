@@ -44,7 +44,6 @@
             org.opennms.core.utils.InetAddressUtils,
             org.opennms.netmgt.dao.hibernate.IfLabelDaoImpl"
 %>
-<%@ page import="org.opennms.netmgt.model.ResourceId" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 
@@ -179,19 +178,19 @@ if (request.isUserInRole( Authentication.ROLE_ADMIN )) {
     }
     // TODO In order to show the following links only when there are metrics, an inexpensive
     //      method has to be implemented on either ResourceService or ResourceDao
-    ResourceId ipaddrResourceId = ResourceId.get("node", Integer.toString(nodeId)).resolve("responseTime", ipAddr);
-    ResourceId snmpintfResourceId = ResourceId.get("node", Integer.toString(nodeId)).resolve("interfaceSnmp", ifLabel);
+    String ipaddrResourceId = OnmsResource.createResourceId("node", Integer.toString(nodeId), "responseTime", ipAddr);
+    String snmpintfResourceId = OnmsResource.createResourceId("node", Integer.toString(nodeId), "interfaceSnmp", ifLabel);
   %>
     <c:url var="ipaddrGraphLink" value="graph/results.htm">
       <c:param name="reports" value="all"/>
-      <c:param name="resourceId" value="<%=ipaddrResourceId.toString()%>"/>
+      <c:param name="resourceId" value="<%=ipaddrResourceId%>"/>
     </c:url>
     <li>
       <a href="<c:out value="${ipaddrGraphLink}"/>">Response Time Graphs</a>
     </li>
     <c:url var="snmpintfGraphLink" value="graph/results.htm">
       <c:param name="reports" value="all"/>
-      <c:param name="resourceId" value="<%=snmpintfResourceId.toString()%>"/>
+      <c:param name="resourceId" value="<%=snmpintfResourceId%>"/>
     </c:url>
     <li>
       <a href="<c:out value="${snmpintfGraphLink}"/>">SNMP Interface Data Graphs</a>

@@ -16,8 +16,7 @@
             <uei>uei.opennms.org/tests/syslogd/substrUeiRewriteTest</uei>
         </ueiMatch>
         <ueiMatch>
-            <process-match expression="^foo$"/>
-            <match type="regex" expression="(\d+) out of (\d+) tests failed for (\S+)$"/>
+            <match type="regex" expression="foo: (\d+) out of (\d+) tests failed for (\S+)$"/>
             <uei>uei.opennms.org/tests/syslogd/regexUeiRewriteTest</uei>
         </ueiMatch>
         <ueiMatch>
@@ -33,16 +32,14 @@
         	<uei>DISCARD-MATCHING-MESSAGES</uei>
         </ueiMatch>
         <ueiMatch>
-        	<process-match expression="^coffee$"/>
-        	<match type="regex" expression="Secretly replaced (\S+) coffee with (\d+) (\S+)$"/>
+        	<match type="regex" expression="coffee: Secretly replaced (\S+) coffee with (\d+) (\S+)$"/>
         	<uei>uei.opennms.org/tests/syslogd/regexParameterAssignmentTest/bothKinds</uei>
         	<parameter-assignment matching-group="1" parameter-name="whoseBeverage" />
         	<parameter-assignment matching-group="2" parameter-name="count" />
         	<parameter-assignment matching-group="3" parameter-name="replacementItem" />        	
         </ueiMatch>
         <ueiMatch>
-        	<process-match expression="^tea$"/>
-        	<match type="regex" expression="Secretly replaced (\S+) tea with (\d+) (\S+)$" default-parameter-mapping="false"/>
+        	<match type="regex" expression="tea: Secretly replaced (\S+) tea with (\d+) (\S+)$" default-parameter-mapping="false"/>
         	<uei>uei.opennms.org/tests/syslogd/regexParameterAssignmentTest/userSpecifiedOnly</uei>
         	<parameter-assignment matching-group="1" parameter-name="whoseBeverage" />
         	<parameter-assignment matching-group="2" parameter-name="count" />

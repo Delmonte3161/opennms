@@ -35,7 +35,6 @@ import java.util.Collection;
 import org.junit.runners.Parameterized.Parameters;
 import org.opennms.core.test.xml.XmlTestNoCastor;
 import org.opennms.core.wsman.WSManConstants;
-import org.opennms.netmgt.collection.api.AttributeType;
 import org.opennms.netmgt.config.wsman.Collection.IncludeAllSystemDefinitions;
 
 public class WsmanDatacollectionConfigTest extends XmlTestNoCastor<WsmanDatacollectionConfig> {
@@ -79,19 +78,19 @@ public class WsmanDatacollectionConfigTest extends XmlTestNoCastor<WsmanDatacoll
         Attrib attr = new Attrib();
         attr.setName("TotalOutputPower");
         attr.setAlias("dracOutputPower");
-        attr.setType(AttributeType.GAUGE);
+        attr.setType("Gauge");
         group.addAttrib(attr);
 
         attr = new Attrib();
         attr.setName("InputVoltage");
         attr.setAlias("dracInputVoltage");
-        attr.setType(AttributeType.GAUGE);
+        attr.setType("Gauge");
         group.addAttrib(attr);
 
         attr = new Attrib();
         attr.setName("OtherIdentifyingInfo");
         attr.setAlias("serviceTag");
-        attr.setType(AttributeType.STRING);
+        attr.setType("String");
         attr.setIndexOf("#IdentifyingDescriptions matches '.*ServiceTag'");
         group.addAttrib(attr);
         wsmanDatacollectionConfig.addGroup(group);
@@ -107,7 +106,7 @@ public class WsmanDatacollectionConfigTest extends XmlTestNoCastor<WsmanDatacoll
         attr = new Attrib();
         attr.setName("Range1MaxInputPower");
         attr.setAlias("dracRangeInputPower");
-        attr.setType(AttributeType.GAUGE);
+        attr.setType("Gauge");
         group.addAttrib(attr);
         wsmanDatacollectionConfig.addGroup(group);
 

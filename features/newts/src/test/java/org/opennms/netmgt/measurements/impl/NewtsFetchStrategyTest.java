@@ -48,7 +48,6 @@ import org.opennms.netmgt.measurements.model.Source;
 import org.opennms.netmgt.model.OnmsAttribute;
 import org.opennms.netmgt.model.OnmsResource;
 import org.opennms.netmgt.model.OnmsResourceType;
-import org.opennms.netmgt.model.ResourceId;
 import org.opennms.netmgt.model.ResourcePath;
 import org.opennms.netmgt.model.RrdGraphAttribute;
 import org.opennms.newts.api.Context;
@@ -70,7 +69,7 @@ public class NewtsFetchStrategyTest {
 
     private NewtsFetchStrategy m_newtsFetchStrategy;
 
-    private Map<ResourceId, OnmsResource> m_resources = Maps.newHashMap();
+    private Map<String, OnmsResource> m_resources = Maps.newHashMap();
 
     @Before
     public void setUp() throws Exception {
@@ -214,7 +213,7 @@ public class NewtsFetchStrategyTest {
 
         final int nodeId = node.hashCode();
         final String newtsResourceId = "response:" + node + ":" + attr;
-        final ResourceId resourceId = ResourceId.get("nodeSource", "NODES:" + nodeId).resolve("responseTime", node);
+        final String resourceId = "nodeSource[NODES:" + nodeId + "].responseTime[" + node + "]";
         OnmsResource resource = m_resources.get(resourceId);
         if (resource == null) {
             resource = new OnmsResource(attr, label, type, Sets.newHashSet(), ResourcePath.get("foo"));
@@ -240,13 +239,13 @@ public class NewtsFetchStrategyTest {
         source.setAggregation("AVERAGE");
         source.setAttribute(attr);
         source.setLabel(label);
-        source.setResourceId(resourceId.toString());
+        source.setResourceId(resourceId);
         source.setTransient(false);
         return source;
     }
 
     private void replay() {
-        for (Entry<ResourceId, OnmsResource> entry : m_resources.entrySet()) {
+        for (Entry<String, OnmsResource> entry : m_resources.entrySet()) {
             EasyMock.expect(m_resourceDao.getResourceById(entry.getKey())).andReturn(entry.getValue());
         }
 

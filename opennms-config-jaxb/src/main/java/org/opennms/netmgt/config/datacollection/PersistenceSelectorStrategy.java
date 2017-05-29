@@ -40,8 +40,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.opennms.core.xml.ValidateUsing;
-import org.opennms.netmgt.collection.api.StrategyDefinition;
-import org.opennms.netmgt.collection.api.Parameter;
 
 /**
  * Selects a PersistenceSelectorStrategy that decides which data is
@@ -51,7 +49,7 @@ import org.opennms.netmgt.collection.api.Parameter;
 @XmlRootElement(name="persistenceSelectorStrategy", namespace="http://xmlns.opennms.org/xsd/config/datacollection")
 @XmlAccessorType(XmlAccessType.NONE)
 @ValidateUsing("datacollection-config.xsd")
-public class PersistenceSelectorStrategy implements StrategyDefinition, Serializable {
+public class PersistenceSelectorStrategy implements Serializable {
     private static final long serialVersionUID = 7039338478011131021L;
 
     /**
@@ -65,7 +63,7 @@ public class PersistenceSelectorStrategy implements StrategyDefinition, Serializ
      * list of parameters to pass to the strategy for strategy-specific
      * configuration information
      */
-    @XmlElement(name="parameter", type=org.opennms.netmgt.config.datacollection.Parameter.class)
+    @XmlElement(name="parameter")
     private List<Parameter> m_parameters = new ArrayList<Parameter>();
 
     public PersistenceSelectorStrategy() {

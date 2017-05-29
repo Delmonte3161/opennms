@@ -28,7 +28,6 @@
 
 package org.opennms.netmgt.collection.support;
 
-import org.opennms.netmgt.collection.api.AttributeType;
 import org.opennms.netmgt.collection.api.CollectionAttribute;
 import org.opennms.netmgt.collection.api.CollectionAttributeType;
 import org.opennms.netmgt.collection.api.CollectionResource;
@@ -106,7 +105,7 @@ public class CollectionAttributeWrapper implements CollectionAttribute {
 
     /** {@inheritDoc} */
     @Override
-    public AttributeType getType() {
+    public String getType() {
         return m_wrapped.getType();
     }
 }

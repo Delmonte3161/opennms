@@ -38,13 +38,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.opennms.netmgt.collectd.AliasedResource;
 import org.opennms.netmgt.collectd.IfInfo;
-import org.opennms.netmgt.collection.api.AttributeType;
 import org.opennms.netmgt.collection.api.CollectionAttribute;
 import org.opennms.netmgt.collection.api.CollectionResource;
 import org.opennms.netmgt.dao.api.ResourceStorageDao;
 import org.opennms.netmgt.dao.hibernate.IfLabelDaoImpl;
 import org.opennms.netmgt.model.OnmsResource;
-import org.opennms.netmgt.model.ResourceId;
 import org.opennms.netmgt.model.ResourcePath;
 import org.opennms.netmgt.model.ResourceTypeUtils;
 import org.opennms.netmgt.poller.LatencyCollectionResource;
@@ -281,11 +279,7 @@ public class CollectionResourceWrapper {
      * 
      * @return a {@link java.lang.String} object.
      */
-    public ResourceId getResourceId() {
-        if (m_resource == null) {
-            return null;
-        }
-
+    public String getResourceId() {
         String resourceType  = getResourceTypeName();
         String resourceLabel = getInstanceLabel();
         if (CollectionResource.RESOURCE_TYPE_NODE.equals(resourceType)) {
@@ -298,15 +292,15 @@ public class CollectionResourceWrapper {
         String parentResourceTypeName = CollectionResource.RESOURCE_TYPE_NODE;
         String parentResourceName = Integer.toString(getNodeId());
         // I can't find a better way to deal with this when storeByForeignSource is enabled        
-        if (m_resource.getParent() != null && m_resource.getParent().toString().startsWith(ResourceTypeUtils.FOREIGN_SOURCE_DIRECTORY)) {
+        if (m_resource != null && m_resource.getParent() != null && m_resource.getParent().startsWith(ResourceTypeUtils.FOREIGN_SOURCE_DIRECTORY)) {
             // If separatorChar is backslash (like on Windows) use a double-escaped backslash in the regex
-            String[] parts = m_resource.getParent().toString().split(File.separatorChar == '\\' ? "\\\\" : File.separator);
+            String[] parts = m_resource.getParent().split(File.separatorChar == '\\' ? "\\\\" : File.separator);
             if (parts.length == 3) {
                 parentResourceTypeName = "nodeSource";
                 parentResourceName = parts[1] + ":" + parts[2];
             }
         }
-        return ResourceId.get(parentResourceTypeName, parentResourceName).resolve(resourceType, resourceLabel);
+        return OnmsResource.createResourceId(parentResourceTypeName, parentResourceName, resourceType, resourceLabel);
     }
 
     /**
@@ -406,7 +400,7 @@ public class CollectionResourceWrapper {
         // Generating a unique ID for the node/resourceType/resource/metric combination.
         String id =  "node[" + m_nodeId + "].resourceType[" + m_resource.getResourceTypeName() + "].instance[" + m_resource.getInterfaceLabel() + "].metric[" + ds + "]";
         Double current = numValue.doubleValue();
-        if (!AttributeType.COUNTER.equals(m_attributes.get(ds).getType())) {
+        if (m_attributes.get(ds).getType().toLowerCase().startsWith("counter") == false) {
             LOG.debug("getAttributeValue: id={}, value= {}", id, current);
             return current;
         } else {
@@ -494,7 +488,7 @@ public class CollectionResourceWrapper {
         } else if ("iflabel".equalsIgnoreCase(ds)) {
             return getIfLabel();
         } else if ("id".equalsIgnoreCase(ds)) {
-            return m_resource.getPath().getName().toString();
+            return m_resource.getPath().getFileName().toString();
         }
 
         try {

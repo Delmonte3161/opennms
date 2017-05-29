@@ -30,7 +30,6 @@ package org.opennms.netmgt.config.collectd.jmx;
 
 import org.junit.runners.Parameterized.Parameters;
 import org.opennms.core.test.xml.XmlTestNoCastor;
-import org.opennms.netmgt.collection.api.AttributeType;
 
 import java.text.ParseException;
 import java.util.Arrays;
@@ -65,7 +64,7 @@ public class AttribTest extends XmlTestNoCastor<Attrib> {
         final Attrib attrib = new Attrib();
         attrib.setName("FreeMemory");
         attrib.setAlias("FreeMemory");
-        attrib.setType(AttributeType.GAUGE);
+        attrib.setType("gauge");
 
         return Arrays.asList(new Object[][] { {
             attrib,

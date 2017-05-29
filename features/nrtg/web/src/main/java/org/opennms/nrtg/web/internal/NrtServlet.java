@@ -41,7 +41,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.google.common.net.MediaType;
-import org.opennms.netmgt.model.ResourceId;
 
 public class NrtServlet extends HttpServlet {
 
@@ -66,7 +65,7 @@ public class NrtServlet extends HttpServlet {
                 resp.getOutputStream().println(m_controller.getMeasurementSetsForDestination(req.getParameter("nrtCollectionTaskId")));
             }
         } else if (req.getParameter("resourceId") != null && req.getParameter("report") != null) {
-            ModelAndView modelAndView = m_controller.nrtStart(ResourceId.fromString(req.getParameter("resourceId")), req.getParameter("report"), httpSession);
+            ModelAndView modelAndView = m_controller.nrtStart(req.getParameter("resourceId"), req.getParameter("report"), httpSession);
 
             String template = getTemplateAsString(modelAndView.getViewName() + ".template");
 

@@ -28,10 +28,7 @@
 
 package org.opennms.netmgt.dao.support;
 
-import static org.easymock.EasyMock.expect;
-
-import java.util.Collections;
-
+import junit.framework.TestCase;
 import org.opennms.netmgt.measurements.api.FetchResults;
 import org.opennms.netmgt.measurements.api.MeasurementFetchStrategy;
 import org.opennms.netmgt.measurements.model.Source;
@@ -45,7 +42,9 @@ import org.opennms.netmgt.model.StringPropertyAttribute;
 import org.opennms.test.ThrowableAnticipator;
 import org.opennms.test.mock.EasyMockUtils;
 
-import junit.framework.TestCase;
+import java.util.Collections;
+
+import static org.easymock.EasyMock.expect;
 
 /**
  * @author <a href="mailto:dj@opennms.org">DJ Gregor</a>
@@ -183,7 +182,7 @@ public class RrdStatisticAttributeVisitorTest extends TestCase {
         attribute.setResource(new OnmsResource("1", "Node One", resourceType, Collections.singleton(attribute), ResourcePath.get("foo")));
         Source source = new Source();
         source.setLabel("result");
-        source.setResourceId(attribute.getResource().getId().toString());
+        source.setResourceId(attribute.getResource().getId());
         source.setAttribute(attribute.getName());
         source.setAggregation(attributeVisitor.getConsolidationFunction().toUpperCase());
         FetchResults results = new FetchResults(new long[] {m_startTime},
@@ -236,12 +235,12 @@ public class RrdStatisticAttributeVisitorTest extends TestCase {
         attributeVisitor.afterPropertiesSet();
 
         MockResourceType resourceType = new MockResourceType();
-        resourceType.setName("somethingOtherThanInterfaceSnmp");
+        resourceType.setName("something other than interfaceSnmp");
         OnmsAttribute attribute = new RrdGraphAttribute("ifInOctets", "something", "something else");
         attribute.setResource(new OnmsResource("1", "Node One", resourceType, Collections.singleton(attribute), ResourcePath.get("foo")));
         Source source = new Source();
         source.setLabel("result");
-        source.setResourceId(attribute.getResource().getId().toString());
+        source.setResourceId(attribute.getResource().getId());
         source.setAttribute(attribute.getName());
         source.setAggregation(attributeVisitor.getConsolidationFunction().toUpperCase());
         FetchResults results = new FetchResults(new long[] {},
@@ -288,7 +287,7 @@ public class RrdStatisticAttributeVisitorTest extends TestCase {
 
         Source source = new Source();
         source.setLabel("result");
-        source.setResourceId(attribute.getResource().getId().toString());
+        source.setResourceId(attribute.getResource().getId());
         source.setAttribute(attribute.getName());
         source.setAggregation(attributeVisitor1.getConsolidationFunction().toUpperCase());
 

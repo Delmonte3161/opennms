@@ -28,10 +28,13 @@
 
 package org.opennms.features.topology.plugins.topo.bsm;
 
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.xml.bind.JAXBException;
 
 import org.opennms.core.criteria.CriteriaBuilder;
 import org.opennms.core.criteria.restrictions.Restrictions;
@@ -72,6 +75,11 @@ public class BusinessServicesTopologyProvider extends AbstractTopologyProvider i
         super(new BusinessServiceVertexProvider(TOPOLOGY_NAMESPACE), new SimpleEdgeProvider(TOPOLOGY_NAMESPACE));
         this.transactionAwareBeanProxyFactory = Objects.requireNonNull(transactionAwareBeanProxyFactory);
         LOG.debug("Creating a new {} with namespace {}", getClass().getSimpleName(), TOPOLOGY_NAMESPACE);
+    }
+
+    @Override
+    public void save() {
+        throw new UnsupportedOperationException();
     }
 
     private void load() {
@@ -142,6 +150,11 @@ public class BusinessServicesTopologyProvider extends AbstractTopologyProvider i
                     }
                     return null;
                 });
+    }
+
+    @Override
+    public void load(String filename) throws MalformedURLException, JAXBException {
+        load();
     }
 
     @Override

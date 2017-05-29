@@ -29,8 +29,6 @@
 package org.opennms.web.svclayer;
 
 import java.io.InputStream;
-
-import org.opennms.netmgt.model.ResourceId;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -42,10 +40,33 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional(readOnly = true)
 public interface RrdGraphService {
-    public InputStream getPrefabGraph(ResourceId resourceId,
+    /**
+     * <p>getPrefabGraph</p>
+     *
+     * @param resourceId a {@link java.lang.String} object.
+     * @param report a {@link java.lang.String} object.
+     * @param start a long.
+     * @param end a long.
+     * @return a {@link java.io.InputStream} object.
+     */
+    public InputStream getPrefabGraph(String resourceId,
             String report, long start, long end, Integer width, Integer height);
     
-    public InputStream getAdhocGraph(ResourceId resourceId,
+    /**
+     * <p>getAdhocGraph</p>
+     *
+     * @param resourceId a {@link java.lang.String} object.
+     * @param title a {@link java.lang.String} object.
+     * @param dataSources an array of {@link java.lang.String} objects.
+     * @param aggregateFunctions an array of {@link java.lang.String} objects.
+     * @param colors an array of {@link java.lang.String} objects.
+     * @param dataSourceTitles an array of {@link java.lang.String} objects.
+     * @param styles an array of {@link java.lang.String} objects.
+     * @param start a long.
+     * @param end a long.
+     * @return a {@link java.io.InputStream} object.
+     */
+    public InputStream getAdhocGraph(String resourceId,
             String title, String[] dataSources, String[] aggregateFunctions,
             String[] colors, String[] dataSourceTitles, String[] styles,
             long start, long end);

@@ -42,7 +42,7 @@ public abstract class VertexInfoPanelItemProvider extends SingleSelectedInfoPane
         Collection<VertexRef> selectedVertexRefs = container.getSelectionManager().getSelectedVertexRefs();
         if (selectedVertexRefs.size() == 1) {
             final VertexRef vertexRef = selectedVertexRefs.iterator().next();
-            Vertex vertex = container.getTopologyServiceClient().getVertex(vertexRef);
+            Vertex vertex = container.getBaseTopology().getVertex(vertexRef);
             return Optional.ofNullable(vertex);
         }
 

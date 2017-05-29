@@ -89,7 +89,7 @@ public class SimpleEdgeBuilder {
 	}
 
 	private String ns() {
-		return m_edgeProvider.getNamespace();
+		return m_edgeProvider.getEdgeNamespace();
 	}
 
 

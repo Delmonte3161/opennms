@@ -47,7 +47,6 @@ import org.opennms.netmgt.model.AdhocGraphType;
 import org.opennms.netmgt.model.OnmsResource;
 import org.opennms.netmgt.model.PrefabGraph;
 import org.opennms.netmgt.model.PrefabGraphType;
-import org.opennms.netmgt.model.ResourceId;
 import org.opennms.netmgt.model.RrdGraphAttribute;
 import org.opennms.netmgt.rrd.RrdFileConstants;
 import org.opennms.web.svclayer.RrdGraphService;
@@ -81,7 +80,7 @@ public class DefaultRrdGraphService implements RrdGraphService, InitializingBean
 
     /** {@inheritDoc} */
     @Override
-    public InputStream getAdhocGraph(ResourceId resourceId, String title,
+    public InputStream getAdhocGraph(String resourceId, String title,
             String[] dataSources, String[] aggregateFunctions,
             String[] colors, String[] dataSourceTitles, String[] styles,
             long start, long end) {
@@ -147,7 +146,7 @@ public class DefaultRrdGraphService implements RrdGraphService, InitializingBean
 
     /** {@inheritDoc} */
     @Override
-    public InputStream getPrefabGraph(ResourceId resourceId, String report, long start, long end, Integer width, Integer height) {
+    public InputStream getPrefabGraph(String resourceId, String report, long start, long end, Integer width, Integer height) {
         Assert.notNull(resourceId, "resourceId argument cannot be null");
         Assert.notNull(report, "report argument cannot be null");
         Assert.isTrue(end > start, "end time " + end + " must be after start time" + start);

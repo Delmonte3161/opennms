@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.opennms.core.ipc</groupId>
     <artifactId>org.opennms.core.ipc.rpc</artifactId>
-    <version>20.0.0-SNAPSHOT</version>
+    <version>19.1.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opennms.core.ipc.rpc</groupId>
@@ -53,6 +53,7 @@
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-spring</artifactId>
+      <version>${camelVersion}</version>
       <exclusions>
         <exclusion>
           <groupId>org.springframework</groupId>
@@ -118,11 +119,6 @@
     <dependency>
       <groupId>org.opennms</groupId>
       <artifactId>opennms-dao-mock</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opennms.core.ipc.rpc</groupId>
-      <artifactId>org.opennms.core.ipc.rpc.common</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

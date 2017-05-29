@@ -49,7 +49,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
  */
 @XmlRootElement(name="xml-source")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class XmlSource extends XmlGroups implements Serializable, Comparable<XmlSource>, Cloneable {
+public class XmlSource extends XmlGroups implements Serializable, Comparable<XmlSource> {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = -9220561601381984080L;
@@ -74,13 +74,6 @@ public class XmlSource extends XmlGroups implements Serializable, Comparable<Xml
      * Instantiates a new XML source.
      */
     public XmlSource() {
-    }
-
-    public XmlSource(XmlSource copy) {
-        super(copy);
-        m_importGroupsList.addAll(copy.m_importGroupsList);
-        m_request = copy.m_request != null ? copy.m_request.clone() : null;
-        m_url = copy.m_url;
     }
 
     /**
@@ -172,8 +165,4 @@ public class XmlSource extends XmlGroups implements Serializable, Comparable<Xml
         return false;
     }
 
-    @Override
-    public XmlSource clone() {
-        return new XmlSource(this);
-    }
 }

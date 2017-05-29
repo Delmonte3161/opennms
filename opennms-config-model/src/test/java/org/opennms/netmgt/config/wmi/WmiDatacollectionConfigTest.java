@@ -34,7 +34,6 @@ import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
 import org.opennms.core.test.xml.XmlTestNoCastor;
-import org.opennms.netmgt.collection.api.AttributeType;
 
 public class WmiDatacollectionConfigTest extends XmlTestNoCastor<WmiDatacollectionConfig> {
 
@@ -70,7 +69,7 @@ public class WmiDatacollectionConfigTest extends XmlTestNoCastor<WmiDatacollecti
         attrib.setName("AvailableBytes");
         attrib.setAlias("wmiOSMemAvailBytes");
         attrib.setWmiObject("AvailableBytes");
-        attrib.setType(AttributeType.GAUGE);
+        attrib.setType(WmiType.GAUGE);
         wpm.getAttribs().add(attrib);
 
         config.getWmiCollections().add(wmiCollection);
@@ -85,7 +84,7 @@ public class WmiDatacollectionConfigTest extends XmlTestNoCastor<WmiDatacollecti
                      "<wpms>" +
                          "<wpm name=\"wmiOSMemory\" wmiClass=\"Win32_PerfFormattedData_PerfOS_Memory\" wmiNamespace=\"root/cimv2\" " +
                              " keyvalue=\"Name\" recheckInterval=\"3600000\" ifType=\"all\" resourceType=\"node\">" +
-                             "<attrib name=\"AvailableBytes\" alias=\"wmiOSMemAvailBytes\" wmiObject=\"AvailableBytes\" type=\"GAUGE\"/>" +
+                             "<attrib name=\"AvailableBytes\" alias=\"wmiOSMemAvailBytes\" wmiObject=\"AvailableBytes\" type=\"gauge\"/>" +
                          "</wpm>" +
                      "</wpms>" +
                  "</wmi-collection>" +

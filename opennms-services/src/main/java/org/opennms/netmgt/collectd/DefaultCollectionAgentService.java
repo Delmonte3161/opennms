@@ -41,7 +41,6 @@ import org.opennms.netmgt.model.OnmsIpInterface;
 import org.opennms.netmgt.model.OnmsNode;
 import org.opennms.netmgt.model.OnmsSnmpInterface;
 import org.opennms.netmgt.model.PrimaryType;
-import org.opennms.netmgt.model.ResourcePath;
 import org.opennms.netmgt.model.ResourceTypeUtils;
 import org.opennms.netmgt.model.monitoringLocations.OnmsMonitoringLocation;
 import org.opennms.netmgt.snmp.SnmpAgentConfig;
@@ -207,19 +206,14 @@ public class DefaultCollectionAgentService implements CollectionAgentService {
      * @return a {@link java.io.File} object.
      */
     @Override
-    public ResourcePath getStorageResourcePath() {
+    public File getStorageDir() {
+        File dir = new File(String.valueOf(getNodeId()));
         final String foreignSource = getForeignSource();
         final String foreignId = getForeignId();
-
-        final ResourcePath dir;
         if(isStoreByForeignSource() && foreignSource != null && foreignId != null) {
-            dir = ResourcePath.get(ResourceTypeUtils.FOREIGN_SOURCE_DIRECTORY,
-                                   foreignSource,
-                                   foreignId);
-        } else {
-            dir = ResourcePath.get(String.valueOf(getNodeId()));
+            File fsDir = new File(ResourceTypeUtils.FOREIGN_SOURCE_DIRECTORY, foreignSource);
+            dir = new File(fsDir, foreignId);
         }
-
         LOG.debug("getStorageDir: isStoreByForeignSource = {}, foreignSource = {}, foreignId = {}, dir = {}", isStoreByForeignSource(), foreignSource, foreignId, dir);
         return dir;
     }

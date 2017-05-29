@@ -49,6 +49,4 @@ public interface Layout {
 	BoundingBox getBounds();
 
 	BoundingBox computeBoundingBox(Collection<VertexRef> vertRefs);
-
-    void updateLocations(Collection<VertexRef> displayVertices);
 }

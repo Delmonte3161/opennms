@@ -36,10 +36,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import org.opennms.features.topology.api.GraphContainer;
 import org.opennms.features.topology.api.SelectionListener;
 import org.opennms.features.topology.api.SelectionNotifier;
-import org.opennms.features.topology.api.TopologyServiceClient;
 import org.opennms.features.topology.api.VerticesUpdateManager;
 import org.opennms.osgi.EventConsumer;
 import org.opennms.osgi.EventProxy;
@@ -47,7 +45,7 @@ import org.opennms.osgi.EventProxyAware;
 
 import com.vaadin.ui.Table;
 
-public class SelectionAwareTable extends Table implements VerticesUpdateManager.VerticesUpdateListener, EventProxyAware, SelectionChangedListener, GraphContainer.ChangeListener {
+public class SelectionAwareTable extends Table implements VerticesUpdateManager.VerticesUpdateListener, EventProxyAware, SelectionChangedListener {
 
 	private static final long serialVersionUID = 2761774077365441249L;
 
@@ -147,7 +145,7 @@ public class SelectionAwareTable extends Table implements VerticesUpdateManager.
     @EventConsumer
     public void verticesUpdated(VerticesUpdateManager.VerticesUpdateEvent event) {
 		if (isAttached()) {
-			TopologyServiceClient source = event.getSource();
+			SelectionAware source = event.getSource();
 			if (event.getVertexRefs().isEmpty()) {
 				selectionChanged(Selection.NONE);
 			} else if (source.contributesTo(getContentType())) {
@@ -189,13 +187,6 @@ public class SelectionAwareTable extends Table implements VerticesUpdateManager.
             }
         }
     }
-
-	@Override
-	public void graphChanged(GraphContainer graphContainer) {
-		if (isAttached()) {
-			refreshRowCache();
-		}
-	}
 
 	public ContentType getContentType() {
 		if (m_container != null) {

@@ -35,7 +35,6 @@ import java.util.Collections;
 
 import org.junit.runners.Parameterized.Parameters;
 import org.opennms.core.test.xml.XmlTestNoCastor;
-import org.opennms.netmgt.collection.api.AttributeType;
 
 public class HttpDatacollectionConfigTest extends XmlTestNoCastor<HttpDatacollectionConfig> {
 
@@ -70,7 +69,7 @@ public class HttpDatacollectionConfigTest extends XmlTestNoCastor<HttpDatacollec
         Attrib attrib = new Attrib();
         attrib.setAlias("documentCount");
         attrib.setMatchGroup(1);
-        attrib.setType(AttributeType.COUNTER);
+        attrib.setType("counter32");
         
         uri.setAttributes(Collections.singletonList(attrib));
 
@@ -91,7 +90,7 @@ public class HttpDatacollectionConfigTest extends XmlTestNoCastor<HttpDatacollec
                                  "user-agent=\"Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en) AppleWebKit/412 (KHTML, like Gecko) Safari/412\" " +
                                  "matches=\".*([0-9]+).*\" response-range=\"100-399\" />" +
                           "<attributes>" +
-                              "<attrib alias=\"documentCount\" match-group=\"1\" type=\"counter\"/>" +
+                              "<attrib alias=\"documentCount\" match-group=\"1\" type=\"counter32\"/>" +
                           "</attributes>" +
                          "</uri>" +
                      "</uris>" +

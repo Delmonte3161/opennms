@@ -47,6 +47,8 @@ import org.opennms.netmgt.rrd.RrdStrategy;
  */
 public class GroupPersister extends BasePersister {
 
+    private final ResourceStorageDao m_resourceStorageDao;
+
     /**
      * <p>Constructor for GroupPersister.</p>
      *
@@ -55,6 +57,7 @@ public class GroupPersister extends BasePersister {
      */
     protected GroupPersister(ServiceParameters params, RrdRepository repository, RrdStrategy<?, ?> rrdStrategy, ResourceStorageDao resourceStorageDao) {
         super(params, repository, rrdStrategy, resourceStorageDao);
+        m_resourceStorageDao = resourceStorageDao;
     }
 
     /** {@inheritDoc} */
@@ -65,7 +68,7 @@ public class GroupPersister extends BasePersister {
             
             Map<String, String> dsNamesToRrdNames = new LinkedHashMap<String , String>();
             for (CollectionAttribute a : group.getAttributes()) {
-                if (a.getType().isNumeric()) {
+                if (ResourceTypeUtils.isNumericType(a.getType())) {
                     dsNamesToRrdNames.put(a.getName(), group.getName());
                 }
             }

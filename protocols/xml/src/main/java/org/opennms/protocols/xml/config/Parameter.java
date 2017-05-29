@@ -46,7 +46,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name="parameter")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Parameter implements Cloneable {
+public class Parameter {
 
     /** The name. */
     @XmlAttribute(required=true)
@@ -70,11 +70,6 @@ public class Parameter implements Cloneable {
     public Parameter(String name, String value) {
         this.name = name;
         this.value = value;
-    }
-
-    public Parameter(Parameter copy) {
-        name = copy.name;
-        value = copy.value;
     }
 
     /**
@@ -121,8 +116,4 @@ public class Parameter implements Cloneable {
         return name + "=" + value;
     }
 
-    @Override
-    public Parameter clone() {
-        return new Parameter(this);
-    }
 }

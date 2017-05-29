@@ -36,7 +36,6 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
-import org.opennms.netmgt.collection.api.AttributeType;
 
 @XmlRootElement(name="column")
 public class JdbcColumn implements Serializable, Comparable<JdbcColumn> {
@@ -48,10 +47,10 @@ public class JdbcColumn implements Serializable, Comparable<JdbcColumn> {
     
     @XmlAttribute(name="data-source-name", required=false)
     private String m_dataSourceName;
-
+    
     @XmlAttribute(name="type", required=true)    
-    private AttributeType m_dataType;
-
+    private String m_dataType;
+    
     @XmlAttribute(name="alias", required=true)
     private String m_alias;
     
@@ -72,16 +71,17 @@ public class JdbcColumn implements Serializable, Comparable<JdbcColumn> {
     public void setDataSourceName(String dataSourceName) {
         m_dataSourceName = dataSourceName;
     }
-
+    
     @XmlTransient
-    public AttributeType getDataType() {
+    public String getDataType() {
         return m_dataType;
     }
-
-    public void setDataType(AttributeType dataType) {
+    
+    public void setDataType(String dataType) {
         m_dataType = dataType;
     }
-
+    
+    
     @XmlTransient
     public String getAlias() {
         return m_alias;

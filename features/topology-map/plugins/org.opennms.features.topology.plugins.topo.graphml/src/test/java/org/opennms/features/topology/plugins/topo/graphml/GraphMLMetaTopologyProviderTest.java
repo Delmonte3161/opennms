@@ -40,6 +40,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.opennms.features.graphml.model.InvalidGraphException;
 import org.opennms.features.topology.api.support.breadcrumbs.BreadcrumbStrategy;
 import org.opennms.features.topology.api.topo.Defaults;
 import org.opennms.features.topology.api.topo.GraphProvider;
@@ -56,14 +57,14 @@ public class GraphMLMetaTopologyProviderTest {
     public TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Test
-    public void load() throws IOException {
+    public void load() throws IOException, InvalidGraphException {
         final File graphXml = tempFolder.newFile();
         Resources.asByteSource(Resources.getResource("test-graph.xml")).copyTo(Files.asByteSink(graphXml));
 
         // Initialize the meta topology provider
         final GraphMLMetaTopologyProvider metaTopoProvider = new GraphMLMetaTopologyProvider(new GraphMLServiceAccessor());
         metaTopoProvider.setTopologyLocation(graphXml.getAbsolutePath());
-        metaTopoProvider.reload();
+        metaTopoProvider.load();
 
         // Verify Breadcrumb-Strategy
         Assert.assertEquals(BreadcrumbStrategy.SHORTEST_PATH_TO_ROOT, metaTopoProvider.getBreadcrumbStrategy());
@@ -75,7 +76,7 @@ public class GraphMLMetaTopologyProviderTest {
 
         // The first graph should be 'regions'
         GraphProvider regionsGraphProvider = it.next();
-        assertEquals("acme:regions", regionsGraphProvider.getNamespace());
+        assertEquals("acme:regions", regionsGraphProvider.getVertexNamespace());
         assertEquals("regions", regionsGraphProvider.getTopologyProviderInfo().getName());
         assertNull(regionsGraphProvider.getDefaults().getPreferredLayout());
         assertEquals(GraphMLTopologyProvider.DEFAULT_DESCRIPTION, regionsGraphProvider.getTopologyProviderInfo().getDescription());
@@ -89,7 +90,7 @@ public class GraphMLMetaTopologyProviderTest {
 
         // The second graph should be 'markets'
         GraphProvider marketsGraphProvider = it.next();
-        assertEquals("acme:markets", marketsGraphProvider.getNamespace());
+        assertEquals("acme:markets", marketsGraphProvider.getVertexNamespace());
         assertEquals("Markets", marketsGraphProvider.getTopologyProviderInfo().getName());
         assertEquals("The Markets Layer", marketsGraphProvider.getTopologyProviderInfo().getDescription());
         assertEquals("Some Layout", marketsGraphProvider.getDefaults().getPreferredLayout());

@@ -30,13 +30,11 @@ package org.opennms.netmgt.config.wmi;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.opennms.netmgt.collection.api.AttributeType;
-
-public class WmiTypeAdapter extends XmlAdapter<String,AttributeType> {
+public class WmiTypeAdapter extends XmlAdapter<String,WmiType> {
 
     @Override
-    public AttributeType unmarshal(final String v) throws Exception {
-        for (final AttributeType type : AttributeType.values()) {
+    public WmiType unmarshal(final String v) throws Exception {
+        for (final WmiType type : WmiType.values()) {
             if (type.toString().equalsIgnoreCase(v)) {
                 return type;
             }
@@ -45,7 +43,7 @@ public class WmiTypeAdapter extends XmlAdapter<String,AttributeType> {
     }
 
     @Override
-    public String marshal(final AttributeType v) throws Exception {
+    public String marshal(final WmiType v) throws Exception {
         return v.toString();
     }
 

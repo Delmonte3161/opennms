@@ -67,12 +67,6 @@ public abstract class AbstractSNMPRequestBuilder<T> implements SNMPRequestBuilde
     }
 
     @Override
-    public SNMPRequestBuilder<T> withTimeToLive(Long ttlInMs) {
-        timeToLiveInMilliseconds = ttlInMs;
-        return this;
-    }
-
-    @Override
     public SNMPRequestBuilder<T> withTimeToLive(long duration, TimeUnit unit) {
         timeToLiveInMilliseconds = unit.toMillis(duration);
         return this;

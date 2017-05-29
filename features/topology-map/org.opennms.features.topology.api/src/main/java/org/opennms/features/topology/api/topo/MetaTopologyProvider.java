@@ -43,11 +43,4 @@ public interface MetaTopologyProvider {
     GraphProvider getGraphProviderBy(String namespace);
 
     BreadcrumbStrategy getBreadcrumbStrategy();
-
-    /**
-     * Each {@link MetaTopologyProvider} must have a unique id.
-     *
-     * @return the unique id.
-     */
-    String getId();
 }

@@ -290,7 +290,7 @@ public class SearchBox extends AbstractComponent implements SelectionListener, G
     public List<SearchSuggestion> getQueryResults(final String query) {
         LOG.debug("SearchBox->getQueryResults: called with query {}", query);
 
-        String namespace = m_operationContext.getGraphContainer().getTopologyServiceClient().getNamespace();
+        String namespace = m_operationContext.getGraphContainer().getBaseTopology().getVertexNamespace();
 
         List<SearchResult> results = Lists.newArrayList();
 

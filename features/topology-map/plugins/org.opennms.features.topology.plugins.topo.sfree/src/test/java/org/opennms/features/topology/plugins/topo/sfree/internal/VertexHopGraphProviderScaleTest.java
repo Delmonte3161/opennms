@@ -55,7 +55,7 @@ public class VertexHopGraphProviderScaleTest {
 		SFreeTopologyProvider baseProvider = new SFreeTopologyProvider();
 		baseProvider.setNodeCount(10000);
 		baseProvider.setConnectedness(1.5);
-		baseProvider.refresh();
+		baseProvider.load(SFreeTopologyProvider.ERDOS_RENIS);
 		
 		m_vertexCount = baseProvider.getVertices().size();
 		m_edgeCount = baseProvider.getEdges().size();

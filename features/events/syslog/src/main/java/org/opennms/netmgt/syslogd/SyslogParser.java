@@ -29,23 +29,16 @@
 package org.opennms.netmgt.syslogd;
 
 import java.lang.reflect.Constructor;
-import java.net.InetAddress;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.opennms.core.time.ZonedDateTimeBuilder;
-import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.config.SyslogdConfig;
-import org.opennms.netmgt.dao.api.AbstractInterfaceToNodeCache;
-import org.opennms.netmgt.dao.api.InterfaceToNodeCache;
-import org.opennms.netmgt.model.events.EventBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +52,7 @@ public class SyslogParser {
     private static final String datePattern="((19|20)\\d{2})-([1-9]|0[1-9]|1[0-2])-(0[1-9]|[1-9]|[12][0-9]|3[01])";
     private Matcher m_matcher = null;
     private final SyslogdConfig m_config;
-    private final ByteBuffer m_text;
+    private final String m_text;
     private Boolean m_found = null;
     private Boolean m_matched = null;
     private boolean m_traceEnabled = false;
@@ -76,12 +69,12 @@ public class SyslogParser {
         }
     );
 
-    public static SyslogParser getParserInstance(SyslogdConfig config, ByteBuffer text) throws MessageDiscardedException {
+    public static SyslogParser getParserInstance(SyslogdConfig config, String text) throws MessageDiscardedException {
         Class<? extends SyslogParser> parserClass = PARSER_CLASSES.getUnchecked(config.getParser());
 
         final SyslogParser retval;
         try {
-            Constructor<? extends SyslogParser> m = parserClass.getConstructor(SyslogdConfig.class, ByteBuffer.class);
+            Constructor<? extends SyslogParser> m = parserClass.getConstructor(SyslogdConfig.class, String.class);
             retval = (SyslogParser)m.newInstance(config, text);
         } catch (final Exception ex) {
             LOG.debug("Unable to get parser for class '{}'", parserClass.getName(), ex);
@@ -91,18 +84,14 @@ public class SyslogParser {
         return retval;
     }
 
-    protected static String fromByteBuffer(ByteBuffer buffer) {
-        return StandardCharsets.US_ASCII.decode(buffer).toString();
-    }
-
-    protected SyslogParser(final SyslogdConfig config, final ByteBuffer text) {
+    protected SyslogParser(final SyslogdConfig config, final String text) {
         if (config == null) {
             throw new IllegalArgumentException("Config argument to SyslogParser must not be null");
         } else if (text == null) {
             throw new IllegalArgumentException("Text argument to SyslogParser must not be null");
         }
         m_config = config;
-        m_text = text.duplicate();
+        m_text = text;
         m_traceEnabled = LOG.isTraceEnabled();
     }
 
@@ -130,8 +119,7 @@ public class SyslogParser {
         return m_config;
     }
 
-    protected ByteBuffer getText() {
-        m_text.rewind();
+    protected String getText() {
         return m_text;
     }
 
@@ -145,7 +133,7 @@ public class SyslogParser {
     }
 
     /* override this to parse data from the matcher */
-    protected SyslogMessage parse() throws SyslogParserException {
+    public SyslogMessage parse() throws SyslogParserException {
         final SyslogMessage message = new SyslogMessage();
         message.setMessage(getMatcher().group().trim());
         return message;
@@ -153,14 +141,14 @@ public class SyslogParser {
 
     protected Matcher getMatcher() {
         if (m_matcher == null) {
-            m_matcher = getPattern().matcher(SyslogParser.fromByteBuffer(getText()));
+            m_matcher = getPattern().matcher(m_text);
         }
         return m_matcher;
     }
 
     protected static Date parseDate(final String dateString) {
         try {
-            // Date pattern has been created and checked inside if loop instead of 
+            // Date pattern has been crearted and checked inside if loop instead of 
             // parsing date inside the exception class.
             if (dateString.matches(datePattern)) {
                 final DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT);
@@ -168,13 +156,11 @@ public class SyslogParser {
             } else {
                 final DateFormat df = new SimpleDateFormat("MMM dd HH:mm:ss", Locale.ROOT);
                 
-                // 2012-03-14 Ben: Ugh, what's a non-lame way of forcing it to parse to "this year"?
+                // Ugh, what's a non-lame way of forcing it to parse to "this year"?
                 Date date = df.parse(dateString);
                 final Calendar c = df.getCalendar();
                 c.setTime(date);
-                // Add 1 to the month value because Calendar.MONTH is zero-based and
-                // java.time.Month values are 1-based
-                c.set(Calendar.YEAR, ZonedDateTimeBuilder.getBestYearForMonth(c.get(Calendar.MONTH) + 1));
+                c.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
                 return c.getTime();
             }
         } catch (final Exception e) {

@@ -33,7 +33,6 @@ import java.util.Date;
 import org.opennms.netmgt.collection.api.CollectionResource;
 import org.opennms.netmgt.collection.api.CollectionSet;
 import org.opennms.netmgt.collection.api.CollectionSetVisitor;
-import org.opennms.netmgt.collection.api.CollectionStatus;
 import org.opennms.netmgt.collection.api.ServiceCollector;
 
 /**
@@ -43,7 +42,7 @@ import org.opennms.netmgt.collection.api.ServiceCollector;
  * to a different value upon collection completion.
  */
 public class SingleResourceCollectionSet extends AbstractCollectionSet {
-    private CollectionStatus m_status = CollectionStatus.FAILED;
+	private int m_status = ServiceCollector.COLLECTION_FAILED;
 	private final CollectionResource m_collectionResource;
 	private final Date m_timestamp;
 
@@ -53,11 +52,11 @@ public class SingleResourceCollectionSet extends AbstractCollectionSet {
 	}
 
 	@Override
-	public final CollectionStatus getStatus() {
+	public final int getStatus() {
 		return m_status;
 	}
 
-	public final void setStatus(CollectionStatus status) {
+	public final void setStatus(int status) {
 		m_status = status;
 	}
 

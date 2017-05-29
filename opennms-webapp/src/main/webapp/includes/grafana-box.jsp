@@ -51,13 +51,7 @@
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%
-    int grafanaDashboadLimit = Integer.parseInt(System.getProperty("org.opennms.grafanaBox.dashboardLimit", "0"));
-%>
 
-<c:if test="${param.useLimit != 'true'}">
-<% grafanaDashboadLimit = 0; %>
-</c:if>
 <%
     String grafanaApiKey = System.getProperty("org.opennms.grafanaBox.apiKey", "");
     String grafanaProtocol = System.getProperty("org.opennms.grafanaBox.protocol", "http");
@@ -119,8 +113,6 @@
         <script type="text/javascript">
             var grafanaTag = '<%=grafanaTag%>';
             var obj = <%=responseString%>;
-            var limit = <%=grafanaDashboadLimit%>;
-            var count = 0;
 
             for (var val of obj) {
                 var showDashboard = true;
@@ -136,14 +128,9 @@
                     }
                 }
                 if (showDashboard) {
-                    if (limit < 1 || count++ < limit) {
-                        $('#dashboardlist').append('<a href="<%=grafanaProtocol%>://<%=grafanaHostname%>:<%=grafanaPort%>/dashboard/' + val['uri'] + '"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span>&nbsp;' + val['title'] + "</a><br/>");
-                    }
+                    $('#dashboardlist').append('<a href="<%=grafanaProtocol%>://<%=grafanaHostname%>:<%=grafanaPort%>/dashboard/' + val['uri'] + '"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span>&nbsp;' + val['title'] + "</a><br/>");
                 }
             };
-            if (limit > 0 && count > limit) {
-                $('#dashboardlist').append('<a href="graph/grafana.jsp"><span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>&nbsp;View list of all Dashboards</a><br/>');
-            }
         </script>
         <%
             } else {

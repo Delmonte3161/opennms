@@ -56,7 +56,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.opennms.core.collection.test.MockCollectionAgent;
 import org.opennms.core.db.DataSourceFactory;
 import org.opennms.core.rpc.mock.MockRpcClientFactory;
 import org.opennms.core.test.MockLogAppender;
@@ -77,10 +76,13 @@ import org.opennms.netmgt.collectd.SnmpCollectionAgent;
 import org.opennms.netmgt.collectd.SnmpCollectionResource;
 import org.opennms.netmgt.collectd.SnmpIfData;
 import org.opennms.netmgt.collection.api.AttributeGroupType;
-import org.opennms.netmgt.collection.api.AttributeType;
 import org.opennms.netmgt.collection.api.CollectionSet;
+import org.opennms.netmgt.collection.api.CollectionSetVisitor;
+import org.opennms.netmgt.collection.api.ServiceCollector;
 import org.opennms.netmgt.collection.api.ServiceParameters;
+import org.opennms.netmgt.collection.support.builder.AttributeType;
 import org.opennms.netmgt.collection.support.builder.CollectionSetBuilder;
+import org.opennms.netmgt.collection.support.builder.GenericTypeResource;
 import org.opennms.netmgt.collection.support.builder.NodeLevelResource;
 import org.opennms.netmgt.config.DatabaseSchemaConfigFactory;
 import org.opennms.netmgt.config.PollOutagesConfigFactory;
@@ -106,9 +108,7 @@ import org.opennms.netmgt.model.OnmsNode;
 import org.opennms.netmgt.model.OnmsSnmpInterface;
 import org.opennms.netmgt.model.ResourcePath;
 import org.opennms.netmgt.model.events.EventBuilder;
-import org.opennms.netmgt.poller.NetworkInterface;
 import org.opennms.netmgt.rrd.RrdRepository;
-import org.opennms.netmgt.snmp.InetAddrUtils;
 import org.opennms.netmgt.snmp.SnmpInstId;
 import org.opennms.netmgt.snmp.SnmpUtils;
 import org.opennms.netmgt.snmp.SnmpValue;
@@ -1449,7 +1449,7 @@ public class ThresholdingVisitorIT {
      * If we forgot it, /opt01 will not pass threshold filter
      */
     @Test
-    public void testThresholsFiltersOnGenericResource() throws Exception {
+    public void testThresholdFiltersOnGenericResource() throws Exception {
         ThresholdingVisitor visitor = createVisitor();
         
         String highExpression = "(((hrStorageAllocUnits*hrStorageUsed)/(hrStorageAllocUnits*hrStorageSize))*100)";
@@ -1561,6 +1561,26 @@ public class ThresholdingVisitorIT {
         verifyEvents(0);
     }
 
+    /**
+     * Similar to {@link #testThresholdFiltersOnGenericResource()}, but
+     * we generate the collection set using the CollectionSetBuilder instead
+     * of using SnmpCollector specific types.
+     */
+    @Test
+    public void testThresholdFiltersOnGenericResourceWithCollectionSetBuilder() throws Exception {
+        ThresholdingVisitor visitor = createVisitor();
+
+        String highExpression = "(((hrStorageAllocUnits*hrStorageUsed)/(hrStorageAllocUnits*hrStorageSize))*100)";
+        addHighThresholdEvent(1, 30, 25, 50, "/opt", "1", highExpression, null, null);
+        addHighThresholdEvent(1, 30, 25, 60, "/opt01", "2", highExpression, null, null);
+
+        runFileSystemDataTestWithCollectionSetBuilder(visitor, 1, "/opt", 50, 100);
+        runFileSystemDataTestWithCollectionSetBuilder(visitor, 2, "/opt01", 60, 100);
+        runFileSystemDataTestWithCollectionSetBuilder(visitor, 3, "/home", 70, 100);
+
+        verifyEvents(0);
+    }
+
     private ThresholdingVisitor createVisitor() {
         Map<String,Object> params = new HashMap<String,Object>();
         params.put("thresholding-enabled", "true");
@@ -1624,6 +1644,27 @@ public class ThresholdingVisitorIT {
         EasyMock.verify(agent);
     }
 
+    private void runFileSystemDataTestWithCollectionSetBuilder(ThresholdingVisitor visitor, int resourceId, String fs, long value, long max) throws Exception {
+        SnmpCollectionAgent agent = createCollectionAgent();
+        NodeLevelResource nodeResource = new NodeLevelResource(agent.getNodeId());
+        // Creating Generic ResourceType
+        org.opennms.netmgt.config.datacollection.ResourceType indexResourceType = createIndexResourceType(agent, "hrStorageIndex");
+        GenericTypeResource genericResource = new GenericTypeResource(nodeResource, indexResourceType, Integer.toString(resourceId));
+        // Creating strings.properties file
+        ResourcePath path = ResourcePath.get("snmp", "1", "hrStorageIndex", Integer.toString(resourceId));
+        m_resourceStorageDao.setStringAttribute(path, "hrStorageType", ".1.3.6.1.2.1.25.2.1.4");
+        m_resourceStorageDao.setStringAttribute(path, "hrStorageDescr", fs);
+        // Build the collection set
+        CollectionSet collectionSet = new CollectionSetBuilder(agent)
+                .withNumericAttribute(genericResource, "hd-usage", "hrStorageUsed", value, AttributeType.GAUGE)
+                .withNumericAttribute(genericResource, "hd-usage", "hrStorageSize", max, AttributeType.GAUGE)
+                .withNumericAttribute(genericResource, "hd-usage", "hrStorageAllocUnits", 1, AttributeType.GAUGE)
+                .build();
+        // Run Visitor
+        collectionSet.visit(visitor);
+        EasyMock.verify(agent);
+    }
+
     /*
      * Parameter expectedValue should be around 200:
      * Initial counter value is 20000 below limit.
@@ -1668,23 +1709,13 @@ public class ThresholdingVisitorIT {
         EasyMock.verify(agent);        
         verifyEvents(0);
     }
-
+    
     private static SnmpCollectionAgent createCollectionAgent() {
         SnmpCollectionAgent agent = EasyMock.createMock(SnmpCollectionAgent.class);
         EasyMock.expect(agent.getNodeId()).andReturn(1).anyTimes();
-        EasyMock.expect(agent.getStorageResourcePath()).andReturn(ResourcePath.get(String.valueOf(1))).anyTimes();
+        EasyMock.expect(agent.getStorageDir()).andReturn(new File(String.valueOf(1))).anyTimes();
         EasyMock.expect(agent.getHostAddress()).andReturn("127.0.0.1").anyTimes();
         EasyMock.expect(agent.getSnmpInterfaceInfo((IfResourceType)EasyMock.anyObject())).andReturn(new HashSet<IfInfo>()).anyTimes();
-        EasyMock.expect(agent.getAttributeNames()).andReturn(Collections.emptySet()).anyTimes();
-        EasyMock.expect(agent.getType()).andReturn(NetworkInterface.TYPE_INET).anyTimes();
-        EasyMock.expect(agent.getAddress()).andReturn(InetAddrUtils.getLocalHostAddress()).anyTimes();
-        EasyMock.expect(agent.isStoreByForeignSource()).andReturn(false).anyTimes();
-        EasyMock.expect(agent.getNodeLabel()).andReturn("test").anyTimes();
-        EasyMock.expect(agent.getForeignSource()).andReturn(null).anyTimes();
-        EasyMock.expect(agent.getForeignId()).andReturn(null).anyTimes();
-        EasyMock.expect(agent.getLocationName()).andReturn(null).anyTimes();
-        EasyMock.expect(agent.getSysObjectId()).andReturn(null).anyTimes();
-        EasyMock.expect(agent.getSavedSysUpTime()).andReturn(0L).anyTimes();
         EasyMock.replay(agent);
         return agent;
     }
@@ -1701,7 +1732,7 @@ public class ThresholdingVisitorIT {
         return new IfResourceType(agent, collection);
     }
 
-    private GenericIndexResourceType createGenericIndexResourceType(SnmpCollectionAgent agent, String resourceTypeName) {
+    private static org.opennms.netmgt.config.datacollection.ResourceType createIndexResourceType(SnmpCollectionAgent agent, String resourceTypeName) {
         org.opennms.netmgt.config.datacollection.ResourceType type = new org.opennms.netmgt.config.datacollection.ResourceType();
         type.setName(resourceTypeName);
         type.setLabel(resourceTypeName);
@@ -1711,6 +1742,11 @@ public class ThresholdingVisitorIT {
         org.opennms.netmgt.config.datacollection.PersistenceSelectorStrategy pstrategy = new org.opennms.netmgt.config.datacollection.PersistenceSelectorStrategy();
         pstrategy.setClazz("org.opennms.netmgt.collection.support.PersistAllSelectorStrategy");
         type.setPersistenceSelectorStrategy(pstrategy);
+        return type;
+    }
+
+    private GenericIndexResourceType createGenericIndexResourceType(SnmpCollectionAgent agent, String resourceTypeName) {
+        org.opennms.netmgt.config.datacollection.ResourceType type = createIndexResourceType(agent, resourceTypeName);
         MockDataCollectionConfig dataCollectionConfig = new MockDataCollectionConfig();
         OnmsSnmpCollection collection = new OnmsSnmpCollection(agent, new ServiceParameters(new HashMap<String, Object>()), dataCollectionConfig, m_locationAwareSnmpClient);
         return new GenericIndexResourceType(agent, collection, type);
@@ -1854,9 +1890,28 @@ public class ThresholdingVisitorIT {
     }
 
     private static CollectionSet createAnonymousCollectionSet(long timestamp) {
-        final MockCollectionAgent agent = new MockCollectionAgent(1, "node", "fs", "fid", InetAddressUtils.ONE_TWENTY_SEVEN);
-        return new CollectionSetBuilder(agent)
-            .withTimestamp(new Date(timestamp)).build();
+    	final Date internalTimestamp = new Date(timestamp);
+    	return new CollectionSet() {
+			@Override
+			public void visit(CollectionSetVisitor visitor) {
+				//Nothing to do
+			}
+			
+			@Override
+			public boolean ignorePersist() {
+				return true;
+			}
+			
+			@Override
+			public int getStatus() {
+				return ServiceCollector.COLLECTION_SUCCEEDED;
+			}
+			
+			@Override
+			public Date getCollectionTimestamp() {
+				return internalTimestamp;
+			}
+		};
     }
 
 }

@@ -32,7 +32,6 @@ import org.jrobin.core.RrdException;
 import org.jrobin.core.timespec.TimeParser;
 import org.jrobin.core.timespec.TimeSpec;
 import org.opennms.core.utils.StreamUtils;
-import org.opennms.netmgt.model.ResourceId;
 import org.opennms.web.servlet.MissingParameterException;
 import org.opennms.web.svclayer.RrdGraphService;
 import org.springframework.web.servlet.ModelAndView;
@@ -81,7 +80,7 @@ public class RrdGraphController extends AbstractController {
             }
         }
 
-        ResourceId resourceId = ResourceId.fromString(request.getParameter("resourceId"));
+        String resourceId = request.getParameter("resourceId");
         
         long[] times = this.parseTimes(request);
         

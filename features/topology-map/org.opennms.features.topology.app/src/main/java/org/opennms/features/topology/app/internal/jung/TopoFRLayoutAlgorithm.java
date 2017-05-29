@@ -32,8 +32,10 @@ import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 
+import edu.uci.ics.jung.graph.SparseGraph;
 import org.apache.commons.collections15.Transformer;
 import org.opennms.features.topology.api.Graph;
+import org.opennms.features.topology.api.GraphContainer;
 import org.opennms.features.topology.api.Layout;
 import org.opennms.features.topology.api.Point;
 import org.opennms.features.topology.api.topo.Edge;
@@ -41,24 +43,24 @@ import org.opennms.features.topology.api.topo.EdgeRef;
 import org.opennms.features.topology.api.topo.Vertex;
 import org.opennms.features.topology.api.topo.VertexRef;
 
-import edu.uci.ics.jung.graph.SparseGraph;
-
 public class TopoFRLayoutAlgorithm extends AbstractLayoutAlgorithm {
 
     @Override
-    public void updateLayout(final Graph graph) {
+    public void updateLayout(final GraphContainer graphContainer) {
 
-        final Layout graphLayout = graph.getLayout();
+        Graph g = graphContainer.getGraph();
+
+        final Layout graphLayout = g.getLayout();
 
         SparseGraph<VertexRef, EdgeRef> jungGraph = new SparseGraph<VertexRef, EdgeRef>();
 
-        Collection<Vertex> vertices = graph.getDisplayVertices();
+        Collection<Vertex> vertices = g.getDisplayVertices();
 
         for(Vertex v : vertices) {
             jungGraph.addVertex(v);
         }
 
-        Collection<Edge> edges = graph.getDisplayEdges();
+        Collection<Edge> edges = g.getDisplayEdges();
 
         for(Edge e : edges) {
             jungGraph.addEdge(e, e.getSource().getVertex(), e.getTarget().getVertex());
@@ -66,7 +68,7 @@ public class TopoFRLayoutAlgorithm extends AbstractLayoutAlgorithm {
 
         TopoFRLayout<VertexRef, EdgeRef> layout = new TopoFRLayout<VertexRef, EdgeRef>(jungGraph);
         // Initialize the vertex positions to the last known positions from the layout
-        Dimension size = selectLayoutSize(graph);
+        Dimension size = selectLayoutSize(graphContainer);
         layout.setInitializer(initializer(graphLayout, (int)size.getWidth()/2, (int)size.getHeight()/2));
         // Resize the graph to accommodate the number of vertices
         layout.setSize(size);

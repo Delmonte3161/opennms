@@ -36,11 +36,13 @@ package org.opennms.netmgt.collection.api;
  * @author ranger
  * @version $Id: $
  */
-public class CollectionException extends RuntimeException {
+public class CollectionException extends Exception {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9090428901522833535L;
 
-    private static final long serialVersionUID = 9078646183081279767L;
-
-    private CollectionStatus m_status = CollectionStatus.FAILED;
+    private int m_errorCode = ServiceCollector.COLLECTION_FAILED;
 
     /**
      * <p>Constructor for CollectionException.</p>
@@ -61,12 +63,12 @@ public class CollectionException extends RuntimeException {
         super(message, cause);
     }
 
-    void setStatus(CollectionStatus status) {
-        m_status = status;
+    void setErrorCode(int errorCode) {
+        m_errorCode = errorCode;
     }
 
-    CollectionStatus getStatus() {
-        return m_status;
+    int getErrorCode() {
+        return m_errorCode;
     }
 
 }

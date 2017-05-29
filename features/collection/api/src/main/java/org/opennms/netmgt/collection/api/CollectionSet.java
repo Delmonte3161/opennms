@@ -38,9 +38,14 @@ import java.util.List;
  * collection.
  */
 public interface CollectionSet extends CollectionVisitable {
-
-    CollectionStatus getStatus();
-
+    
+    /**
+     * <p>getStatus</p>
+     *
+     * @return an int (one of the ServiceCollector.COLLECTION_<FOO> values)
+     */
+    int getStatus();
+    
     /**
      * <p>ignorePersist</p>
      *

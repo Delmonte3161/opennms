@@ -1,23 +1,16 @@
 package org.opennms.vaadin.extender;
 
 
+import com.vaadin.server.*;
+import com.vaadin.server.ServiceException;
+import org.osgi.framework.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.vaadin.server.ServiceException;
-import com.vaadin.server.SessionDestroyEvent;
-import com.vaadin.server.SessionDestroyListener;
-import com.vaadin.server.SessionInitEvent;
-import com.vaadin.server.SessionInitListener;
-import com.vaadin.server.VaadinSession;
 
 public class SessionListenerRepository implements SessionInitListener, SessionDestroyListener {
 
@@ -54,9 +47,10 @@ public class SessionListenerRepository implements SessionInitListener, SessionDe
     }
 
     private List<SessionListener> getSessionListeners() {
-        final List<SessionListener> sessionListeners = new ArrayList<SessionListener>();
+        List<SessionListener> sessionListeners = new ArrayList<SessionListener>();
+        ServiceReference[] references = new ServiceReference[0];
         try {
-            final ServiceReference[] references = context.getAllServiceReferences(SessionListener.class.getName(), null);
+            references = context.getAllServiceReferences(SessionListener.class.getName(), null);
             if (references != null) {
                 for (ServiceReference eachReference : references) {
                     Object service = context.getService(eachReference);

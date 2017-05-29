@@ -34,7 +34,6 @@ import org.opennms.netmgt.measurements.model.Source;
 import org.opennms.netmgt.model.AttributeStatisticVisitor;
 import org.opennms.netmgt.model.AttributeVisitor;
 import org.opennms.netmgt.model.OnmsAttribute;
-import org.opennms.netmgt.model.ResourceId;
 import org.opennms.netmgt.model.RrdGraphAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,7 +148,7 @@ public class RrdStatisticAttributeVisitor implements AttributeVisitor, Initializ
 
         final Source source = new Source();
         source.setLabel("result");
-        source.setResourceId(attribute.getResource().getId().toString());
+        source.setResourceId(attribute.getResource().getId());
         source.setAttribute(attribute.getName());
         source.setAggregation(m_consolidationFunction.toUpperCase());
 

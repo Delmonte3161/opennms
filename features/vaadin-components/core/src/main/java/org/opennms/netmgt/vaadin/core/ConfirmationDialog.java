@@ -28,8 +28,6 @@
 
 package org.opennms.netmgt.vaadin.core;
 
-import java.util.function.Supplier;
-
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -101,18 +99,8 @@ public class ConfirmationDialog extends Window implements Window.CloseListener, 
         return this;
     }
 
-    public ConfirmationDialog withDescription(Supplier<String> descriptionSupplier) {
-        withDescription(descriptionSupplier.get());
-        return this;
-    }
-
     public ConfirmationDialog withOkAction(Action okAction) {
         this.okAction = okAction;
-        return this;
-    }
-
-    public ConfirmationDialog withCancelButton(boolean cancelButtonVisible) {
-        cancelButton.setVisible(cancelButtonVisible);
         return this;
     }
 

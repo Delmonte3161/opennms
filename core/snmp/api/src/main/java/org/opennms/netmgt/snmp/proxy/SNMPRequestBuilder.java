@@ -44,8 +44,6 @@ public interface SNMPRequestBuilder<T> {
 
     SNMPRequestBuilder<T> withDescription(String string);
 
-    SNMPRequestBuilder<T> withTimeToLive(Long ttlInMs);
-
     SNMPRequestBuilder<T> withTimeToLive(long duration, TimeUnit unit);
 
     CompletableFuture<T> execute();

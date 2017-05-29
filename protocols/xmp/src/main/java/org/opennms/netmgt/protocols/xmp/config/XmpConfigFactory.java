@@ -98,10 +98,6 @@ public class XmpConfigFactory {
      */
     public static XmpConfigFactory getInstance() { return instance; }
 
-    public static void setInstance(XmpConfigFactory instance) {
-        XmpConfigFactory.instance = instance;
-    }
-
     /* instance variables ******************************** */
 
     /* constructors  ************************************* */

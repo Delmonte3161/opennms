@@ -28,8 +28,6 @@
 
 package org.opennms.netmgt.poller;
 
-import java.util.Set;
-
 /**
  * <P>
  * The NetworkInterface class is designed to be a well defined front for passing
@@ -83,13 +81,6 @@ public interface NetworkInterface<T> {
      * @return a {@link java.lang.Object} object.
      */
     public T getAddress();
-
-    /**
-     * Retrieves the names of all available attributes.
-     *
-     * @return a {@link Set} that contains the name of all configured attributes
-     */
-    public Set<String> getAttributeNames();
 
     /**
      * <P>

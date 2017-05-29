@@ -54,7 +54,7 @@
 %>
 
 <%
-    ResourceId resourceId = ResourceId.fromString(request.getParameter("resourceId"));
+	String resourceId = request.getParameter( "resourceId" );
 
     WebApplicationContext webAppContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
     
@@ -151,7 +151,6 @@
 %>
 
 <%@page import="org.opennms.web.svclayer.api.ResourceService"%>
-<%@ page import="org.opennms.netmgt.model.ResourceId" %>
 <jsp:include page="/includes/bootstrap.jsp" flush="false" >
   <jsp:param name="title" value="Custom Resource Graphs" />
   <jsp:param name="headTitle" value="Custom" />

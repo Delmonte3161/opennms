@@ -41,7 +41,6 @@ import org.junit.Test;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.collection.api.StorageStrategyService;
 import org.opennms.netmgt.config.datacollection.Parameter;
-import org.opennms.netmgt.model.ResourcePath;
 import org.opennms.netmgt.snmp.SnmpAgentConfig;
 
 /**
@@ -77,7 +76,7 @@ public class SiblingColumnStorageStrategyTest {
         strategy.setResourceTypeName("hrStorageIndex");
 
         // Create parameters for the strategy -- hrStorageTable
-        List<org.opennms.netmgt.collection.api.Parameter> params = new ArrayList<>();
+        List<Parameter> params = new ArrayList<Parameter>();
         params.add(createParameter("sibling-column-name", "hrStorageDescr"));
         params.add(createParameter("replace-first", "s/^-$/_root_fs/"));
         params.add(createParameter("replace-first", "s/^-//"));
@@ -88,7 +87,7 @@ public class SiblingColumnStorageStrategyTest {
         strategy.setParameters(params);
 
         // Test Resource Name - root file system (hrStorageTable)
-        ResourcePath parentResource = ResourcePath.get("1");
+        String parentResource = "1";
         MockCollectionResource resource = new MockCollectionResource(parentResource, "1", "hrStorageIndex");
         resource.getAttributeMap().put("hrStorageDescr", "/");
         String resourceName = strategy.getResourceNameFromIndex(resource);
@@ -100,7 +99,7 @@ public class SiblingColumnStorageStrategyTest {
         Assert.assertEquals("Volumes-iDisk", strategy.getResourceNameFromIndex(resource));
 
         // Test RelativePath - hrStorageTable
-        Assert.assertEquals(ResourcePath.get("1", "hrStorageIndex", "_root_fs"), strategy.getRelativePathForAttribute(parentResource, resourceName));
+        Assert.assertEquals(Paths.get("1", "hrStorageIndex", "_root_fs"), strategy.getRelativePathForAttribute(parentResource, resourceName));
     }
 
     @Test(expected=IllegalArgumentException.class)
@@ -108,7 +107,7 @@ public class SiblingColumnStorageStrategyTest {
         strategy.setResourceTypeName("hrStorageIndex");
 
         // Create parameters for the strategy -- hrStorageTable
-        List<org.opennms.netmgt.collection.api.Parameter> params = new ArrayList<>();
+        List<Parameter> params = new ArrayList<Parameter>();
         params.add(createParameter("sibling-column-oid", ".1.3.6.1.2.1.25.2.3.1.3"));
         params.add(createParameter("replace-first", "s/^-$/_root_fs/"));
         params.add(createParameter("replace-first", "s/^-//"));
@@ -123,14 +122,14 @@ public class SiblingColumnStorageStrategyTest {
     public void testMatchIndex() throws Exception {
         strategy.setResourceTypeName("macIndex");
 
-        List<org.opennms.netmgt.collection.api.Parameter> params = new ArrayList<>();
+        List<Parameter> params = new ArrayList<Parameter>();
         params.add(createParameter("sibling-column-name", "_index"));
         params.add(createParameter("replace-first", "s/^(([\\d]{1,3}\\.){8,8}).*$/$1/"));
         params.add(createParameter("replace-first", "s/\\.$//"));
 
         strategy.setParameters(params);
 
-        ResourcePath parentResource = ResourcePath.get("1");
+        String parentResource = "1";
         MockCollectionResource resource = new MockCollectionResource(parentResource, "0.132.43.51.76.89.2.144.10.1.1.1", "macIndex");
         String resourceName = strategy.getResourceNameFromIndex(resource);
         Assert.assertEquals("0.132.43.51.76.89.2.144", resourceName);

@@ -34,14 +34,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.opennms.features.graphml.model.GraphML;
 import org.opennms.features.graphml.model.GraphMLEdge;
@@ -80,23 +78,14 @@ public class GraphMLMetaTopologyProvider implements MetaTopologyProvider {
 
     private VertexRef getVertex(GraphMLNode node) {
         return graphsByNamespace.values().stream()
-                .map(g -> g.getVertex(g.getNamespace(), node.getId()))
-                .filter(v -> v != null)
-                .findFirst().orElse(null);
+            .map(g -> g.getVertex(g.getVertexNamespace(), node.getId()))
+            .filter(v -> v != null)
+            .findFirst().orElse(null);
     }
 
-    @Override
-    public String getId() {
-        return getGraphProviders().stream()
-                .sorted(Comparator.comparing(GraphProvider::getNamespace))
-                .map(g -> g.getNamespace())
-                .collect(Collectors.joining(":"));
-    }
-
-    public void reload() {
+    public void load() throws IOException, InvalidGraphException {
         graphsByNamespace.clear();
         oppositeVertices.clear();
-        rawGraphsByNamespace.clear();
         if (graphMLFile == null) {
             LOG.warn("No graph defined");
             return;
@@ -112,8 +101,8 @@ public class GraphMLMetaTopologyProvider implements MetaTopologyProvider {
             for (GraphMLGraph eachGraph : graphML.getGraphs()) {
                 final GraphMLTopologyProvider topoProvider = new GraphMLTopologyProvider(eachGraph, m_serviceAccessor);
                 final VertexHopGraphProvider vertexHopGraphProvider = new VertexHopGraphProvider(topoProvider);
-                graphsByNamespace.put(topoProvider.getNamespace(), vertexHopGraphProvider);
-                rawGraphsByNamespace.put(topoProvider.getNamespace(), topoProvider);
+                graphsByNamespace.put(topoProvider.getVertexNamespace(), vertexHopGraphProvider);
+                rawGraphsByNamespace.put(topoProvider.getVertexNamespace(), topoProvider);
             }
 
             for (GraphMLGraph eachGraph : graphML.getGraphs()) {
@@ -131,8 +120,6 @@ public class GraphMLMetaTopologyProvider implements MetaTopologyProvider {
                 }
             }
             this.breadcrumbStrategy = getBreadcrumbStrategy(graphML);
-        } catch (InvalidGraphException | IOException e) {
-            LOG.error(e.getMessage(), e);
         }
     }
 

@@ -28,15 +28,12 @@
 
 package org.opennms.netmgt.config.datacollction.nsclient;
 
-import java.util.Objects;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-
-import org.opennms.netmgt.collection.api.AttributeType;
+import java.util.Objects;
 
 
 /**
@@ -76,7 +73,7 @@ public class Attrib {
     @XmlAttribute(name = "alias", required = true)
     protected String alias;
     @XmlAttribute(name = "type", required = true)
-    protected AttributeType type;
+    protected String type;
     @XmlAttribute(name = "maxval")
     protected String maxval;
     @XmlAttribute(name = "minval")
@@ -130,12 +127,28 @@ public class Attrib {
         this.alias = value;
     }
 
-    public AttributeType getType() {
+    /**
+     * Gets the value of the type property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getType() {
         return type;
     }
 
-    public void setType(AttributeType type) {
-        this.type = type;
+    /**
+     * Sets the value of the type property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setType(String value) {
+        this.type = value;
     }
 
     /**

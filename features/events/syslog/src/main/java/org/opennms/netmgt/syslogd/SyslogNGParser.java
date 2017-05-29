@@ -28,7 +28,6 @@
 
 package org.opennms.netmgt.syslogd;
 
-import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,19 +36,13 @@ import org.opennms.netmgt.config.SyslogdConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A stricter variant of the {@link CustomSyslogParser} which parses
- * Syslog-NG's default format.  It ignores forwarding-regexp, 
- * matching-group-host, and matching-group-message and instead 
- * relies on a well-known properly-formatted syslog message.
- */
 public class SyslogNGParser extends SyslogParser {
     private static final Logger LOG = LoggerFactory.getLogger(SyslogNGParser.class);
 
     //                                                                <PRI>        IDENT               TIMESTAMP                                                                                 HOST   PROCESS/ID                            MESSAGE
     private static final Pattern m_syslogNGPattern = Pattern.compile("^<(\\d{1,3})>(?:(\\S*?)(?::? )?)((?:\\d\\d\\d\\d-\\d\\d-\\d\\d)|(?:\\S\\S\\S\\s+\\d{1,2}\\s+\\d\\d:\\d\\d:\\d\\d)) (\\S+) (?:(\\S+?)(?:\\[(\\d+)\\])?:\\s+){0,1}(\\S.*?)$", Pattern.MULTILINE);
 
-    public SyslogNGParser(final SyslogdConfig config, final ByteBuffer text) {
+    public SyslogNGParser(final SyslogdConfig config, final String text) {
         super(config, text);
     }
 
@@ -59,7 +52,7 @@ public class SyslogNGParser extends SyslogParser {
     }
 
     @Override
-    protected SyslogMessage parse() throws SyslogParserException {
+    public SyslogMessage parse() throws SyslogParserException {
         if (!this.find()) {
             if (traceEnabled()) {
                 LOG.trace("'{}' did not match '{}'", m_syslogNGPattern, getText());
@@ -88,7 +81,12 @@ public class SyslogNGParser extends SyslogParser {
         message.setHostName(matcher.group(4));
         message.setProcessName(matcher.group(5));
         if (matcher.group(6) != null) {
-            message.setProcessId(matcher.group(6));
+            try {
+                final Integer pid = Integer.parseInt(matcher.group(6));
+                message.setProcessId(pid);
+            } catch (final NumberFormatException nfe) {
+                LOG.debug("Unable to parse '{}' as a process ID.", matcher.group(6), nfe);
+            }
         }
         message.setMessage(matcher.group(7).trim());
 

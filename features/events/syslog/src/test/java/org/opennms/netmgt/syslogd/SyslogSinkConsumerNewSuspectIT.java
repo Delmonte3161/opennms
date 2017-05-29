@@ -33,10 +33,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
@@ -127,6 +129,11 @@ public class SyslogSinkConsumerNewSuspectIT {
         m_syslogSinkConsumer.setSyslogdConfig(config);
         m_syslogSinkConsumer.setEventForwarder(m_eventIpcManager);
         m_syslogSinkModule = m_syslogSinkConsumer.getModule();
+        
+        SyslogSinkConsumerTest.grookPatternList = new ArrayList<String>(SyslogSinkConsumerTest.setGrookPatternList(new File(
+                                                                                                                            this.getClass().getResource("/etc/syslogd-configuration.properties").getPath())));
+        m_syslogSinkConsumer.setGrokPatternsList(SyslogSinkConsumerTest.grookPatternList);
+
     }
 
     @After
@@ -151,7 +158,7 @@ public class SyslogSinkConsumerNewSuspectIT {
         // One of the interfaces on node1
         final InetAddress addr = InetAddressUtils.addr("192.168.1.3");
 
-        final byte[] bytes = ("<34>1 2010-08-19T22:14:15.000Z " + InetAddressUtils.str(addr) + " - - - - \uFEFFfoo0: load test 0 on tty1\0").getBytes();
+        final byte[] bytes = ("<34>1 2010-08-19T22:14:15.000Z " + InetAddressUtils.str(addr) + " - - - - BOMfoo0: load test 0 on tty1\0").getBytes();
         final DatagramPacket pkt = new DatagramPacket(bytes, bytes.length, addr, SyslogClient.PORT);
 
         // Create a new SyslogConnection and call it to create the processed event
@@ -203,7 +210,7 @@ public class SyslogSinkConsumerNewSuspectIT {
         // One of the interfaces on node1
         final InetAddress addr = InetAddressUtils.addr("192.168.1.3");
 
-        final byte[] bytes = ("<34>1 2010-08-19T22:14:15.000Z " + InetAddressUtils.str(addr) + " - - - - \uFEFFfoo0: load test 0 on tty1\0").getBytes();
+        final byte[] bytes = ("<34>1 2010-08-19T22:14:15.000Z " + InetAddressUtils.str(addr) + " - - - - BOMfoo0: load test 0 on tty1\0").getBytes();
         final DatagramPacket pkt = new DatagramPacket(bytes, bytes.length, addr, SyslogClient.PORT);
 
         // Sync the cache with the database

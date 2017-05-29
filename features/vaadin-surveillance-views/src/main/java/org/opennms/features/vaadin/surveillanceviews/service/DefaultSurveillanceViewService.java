@@ -57,7 +57,6 @@ import org.opennms.netmgt.model.OnmsOutage;
 import org.opennms.netmgt.model.OnmsResource;
 import org.opennms.netmgt.model.OnmsResourceType;
 import org.opennms.netmgt.model.PrefabGraph;
-import org.opennms.netmgt.model.ResourceId;
 import org.opennms.netmgt.model.SurveillanceStatus;
 import org.opennms.web.api.Util;
 import org.slf4j.Logger;
@@ -442,7 +441,7 @@ public class DefaultSurveillanceViewService implements SurveillanceViewService {
      * {@inheritDoc}
      */
     @Override
-    public Map<String, String> getGraphResultsForResourceId(final ResourceId resourceId) {
+    public Map<String, String> getGraphResultsForResourceId(final String resourceId) {
         return m_transactionOperations.execute(new TransactionCallback<Map<String, String>>() {
             @Override
             public Map<String, String> doInTransaction(TransactionStatus transactionStatus) {

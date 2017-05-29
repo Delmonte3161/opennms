@@ -29,6 +29,8 @@
 package org.opennms.plugins.elasticsearch.rest;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -597,15 +599,14 @@ public class EventToIndex implements AutoCloseable {
 		body.put("eventuei",event.getUei());
 
 		Calendar cal=Calendar.getInstance();
-		if (event.getTime()==null) {
+		if (event.getCreationTime()==null) {
 			if(LOG.isDebugEnabled()) LOG.debug("using local time because no event creation time for event.toString: "+ event.toString());
 			cal.setTime(new Date());
 
-		} else 	cal.setTime(event.getTime()); // javax.xml.bind.DatatypeConverter.parseDateTime("2010-01-01T12:00:00Z");
-
-
-		body.put("@timestamp", DatatypeConverter.printDateTime(cal));
-
+		} else 	cal.setTime(event.getCreationTime()); // javax.xml.bind.DatatypeConverter.parseDateTime("2010-01-01T12:00:00Z");
+		if (!event.getSource().equalsIgnoreCase("syslogd")) {
+			body.put("@timestamp", DatatypeConverter.printDateTime(cal));
+		}
 		body.put("dow", Integer.toString(cal.get(Calendar.DAY_OF_WEEK)));
 		body.put("hour",Integer.toString(cal.get(Calendar.HOUR_OF_DAY)));
 		body.put("dom", Integer.toString(cal.get(Calendar.DAY_OF_MONTH))); 
@@ -623,10 +624,40 @@ public class EventToIndex implements AutoCloseable {
 		body.put("host",event.getHost());
 
 		//get params from event
-		for(Parm parm : event.getParmCollection()) {
-			body.put("p_" + parm.getParmName(), parm.getValue().getContent());
+		String trapOidMap = "";
+		for (Parm parm : event.getParmCollection()) {
+			if (parm.getParmName().equalsIgnoreCase("timestamp")) {
+				Calendar eventcreateCal = Calendar.getInstance();
+				eventcreateCal.setTime(tokenizeRfcDate(parm.getValue().getContent()));
+				body.put("@timestamp", DatatypeConverter.printDateTime(eventcreateCal));
+			} else {
+				/*
+				 * CTSMONETFB-196: Traps oids and varbinds cause elastic to hit field and field depth
+				 * limit quickly in our environment. We tried increasing the limits to 
+				 * arbitrary values like 10000, 25000 and 100k but that only takes care of it
+				 * for a short time. This should help index events that were not before. 
+				 * 
+				 * We index what was originally field names into field values now, so that, theoretically
+				 * we should never hit those limits.
+				 */
+				if(parm.getParmName().matches("^[\\.\\d]+")){
+					if(trapOidMap.length() > 0){
+						trapOidMap += ", " +  parm.getParmName() + " : " + parm.getValue().getContent();
+					}
+					else {
+						trapOidMap += parm.getParmName() + " : " + parm.getValue().getContent();
+					}
+				}
+				else{
+					body.put("p_" + parm.getParmName(), parm.getValue().getContent());
+				}
+					
+			}
 		}
-
+		if (trapOidMap.length() > 0){
+			body.put("p_trapmap" , trapOidMap);
+		}
+		body.put("p_timestamp" ,cal.getTime().toString());
 		// remove old and new alarm values parms if not needed
 		if(! archiveNewAlarmValues){
 			body.remove("p_"+OLD_ALARM_VALUES_PARAM);
@@ -638,7 +669,7 @@ public class EventToIndex implements AutoCloseable {
 
 		body.put("interface", event.getInterface());
 		body.put("logmsg", ( event.getLogmsg()!=null ? event.getLogmsg().getContent() : null ));
-		body.put("logmsgdest", ( event.getLogmsg()!=null ? event.getLogmsg().getDest() : null ));
+ 		body.put("logmsgdest", ( event.getLogmsg()!=null ? event.getLogmsg().getDest() : null ));
 
 		if(event.getNodeid()!=null){
 			body.put("nodeid", Long.toString(event.getNodeid()));
@@ -687,6 +718,18 @@ public class EventToIndex implements AutoCloseable {
 		Index index = builder.build();
 
 		return index;
+	}
+	
+	private Date tokenizeRfcDate(String dateString)  {
+		DateFormat eventDate=new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+		try {
+			return eventDate.parse(dateString);
+		} catch (java.text.ParseException e) {
+			LOG.error("cannot parse given event date,Hence passing current date");
+			return Calendar.getInstance().getTime();
+		}
+
+
 	}
 
 	/**
@@ -769,7 +812,11 @@ public class EventToIndex implements AutoCloseable {
 				//decode event parms into alarm record
 				List<Parm> params = EventParameterUtils.decode(value);
 				for(Parm parm : params) {
-					body.put("p_" + parm.getParmName(), parm.getValue().getContent());
+					/*
+					 * We haven't seen these events. Not expecting these to contain
+					 * any field with period in its name. Adding a check just in case. 
+					 */
+					body.put("p_" + parm.getParmName().replace('.', '_'), parm.getValue().getContent());
 				}
 			} else if((ALARM_SEVERITY_PARAM.equals(key) && value!=null)){ 
 				try{

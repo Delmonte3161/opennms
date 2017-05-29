@@ -47,7 +47,7 @@ import org.opennms.netmgt.collection.api.CollectionException;
 import org.opennms.netmgt.collection.api.CollectionResource;
 import org.opennms.netmgt.collection.api.CollectionSet;
 import org.opennms.netmgt.collection.api.CollectionSetVisitor;
-import org.opennms.netmgt.collection.api.CollectionStatus;
+import org.opennms.netmgt.collection.api.ServiceCollector;
 import org.opennms.netmgt.snmp.AggregateTracker;
 import org.opennms.netmgt.snmp.Collectable;
 import org.opennms.netmgt.snmp.CollectionTracker;
@@ -94,7 +94,7 @@ public class SnmpCollectionSet implements Collectable, CollectionSet {
     private IfNumberTracker m_ifNumber;
     private SysUpTimeTracker m_sysUpTime;
     private SnmpNodeCollector m_nodeCollector;
-    private CollectionStatus m_status = CollectionStatus.FAILED;
+    private int m_status=ServiceCollector.COLLECTION_FAILED;
     private boolean m_ignorePersist;
     private Date m_timestamp;
 
@@ -370,7 +370,6 @@ public class SnmpCollectionSet implements Collectable, CollectionSet {
             CompletableFuture<CollectionTracker> future = m_client.walk(getAgentConfig(), getTracker())
                 .withDescription("SnmpCollectors for " + agent.getHostAddress())
                 .withLocation(getCollectionAgent().getLocationName())
-                .withTimeToLive(m_snmpCollection.getServiceParameters().getServiceInterval())
                 .execute();
 
             // wait for collection to finish
@@ -384,7 +383,7 @@ public class SnmpCollectionSet implements Collectable, CollectionSet {
             SnmpPropertyExtenderProcessor processor = new SnmpPropertyExtenderProcessor();
             processor.process(this, m_snmpCollection.getName(), m_agent.getSysObjectId(), m_agent.getHostAddress());
 
-            m_status = CollectionStatus.SUCCEEDED;
+            m_status = ServiceCollector.COLLECTION_SUCCEEDED;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new CollectionUnknown(String.format("Collection of SNMP data for interface %s at location %s was interrupted.",
@@ -569,8 +568,13 @@ public class SnmpCollectionSet implements Collectable, CollectionSet {
         return m_snmpCollection.getIfAliasResourceType(getCollectionAgent());
     }
 
+    /**
+     * <p>getStatus</p>
+     *
+     * @return a int.
+     */
     @Override
-    public CollectionStatus getStatus() {
+    public int getStatus() {
         return m_status;
     }
 

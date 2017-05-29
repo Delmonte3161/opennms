@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opennms</groupId>
   <artifactId>opennms</artifactId>
-  <version>20.0.0-SNAPSHOT</version>
+  <version>19.1.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>OpenNMS</name>
   <url>http://opennms.org/</url>
@@ -1190,7 +1190,7 @@
     <install.version>${project.version}</install.version>
     <display.version>${install.version}</display.version>
     <opennms.home>${dist.dir}/${dist.name}</opennms.home>
-    <opennms.osgi.version>20.0.0.SNAPSHOT</opennms.osgi.version>
+    <opennms.osgi.version>19.1.1.SNAPSHOT</opennms.osgi.version>
     <maven.metadata.legacy>true</maven.metadata.legacy>
     <root.dir>${project.basedir}</root.dir>
     <dist.dir>${root.dir}/target</dist.dir>
@@ -1271,7 +1271,6 @@
     <commonsConfigurationVersion>1.6</commonsConfigurationVersion>
     <commonsCsvVersion>1.1</commonsCsvVersion>
     <commonsDigesterVersion>2.1</commonsDigesterVersion>
-    <commonsJxpathVersion>1.3</commonsJxpathVersion>
     <commonsIoVersion>2.4</commonsIoVersion>
     <commonsLangVersion>2.6</commonsLangVersion>
     <commonsLoggingVersion>99.99.99-use-jcl-over-slf4j</commonsLoggingVersion>
@@ -1313,7 +1312,7 @@
     <liquibaseVersion>2.0.5-ONMS20160524b</liquibaseVersion>
     <lmaxDisruptorVersion>3.3.2</lmaxDisruptorVersion>
     <log4jVersion>99.99.99-use-log4j2</log4jVersion>
-    <log4j2Version>2.8.2</log4j2Version>
+    <log4j2Version>2.5</log4j2Version>
     <minaVersion>2.0.13</minaVersion>
     <minionKarafVersion>4.0.5</minionKarafVersion>
     <newtsVersion>1.4.3</newtsVersion>
@@ -1681,16 +1680,6 @@
       </dependency>
       <dependency>
         <groupId>org.opennms.core.ipc.rpc</groupId>
-        <artifactId>org.opennms.core.ipc.rpc.common</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.opennms.core.ipc.rpc</groupId>
-        <artifactId>org.opennms.core.ipc.rpc.commands</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.opennms.core.ipc.rpc</groupId>
         <artifactId>org.opennms.core.ipc.rpc.xml</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1782,12 +1771,6 @@
       <dependency>
         <groupId>org.opennms.core.test-api</groupId>
         <artifactId>org.opennms.core.test-api.camel</artifactId>
-        <version>${project.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.opennms.core.test-api</groupId>
-        <artifactId>org.opennms.core.test-api.collection</artifactId>
         <version>${project.version}</version>
         <scope>test</scope>
       </dependency>
@@ -1963,22 +1946,7 @@
       </dependency>
       <dependency>
         <groupId>org.opennms.features.collection</groupId>
-        <artifactId>org.opennms.features.collection.collectors</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.opennms.features.collection</groupId>
-        <artifactId>org.opennms.features.collection.client-rpc</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.opennms.features.collection</groupId>
         <artifactId>org.opennms.features.collection.persistence.rrd</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.opennms.features.collection</groupId>
-        <artifactId>org.opennms.features.collection.test-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -2451,11 +2419,6 @@
       <dependency>
         <groupId>org.opennms</groupId>
         <artifactId>opennms-provision-command</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.opennms</groupId>
-        <artifactId>opennms-requisition-service</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -3117,7 +3080,7 @@
       <dependency>
         <groupId>commons-jxpath</groupId>
         <artifactId>commons-jxpath</artifactId>
-        <version>${commonsJxpathVersion}</version>
+        <version>1.3</version>
       </dependency>
       <dependency>
         <groupId>commons-lang</groupId>
@@ -3675,10 +3638,27 @@
       </dependency>
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-bom</artifactId>
+        <artifactId>log4j-api</artifactId>
         <version>${log4j2Version}</version>
-        <scope>import</scope>
-        <type>pom</type>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>${log4j2Version}</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-1.2-api</artifactId>
+        <version>${log4j2Version}</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-slf4j-impl</artifactId>
+        <version>${log4j2Version}</version>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>log4j</groupId>

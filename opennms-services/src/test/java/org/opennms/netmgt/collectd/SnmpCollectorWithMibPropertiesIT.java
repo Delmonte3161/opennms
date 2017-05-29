@@ -41,7 +41,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.opennms.core.collection.test.JUnitCollector;
 import org.opennms.core.spring.BeanUtils;
 import org.opennms.core.test.MockLogAppender;
 import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
@@ -51,7 +50,7 @@ import org.opennms.core.test.snmp.annotations.JUnitSnmpAgent;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.collection.api.CollectionAgent;
 import org.opennms.netmgt.collection.api.CollectionSet;
-import org.opennms.netmgt.collection.api.CollectionStatus;
+import org.opennms.netmgt.collection.api.ServiceCollector;
 import org.opennms.netmgt.config.SnmpPeerFactory;
 import org.opennms.netmgt.dao.api.IpInterfaceDao;
 import org.opennms.netmgt.dao.api.NodeDao;
@@ -80,6 +79,7 @@ import org.springframework.transaction.PlatformTransactionManager;
         "classpath:/META-INF/opennms/applicationContext-soa.xml",
         "classpath:/META-INF/opennms/applicationContext-mockDao.xml",
         "classpath*:/META-INF/opennms/component-dao.xml",
+        "classpath:/META-INF/opennms/applicationContext-pinger.xml",
         "classpath:/META-INF/opennms/applicationContext-daemon.xml",
         "classpath:/META-INF/opennms/mockEventIpcManager.xml",
         "classpath:/META-INF/opennms/applicationContext-proxy-snmp.xml"
@@ -140,7 +140,6 @@ public class SnmpCollectorWithMibPropertiesIT implements InitializingBean, TestC
      */
     @Before
     public void setUp() throws Exception {
-        MockServiceCollector.setDelegate(null);
         MockLogAppender.setupLogging();
 
         m_rrdStrategy = new JRobinRrdStrategy();
@@ -174,7 +173,7 @@ public class SnmpCollectorWithMibPropertiesIT implements InitializingBean, TestC
         SnmpPeerFactory.setInstance(m_snmpPeerFactory);
 
         SnmpCollector collector = new SnmpCollector();
-        collector.initialize();
+        collector.initialize(null);
 
         m_collectionSpecification = CollectorTestUtils.createCollectionSpec("SNMP", collector, "default");
         m_collectionAgent = DefaultCollectionAgent.create(iface.getId(), m_ipInterfaceDao, m_transactionManager);
@@ -202,9 +201,13 @@ public class SnmpCollectorWithMibPropertiesIT implements InitializingBean, TestC
     public void testCollect() throws Exception {
         System.setProperty("org.opennms.netmgt.collectd.SnmpCollector.limitCollectionToInstances", "true");
 
+        m_collectionSpecification.initialize(m_collectionAgent);
+
         CollectionSet collectionSet = m_collectionSpecification.collect(m_collectionAgent);
-        assertEquals("collection status", CollectionStatus.SUCCEEDED, collectionSet.getStatus());
+        assertEquals("collection status", ServiceCollector.COLLECTION_SUCCEEDED, collectionSet.getStatus());
         CollectorTestUtils.persistCollectionSet(m_rrdStrategy, m_resourceStorageDao, m_collectionSpecification, collectionSet);
+
+        m_collectionSpecification.release(m_collectionAgent);
 
         Map<String, String> slot0 = m_resourceStorageDao.getStringAttributes(ResourcePath.get("snmp", "1", "bsnAPIfLoadParametersEntry", "132.178.97.20.31.224.0"));
         assertEquals("AP84b2.6111.29ac", slot0.get("bsnAPName"));
@@ -225,10 +228,13 @@ public class SnmpCollectorWithMibPropertiesIT implements InitializingBean, TestC
     public void testCollectCiscoQoS() throws Exception {
         System.setProperty("org.opennms.netmgt.collectd.SnmpCollector.limitCollectionToInstances", "true");
 
+        m_collectionSpecification.initialize(m_collectionAgent);
+
         CollectionSet collectionSet = m_collectionSpecification.collect(m_collectionAgent);
-        assertEquals("collection status", CollectionStatus.SUCCEEDED, collectionSet.getStatus());
+        assertEquals("collection status", ServiceCollector.COLLECTION_SUCCEEDED, collectionSet.getStatus());
         CollectorTestUtils.persistCollectionSet(m_rrdStrategy, m_resourceStorageDao, m_collectionSpecification, collectionSet);
 
+        m_collectionSpecification.release(m_collectionAgent);
         Map<String, String> map = m_resourceStorageDao.getStringAttributes(ResourcePath.get("snmp", "1", "cbQosCMStatsEntry", "290.508801"));
         assertEquals("OUTBOUND-LLQ", map.get("cbQosClassMapPolicy"));
         assertEquals("GESTION-ROUTING", map.get("cbQosClassMapName"));

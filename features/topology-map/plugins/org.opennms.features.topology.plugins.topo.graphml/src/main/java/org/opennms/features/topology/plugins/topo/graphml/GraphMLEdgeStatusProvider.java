@@ -136,11 +136,6 @@ public class GraphMLEdgeStatusProvider implements EdgeStatusProvider {
         final List<StatusScript> scripts = Lists.newArrayList();
         try (final DirectoryStream<Path> stream = Files.newDirectoryStream(getScriptPath())) {
             for (final Path path : stream) {
-                // ignore readme
-                if (".readme".equals(path.getFileName().toString())) {
-                    LOG.debug("Skipping .readme");
-                    continue;
-                }
                 final String extension = FilenameUtils.getExtension(path.toString());
                 final ScriptEngine scriptEngine = this.scriptEngineManager.getEngineByExtension(extension);
                 if (scriptEngine == null) {
@@ -170,7 +165,7 @@ public class GraphMLEdgeStatusProvider implements EdgeStatusProvider {
 
     @Override
     public String getNamespace() {
-        return provider.getNamespace();
+        return provider.getVertexNamespace();
     }
 
     @Override

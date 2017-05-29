@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.opennms.features.minion</groupId>
         <artifactId>minion-parent</artifactId>
-        <version>20.0.0-SNAPSHOT</version>
+        <version>19.1.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>repository</artifactId>
@@ -54,9 +54,7 @@
                                 <feature>minion-heartbeat-producer</feature>
                                 <feature>minion-snmp-proxy</feature>
                                 <feature>minion-provisiond-detectors</feature>
-                                <feature>minion-provisiond-requisitions</feature>
                                 <feature>minion-poller</feature>
-                                <feature>minion-collection</feature>
                                 <feature>minion-icmp-proxy</feature>
                                 <feature>hawtio-offline</feature>
                             </features>
@@ -142,11 +140,6 @@
         </dependency>
         <dependency>
             <groupId>org.opennms.features.minion.shell</groupId>
-            <artifactId>org.opennms.features.minion.shell.collection</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.opennms.features.minion.shell</groupId>
             <artifactId>org.opennms.features.minion.shell.poller</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -159,10 +152,6 @@
             <groupId>org.opennms.features.minion.heartbeat</groupId>
             <artifactId>org.opennms.features.minion.heartbeat.producer</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.opennms</groupId>
-            <artifactId>opennms-requisition-service</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opennms</groupId>
@@ -221,11 +210,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.opennms.features.collection</groupId>
-            <artifactId>org.opennms.features.collection.collectors</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.opennms.features</groupId>
             <artifactId>org.opennms.features.wsman</artifactId>
             <version>${project.version}</version>
@@ -252,19 +236,6 @@
         <dependency>
             <groupId>org.opennms.features.poller.monitors</groupId>
             <artifactId>org.opennms.features.poller.monitors.core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.opennms.features</groupId>
-            <artifactId>org.opennms.features.jdbc-collector</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opennms</groupId>
-            <artifactId>opennms-vmware</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opennms.protocols</groupId>
-            <artifactId>org.opennms.protocols.xml</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

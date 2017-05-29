@@ -28,6 +28,7 @@
 
 package org.opennms.features.topology.plugins.topo.graphml;
 
+import java.io.IOException;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,12 +37,13 @@ import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opennms.features.graphml.model.GraphMLGraph;
+import org.opennms.features.graphml.model.InvalidGraphException;
+import org.opennms.features.topology.api.GraphContainer;
 import org.opennms.features.topology.api.OperationContext;
 import org.opennms.features.topology.api.topo.SearchProvider;
+import org.opennms.features.topology.app.internal.ProviderManager;
 import org.opennms.features.topology.app.internal.VEProviderGraphContainer;
 import org.opennms.features.topology.app.internal.gwt.client.SearchSuggestion;
-import org.opennms.features.topology.app.internal.service.DefaultTopologyService;
-import org.opennms.features.topology.app.internal.service.SimpleServiceLocator;
 import org.opennms.features.topology.app.internal.ui.SearchBox;
 import org.opennms.features.topology.plugins.topo.graphml.internal.GraphMLServiceAccessor;
 import org.opennms.osgi.OnmsServiceManager;
@@ -62,23 +64,20 @@ public class GraphMLSearchProviderTest {
     }
 
     @Test
-    public void canSearchAllSearchProviders() {
+    public void canSearchAllSearchProviders() throws IOException, InvalidGraphException {
         final GraphMLMetaTopologyProvider metaTopologyProvider = new GraphMLMetaTopologyProvider(new GraphMLServiceAccessor());
         metaTopologyProvider.setTopologyLocation("target/test-classes/test-graph.xml");
-        metaTopologyProvider.reload();
+        metaTopologyProvider.load();
         Assert.assertNotNull(metaTopologyProvider.getDefaultGraphProvider());
 
         List<SearchProvider> searchProviders = metaTopologyProvider.getGraphProviders().stream()
-                .map(eachProvider -> new GraphMLSearchProvider(metaTopologyProvider.getRawTopologyProvider(eachProvider.getNamespace())))
+                .map(eachProvider -> new GraphMLSearchProvider(metaTopologyProvider.getRawTopologyProvider(eachProvider.getVertexNamespace())))
                 .collect(Collectors.toList());
         Assert.assertEquals(2, searchProviders.size());
 
-        DefaultTopologyService defaultTopologyService = new DefaultTopologyService();
-        defaultTopologyService.setServiceLocator(new SimpleServiceLocator(metaTopologyProvider));
-        VEProviderGraphContainer graphContainer = new VEProviderGraphContainer();
-        graphContainer.setTopologyService(defaultTopologyService);
-        graphContainer.setMetaTopologyId(metaTopologyProvider.getId());
-        graphContainer.setSelectedNamespace(metaTopologyProvider.getDefaultGraphProvider().getNamespace());
+        ProviderManager providerManager = new ProviderManager();
+        GraphContainer graphContainer = new VEProviderGraphContainer(providerManager);
+        graphContainer.setBaseTopology(metaTopologyProvider.getDefaultGraphProvider());
 
         OperationContext operationContext = EasyMock.niceMock(OperationContext.class);
         EasyMock.expect(operationContext.getGraphContainer()).andReturn(graphContainer).anyTimes();

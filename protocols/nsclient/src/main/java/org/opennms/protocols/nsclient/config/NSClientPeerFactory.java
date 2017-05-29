@@ -78,7 +78,7 @@ import org.springframework.core.io.FileSystemResource;
  * @author <a href="mailto:gturner@newedgenetworks.com">Gerald Turner </a>
  * @author <a href="http://www.opennms.org/">OpenNMS </a>
  */
-public class NSClientPeerFactory {
+public final class NSClientPeerFactory {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(NSClientPeerFactory.class);
 

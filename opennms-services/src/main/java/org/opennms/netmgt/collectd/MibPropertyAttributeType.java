@@ -29,7 +29,6 @@
 package org.opennms.netmgt.collectd;
 
 import org.opennms.netmgt.collection.api.AttributeGroupType;
-import org.opennms.netmgt.collection.api.AttributeType;
 import org.opennms.netmgt.collection.api.CollectionAttribute;
 import org.opennms.netmgt.collection.api.Persister;
 import org.opennms.netmgt.config.datacollection.MibObjProperty;
@@ -77,8 +76,8 @@ public class MibPropertyAttributeType extends SnmpAttributeType {
      * @see org.opennms.netmgt.collection.api.CollectionAttributeType#getType()
      */
     @Override
-    public AttributeType getType() {
-        return AttributeType.STRING;
+    public String getType() {
+        return "string";
     }
 
     /* (non-Javadoc)

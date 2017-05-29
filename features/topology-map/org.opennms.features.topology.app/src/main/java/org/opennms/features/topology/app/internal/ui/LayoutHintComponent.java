@@ -61,10 +61,7 @@ public class LayoutHintComponent extends CustomComponent implements GraphContain
         layout.addComponent(icon);
         layout.addComponent(text);
         layout.setDescription("Click to apply the manual layout");
-        layout.addLayoutClickListener((event) -> {
-            graphContainer.setLayoutAlgorithm(new ManualLayoutAlgorithm(layoutManager));
-            graphContainer.redoLayout();
-        });
+        layout.addLayoutClickListener((event) -> graphContainer.setLayoutAlgorithm(new ManualLayoutAlgorithm(layoutManager)));
         layout.setSpacing(true);
         setCompositionRoot(layout);
     }
@@ -72,9 +69,9 @@ public class LayoutHintComponent extends CustomComponent implements GraphContain
     @Override
     public void graphChanged(GraphContainer graphContainer) {
         if (!(graphContainer.getLayoutAlgorithm() instanceof ManualLayoutAlgorithm)) {
-            LayoutEntity layoutEntity = layoutManager.loadLayout(graphContainer.getGraph());
+            LayoutEntity layoutEntity = layoutManager.loadLayout(graphContainer);
             if (layoutEntity != null) {
-                boolean isEqualLayout = layoutManager.isPersistedLayoutEqualToCurrentLayout(graphContainer.getGraph());
+                boolean isEqualLayout = layoutManager.isPersistedLayoutEqualToCurrentLayout(graphContainer);
                 getCompositionRoot().setVisible(!isEqualLayout);
             } else {
                 getCompositionRoot().setVisible(false);

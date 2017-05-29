@@ -31,18 +31,18 @@ package org.opennms.features.topology.app.internal.jung;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 
+import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
+import edu.uci.ics.jung.algorithms.layout.util.RandomLocationTransformer;
+import edu.uci.ics.jung.graph.SparseGraph;
 import org.apache.commons.collections15.Transformer;
 import org.opennms.features.topology.api.Graph;
+import org.opennms.features.topology.api.GraphContainer;
 import org.opennms.features.topology.api.Layout;
 import org.opennms.features.topology.api.Point;
 import org.opennms.features.topology.api.topo.Edge;
 import org.opennms.features.topology.api.topo.EdgeRef;
 import org.opennms.features.topology.api.topo.Vertex;
 import org.opennms.features.topology.api.topo.VertexRef;
-
-import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
-import edu.uci.ics.jung.algorithms.layout.util.RandomLocationTransformer;
-import edu.uci.ics.jung.graph.SparseGraph;
 
 public class ISOMLayoutAlgorithm extends AbstractLayoutAlgorithm {
 
@@ -71,19 +71,21 @@ public class ISOMLayoutAlgorithm extends AbstractLayoutAlgorithm {
     }
 
 	@Override
-	public void updateLayout(final Graph graph) {
+	public void updateLayout(final GraphContainer graphContainer) {
 
-		final Layout graphLayout = graph.getLayout();
+		Graph g = graphContainer.getGraph();
+
+		final Layout graphLayout = g.getLayout();
 
 		SparseGraph<VertexRef, EdgeRef> jungGraph = new SparseGraph<VertexRef, EdgeRef>();
 
-		Collection<? extends Vertex> vertices = graph.getDisplayVertices();
+		Collection<? extends Vertex> vertices = g.getDisplayVertices();
 
 		for(Vertex v : vertices) {
 			jungGraph.addVertex(v);
 		}
 
-		Collection<? extends Edge> edges = graph.getDisplayEdges();
+		Collection<? extends Edge> edges = g.getDisplayEdges();
 
 		for(Edge e : edges) {
 			jungGraph.addEdge(e, e.getSource().getVertex(), e.getTarget().getVertex());
@@ -91,7 +93,7 @@ public class ISOMLayoutAlgorithm extends AbstractLayoutAlgorithm {
 
 		NonStupidISOMLayout layout = new NonStupidISOMLayout(jungGraph, graphLayout);
 		layout.setInitializer(initializer(graphLayout));
-		layout.setSize(selectLayoutSize(graph));
+		layout.setSize(selectLayoutSize(graphContainer));
 
 		while(!layout.done()) {
 			layout.step();

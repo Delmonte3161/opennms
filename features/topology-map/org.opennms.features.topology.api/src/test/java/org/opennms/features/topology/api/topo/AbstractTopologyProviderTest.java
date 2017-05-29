@@ -55,12 +55,22 @@ public class AbstractTopologyProviderTest {
             }
 
             @Override
+            public void save() {
+                // nothing to do
+            }
+            
+            @Override
+            public void refresh() {
+                // nothing to do
+            }
+
+            @Override
             public Defaults getDefaults() {
                 return new Defaults();
             }
 
             @Override
-            public void refresh() {
+            public void load(String filename) throws MalformedURLException, JAXBException {
                 for (int i=0; i<10; i++) 
                     addVertex(0, i);
                 
@@ -71,7 +81,7 @@ public class AbstractTopologyProviderTest {
                     addEdges(new AbstractEdge("test", getNextEdgeId(), getVertices().get(i), getVertices().get(i+1)));
             }
         };
-        provider.refresh();
+        provider.load(null);
         
         Assert.assertEquals(10, provider.getVerticesWithoutGroups().size());
         Assert.assertEquals(5,  provider.getGroups().size());

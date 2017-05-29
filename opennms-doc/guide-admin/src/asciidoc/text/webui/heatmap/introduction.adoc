@@ -12,7 +12,7 @@ The feature is by default deactivated and is configured through `opennms.propert
 .Heatmap visualizations of alarms
 image:webui/heatmap/heatmap.png[]
 
-.Heatmap dashboard configuration properties
+.Grafana Dashboard configuration properties
 [options="header, autowidth"]
 |===
 | Name                                       | Type      | Description                                                  | Default

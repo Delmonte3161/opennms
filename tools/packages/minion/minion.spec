@@ -121,12 +121,37 @@ rm -rf %{buildroot}
 
 %install
 
-export EXTRA_ARGS=""
+export OPTS_MAVEN="-Daether.connector.basic.threads=1 -Daether.connector.resumeDownloads=false"
+export OPTS_SKIP_TESTS="-DskipITs=true -Dmaven.test.skip.exec=true"
+export OPTS_SKIP_TARBALL="-Dbuild.skip.tarball=true"
+export OPTS_ASSEMBLIES="-Passemblies"
+export OPTS_PROFILES="-Prun-expensive-tasks"
+export COMPILE_PROJECTS="org.opennms.features.minion.container:karaf,org.opennms.features.minion:core-repository,org.opennms.features.minion:repository,org.opennms.features.minion:container-parent,org.opennms.features.minion:core-parent,org.opennms.features.minion:org.opennms.features.minion.heartbeat,org.opennms.features.minion:repository,org.opennms.features.minion:shell"
+export ASSEMBLY_PROJECTS=":org.opennms.assemblies.minion"
+
 if [ "%{enable_snapshots}" = 1 ]; then
-	EXTRA_ARGS="-s"
+	OPTS_ENABLE_SNAPSHOTS="-Denable.snapshots=true"
+	OPTS_UPDATE_POLICY="-DupdatePolicy=always"
 fi
 
-tools/packages/minion/create-minion-assembly.sh $EXTRA_ARGS
+# always build the root POM, just to be sure inherited properties/plugin/dependencies are right
+./compile.pl -N $OPTS_SKIP_TESTS $OPTS_SKIP_TARBALL $OPTS_SETTINGS_XML $OPTS_ENABLE_SNAPSHOTS $OPTS_UPDATE_POLICY -Dinstall.version="%{version}-%{release}" -Ddist.name="%{buildroot}" -Dopennms.home="%{instprefix}" install
+if [ "%{skip_compile}" = 1 ]; then
+	echo "=== SKIPPING FULL COMPILE ==="
+	echo "Projects: ${ASSEMBLY_PROJECTS}"
+	./compile.pl $OPTS_MAVEN $OPTS_SKIP_TESTS $OPTS_SKIP_TARBALL $OPTS_SETTINGS_XML $OPTS_ENABLE_SNAPSHOTS $OPTS_UPDATE_POLICY $OPTS_PROFILES $OPTS_ASSEMBLIES -Dinstall.version="%{version}-%{release}" -Ddist.name="%{buildroot}" \
+		-Dopennms.home="%{instprefix}" \
+		--projects "${ASSEMBLY_PROJECTS}" \
+		install
+else
+	# get the full list of minion projects to build
+	echo "=== RUNNING COMPILE ==="
+	echo "Projects: ${COMPILE_PROJECTS},${ASSEMBLY_PROJECTS}"
+	./compile.pl $OPTS_MAVEN $OPTS_SKIP_TESTS $OPTS_SKIP_TARBALL $OPTS_SETTINGS_XML $OPTS_ENABLE_SNAPSHOTS $OPTS_UPDATE_POLICY $OPTS_PROFILES $OPTS_ASSEMBLIES -Dinstall.version="%{version}-%{release}" -Ddist.name="%{buildroot}" \
+		-Dopennms.home="%{instprefix}" \
+		--projects "${COMPILE_PROJECTS},${ASSEMBLY_PROJECTS}" --also-make \
+		install
+fi
 
 # Extract the minion assembly
 mkdir -p %{buildroot}%{minioninstprefix}

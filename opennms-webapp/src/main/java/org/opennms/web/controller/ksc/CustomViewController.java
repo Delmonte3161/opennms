@@ -55,7 +55,6 @@ import org.opennms.netmgt.config.kscReports.Report;
 import org.opennms.netmgt.events.api.EventConstants;
 import org.opennms.netmgt.model.OnmsResource;
 import org.opennms.netmgt.model.PrefabGraph;
-import org.opennms.netmgt.model.ResourceId;
 import org.opennms.netmgt.model.events.EventBuilder;
 import org.opennms.web.api.Authentication;
 import org.opennms.web.api.Util;
@@ -96,7 +95,7 @@ public class CustomViewController extends AbstractController implements Initiali
     private int m_defaultGraphsPerLine = 0;
     private Executor m_executor;
     
-    private Set<ResourceId> m_resourcesPendingPromotion = Collections.synchronizedSet(new HashSet<>());
+    private Set<String> m_resourcesPendingPromotion = Collections.synchronizedSet(new HashSet<String>());
 
     /** {@inheritDoc} */
     @Override

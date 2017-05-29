@@ -28,11 +28,14 @@
 
 package org.opennms.features.topology.plugins.topo.linkd.internal;
 
+import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.xml.bind.JAXBException;
 
 import org.opennms.features.topology.api.browsers.ContentType;
 import org.opennms.features.topology.api.browsers.SelectionChangedListener;
@@ -71,6 +74,17 @@ public class NodeACLVertexProvider implements GraphProvider {
         m_aclsEnabled = aclsProp != null ? aclsProp.equals("true") : false;
     }
 
+
+    @Override
+    public void save() {
+        m_delegate.save();
+    }
+
+    @Override
+    public void load(String filename) throws MalformedURLException, JAXBException {
+        m_delegate.load(filename);
+    }
+
     @Override
     public void refresh() {
         m_delegate.refresh();
@@ -94,6 +108,11 @@ public class NodeACLVertexProvider implements GraphProvider {
     @Override
     public Vertex addVertex(int x, int y) {
         return m_delegate.addVertex(x, y);
+    }
+
+    @Override
+    public boolean groupingSupported() {
+        return false;
     }
 
     @Override
@@ -129,6 +148,11 @@ public class NodeACLVertexProvider implements GraphProvider {
     @Override
     public Defaults getDefaults() {
         return m_delegate.getDefaults();
+    }
+
+    @Override
+    public String getEdgeNamespace() {
+        return m_delegate.getEdgeNamespace();
     }
 
     @Override
@@ -171,8 +195,8 @@ public class NodeACLVertexProvider implements GraphProvider {
     }
 
     @Override
-    public String getNamespace() {
-        return m_delegate.getNamespace();
+    public String getVertexNamespace() {
+        return m_delegate.getVertexNamespace();
     }
 
     @Override
@@ -291,11 +315,6 @@ public class NodeACLVertexProvider implements GraphProvider {
     @Override
     public int getVertexTotalCount() {
         return m_delegate.getVertexTotalCount();
-    }
-
-    @Override
-    public int getEdgeTotalCount() {
-        return m_delegate.getEdgeTotalCount();
     }
 
     @Override

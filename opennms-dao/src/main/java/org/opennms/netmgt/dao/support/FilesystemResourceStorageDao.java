@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
@@ -82,24 +83,24 @@ public class FilesystemResourceStorageDao implements ResourceStorageDao, Initial
     @Override
     public boolean exists(ResourcePath path, int depth) {
         Preconditions.checkArgument(depth >= 0, "depth must be non-negative");
-        return exists(toPath(path), depth);
+        return exists(toFile(path).toPath(), depth);
     }
 
     @Override
     public boolean existsWithin(ResourcePath path, int depth) {
         Preconditions.checkArgument(depth >= 0, "depth must be non-negative");
-        return existsWithin(toPath(path), depth);
+        return existsWithin(toFile(path).toPath(), depth);
     }
 
     @Override
     public Set<ResourcePath> children(ResourcePath path, int depth) {
         Preconditions.checkArgument(depth > 0, "depth must be positive");
-        final Path root = toPath(path);
-        if (!Files.isDirectory(root)) {
+        final File root = toFile(path);
+        if (!root.isDirectory()) {
             return Collections.emptySet();
         }
 
-        try (Stream<Path> stream = Files.list(root)) {
+        try (Stream<Path> stream = Files.list(root.toPath())) {
             return stream.filter(p -> p.toFile().isDirectory()) // filter for directories
                 .filter(p -> exists(p, depth-1)) // filter for folders with metrics
                 .map(p -> ResourcePath.get(path, p.toFile().getName()))
@@ -112,13 +113,13 @@ public class FilesystemResourceStorageDao implements ResourceStorageDao, Initial
 
     @Override
     public Set<OnmsAttribute> getAttributes(ResourcePath path) {
-        return RrdResourceAttributeUtils.getAttributesAtRelativePath(m_rrdDirectory, ResourcePath.resourceToFilesystemPath(path).toString(), RRD_EXTENSION);
+        return RrdResourceAttributeUtils.getAttributesAtRelativePath(m_rrdDirectory, toRelativePath(path), RRD_EXTENSION);
     }
 
     @Override
     public void setStringAttribute(ResourcePath path, String key, String value) {
         try {
-            RrdResourceAttributeUtils.updateStringProperty(toPath(path).toFile(), value, key);
+            RrdResourceAttributeUtils.updateStringProperty(toFile(path), value, key);
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }
@@ -126,28 +127,28 @@ public class FilesystemResourceStorageDao implements ResourceStorageDao, Initial
 
     @Override
     public String getStringAttribute(ResourcePath path, String key) {
-        return RrdResourceAttributeUtils.getStringProperty(toPath(path).toFile(), key);
+        return RrdResourceAttributeUtils.getStringProperty(toFile(path), key);
     }
 
     @Override
     public Map<String, String> getStringAttributes(ResourcePath path) {
-        Properties props = RrdResourceAttributeUtils.getStringProperties(m_rrdDirectory, ResourcePath.resourceToFilesystemPath(path).toString());
+        Properties props = RrdResourceAttributeUtils.getStringProperties(m_rrdDirectory, toRelativePath(path));
         return Maps.fromProperties(props);
     }
 
     @Override
     public void updateMetricToResourceMappings(ResourcePath path, Map<String, String> metricsNameToResourceNames) {
-        RrdResourceAttributeUtils.updateDsProperties(toPath(path).toFile(), metricsNameToResourceNames);
+        RrdResourceAttributeUtils.updateDsProperties(toFile(path), metricsNameToResourceNames);
     }
 
     @Override
     public Map<String, String> getMetaData(ResourcePath path) {
-        return RrdMetaDataUtils.readMetaDataFile(getRrdDirectory(), ResourcePath.resourceToFilesystemPath(path).toString());
+        return RrdMetaDataUtils.readMetaDataFile(getRrdDirectory(), toRelativePath(path));
     }
 
     @Override
     public boolean delete(ResourcePath path) {
-        return FileUtils.deleteQuietly(toPath(path).toFile());
+        return FileUtils.deleteQuietly(toFile(path));
     }
 
     private boolean exists(Path root, int depth) {
@@ -180,8 +181,22 @@ public class FilesystemResourceStorageDao implements ResourceStorageDao, Initial
         }
     }
 
-    private Path toPath(final ResourcePath path) {
-        return m_rrdDirectory.getAbsoluteFile().toPath().resolve(ResourcePath.resourceToFilesystemPath(path));
+    private File toFile(ResourcePath path) {
+        return Paths.get(m_rrdDirectory.getAbsolutePath(), path.elements()).toFile();
+    }
+
+    private String toRelativePath(ResourcePath path) {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (final String el : path) {
+            if (!first) {
+                sb.append(File.separator);
+            } else {
+                first = false;
+            }
+            sb.append(el);
+        }
+        return sb.toString();
     }
 
     public void setRrdDirectory(File rrdDirectory) {

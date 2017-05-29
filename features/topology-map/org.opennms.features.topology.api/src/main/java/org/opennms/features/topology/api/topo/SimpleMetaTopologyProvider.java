@@ -30,10 +30,8 @@ package org.opennms.features.topology.api.topo;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.opennms.features.topology.api.support.breadcrumbs.BreadcrumbStrategy;
 
@@ -51,14 +49,6 @@ public class SimpleMetaTopologyProvider implements MetaTopologyProvider {
 
     public SimpleMetaTopologyProvider(GraphProvider graphProvider) {
         this.graphProvider = Objects.requireNonNull(graphProvider);
-    }
-
-    @Override
-    public String getId() {
-        return getGraphProviders().stream()
-                .sorted(Comparator.comparing(GraphProvider::getNamespace))
-                .map(g -> g.getNamespace())
-                .collect(Collectors.joining(":"));
     }
 
     @Override
@@ -80,7 +70,7 @@ public class SimpleMetaTopologyProvider implements MetaTopologyProvider {
     public GraphProvider getGraphProviderBy(String namespace) {
         return getGraphProviders()
                 .stream()
-                .filter(provider -> provider.getNamespace().equals(namespace))
+                .filter(provider -> provider.getVertexNamespace().equals(namespace))
                 .findFirst().orElse(null);
     }
 

@@ -37,6 +37,7 @@ import org.opennms.netmgt.collection.api.CollectionAttribute;
 import org.opennms.netmgt.collection.api.Persister;
 import org.opennms.netmgt.collection.support.AbstractCollectionAttributeType;
 import org.opennms.netmgt.config.datacollection.MibObject;
+import org.opennms.netmgt.model.ResourceTypeUtils;
 import org.opennms.netmgt.snmp.Collectable;
 import org.opennms.netmgt.snmp.CollectionTracker;
 import org.opennms.netmgt.snmp.SnmpInstId;
@@ -124,7 +125,7 @@ public abstract class SnmpAttributeType extends AbstractCollectionAttributeType 
      * @return a {@link org.opennms.netmgt.collectd.SnmpAttributeType} object.
      */
     public static SnmpAttributeType create(ResourceType resourceType, String collectionName, MibObject mibObj, AttributeGroupType groupType) {
-        if (NumericAttributeType.supportsType(mibObj.getType())) {
+        if (ResourceTypeUtils.isNumericType(mibObj.getType())) {
             return new NumericAttributeType(resourceType, collectionName, mibObj, groupType);
         }
         if (StringAttributeType.supportsType(mibObj.getType())) {
@@ -181,6 +182,19 @@ public abstract class SnmpAttributeType extends AbstractCollectionAttributeType 
      */
     public String getInstance() {
         return m_mibObj.getInstance();
+    }
+
+    /* (non-Javadoc)
+     * @see org.opennms.netmgt.collectd.AttributeDefinition#getType()
+     */
+    /**
+     * <p>getType</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
+    @Override
+    public String getType() {
+        return m_mibObj.getType();
     }
 
     SnmpObjId getSnmpObjId() {

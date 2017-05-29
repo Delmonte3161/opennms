@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.opennms</groupId>
     <artifactId>org.opennms.core</artifactId>
-    <version>20.0.0-SNAPSHOT</version>
+    <version>19.1.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opennms.core</groupId>
@@ -13,7 +13,6 @@
   <modules>
     <module>activemq</module>
     <module>camel</module>
-    <module>collection</module>
     <module>db</module>
     <module>dns</module>
     <module>http</module>

@@ -28,9 +28,13 @@
 
 package org.opennms.features.topology.plugins.topo.graphml;
 
+import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.xml.bind.JAXBException;
 
 import org.opennms.features.graphml.model.GraphMLGraph;
 import org.opennms.features.graphml.model.GraphMLNode;
@@ -78,18 +82,18 @@ public class GraphMLTopologyProvider extends AbstractTopologyProvider implements
         m_serviceAccessor = serviceAccessor;
 
         for (GraphMLNode graphMLNode : graph.getNodes()) {
-            GraphMLVertex newVertex = new GraphMLVertex(this.getNamespace(), graphMLNode);
+            GraphMLVertex newVertex = new GraphMLVertex(this.getVertexNamespace(), graphMLNode);
             setNodeIdForVertex(newVertex);
             addVertices(newVertex);
         }
         for (org.opennms.features.graphml.model.GraphMLEdge eachEdge : graph.getEdges()) {
-            GraphMLVertex sourceVertex = (GraphMLVertex) getVertex(getNamespace(), eachEdge.getSource().getId());
-            GraphMLVertex targetVertex = (GraphMLVertex) getVertex(getNamespace(), eachEdge.getTarget().getId());
+            GraphMLVertex sourceVertex = (GraphMLVertex) getVertex(getVertexNamespace(), eachEdge.getSource().getId());
+            GraphMLVertex targetVertex = (GraphMLVertex) getVertex(getVertexNamespace(), eachEdge.getTarget().getId());
             if (sourceVertex == null || targetVertex == null) {
                 // Skip edges where either the source of target vertices are outside of this graph
                 continue;
             }
-            GraphMLEdge newEdge = new GraphMLEdge(getNamespace(), eachEdge, sourceVertex, targetVertex);
+            GraphMLEdge newEdge = new GraphMLEdge(getEdgeNamespace(), eachEdge, sourceVertex, targetVertex);
             addEdges(newEdge);
         }
         setTopologyProviderInfo(createTopologyProviderInfo(graph));
@@ -117,6 +121,8 @@ public class GraphMLTopologyProvider extends AbstractTopologyProvider implements
                 } else {
                     LOG.warn("No node found for the given foreignSource ({}) and foreignId ({}).", foreignSource, foreignId);
                 }
+            } else {
+                LOG.warn("The given nodeId is null. In order to resolve the nodeId a foreignSource ({}) and foreignId ({}) must be set.", foreignSource, foreignId);
             }
         }
     }
@@ -148,8 +154,17 @@ public class GraphMLTopologyProvider extends AbstractTopologyProvider implements
 
     @Override
     public void refresh() {
-        // Refresh is handled by the MetaTopologyProvider as one GraphML file may represent
-        // multiple layers (GraphMLTopologyProviders)
+        // TODO: How to handle refresh()?
+    }
+
+    @Override
+    public void load(final String filename) throws MalformedURLException, JAXBException {
+        refresh();
+    }
+
+    @Override
+    public void save() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -166,7 +181,7 @@ public class GraphMLTopologyProvider extends AbstractTopologyProvider implements
     @Override
     public SelectionChangedListener.Selection getSelection(List<VertexRef> selectedVertices, ContentType contentType) {
         Set<Integer> nodeIds = selectedVertices.stream()
-                .filter(eachVertex -> eachVertex.getNamespace().equals(getNamespace()) && eachVertex instanceof GraphMLVertex)
+                .filter(eachVertex -> eachVertex.getNamespace().equals(getVertexNamespace()) && eachVertex instanceof GraphMLVertex)
                 .map(eachVertex -> (GraphMLVertex) eachVertex)
                 .filter(eachVertex -> eachVertex.getNodeID() != null)
                 .map(eachVertex -> eachVertex.getNodeID())

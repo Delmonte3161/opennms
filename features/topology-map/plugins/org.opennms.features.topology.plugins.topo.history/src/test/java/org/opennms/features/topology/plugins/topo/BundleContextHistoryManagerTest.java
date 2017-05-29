@@ -148,7 +148,7 @@ public class BundleContextHistoryManagerTest  {
         startingCriteria = new HashMap<>();
         this.capturedCriteria = new ArrayList<>();
         displayableVertices = new ArrayList<>();
-        selectedLayout = new DefaultLayout();
+        selectedLayout = new DefaultLayout(graphContainerMock);
 
         historyManager = new BundleContextHistoryManager(bundleContextMock, serviceLocatorMock);
         historyManager.onBind(new CircleLayoutOperation());

@@ -30,6 +30,8 @@ package org.opennms.netmgt.collection.api;
 
 import java.util.List;
 
+import org.opennms.netmgt.config.datacollection.Parameter;
+
 /**
  * PersistenceSelectorStrategy
  * 

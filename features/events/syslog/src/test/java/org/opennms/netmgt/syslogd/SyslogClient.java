@@ -36,8 +36,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 import org.opennms.core.utils.InetAddressUtils;
 import org.slf4j.Logger;
@@ -123,8 +121,8 @@ public class SyslogClient {
     // actually logged.
     // @exception SyslogException if there was a problem
     public void syslog(int priority, String msg) {
+        System.err.println("Sending message: " + msg);
         final DatagramPacket packet = getPacket(priority, msg);
-        System.err.println("Sending message: " + StandardCharsets.US_ASCII.decode(ByteBuffer.wrap(packet.getData())).toString());
         try {
             socket.send(packet);
         }

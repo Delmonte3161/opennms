@@ -34,6 +34,11 @@ import java.util.Collection;
 
 import org.junit.runners.Parameterized.Parameters;
 import org.opennms.core.test.xml.XmlTestNoCastor;
+import org.opennms.netmgt.config.syslogd.Match;
+import org.opennms.netmgt.config.syslogd.ProcessMatch;
+import org.opennms.netmgt.config.syslogd.SyslogdConfigurationGroup;
+import org.opennms.netmgt.config.syslogd.UeiList;
+import org.opennms.netmgt.config.syslogd.UeiMatch;
 
 public class SyslogdConfigurationGroupTest extends XmlTestNoCastor<SyslogdConfigurationGroup> {
 
@@ -55,15 +60,11 @@ public class SyslogdConfigurationGroupTest extends XmlTestNoCastor<SyslogdConfig
                 "            <uei>uei.opennms.org/vendor/openwrt/syslog/SystemStarting</uei>\n" + 
                 "        </ueiMatch>\n" +
                 "    </ueiList>\n" + 
-                "    <hideMessage/>\n" +
                 "</syslogd-configuration-group>"
             },
             {
                 new SyslogdConfigurationGroup(),
-                "<syslogd-configuration-group>\n" +
-                "  <ueiList/>\n" +
-                "  <hideMessage/>\n" +
-                "</syslogd-configuration-group>\n"
+                "<syslogd-configuration-group/>"
             }
         });
     }
@@ -71,10 +72,13 @@ public class SyslogdConfigurationGroupTest extends XmlTestNoCastor<SyslogdConfig
     private static SyslogdConfigurationGroup getConfigGroup() {
         SyslogdConfigurationGroup configGroup = new SyslogdConfigurationGroup();
 
+        UeiList ueiList = new UeiList();
+        configGroup.setUeiList(ueiList);
+
         UeiMatch ueiMatch = new UeiMatch();
         ueiMatch.addSeverity("Notice");
         ueiMatch.setUei("uei.opennms.org/vendor/openwrt/syslog/SystemStarting");
-        configGroup.addUeiMatch(ueiMatch);
+        ueiList.addUeiMatch(ueiMatch);
 
         ProcessMatch processMatch = new ProcessMatch();
         processMatch.setExpression("^ifup$");

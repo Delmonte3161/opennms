@@ -39,7 +39,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.opennms.features.topology.api.Graph;
 import org.opennms.features.topology.api.GraphContainer;
 import org.opennms.features.topology.api.Layout;
 import org.opennms.features.topology.api.Point;
@@ -98,8 +97,8 @@ public class LayoutManager {
         layoutDao.saveOrUpdate(layoutEntity);
     }
 
-    public LayoutEntity loadLayout(Graph graph) {
-        LayoutEntity layoutEntity = findBy(graph);
+    public LayoutEntity loadLayout(GraphContainer graphContainer) {
+        LayoutEntity layoutEntity = findBy(graphContainer);
         if (layoutEntity != null) {
             layoutEntity.setLastUsed(new Date());
             layoutDao.saveOrUpdate(layoutEntity);
@@ -107,8 +106,8 @@ public class LayoutManager {
         return layoutEntity;
     }
 
-    private LayoutEntity findBy(Graph graph) {
-        List<VertexRef> vertexRefs = toVertexRef(graph.getDisplayVertices());
+    private LayoutEntity findBy(GraphContainer graphContainer) {
+        List<VertexRef> vertexRefs = toVertexRef(graphContainer.getGraph().getDisplayVertices());
         String id = calculateHash(vertexRefs);
         return layoutDao.get(id);
     }
@@ -134,8 +133,8 @@ public class LayoutManager {
         return vertexRefEntity;
     }
 
-    public boolean isPersistedLayoutEqualToCurrentLayout(Graph graph) {
-        LayoutEntity layoutEntity = loadLayout(graph);
+    public boolean isPersistedLayoutEqualToCurrentLayout(GraphContainer graphContainer) {
+        LayoutEntity layoutEntity = loadLayout(graphContainer);
         if (layoutEntity != null) {
             // If we have a layout persisted, we verify if it is equal.
             final Map<VertexRef, Point> persistedLocations = layoutEntity.getVertexPositions()
@@ -150,7 +149,7 @@ public class LayoutManager {
 
             // The locations may contain elements currently not visible, we filter them
             final Map<VertexRef, Point> manualLocations = new HashMap<>();
-            graph.getLayout().getLocations().forEach((key, value) -> {
+            graphContainer.getGraph().getLayout().getLocations().forEach((key, value) -> {
                 if (persistedLocations.containsKey(key)) {
                     // layoutEntity stores int coordinates, but manualLocations are stored as double.
                     // Convert to int to make it comparable.

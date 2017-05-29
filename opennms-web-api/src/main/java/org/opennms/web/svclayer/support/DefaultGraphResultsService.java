@@ -46,7 +46,6 @@ import org.opennms.netmgt.events.api.EventProxy;
 import org.opennms.netmgt.events.api.EventProxyException;
 import org.opennms.netmgt.model.OnmsResource;
 import org.opennms.netmgt.model.PrefabGraph;
-import org.opennms.netmgt.model.ResourceId;
 import org.opennms.netmgt.model.ResourceTypeUtils;
 import org.opennms.netmgt.model.RrdGraphAttribute;
 import org.opennms.netmgt.model.events.EventBuilder;
@@ -91,7 +90,7 @@ public class DefaultGraphResultsService implements GraphResultsService, Initiali
     }
 
     @Override
-    public GraphResults findResults(ResourceId[] resourceIds, String[] reports, long start, long end, String relativeTime) {
+    public GraphResults findResults(String[] resourceIds, String[] reports, long start, long end, String relativeTime) {
         if (resourceIds == null) {
             throw new IllegalArgumentException("resourceIds argument cannot be null");
         }
@@ -109,23 +108,30 @@ public class DefaultGraphResultsService implements GraphResultsService, Initiali
         graphResults.setRelativeTimePeriods(m_periods);
         graphResults.setReports(reports);
 
-        HashMap<ResourceId, List<OnmsResource>> resourcesMap = new HashMap<>();
+        HashMap<String, List<OnmsResource>> resourcesMap = new HashMap<String, List<OnmsResource>>();
 
-        for (ResourceId resourceId : resourceIds) {
-            LOG.debug("findResults: parent, childType, childName = {}, {}, {}", resourceId.parent, resourceId.type, resourceId.name);
+        for (String resourceId : resourceIds) {
+            String[] values = parseResourceId(resourceId);
+            if (values == null) {
+                continue;
+            }
+            String parent = values[0];
+            String childType = values[1];
+            String childName = values[2];
+            LOG.debug("findResults: parent, childType, childName = {}, {}, {}", values[0], values[1], values[2]);
             OnmsResource resource = null;
-            if (!resourcesMap.containsKey(resourceId.parent)) {
+            if (!resourcesMap.containsKey(parent)) {
                 List<OnmsResource> resourceList = m_resourceDao.getResourceById(resourceId).getChildResources();
                 if (resourceList == null) {
-                    LOG.warn("findResults: zero child resources found for {}", resourceId.parent);
+                    LOG.warn("findResults: zero child resources found for {}", parent);
                 } else {
-                    resourcesMap.put(resourceId.parent, resourceList);
-                    LOG.debug("findResults: add resourceList to map for {}", resourceId.parent);
+                    resourcesMap.put(parent, resourceList);
+                    LOG.debug("findResults: add resourceList to map for {}", parent);
                 }
             }
-            for (OnmsResource r : resourcesMap.get(resourceId.parent)) {
-                if (resourceId.type.equals(r.getResourceType().getName())
-                        && resourceId.name.equals(r.getName())) {
+            for (OnmsResource r : resourcesMap.get(parent)) {
+                if (childType.equals(r.getResourceType().getName())
+                        && childName.equals(r.getName())) {
                     resource = r;
                     LOG.debug("findResults: found resource in map{}", r.toString());
                     break;
@@ -147,9 +153,29 @@ public class DefaultGraphResultsService implements GraphResultsService, Initiali
     }
 
     @Override
-    public PrefabGraph[] getAllPrefabGraphs(ResourceId resourceId) {
+    public PrefabGraph[] getAllPrefabGraphs(String resourceId) {
         OnmsResource resource = m_resourceDao.getResourceById(resourceId);
         return m_graphDao.getPrefabGraphsForResource(resource);
+    }
+
+    /**
+     * <p>parseResourceId</p>
+     *
+     * @param resourceId a {@link java.lang.String} resource ID
+     * @return an array of {@link java.lang.String} objects or null if the
+     * string is unparsable.
+     */
+    public static String[] parseResourceId(String resourceId) {
+        try {
+            String parent = resourceId.substring(0, resourceId.indexOf(']') + 1);
+            String child = resourceId.substring(resourceId.indexOf(']') + 2);
+            String childType = child.substring(0, child.indexOf('['));
+            String childName = child.substring(child.indexOf('[') + 1, child.indexOf(']'));
+            return new String[]{parent, childType, childName};
+        } catch (Throwable e) {
+            LOG.warn("Illegally formatted resourceId found in DefaultGraphResultsService: {}", resourceId, e);
+            return null;
+        }
     }
 
     /**
@@ -162,7 +188,7 @@ public class DefaultGraphResultsService implements GraphResultsService, Initiali
      * @return a {@link org.opennms.web.svclayer.model.GraphResults.GraphResultSet}
      * object.
      */
-    private GraphResultSet createGraphResultSet(ResourceId resourceId, OnmsResource resource, String[] reports, GraphResults graphResults) throws IllegalArgumentException {
+    private GraphResultSet createGraphResultSet(String resourceId, OnmsResource resource, String[] reports, GraphResults graphResults) throws IllegalArgumentException {
         if (resource == null) {
             resource = m_resourceDao.getResourceById(resourceId);
             if (resource == null) {

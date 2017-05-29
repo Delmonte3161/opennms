@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.opennms</groupId>
     <artifactId>opennms-integrations</artifactId>
-    <version>20.0.0-SNAPSHOT</version>
+    <version>19.1.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>opennms-vtdxml-collector-handler</artifactId>
@@ -51,11 +51,6 @@
     </dependency>
     <dependency>
       <groupId>org.opennms.core.test-api</groupId>
-      <artifactId>org.opennms.core.test-api.collection</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opennms.core.test-api</groupId>
       <artifactId>org.opennms.core.test-api.http</artifactId>
       <scope>test</scope>
     </dependency>
@@ -73,13 +68,6 @@
     <dependency>
       <groupId>org.opennms</groupId>
       <artifactId>opennms-rrdtool-api</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opennms.protocols</groupId>
-      <artifactId>org.opennms.protocols.xml</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
   </dependencies>

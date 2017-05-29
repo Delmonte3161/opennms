@@ -51,7 +51,6 @@ import org.opennms.netmgt.dao.api.ResourceDao;
 import org.opennms.netmgt.model.OnmsNode;
 import org.opennms.netmgt.model.OnmsResource;
 import org.opennms.netmgt.model.PrefabGraph;
-import org.opennms.netmgt.model.ResourceId;
 import org.opennms.netmgt.model.resource.ResourceDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.ObjectRetrievalFailureException;
@@ -110,7 +109,7 @@ public class GraphRestService extends OnmsRestService {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
     @Transactional(readOnly=true)
     public GraphNameCollection getGraphNamesForResource(@PathParam("resourceId") final String resourceId) {
-        OnmsResource resource = m_resourceDao.getResourceById(ResourceId.fromString(resourceId));
+        OnmsResource resource = m_resourceDao.getResourceById(resourceId);
         if (resource == null) {
             throw getException(Status.NOT_FOUND, "No resource with id '{}' found.", resourceId);
         }

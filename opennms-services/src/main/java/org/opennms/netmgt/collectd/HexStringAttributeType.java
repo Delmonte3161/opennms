@@ -29,7 +29,6 @@
 package org.opennms.netmgt.collectd;
 
 import org.opennms.netmgt.collection.api.AttributeGroupType;
-import org.opennms.netmgt.collection.api.AttributeType;
 import org.opennms.netmgt.collection.api.CollectionAttribute;
 import org.opennms.netmgt.collection.api.Persister;
 import org.opennms.netmgt.config.datacollection.MibObject;
@@ -60,11 +59,6 @@ public class HexStringAttributeType extends SnmpAttributeType {
      */
     public HexStringAttributeType(ResourceType resourceType, String collectionName, MibObject mibObj, AttributeGroupType groupType) {
         super(resourceType, collectionName, mibObj, groupType);
-    }
-
-    @Override
-    public AttributeType getType() {
-        return AttributeType.STRING;
     }
 
     @Override

@@ -430,7 +430,7 @@ public class RrdDashletConfigurationWindow extends DashletConfigurationWindow {
 
     private void setRrdGraphEntryFromKscReportGraph(RrdGraphEntry rrdGraphEntry, Graph graph) {
 
-        String graphLabel, graphId, graphUrl, nodeId, nodeLabel, resourceLabel, resourceTypeId, resourceTypeLabel;
+        String graphLabel, graphId, graphUrl, nodeId, nodeLabel, resourceId, resourceLabel, resourceTypeId, resourceTypeLabel;
 
         String[] graphTypeArr = graph.getGraphtype().split("\\.");
         String[] resourceIdArr = graph.getResourceId().orElse("").split("\\.");
@@ -453,13 +453,20 @@ public class RrdDashletConfigurationWindow extends DashletConfigurationWindow {
 
                 for (OnmsResource onmsResource : onmsResourceList) {
 
-                    String onmsResourceId = onmsResource.getId().toString();
+                    String onmsResourceId = null;
+
+                    try {
+                        onmsResourceId = URLDecoder.decode(onmsResource.getId(), StandardCharsets.UTF_8.name());
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
 
                     if (onmsResourceId.equals(graph.getResourceId())) {
+                        resourceId = onmsResourceId;
                         resourceLabel = onmsResource.getLabel();
 
-                        Map<String, String> resultsMap = m_rrdGraphHelper.getGraphResultsForResourceId(onmsResource.getId());
-                        Map<String, String> nameTitleMapping = m_rrdGraphHelper.getGraphNameTitleMappingForResourceId(onmsResource.getId());
+                        Map<String, String> resultsMap = m_rrdGraphHelper.getGraphResultsForResourceId(resourceId);
+                        Map<String, String> nameTitleMapping = m_rrdGraphHelper.getGraphNameTitleMappingForResourceId(resourceId);
 
                         graphId = onmsResourceId + "." + nameTitleMapping.get(graph.getGraphtype());
 
@@ -470,7 +477,7 @@ public class RrdDashletConfigurationWindow extends DashletConfigurationWindow {
                         rrdGraphEntry.setNodeLabel(nodeLabel);
                         rrdGraphEntry.setResourceTypeId(resourceTypeId);
                         rrdGraphEntry.setResourceTypeLabel(resourceTypeLabel);
-                        rrdGraphEntry.setResourceId(onmsResourceId);
+                        rrdGraphEntry.setResourceId(resourceId);
                         rrdGraphEntry.setResourceLabel(resourceLabel);
                         rrdGraphEntry.setGraphId(graphId);
                         rrdGraphEntry.setGraphLabel(graphLabel);

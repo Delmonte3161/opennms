@@ -28,7 +28,6 @@
 
 package org.opennms.netmgt.poller;
 
-import org.opennms.netmgt.collection.api.AttributeType;
 import org.opennms.netmgt.collection.api.CollectionAttribute;
 import org.opennms.netmgt.collection.api.CollectionResource;
 import org.opennms.netmgt.collection.api.CollectionSetVisitor;
@@ -121,11 +120,11 @@ public class LatencyCollectionAttribute implements CollectionAttribute {
     /**
      * <p>getType</p>
      *
-     * @return a {@link AttributeType} object.
+     * @return a {@link java.lang.String} object.
      */
     @Override
-    public AttributeType getType() {
-        return AttributeType.GAUGE;
+    public String getType() {
+        return "gauge";
     }
 
     /** {@inheritDoc} */

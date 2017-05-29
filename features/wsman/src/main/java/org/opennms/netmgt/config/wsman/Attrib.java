@@ -36,8 +36,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.opennms.netmgt.collection.api.AttributeType;
-
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "attrib")
@@ -48,7 +46,7 @@ public class Attrib {
     @XmlAttribute(name = "alias", required = true)
     protected String alias;
     @XmlAttribute(name = "type", required = true)
-    protected AttributeType type;
+    protected String type;
     @XmlAttribute(name = "index-of")
     protected String indexOf;
     @XmlAttribute(name = "filter")
@@ -102,12 +100,28 @@ public class Attrib {
         this.alias = value;
     }
 
-    public AttributeType getType() {
+    /**
+     * Gets the value of the type property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getType() {
         return type;
     }
 
-    public void setType(AttributeType type) {
-        this.type = type;
+    /**
+     * Sets the value of the type property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setType(String value) {
+        this.type = value;
     }
 
     public String getIndexOf() {

@@ -95,11 +95,7 @@ public class KafkaMessageConsumerManager extends AbstractMessageConsumerManager 
                 while (!closed.get()) {
                     ConsumerRecords<String, String> records = consumer.poll(100);
                     for (ConsumerRecord<String, String> record : records) {
-                        try {
-                            dispatch(module, module.unmarshal(record.value()));
-                        } catch (RuntimeException e) {
-                            LOG.warn("Unexpected exception while dispatching message", e);
-                        }
+                        dispatch(module, module.unmarshal(record.value()));
                     }
                 }
             } catch (WakeupException e) {
@@ -120,7 +116,7 @@ public class KafkaMessageConsumerManager extends AbstractMessageConsumerManager 
     }
 
     @Override
-    protected void startConsumingForModule(SinkModule<?, Message> module) throws Exception {
+    public void startConsumingForModule(SinkModule<?, Message> module) throws Exception {
         if (!consumerRunnersByModule.containsKey(module)) {
             LOG.info("Starting consumers for module: {}", module);
 
@@ -137,7 +133,7 @@ public class KafkaMessageConsumerManager extends AbstractMessageConsumerManager 
     }
 
     @Override
-    protected void stopConsumingForModule(SinkModule<?, Message> module) throws Exception {
+    public void stopConsumingForModule(SinkModule<?, Message> module) throws Exception {
         if (consumerRunnersByModule.containsKey(module)) {
             LOG.info("Stopping consumers for module: {}", module);
             final List<KafkaConsumerRunner> consumerRunners = consumerRunnersByModule.get(module);

@@ -28,6 +28,7 @@
 
 package org.opennms.features.topology.api.support;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,6 +42,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import javax.xml.bind.JAXBException;
+
 import org.opennms.features.topology.api.GraphContainer;
 import org.opennms.features.topology.api.browsers.ContentType;
 import org.opennms.features.topology.api.browsers.SelectionAware;
@@ -53,8 +56,8 @@ import org.opennms.features.topology.api.topo.Edge;
 import org.opennms.features.topology.api.topo.EdgeListener;
 import org.opennms.features.topology.api.topo.EdgeRef;
 import org.opennms.features.topology.api.topo.GraphProvider;
-import org.opennms.features.topology.api.topo.RefComparator;
 import org.opennms.features.topology.api.topo.TopologyProviderInfo;
+import org.opennms.features.topology.api.topo.RefComparator;
 import org.opennms.features.topology.api.topo.Vertex;
 import org.opennms.features.topology.api.topo.VertexListener;
 import org.opennms.features.topology.api.topo.VertexRef;
@@ -274,13 +277,23 @@ public class VertexHopGraphProvider implements GraphProvider, SelectionAware {
     }
 
     @Override
+    public void save() {
+        m_delegate.save();
+    }
+
+    @Override
+    public void load(String filename) throws MalformedURLException, JAXBException {
+        m_delegate.load(filename);
+    }
+
+    @Override
     public void refresh() {
         m_delegate.refresh();
     }
 
     @Override
-    public String getNamespace() {
-        return m_delegate.getNamespace();
+    public String getVertexNamespace() {
+        return m_delegate.getVertexNamespace();
     }
 
     @Override
@@ -291,7 +304,7 @@ public class VertexHopGraphProvider implements GraphProvider, SelectionAware {
     @Deprecated
     @Override
     public boolean containsVertexId(String id) {
-        return containsVertexId(new DefaultVertexRef(getNamespace(), id));
+        return containsVertexId(new DefaultVertexRef(getVertexNamespace(), id));
     }
 
     @Override
@@ -612,8 +625,8 @@ public class VertexHopGraphProvider implements GraphProvider, SelectionAware {
     }
 
     @Override
-    public int getEdgeTotalCount() {
-        return m_delegate.getEdgeTotalCount();
+    public String getEdgeNamespace() {
+        return m_delegate.getEdgeNamespace();
     }
 
     @Override
@@ -671,6 +684,11 @@ public class VertexHopGraphProvider implements GraphProvider, SelectionAware {
     @Override
     public Vertex addVertex(int x, int y) {
         return m_delegate.addVertex(x, y);
+    }
+
+    @Override
+    public boolean groupingSupported() {
+        return false;
     }
 
     @Override

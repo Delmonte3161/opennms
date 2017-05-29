@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 
 import org.opennms.netmgt.collection.api.AttributeGroup;
 import org.opennms.netmgt.collection.api.AttributeGroupType;
-import org.opennms.netmgt.collection.api.AttributeType;
 import org.opennms.netmgt.collection.api.CollectionAgent;
 import org.opennms.netmgt.collection.api.CollectionAttribute;
 import org.opennms.netmgt.collection.api.CollectionResource;
@@ -180,7 +179,7 @@ public abstract class SnmpCollectionResource implements CollectionResource {
     public List<CollectionAttribute> getStringAttributes() {
         return m_groups.values().stream()
         .flatMap(g -> g.getAttributes().stream())
-        .filter(a -> a.getAttributeType() instanceof NumericCollectionAttributeType == false || AttributeType.STRING.equals(a.getAttributeType().getType()))
+        .filter(a -> a.getAttributeType() instanceof NumericCollectionAttributeType == false || a.getAttributeType().getType().equalsIgnoreCase("string"))
         .collect(Collectors.toList());
     }
 

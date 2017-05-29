@@ -29,7 +29,6 @@
 package org.opennms.netmgt.collection.api;
 
 import org.opennms.netmgt.collection.support.DefaultTimeKeeper;
-import org.opennms.netmgt.model.ResourcePath;
 
 /**
  * <p>CollectionResource interface.</p>
@@ -65,7 +64,7 @@ public interface CollectionResource extends ResourceIdentifier, CollectionVisita
      * 
      * @return a {@link java.lang.String} object.
      */
-    ResourcePath getParent();
+    String getParent();
     
     /**
      * Returns the name of the instance this {@link CollectionResource} represents. For node level resources, this will be null

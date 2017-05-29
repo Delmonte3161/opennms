@@ -115,13 +115,9 @@ public class JdbcAgentState {
         if(m_useDataSourceName) {
             throw new JdbcCollectorException("Attempt to retrieve a JDBC Connection when the collector should be using the DataSourceFactory!");
         }
-
+        
         try {
-            final Connection con = m_driver.connect(m_dbUrl, m_dbProps);
-            if (con == null) {
-                throw new SQLException("Driver returned null!");
-            }
-            return con;
+            return m_driver.connect(m_dbUrl, m_dbProps);
         } catch(SQLException e) {
             throw new JdbcCollectorException("Unable to connect to JDBC URL: '" + m_dbUrl +"'", e);
         }

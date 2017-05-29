@@ -37,7 +37,6 @@ import org.opennms.netmgt.model.OnmsLocationMonitor;
 import org.opennms.netmgt.model.OnmsNode;
 import org.opennms.netmgt.model.OnmsResource;
 import org.opennms.netmgt.model.OnmsResourceType;
-import org.opennms.netmgt.model.ResourceId;
 
 public class MockResourceDao implements ResourceDao {
 
@@ -47,7 +46,7 @@ public class MockResourceDao implements ResourceDao {
     }
 
     @Override
-    public OnmsResource getResourceById(ResourceId id) {
+    public OnmsResource getResourceById(String id) {
         throw new UnsupportedOperationException("Not yet implemented!");
     }
 
@@ -67,7 +66,7 @@ public class MockResourceDao implements ResourceDao {
     }
 
     @Override
-    public boolean deleteResourceById(final ResourceId resourceId) {
+    public boolean deleteResourceById(final String resourceId) {
         throw new UnsupportedOperationException("Not yet implemented!");
     }
 }

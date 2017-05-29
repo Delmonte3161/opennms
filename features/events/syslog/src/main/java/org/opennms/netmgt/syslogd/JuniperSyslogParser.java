@@ -28,7 +28,6 @@
 
 package org.opennms.netmgt.syslogd;
 
-import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,7 +42,7 @@ public class JuniperSyslogParser extends SyslogParser {
     //                                                                PRI         TIMESTAMP                                          HOST      PROCESS/ID          MESSAGE
     private static final Pattern m_juniperPattern = Pattern.compile("^<(\\d+)>\\s*(\\S\\S\\S\\s+\\d{1,2}\\s+\\d\\d:\\d\\d:\\d\\d)\\s+(\\S+)\\s+(\\S+)\\[(\\d+)\\]: (.*?)$", Pattern.MULTILINE);
 
-    public JuniperSyslogParser(final SyslogdConfig config, final ByteBuffer text) {
+    public JuniperSyslogParser(final SyslogdConfig config, final String text) {
         super(config, text);
     }
 
@@ -53,7 +52,7 @@ public class JuniperSyslogParser extends SyslogParser {
     }
     
     @Override
-    protected SyslogMessage parse() throws SyslogParserException {
+    public SyslogMessage parse() throws SyslogParserException {
         if (!this.find()) {
             if (traceEnabled()) {
                 LOG.trace("'{}' did not match '{}', falling back to the custom parser", m_juniperPattern, getText());
@@ -80,7 +79,12 @@ public class JuniperSyslogParser extends SyslogParser {
 
         message.setHostName(matcher.group(3));
         message.setProcessName(matcher.group(4));
-        message.setProcessId(matcher.group(5));
+        try {
+            final Integer pid = Integer.parseInt(matcher.group(5));
+            message.setProcessId(pid);
+        } catch (final NumberFormatException nfe) {
+            LOG.debug("Unable to parse '{}' as a process ID.", matcher.group(5), nfe);
+        }
         message.setMessage(matcher.group(6).trim());
 
         return message;

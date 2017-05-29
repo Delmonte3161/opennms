@@ -1,8 +1,8 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2013-2017 The OpenNMS Group, Inc.
- * OpenNMS(R) is Copyright (C) 1999-2017 The OpenNMS Group, Inc.
+ * Copyright (C) 2013-2014 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2014 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
  *
@@ -38,37 +38,34 @@
 
 package org.opennms.netmgt.collectd;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.opennms.core.spring.BeanUtils;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.core.utils.ParameterMap;
-import org.opennms.netmgt.collection.api.AbstractRemoteServiceCollector;
-import org.opennms.netmgt.collection.api.AttributeType;
+import org.opennms.netmgt.collectd.vmware.cim.VmwareCimCollectionAttributeType;
+import org.opennms.netmgt.collectd.vmware.cim.VmwareCimCollectionResource;
+import org.opennms.netmgt.collectd.vmware.cim.VmwareCimCollectionSet;
+import org.opennms.netmgt.collectd.vmware.cim.VmwareCimMultiInstanceCollectionResource;
+import org.opennms.netmgt.collection.api.AttributeGroupType;
 import org.opennms.netmgt.collection.api.CollectionAgent;
 import org.opennms.netmgt.collection.api.CollectionException;
 import org.opennms.netmgt.collection.api.CollectionInitializationException;
 import org.opennms.netmgt.collection.api.CollectionSet;
-import org.opennms.netmgt.collection.api.CollectionStatus;
-import org.opennms.netmgt.collection.support.builder.CollectionSetBuilder;
-import org.opennms.netmgt.collection.support.builder.DeferredGenericTypeResource;
-import org.opennms.netmgt.collection.support.builder.NodeLevelResource;
-import org.opennms.netmgt.collection.support.builder.Resource;
-import org.opennms.netmgt.config.vmware.VmwareServer;
+import org.opennms.netmgt.collection.api.ServiceCollector;
 import org.opennms.netmgt.config.vmware.cim.Attrib;
 import org.opennms.netmgt.config.vmware.cim.VmwareCimCollection;
 import org.opennms.netmgt.config.vmware.cim.VmwareCimGroup;
 import org.opennms.netmgt.dao.VmwareCimDatacollectionConfigDao;
-import org.opennms.netmgt.dao.VmwareConfigDao;
 import org.opennms.netmgt.dao.api.NodeDao;
+import org.opennms.netmgt.events.api.EventProxy;
 import org.opennms.netmgt.model.OnmsNode;
 import org.opennms.netmgt.rrd.RrdRepository;
 import org.opennms.protocols.vmware.VmwareViJavaAccess;
@@ -76,12 +73,11 @@ import org.sblim.wbem.cim.CIMObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
 import com.vmware.vim25.HostRuntimeInfo;
 import com.vmware.vim25.HostSystemPowerState;
 import com.vmware.vim25.mo.HostSystem;
 
-public class VmwareCimCollector extends AbstractRemoteServiceCollector {
+public class VmwareCimCollector implements ServiceCollector {
 
     /**
      * Interface for defining methods for value modifications
@@ -178,17 +174,17 @@ public class VmwareCimCollector extends AbstractRemoteServiceCollector {
     /**
      * logging for VMware CIM data collection
      */
-    private static final Logger logger = LoggerFactory.getLogger(VmwareCimCollector.class);
+    private final Logger logger = LoggerFactory.getLogger(VmwareCimCollector.class);
 
-    private static final String VMWARE_COLLECTION_KEY = "vmwareCollection";
-    private static final String VMWARE_MGMT_SERVER_KEY = "vmwareManagementServer";
-    private static final String VMWARE_MGED_OBJECT_ID_KEY = "vmwareManagedObjectId";
-    private static final String VMWARE_SERVER_KEY = "vmwareServer";
+    /**
+     * the attribute groups
+     */
+    private Map<String, AttributeGroupType> m_groupTypeList = new HashMap<String, AttributeGroupType>();
 
-    private static final Map<String, Class<?>> TYPE_MAP = Collections.unmodifiableMap(Stream.of(
-            new SimpleEntry<>(VMWARE_COLLECTION_KEY, VmwareCimCollection.class),
-            new SimpleEntry<>(VMWARE_SERVER_KEY, VmwareServer.class))
-            .collect(Collectors.toMap((e) -> e.getKey(), (e) -> e.getValue())));
+    /**
+     * the attribute types
+     */
+    private Map<String, VmwareCimCollectionAttributeType> m_attribTypeList = new HashMap<String, VmwareCimCollectionAttributeType>();
 
     /**
      * the node dao object for retrieving assets
@@ -198,16 +194,7 @@ public class VmwareCimCollector extends AbstractRemoteServiceCollector {
     /**
      * the config dao
      */
-    private VmwareCimDatacollectionConfigDao m_vmwareCimDatacollectionConfigDao;
-
-    /**
-     * the config dao
-     */
-    private VmwareConfigDao m_vmwareConfigDao = null;
-
-    public VmwareCimCollector() {
-        super(TYPE_MAP);
-    }
+    VmwareCimDatacollectionConfigDao m_vmwareCimDatacollectionConfigDao;
 
     /**
      * SensorType mapping
@@ -337,7 +324,7 @@ public class VmwareCimCollector extends AbstractRemoteServiceCollector {
      *
      */
     @Override
-    public void initialize() throws CollectionInitializationException {
+    public void initialize(Map<String, String> parameters) throws CollectionInitializationException {
         if (m_nodeDao == null) {
             m_nodeDao = BeanUtils.getBean("daoContext", "nodeDao", NodeDao.class);
         }
@@ -354,93 +341,153 @@ public class VmwareCimCollector extends AbstractRemoteServiceCollector {
             logger.error("vmwareCimDatacollectionConfigDao should be a non-null value.");
         }
 
-        if (m_vmwareConfigDao == null) {
-            m_vmwareConfigDao = BeanUtils.getBean("daoContext", "vmwareConfigDao", VmwareConfigDao.class);
+        initializeRrdRepository();
+    }
+
+    /**
+     * Initializes the Rrd repository.
+     */
+    private void initializeRrdRepository() {
+        logger.debug("initializeRrdRepository: Initializing RRD repo from VmwareCimCollector...");
+        initializeRrdDirs();
+    }
+
+    /**
+     * Initializes the Rrd directories.
+     */
+    private void initializeRrdDirs() {
+        final File f = new File(m_vmwareCimDatacollectionConfigDao.getRrdPath());
+        if (!f.isDirectory() && !f.mkdirs()) {
+            throw new RuntimeException("Unable to create RRD file repository.  Path doesn't already exist and could not make directory: " + m_vmwareCimDatacollectionConfigDao.getRrdPath());
         }
     }
 
+    /**
+     * Initializes the attribute group list for a given collection name.
+     *
+     * @param collection the collection's name
+     */
+    private void loadAttributeGroupList(final VmwareCimCollection collection) {
+        for (final VmwareCimGroup vpm : collection.getVmwareCimGroup()) {
+            final AttributeGroupType attribGroupType1 = new AttributeGroupType(vpm.getName(), AttributeGroupType.IF_TYPE_ALL);
+            m_groupTypeList.put(vpm.getName(), attribGroupType1);
+        }
+    }
+
+    /**
+     * Initializes the attribute type list for a given collection name.
+     *
+     * @param collection the collection's name
+     */
+    private void loadAttributeTypeList(final VmwareCimCollection collection) {
+        for (final VmwareCimGroup vpm : collection.getVmwareCimGroup()) {
+            for (final Attrib attrib : vpm.getAttrib()) {
+                final AttributeGroupType attribGroupType = m_groupTypeList.get(vpm.getName());
+                final VmwareCimCollectionAttributeType attribType = new VmwareCimCollectionAttributeType(attrib, attribGroupType);
+                m_attribTypeList.put(attrib.getName(), attribType);
+            }
+        }
+    }
+
+    /**
+     * Initializes this instance for a given collection agent and a parameter map.
+     *
+     * @param agent      the collection agent
+     * @param parameters the parameter map
+     * @throws CollectionInitializationException
+     *
+     */
     @Override
-    public Map<String, Object> getRuntimeAttributes(CollectionAgent agent, Map<String, Object> parameters) {
-        final Map<String, Object> runtimeAttributes = new HashMap<>();
-        final OnmsNode onmsNode = m_nodeDao.get(agent.getNodeId());
-        if (onmsNode == null) {
-            throw new IllegalArgumentException(String.format("VmwareCollector: No node found with id: %d", agent.getNodeId()));
-        }
+    public void initialize(CollectionAgent agent, Map<String, Object> parameters) throws CollectionInitializationException {
+        OnmsNode onmsNode = m_nodeDao.get(agent.getNodeId());
 
-        // retrieve the assets
-        final String vmwareManagementServer = onmsNode.getAssetRecord().getVmwareManagementServer();
-        if (Strings.isNullOrEmpty(vmwareManagementServer)) {
-            throw new IllegalArgumentException(String.format("VmwareCollector: No management server is set on node with id %d.",  onmsNode.getId()));
-        }
-        runtimeAttributes.put(VMWARE_MGMT_SERVER_KEY, vmwareManagementServer);
+        // retrieve the assets and
+        String vmwareManagementServer = onmsNode.getAssetRecord().getVmwareManagementServer();
+        String vmwareManagedEntityType = onmsNode.getAssetRecord().getVmwareManagedEntityType();
+        String vmwareManagedObjectId = onmsNode.getForeignId();
 
-        final String vmwareManagedObjectId = onmsNode.getForeignId();
-        if (Strings.isNullOrEmpty(vmwareManagedObjectId)) {
-            throw new IllegalArgumentException(String.format("VmwareCollector: No foreign id is set on node with id %d.",  onmsNode.getId()));
-        }
-        runtimeAttributes.put(VMWARE_MGED_OBJECT_ID_KEY, vmwareManagedObjectId);
+        parameters.put("vmwareManagementServer", vmwareManagementServer);
+        parameters.put("vmwareManagedEntityType", vmwareManagedEntityType);
+        parameters.put("vmwareManagedObjectId", vmwareManagedObjectId);
+    }
 
-        // retrieve the collection
-        final String collectionName = ParameterMap.getKeyedString(parameters, "collection", ParameterMap.getKeyedString(parameters, "vmware-collection", null));
-        final VmwareCimCollection collection = m_vmwareCimDatacollectionConfigDao.getVmwareCimCollection(collectionName);
-        if (collection == null) {
-            throw new IllegalArgumentException(String.format("VmwareCollector: No collection found with name '%s'.",  collectionName));
-        }
-        runtimeAttributes.put(VMWARE_COLLECTION_KEY, collection);
+    /**
+     * This method is used for cleanup.
+     */
+    @Override
+    public void release() {
+    }
 
-        // retrieve the server configuration
-        final Map<String, VmwareServer> serverMap = m_vmwareConfigDao.getServerMap();
-        if (serverMap == null) {
-            throw new IllegalStateException(String.format("VmwareCollector: Error getting vmware-config.xml's server map."));
-        }
-        final VmwareServer vmwareServer = serverMap.get(vmwareManagementServer);
-        if (vmwareServer == null) {
-            throw new IllegalStateException(String.format("VmwareCollector: Error getting credentials for VMware management server: %s", vmwareManagementServer));
-        }
-        runtimeAttributes.put(VMWARE_SERVER_KEY, vmwareServer);
-        return runtimeAttributes;
+    /**
+     * This method is used for cleanup for a given collection agent.
+     *
+     * @param agent the collection agent
+     */
+    @Override
+    public void release(CollectionAgent agent) {
     }
 
     /**
      * This method collect the data for a given collection agent.
      *
      * @param agent      the collection agent
+     * @param eproxy     the event proxy
      * @param parameters the parameters map
      * @return the generated collection set
      * @throws CollectionException
      */
     @Override
-    public CollectionSet collect(CollectionAgent agent, Map<String, Object> parameters) throws CollectionException {
-        final VmwareCimCollection collection = (VmwareCimCollection) parameters.get(VMWARE_COLLECTION_KEY);
-        final String vmwareManagementServer = (String) parameters.get(VMWARE_MGMT_SERVER_KEY);
-        final String vmwareManagedObjectId = (String) parameters.get(VMWARE_MGED_OBJECT_ID_KEY);
-        final VmwareServer vmwareServer = (VmwareServer) parameters.get(VMWARE_SERVER_KEY);
+    public CollectionSet collect(CollectionAgent agent, EventProxy eproxy, Map<String, Object> parameters) throws CollectionException {
+        String collectionName = ParameterMap.getKeyedString(parameters, "collection", ParameterMap.getKeyedString(parameters, "vmware-collection", null));
 
-        CollectionSetBuilder builder = new CollectionSetBuilder(agent);
-        builder.withStatus(CollectionStatus.FAILED);
+        final VmwareCimCollection collection = m_vmwareCimDatacollectionConfigDao.getVmwareCimCollection(collectionName);
 
-        VmwareViJavaAccess vmwareViJavaAccess = new VmwareViJavaAccess(vmwareServer);
-        int timeout = ParameterMap.getKeyedInteger(parameters, "timeout", -1);
-        if (timeout > 0) {
-            if (!vmwareViJavaAccess.setTimeout(timeout)) {
-                logger.warn("Error setting connection timeout for VMware management server '{}'", vmwareManagementServer);
+        String vmwareManagementServer = (String) parameters.get("vmwareManagementServer");
+        String vmwareManagedObjectId = (String) parameters.get("vmwareManagedObjectId");
+
+        if (vmwareManagementServer == null || vmwareManagedObjectId == null) {
+            return null;
+        } else {
+            if ("".equals(vmwareManagementServer) || "".equals(vmwareManagedObjectId)) {
+                return null;
             }
         }
 
-        if (collection.getVmwareCimGroup().length < 1) {
-            logger.info("No groups to collect. Returning empty collection set.");
-            builder.withStatus(CollectionStatus.SUCCEEDED);
-            return builder.build();
+        // Load the attribute group types.
+        loadAttributeGroupList(collection);
+
+        // Load the attribute types.
+        loadAttributeTypeList(collection);
+
+        VmwareCimCollectionSet collectionSet = new VmwareCimCollectionSet();
+
+        collectionSet.setCollectionTimestamp(new Date());
+
+        collectionSet.setStatus(ServiceCollector.COLLECTION_FAILED);
+
+        VmwareViJavaAccess vmwareViJavaAccess = null;
+
+        try {
+            vmwareViJavaAccess = new VmwareViJavaAccess(vmwareManagementServer);
+            int timeout = ParameterMap.getKeyedInteger(parameters, "timeout", -1);
+            if (timeout > 0) {
+                if (!vmwareViJavaAccess.setTimeout(timeout)) {
+                    logger.warn("Error setting connection timeout for VMware management server '{}'", vmwareManagementServer);
+                }
+            }
+        } catch (IOException e) {
+            logger.warn("Error initialising VMware connection to '{}': '{}'", vmwareManagementServer, e.getMessage());
+            return collectionSet;
         }
 
         try {
             vmwareViJavaAccess.connect();
         } catch (MalformedURLException e) {
             logger.warn("Error connecting VMware management server '{}': '{}' exception: {} cause: '{}'", vmwareManagementServer, e.getMessage(), e.getClass().getName(), e.getCause());
-            return builder.build();
+            return collectionSet;
         } catch (RemoteException e) {
             logger.warn("Error connecting VMware management server '{}': '{}' exception: {} cause: '{}'", vmwareManagementServer, e.getMessage(), e.getClass().getName(), e.getCause());
-            return builder.build();
+            return collectionSet;
         }
 
         HostSystem hostSystem = vmwareViJavaAccess.getHostSystemByManagedObjectId(vmwareManagedObjectId);
@@ -479,7 +526,7 @@ public class VmwareCimCollector extends AbstractRemoteServiceCollector {
                         cimList = vmwareViJavaAccess.queryCimObjects(hostSystem, cimClass, InetAddressUtils.str(agent.getAddress()));
                     } catch (Exception e) {
                         logger.warn("Error retrieving CIM values from host system '{}'. Error message: '{}'", vmwareManagedObjectId, e.getMessage());
-                        return builder.build();
+                        return collectionSet;
                     } finally {
                         vmwareViJavaAccess.disconnect();
                     }
@@ -514,28 +561,33 @@ public class VmwareCimCollector extends AbstractRemoteServiceCollector {
                     }
 
                     if (addObject) {
-                        final String instance = vmwareViJavaAccess.getPropertyOfCimObject(cimObject, instanceAttribute);
-                        final NodeLevelResource nodeResource = new NodeLevelResource(agent.getNodeId());
-                        final Resource resource = new DeferredGenericTypeResource(nodeResource,vmwareCimGroup.getResourceType(), instance);
+                        String instance = vmwareViJavaAccess.getPropertyOfCimObject(cimObject, instanceAttribute);
+                        VmwareCimCollectionResource vmwareCollectionResource = new VmwareCimMultiInstanceCollectionResource(agent, instance, vmwareCimGroup.getResourceType());
+
                         for (Attrib attrib : vmwareCimGroup.getAttrib()) {
-                            final AttributeType type = attrib.getType();
+                            final VmwareCimCollectionAttributeType attribType = m_attribTypeList.get(attrib.getName());
+
                             String value = vmwareViJavaAccess.getPropertyOfCimObject(cimObject, attrib.getName());
+
                             if (valueModifiers.containsKey(attrib.getName())) {
                                 String modifiedValue = valueModifiers.get(attrib.getName()).modifyValue(attrib.getName(), value, cimObject, vmwareViJavaAccess);
                                 logger.debug("Applying value modifier for instance value " + attrib.getName() + "[" + instance + "]='" + value + "' => '" + modifiedValue + "' for node " + agent.getNodeId());
                                 value = modifiedValue;
                             }
-                            builder.withAttribute(resource, vmwareCimGroup.getName(), attrib.getAlias(), value, type);
+
+                            vmwareCollectionResource.setAttributeValue(attribType, value);
+                            logger.debug("Storing multi instance value " + attrib.getName() + "[" + instance + "]='" + value + "' for node " + agent.getNodeId());
                         }
+                        collectionSet.getCollectionResources().add(vmwareCollectionResource);
                     }
                 }
             }
-            builder.withStatus(CollectionStatus.SUCCEEDED);
+            collectionSet.setStatus(ServiceCollector.COLLECTION_SUCCEEDED);
         }
 
         vmwareViJavaAccess.disconnect();
 
-        return builder.build();
+        return collectionSet;
     }
 
     /**
@@ -557,5 +609,4 @@ public class VmwareCimCollector extends AbstractRemoteServiceCollector {
     public void setNodeDao(NodeDao nodeDao) {
         m_nodeDao = nodeDao;
     }
-
 }

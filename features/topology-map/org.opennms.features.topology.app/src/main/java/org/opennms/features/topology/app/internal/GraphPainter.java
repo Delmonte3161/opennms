@@ -38,7 +38,6 @@ import java.util.StringJoiner;
 
 import org.opennms.features.topology.api.Graph;
 import org.opennms.features.topology.api.GraphContainer;
-import org.opennms.features.topology.api.GraphVisitor;
 import org.opennms.features.topology.api.Layout;
 import org.opennms.features.topology.api.Point;
 import org.opennms.features.topology.api.SelectionManager;
@@ -46,7 +45,9 @@ import org.opennms.features.topology.api.support.VertexHopGraphProvider.VertexHo
 import org.opennms.features.topology.api.topo.Criteria;
 import org.opennms.features.topology.api.topo.Edge;
 import org.opennms.features.topology.api.topo.EdgeRef;
+import org.opennms.features.topology.api.topo.EdgeStatusProvider;
 import org.opennms.features.topology.api.topo.Status;
+import org.opennms.features.topology.api.topo.StatusProvider;
 import org.opennms.features.topology.api.topo.Vertex;
 import org.opennms.features.topology.api.topo.VertexRef;
 import org.opennms.features.topology.app.internal.gwt.client.SharedEdge;
@@ -59,13 +60,14 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 import com.vaadin.server.PaintException;
 
-public class GraphPainter implements GraphVisitor {
+public class GraphPainter extends BaseGraphVisitor {
 
     public static final int DEFAULT_EDGE_PATH_OFFSET = Integer.getInteger("org.opennms.features.topology.api.topo.defaultEdgePathOffset", 20);
 
 	private final GraphContainer m_graphContainer;
 	private final IconRepositoryManager m_iconRepoManager;
 	private final Layout m_layout;
+	private final StatusProvider m_statusProvider;
 	private final TopologyComponentState m_componentState;
     private final List<SharedVertex> m_vertices = new ArrayList<SharedVertex>();
     private final List<SharedEdge> m_edges = new ArrayList<SharedEdge>();
@@ -75,13 +77,18 @@ public class GraphPainter implements GraphVisitor {
     private Set<VertexRef> m_focusVertices = new HashSet<VertexRef>();
 
 
-    GraphPainter(GraphContainer graphContainer, Layout layout, IconRepositoryManager iconRepoManager, TopologyComponentState componentState) {
+    GraphPainter(GraphContainer graphContainer, Layout layout, IconRepositoryManager iconRepoManager, StatusProvider statusProvider, TopologyComponentState componentState) {
 		m_graphContainer = graphContainer;
 		m_layout = layout;
 		m_iconRepoManager = iconRepoManager;
+		m_statusProvider = statusProvider;
 		m_componentState = componentState;
 	}
 	
+	public StatusProvider getStatusProvider() {
+	    return m_statusProvider;
+	}
+
     @Override
     public void visitGraph(Graph graph) throws PaintException {
         m_focusVertices.clear();
@@ -92,10 +99,27 @@ public class GraphPainter implements GraphVisitor {
                 m_focusVertices.addAll(c.getVertices());
             }catch(ClassCastException e){}
         }
-        m_statusMap.clear();
-		m_statusMap.putAll(graph.getVertexStatus());
-		m_edgeStatusMap.clear();
-		m_edgeStatusMap.putAll(graph.getEdgeStatus());
+
+        if (m_statusProvider != null) {
+			if (m_statusProvider.contributesTo(m_graphContainer.getBaseTopology().getVertexNamespace())) {
+				Map<VertexRef, Status> newStatusMap = m_statusProvider.getStatusForVertices(m_graphContainer.getBaseTopology(), new ArrayList<>(graph.getDisplayVertices()), m_graphContainer.getCriteria());
+				if (newStatusMap != null) {
+					m_statusMap.clear();
+					m_statusMap.putAll(newStatusMap);
+				}
+			}
+        }
+
+        if(m_graphContainer.getEdgeStatusProvider() != null) {
+			EdgeStatusProvider edgeStatusProvider = m_graphContainer.getEdgeStatusProvider();
+			if (edgeStatusProvider.contributesTo(m_graphContainer.getBaseTopology().getEdgeNamespace())) {
+				Map<EdgeRef, Status> newStatusForEdges = edgeStatusProvider.getStatusForEdges(m_graphContainer.getBaseTopology(),
+						new ArrayList<>(graph.getDisplayEdges()),
+						m_graphContainer.getCriteria());
+				m_edgeStatusMap.clear();
+				m_edgeStatusMap.putAll(newStatusForEdges);
+            }
+        }
     }
 
     @Override
@@ -156,7 +180,7 @@ public class GraphPainter implements GraphVisitor {
 	 * @return True if links to other layers exists, false otherwise
      */
 	private boolean getTargets(Vertex vertex) {
-		return !m_graphContainer.getTopologyServiceClient().getOppositeVertices(vertex).isEmpty();
+		return !m_graphContainer.getMetaTopologyProvider().getOppositeVertices(vertex).isEmpty();
 	}
 
     private String getStatusCount(Vertex vertex) {
@@ -229,11 +253,11 @@ public class GraphPainter implements GraphVisitor {
 	}
 
 	private String getSourceKey(Edge edge) {
-		return m_graphContainer.getTopologyServiceClient().getVertex(edge.getSource().getVertex(), m_graphContainer.getCriteria()).getKey();
+		return m_graphContainer.getBaseTopology().getVertex(edge.getSource().getVertex(), m_graphContainer.getCriteria()).getKey();
 	}
 
 	private String getTargetKey(Edge edge) {
-		return m_graphContainer.getTopologyServiceClient().getVertex(edge.getTarget().getVertex(), m_graphContainer.getCriteria()).getKey();
+		return m_graphContainer.getBaseTopology().getVertex(edge.getTarget().getVertex(), m_graphContainer.getCriteria()).getKey();
 	}
 
 	/**

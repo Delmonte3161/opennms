@@ -28,6 +28,7 @@
 
 package org.opennms.netmgt.syslogd;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -121,6 +122,10 @@ public class SyslogdImplementationsIT implements InitializingBean {
         SyslogSinkConsumer consumer = new SyslogSinkConsumer(new MetricRegistry());
         consumer.setSyslogdConfig(m_config);
         consumer.setEventForwarder(m_eventIpcManager);
+        SyslogSinkConsumerTest.grookPatternList = new ArrayList<String>(SyslogSinkConsumerTest.setGrookPatternList(new File(
+                                                                                                                            this.getClass().getResource("/etc/syslogd-configuration.properties").getPath())));
+        consumer.setGrokPatternsList(SyslogSinkConsumerTest.grookPatternList);
+
         m_messageDispatcherFactory.setConsumer(consumer);
     }
 

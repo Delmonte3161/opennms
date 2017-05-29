@@ -49,10 +49,8 @@ import org.opennms.core.utils.ConfigFileConstants;
 import org.opennms.core.utils.InsufficientInformationException;
 import org.opennms.netmgt.collection.api.CollectionInitializationException;
 import org.opennms.netmgt.collection.api.CollectionInstrumentation;
-import org.opennms.netmgt.collection.api.LocationAwareCollectorClient;
-import org.opennms.netmgt.collection.api.PersisterFactory;
 import org.opennms.netmgt.collection.api.ServiceCollector;
-import org.opennms.netmgt.collection.api.ServiceCollectorRegistry;
+import org.opennms.netmgt.collection.api.PersisterFactory;
 import org.opennms.netmgt.config.CollectdConfigFactory;
 import org.opennms.netmgt.config.DataCollectionConfigFactory;
 import org.opennms.netmgt.config.SnmpEventInfo;
@@ -153,12 +151,6 @@ public class Collectd extends AbstractServiceDaemon implements
 
     @Autowired
     private volatile FilterDao m_filterDao;
-
-    @Autowired
-    private volatile ServiceCollectorRegistry m_serviceCollectorRegistry;
-
-    @Autowired
-    private volatile LocationAwareCollectorClient m_locationAwareCollectorClient;
 
     static class SchedulingCompletedFlag {
         volatile boolean m_schedulingCompleted = false;
@@ -601,7 +593,7 @@ public class Collectd extends AbstractServiceDaemon implements
 
             LOG.debug("getSpecificationsForInterface: address/service: {}/{} scheduled, interface does belong to package: {}", iface, svcName, wpkg.getName());
             
-            matchingPkgs.add(new CollectionSpecification(wpkg, svcName, getServiceCollector(svcName), instrumentation(), m_locationAwareCollectorClient));
+            matchingPkgs.add(new CollectionSpecification(wpkg, svcName, getServiceCollector(svcName), instrumentation()));
         }
         return matchingPkgs;
     }
@@ -1015,7 +1007,7 @@ public class Collectd extends AbstractServiceDaemon implements
                     LOG.debug("rebuildScheduler: Loading collector {}, classname {}", svcName, collector.getClassName());
                     Class<?> cc = Class.forName(collector.getClassName());
                     ServiceCollector sc = (ServiceCollector) cc.newInstance();
-                    sc.initialize();
+                    sc.initialize(Collections.<String, String>emptyMap());
                     setServiceCollector(svcName, sc);
                 } catch (Throwable t) {
                     LOG.warn("rebuildScheduler: Failed to load collector {} for service {}", collector.getClassName(), svcName, t);
@@ -1499,14 +1491,6 @@ public class Collectd extends AbstractServiceDaemon implements
         m_filterDao = dao;
     }
 
-    public void setServiceCollectorRegistry(ServiceCollectorRegistry serviceCollectorRegistry) {
-        m_serviceCollectorRegistry = serviceCollectorRegistry;
-    }
-
-    public void setLocationAwareCollectorClient(LocationAwareCollectorClient locationAwareCollectorClient) {
-        m_locationAwareCollectorClient = locationAwareCollectorClient;
-    }
-
     /**
      * <p>setTransactionTemplate</p>
      *
@@ -1575,12 +1559,11 @@ public class Collectd extends AbstractServiceDaemon implements
             String svcName = collector.getService();
             try {
                 LOG.debug("instantiateCollectors: Loading collector {}, classname {}", svcName, collector.getClassName());
-                final ServiceCollector sc = m_serviceCollectorRegistry.getCollectorByClassName(collector.getClassName());
-                if (sc == null) {
-                    throw new IllegalArgumentException(String.format("No collector found with class name '%s'. Available collectors include: %s",
-                            collector.getClassName(), m_serviceCollectorRegistry.getCollectorClassNames()));
-                }
-                sc.initialize();
+                Class<?> cc = Class.forName(collector.getClassName());
+                ServiceCollector sc = (ServiceCollector) cc.newInstance();
+
+                sc.initialize(Collections.<String, String>emptyMap());
+
                 setServiceCollector(svcName, sc);
             } catch (Throwable t) {
                 LOG.warn("instantiateCollectors: Failed to load collector {} for service {}", collector.getClassName(), svcName, t);

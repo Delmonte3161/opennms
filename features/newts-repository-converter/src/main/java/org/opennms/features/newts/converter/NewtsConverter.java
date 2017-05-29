@@ -680,8 +680,7 @@ public class NewtsConverter implements AutoCloseable {
                                                                 Path::toString));
 
         } else {
-            resourcePath = ResourcePath.get(Iterables.transform(relativeResourceDir,
-                                                                Path::toString));
+            resourcePath = ResourcePath.get(relativeResourceDir);
         }
         return resourcePath;
     }

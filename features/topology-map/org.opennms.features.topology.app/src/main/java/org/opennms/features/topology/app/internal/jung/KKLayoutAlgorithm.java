@@ -30,32 +30,34 @@ package org.opennms.features.topology.app.internal.jung;
 
 import java.util.Collection;
 
+import edu.uci.ics.jung.algorithms.layout.KKLayout;
+import edu.uci.ics.jung.graph.SparseGraph;
 import org.opennms.features.topology.api.Graph;
+import org.opennms.features.topology.api.GraphContainer;
 import org.opennms.features.topology.api.Layout;
 import org.opennms.features.topology.api.Point;
 import org.opennms.features.topology.api.topo.Edge;
 import org.opennms.features.topology.api.topo.Vertex;
 import org.opennms.features.topology.api.topo.VertexRef;
 
-import edu.uci.ics.jung.algorithms.layout.KKLayout;
-import edu.uci.ics.jung.graph.SparseGraph;
-
 public class KKLayoutAlgorithm extends AbstractLayoutAlgorithm {
 
 	@Override
-	public void updateLayout(final Graph graph) {
+	public void updateLayout(final GraphContainer graphContainer) {
 
-		final Layout graphLayout = graph.getLayout();
+		Graph g = graphContainer.getGraph();
+
+		final Layout graphLayout = g.getLayout();
 
 		SparseGraph<VertexRef, Edge> jungGraph = new SparseGraph<VertexRef, Edge>();
 
-		Collection<? extends Vertex> vertices = graph.getDisplayVertices();
+		Collection<? extends Vertex> vertices = g.getDisplayVertices();
 
 		for(Vertex v : vertices) {
 			jungGraph.addVertex(v);
 		}
 
-		Collection<? extends Edge> edges = graph.getDisplayEdges();
+		Collection<? extends Edge> edges = g.getDisplayEdges();
 
 		for(Edge e : edges) {
 			jungGraph.addEdge(e, e.getSource().getVertex(), e.getTarget().getVertex());
@@ -63,7 +65,7 @@ public class KKLayoutAlgorithm extends AbstractLayoutAlgorithm {
 
 		KKLayout<VertexRef, Edge> layout = new KKLayout<VertexRef, Edge>(jungGraph);
 		layout.setInitializer(initializer(graphLayout));
-		layout.setSize(selectLayoutSize(graph));
+		layout.setSize(selectLayoutSize(graphContainer));
 
 		while(!layout.done()) {
 			layout.step();

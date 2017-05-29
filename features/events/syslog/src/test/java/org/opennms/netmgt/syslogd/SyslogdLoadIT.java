@@ -31,6 +31,7 @@ package org.opennms.netmgt.syslogd;
 import static org.junit.Assert.assertEquals;
 import static org.opennms.core.utils.InetAddressUtils.addr;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.DatagramPacket;
@@ -139,6 +140,11 @@ public class SyslogdLoadIT implements InitializingBean {
         m_syslogSinkConsumer.setEventForwarder(m_eventIpcManager);
         m_syslogSinkModule = m_syslogSinkConsumer.getModule();
         m_messageDispatcherFactory.setConsumer(m_syslogSinkConsumer);
+        
+        SyslogSinkConsumerTest.grookPatternList = new ArrayList<String>(SyslogSinkConsumerTest.setGrookPatternList(new File(
+                                                                                                                            this.getClass().getResource("/etc/syslogd-configuration.properties").getPath())));
+        m_syslogSinkConsumer.setGrokPatternsList(SyslogSinkConsumerTest.grookPatternList);
+
     }
 
     @After
@@ -311,7 +317,7 @@ public class SyslogdLoadIT implements InitializingBean {
         InetAddress address = InetAddress.getLocalHost();
 
         // handle an invalid packet
-        byte[] bytes = "<34>1 2010-08-19T22:14:15.000Z localhost - - - - \uFEFFfoo0: load test 0 on tty1\0".getBytes();
+        byte[] bytes = "<34>1 2010-08-19T22:14:15.000Z localhost - - - - BOMfoo0: load test 0 on tty1\0".getBytes();
         DatagramPacket pkt = new DatagramPacket(bytes, bytes.length, address, SyslogClient.PORT);
         SyslogMessageLogDTO messageLog = m_syslogSinkModule.toMessageLog(new SyslogConnection(pkt, false));
         m_syslogSinkConsumer.handleMessage(messageLog);
@@ -324,7 +330,7 @@ public class SyslogdLoadIT implements InitializingBean {
 
         m_eventCounter.waitForFinish(120000);
         
-        assertEquals(1, m_eventCounter.getCount());
+        assertEquals(2, m_eventCounter.getCount());
     }
 
     @Test
@@ -352,7 +358,7 @@ public class SyslogdLoadIT implements InitializingBean {
 
         m_eventCounter.waitForFinish(120000);
         
-        assertEquals(1, m_eventCounter.getCount());
+        assertEquals(2, m_eventCounter.getCount());
     }
 
     @Test

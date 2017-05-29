@@ -43,7 +43,6 @@ import org.opennms.netmgt.collection.api.PersistOperationBuilder;
 import org.opennms.netmgt.collection.api.ResourceIdentifier;
 import org.opennms.netmgt.collection.api.TimeKeeper;
 import org.opennms.netmgt.collection.support.DefaultTimeKeeper;
-import org.opennms.netmgt.model.ResourcePath;
 import org.slf4j.LoggerFactory;
 
 public class TcpPersistOperationBuilder implements PersistOperationBuilder {
@@ -71,7 +70,7 @@ public class TcpPersistOperationBuilder implements PersistOperationBuilder {
 
     private File getResourceDir(ResourceIdentifier resource) throws FileNotFoundException {
         return new File(baseDir).toPath()
-                .resolve(ResourcePath.resourceToFilesystemPath(resource.getPath()))
+                .resolve(resource.getPath())
                 .toFile();
     }
 

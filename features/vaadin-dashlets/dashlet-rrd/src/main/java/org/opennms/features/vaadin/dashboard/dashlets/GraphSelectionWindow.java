@@ -37,7 +37,6 @@ import org.opennms.netmgt.dao.api.NodeDao;
 import org.opennms.netmgt.model.OnmsNode;
 import org.opennms.netmgt.model.OnmsResource;
 import org.opennms.netmgt.model.OnmsResourceType;
-import org.opennms.netmgt.model.ResourceId;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -166,7 +165,15 @@ public class GraphSelectionWindow extends Window {
 
                         for (OnmsResource onmsResource : resourceTypeMapEntry.getValue()) {
 
-                            String newResourceItemId = onmsResource.getId().toString();
+                            String newResourceItemId;
+
+                            try {
+                                newResourceItemId = URLDecoder.decode(onmsResource.getId(), StandardCharsets.UTF_8.name());
+                            } catch (UnsupportedEncodingException e) {
+                                // Should not happen
+                                e.printStackTrace();
+                                continue;
+                            }
 
                             Item newResourceItem = hierarchicalContainer.addItem(newResourceItemId);
 
@@ -189,10 +196,8 @@ public class GraphSelectionWindow extends Window {
                  * a resource is selected
                  */
                 if ("resource".equals(type)) {
-                    final ResourceId resourceId = ResourceId.fromString(itemToExpandId);
-
-                    Map<String, String> map = rrdGraphHelper.getGraphResultsForResourceId(resourceId);
-                    Map<String, String> titleNameMapping = rrdGraphHelper.getGraphTitleNameMappingForResourceId(resourceId);
+                    Map<String, String> map = rrdGraphHelper.getGraphResultsForResourceId(itemToExpandId);
+                    Map<String, String> titleNameMapping = rrdGraphHelper.getGraphTitleNameMappingForResourceId(itemToExpandId);
 
                     for (Map.Entry<String, String> entry : titleNameMapping.entrySet()) {
                         String newGraphItemId = itemToExpandId + "." + entry.getKey();
