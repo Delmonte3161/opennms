@@ -30,6 +30,7 @@ package org.opennms.smoketest.minion;
 import static com.jayway.awaitility.Awaitility.await;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertTrue;
 
 import java.net.InetSocketAddress;
 import java.util.Date;
@@ -67,7 +68,7 @@ public class SyslogKafkaElasticsearch2Test extends AbstractSyslogTest {
     @Test
     public void testMinionSyslogsOverKafkaToEsRest() throws Exception {
         Date startOfTest = new Date();
-        int numMessages = 100;
+        int numMessages = 10;
         int packetsPerSecond = 500;
 
         InetSocketAddress minionSshAddr = testEnvironment.getServiceAddress(ContainerAlias.MINION, 8201);
@@ -136,6 +137,20 @@ public class SyslogKafkaElasticsearch2Test extends AbstractSyslogTest {
         }
 
         // 100 warm-up messages plus ${numMessages} messages
-        pollForElasticsearchEventsUsingJest(esRestAddr,numMessages);
+        //pollForElasticsearchEventsUsingJest(esRestAddr,numMessages);
+        
+        int resendCount = 0;
+        while(pollForElasticsearchEventsUsingJestAndReturnValue(esRestAddr,numMessages) == 0){
+        	resendCount++;
+     	   LOG.info("Resending Packets:"+resendCount);
+     	   sendMessage(ContainerAlias.MINION, sender, chunk);
+     	   Thread.sleep(60000);
+      	   if(resendCount>30){
+      		   break;
+      	   }
+        }
+        
+        assertTrue(resendCount<30);
+        LOG.info("Completed Test");
     }
 }

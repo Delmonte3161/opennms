@@ -171,7 +171,8 @@ public class SyslogKafkaElasticsearch5OutageTest extends AbstractSyslogTest {
         int resendCount = 0;
         
         while(pollForElasticsearchEventsUsingJestAndReturnValue(getEs5Address(),numMessages) == 0){
-     	   LOG.info("#########Resending:"+resendCount++);
+           resendCount++;
+     	   LOG.info("Resending:"+resendCount);
      	   sendMessage(ContainerAlias.MINION, sender, chunk);
      	   Thread.sleep(60000);
 	     	   if(resendCount>30){

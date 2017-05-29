@@ -161,7 +161,8 @@ public class SyslogKafkaElasticsearch1Test extends AbstractSyslogTest {
         }
        int resendCount = 0;
        while(pollForElasticsearchEventsUsingJestAndReturnValue(esRestAddr,numMessages) == 0){
-    	   LOG.info("Resending Packets:"+resendCount++);
+    	   resendCount++;
+    	   LOG.info("Resending Packets:"+resendCount);
     	   sendMessage(ContainerAlias.MINION, sender, chunk);
     	   Thread.sleep(60000);
      	   if(resendCount>30){

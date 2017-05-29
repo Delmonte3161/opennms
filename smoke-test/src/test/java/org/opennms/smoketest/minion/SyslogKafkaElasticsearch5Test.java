@@ -30,6 +30,7 @@ package org.opennms.smoketest.minion;
 import static com.jayway.awaitility.Awaitility.await;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertTrue;
 
 import java.net.InetSocketAddress;
 import java.util.Date;
@@ -67,7 +68,7 @@ public class SyslogKafkaElasticsearch5Test extends AbstractSyslogTest {
     @Test
     public void testMinionSyslogsOverKafkaToEsRest() throws Exception {
         Date startOfTest = new Date();
-        int numMessages = 1000;
+        int numMessages = 1;
         int packetsPerSecond = 500;
 
         InetSocketAddress minionSshAddr = testEnvironment.getServiceAddress(ContainerAlias.MINION, 8201);
@@ -106,7 +107,7 @@ public class SyslogKafkaElasticsearch5Test extends AbstractSyslogTest {
         LOG.info("Resetting statistics");
         resetRouteStatistics(opennmsSshAddr, minionSshAddr);
         // Warm up the routes
-        sendMessage(ContainerAlias.MINION, sender, 100);
+        sendMessage(ContainerAlias.MINION, sender, 1);
 
         for (int i = 0; i < 20; i++) {
             LOG.info("Slept for " + i + " seconds");
@@ -133,8 +134,22 @@ public class SyslogKafkaElasticsearch5Test extends AbstractSyslogTest {
                 start = System.currentTimeMillis();
             }
         }
+        
+        int resendCount = 0;
+        while(pollForElasticsearchEventsUsingJestAndReturnValue(esRestAddr,numMessages) == 0){
+        	resendCount++;
+     	   LOG.info("Resending Packets:"+resendCount);
+     	   sendMessage(ContainerAlias.MINION, sender, chunk);
+     	   Thread.sleep(60000);
+      	   if(resendCount>30){
+      		   break;
+      	   }
+        }
 
         // 100 warm-up messages plus ${numMessages} messages
-        pollForElasticsearchEventsUsingJest(esRestAddr, 100 + numMessages);
+        //pollForElasticsearchEventsUsingJest(esRestAddr, 100 + numMessages);
+        
+        assertTrue(resendCount<30);
+        LOG.info("Completed Test");
     }
 }
