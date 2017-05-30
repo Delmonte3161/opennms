@@ -99,7 +99,7 @@ public class TrapTest {
     public void canReceiveTraps() throws Exception {
         Date startOfTest = new Date();
 
-        final InetSocketAddress trapAddr = minionSystem.getServiceAddress(ContainerAlias.MINION, 1162, "udp");
+        final InetSocketAddress trapAddr = minionSystem.getServiceAddress(ContainerAlias.MINION, 162, "udp");
 
         // Connect to the postgresql container
         InetSocketAddress pgsql = minionSystem.getServiceAddress(ContainerAlias.POSTGRES, 5432);
@@ -113,7 +113,7 @@ public class TrapTest {
                 .toCriteria();
 
         // Send traps to the Minion listener until one makes it through
-        await().atMost(5, MINUTES).pollInterval(30, SECONDS).pollDelay(0, SECONDS).until(new Callable<Boolean>() {
+        await().atMost(10, MINUTES).pollInterval(30, SECONDS).pollDelay(0, SECONDS).until(new Callable<Boolean>() {
             @Override public Boolean call() throws Exception {
                 sendTrap(trapAddr);
                 try {
