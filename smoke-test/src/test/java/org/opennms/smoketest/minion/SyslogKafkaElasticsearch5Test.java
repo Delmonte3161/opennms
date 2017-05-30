@@ -142,7 +142,8 @@ public class SyslogKafkaElasticsearch5Test extends AbstractSyslogTest {
      	   sendMessage(ContainerAlias.MINION, sender, chunk);
      	   Thread.sleep(60000);
       	   if(resendCount>30){
-      		   break;
+        		 LOG.info("Timed out :( Test failed! ");
+        		 break;
       	   }
         }
 
