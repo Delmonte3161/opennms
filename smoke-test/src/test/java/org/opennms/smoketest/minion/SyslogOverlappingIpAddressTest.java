@@ -34,6 +34,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 import java.util.Date;
+import java.util.concurrent.Callable;
 
 import org.junit.Test;
 import org.opennms.core.criteria.CriteriaBuilder;
@@ -82,6 +83,8 @@ public class SyslogOverlappingIpAddressTest extends AbstractSyslogTest {
     public void testAssociateSyslogsWithNodesWithOverlappingIpAddresses() throws Exception {
         final Date startOfTest = new Date();
         final String hostIpAddress = "1.2.3.4";
+         
+        Thread.sleep(300000);
 
         // Create requisition with two node in different locations but same IP
         final RestClient client = new RestClient(testEnvironment.getServiceAddress(ContainerAlias.OPENNMS, 8980));
@@ -111,14 +114,14 @@ public class SyslogOverlappingIpAddressTest extends AbstractSyslogTest {
 
         // Wait for the nodes to be provisioned
         final OnmsNode onmsNode1 = await()
-                .atMost(1, MINUTES).pollInterval(5, SECONDS)
+                .atMost(5, MINUTES).pollInterval(60, SECONDS)
                 .until(DaoUtils.findMatchingCallable(this.daoFactory.getDao(NodeDaoHibernate.class),
                                                      new CriteriaBuilder(OnmsNode.class)
                                                              .eq("label", "node_1")
                                                              .toCriteria()),
                        notNullValue());
         final OnmsNode onmsNode2 = await()
-                .atMost(1, MINUTES).pollInterval(5, SECONDS)
+                .atMost(5, MINUTES).pollInterval(60, SECONDS)
                 .until(DaoUtils.findMatchingCallable(this.daoFactory.getDao(NodeDaoHibernate.class),
                                                      new CriteriaBuilder(OnmsNode.class)
                                                              .eq("label", "node_2")
@@ -126,24 +129,64 @@ public class SyslogOverlappingIpAddressTest extends AbstractSyslogTest {
                        notNullValue());
 
         // Sending syslog messages to each node and expect it to appear on the node
-        sendMessage(ContainerAlias.MINION, hostIpAddress, 1);
-        await().atMost(1, MINUTES).pollInterval(5, SECONDS)
+
+           await().atMost(10, MINUTES).pollInterval(30, SECONDS).pollDelay(0, SECONDS).until(new Callable<Boolean>() {
+            @Override public Boolean call() throws Exception {
+            	sendMessage(ContainerAlias.MINION, hostIpAddress, 1);
+                try {
+                    await().atMost(30, SECONDS).pollInterval(5, SECONDS).until(DaoUtils.countMatchingCallable(daoFactory.getDao(EventDaoHibernate.class),
+                            new CriteriaBuilder(OnmsEvent.class)
+                    .eq("eventUei", "uei.opennms.org/vendor/cisco/syslog/SEC-6-IPACCESSLOGP/aclDeniedIPTraffic")
+                    .ge("eventCreateTime", startOfTest)
+                    .eq("node", onmsNode1)
+                    .toCriteria()),
+                    
+                     is(1));
+                } catch (final Exception e) {
+                    return false;
+                }
+                return true;
+            }
+        });
+
+        await().atMost(10, MINUTES).pollInterval(30, SECONDS).pollDelay(0, SECONDS).until(new Callable<Boolean>() {
+            @Override public Boolean call() throws Exception {
+            	sendMessage(ContainerAlias.MINION_OTHER_LOCATION, hostIpAddress, 1);
+                try {
+                    await().atMost(30, SECONDS).pollInterval(5, SECONDS).until(DaoUtils.countMatchingCallable(daoFactory.getDao(EventDaoHibernate.class),
+                    		  new CriteriaBuilder(OnmsEvent.class)
+                    .eq("eventUei", "uei.opennms.org/vendor/cisco/syslog/SEC-6-IPACCESSLOGP/aclDeniedIPTraffic")
+                    .ge("eventCreateTime", startOfTest)
+                    .eq("node", onmsNode2)
+                    .toCriteria()),
+                    
+                     is(1));
+                } catch (final Exception e) {
+                    return false;
+                }
+                return true;
+            }
+        });
+        
+
+        /*sendMessage(ContainerAlias.MINION, hostIpAddress, 1);
+        await().atMost(5, MINUTES).pollInterval(60, SECONDS)
                .until(DaoUtils.countMatchingCallable(this.daoFactory.getDao(EventDaoHibernate.class),
                                                      new CriteriaBuilder(OnmsEvent.class)
                                                              .eq("eventUei", "uei.opennms.org/vendor/cisco/syslog/SEC-6-IPACCESSLOGP/aclDeniedIPTraffic")
                                                              .ge("eventCreateTime", startOfTest)
                                                              .eq("node", onmsNode1)
                                                              .toCriteria()),
-                      is(1));
+                      is(1));*/
 
-        sendMessage(ContainerAlias.MINION_OTHER_LOCATION, hostIpAddress, 1);
-        await().atMost(1, MINUTES).pollInterval(5, SECONDS)
+        /*sendMessage(ContainerAlias.MINION_OTHER_LOCATION, hostIpAddress, 1);
+        await().atMost(5, MINUTES).pollInterval(60, SECONDS)
                .until(DaoUtils.countMatchingCallable(this.daoFactory.getDao(EventDaoHibernate.class),
                                                      new CriteriaBuilder(OnmsEvent.class)
                                                              .eq("eventUei", "uei.opennms.org/vendor/cisco/syslog/SEC-6-IPACCESSLOGP/aclDeniedIPTraffic")
                                                              .ge("eventCreateTime", startOfTest)
                                                              .eq("node", onmsNode2)
                                                              .toCriteria()),
-                      is(1));
+                      is(1));*/
     }
 }

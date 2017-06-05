@@ -100,7 +100,7 @@ public class SyslogKafkaElasticsearch1Test extends AbstractSyslogTest {
         final String sender = testEnvironment.getContainerInfo(ContainerAlias.SNMPD).networkSettings().ipAddress();
 
         // Wait for the minion to show up
-        await().atMost(90, SECONDS).pollInterval(5, SECONDS)
+        await().atMost(300, SECONDS).pollInterval(40, SECONDS)
             .until(DaoUtils.countMatchingCallable(
                  this.daoFactory.getDao(MinionDaoHibernate.class),
                  new CriteriaBuilder(OnmsMinion.class)
