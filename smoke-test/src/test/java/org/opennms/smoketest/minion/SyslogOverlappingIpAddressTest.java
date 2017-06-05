@@ -84,7 +84,6 @@ public class SyslogOverlappingIpAddressTest extends AbstractSyslogTest {
         final Date startOfTest = new Date();
         final String hostIpAddress = "1.2.3.4";
          
-        Thread.sleep(300000);
 
         // Create requisition with two node in different locations but same IP
         final RestClient client = new RestClient(testEnvironment.getServiceAddress(ContainerAlias.OPENNMS, 8980));
