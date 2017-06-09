@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>opennms</artifactId>
+    <groupId>org.opennms</groupId>
+    <version>20.0.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>opennms-integrations</artifactId>
+  <packaging>pom</packaging>
+  <name>OpenNMS :: Integrations</name>
+  <modules>
+    <module>opennms-dns-provisioning-adapter</module>
+    <module>opennms-reverse-dns-provisioning-adapter</module>
+    <module>opennms-puppet-provisioning-adapter</module>
+    <module>opennms-R</module>
+    <module>opennms-rancid-provisioning-adapter</module>
+    <module>opennms-rws</module>
+    <module>opennms-snmp-asset-provisioning-adapter</module>
+    <module>opennms-snmp-hardware-inventory-provisioning-adapter</module>
+    <module>opennms-jasper-extensions</module>
+    <module>opennms-jasperstudio-extension</module>
+    <module>opennms-vmware</module>
+    <module>opennms-vtdxml-collector-handler</module>
+  </modules>
+</project>
