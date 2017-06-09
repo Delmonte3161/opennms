@@ -33,7 +33,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.net.MalformedURLException;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -96,9 +95,9 @@ public abstract class VmwareRequisitionTool {
 
         VmwareRequisitionUrlConnection c = new VmwareRequisitionUrlConnection(url) {
             @Override
-            protected Requisition getExistingRequisition() {
+            protected Requisition getExistingRequisition(String foreignSource) {
                 // This is not elegant but it is necessary to avoid booting Spring
-                File req = new File(ConfigFileConstants.getFilePathString(), "imports" + File.separator + m_foreignSource + ".xml");
+                File req = new File(ConfigFileConstants.getFilePathString(), "imports" + File.separator + foreignSource + ".xml");
                 if (req.exists()) {
                     return JaxbUtils.unmarshal(Requisition.class, req);
                 }

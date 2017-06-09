@@ -89,19 +89,13 @@ public enum SyslogFacility {
 
     public static SyslogFacility getFacility(final int fac) {
         final SyslogFacility[] facilities = SyslogFacility.values();
-    	if (fac == 99) {
-			return facilities[(facilities.length) - 1];
-		}
         if (facilities.length < fac) {
-            return null;
+            return SyslogFacility.UNKNOWN;
         }
         return facilities[fac];
     }
     
     public static SyslogFacility getFacilityForCode(final int code) {
-		if (code == 99) {
-			return getFacility(code);
-		}
         return getFacility((code & MASK) >> 3);
     }
 }

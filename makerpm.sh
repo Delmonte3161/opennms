@@ -58,7 +58,6 @@ function usage()
     tell "\t-M <major> : default 0 (0 means a snapshot release)"
     tell "\t-m <minor> : default <datestamp> (ignored unless major is 0)"
     tell "\t-u <micro> : default 1 (ignore unless major is 0)"
-    tell "\t-R <Release Name> : Release Name which explicitly needs to be changed during RPM Build"
     exit 1
 }
 
@@ -158,7 +157,7 @@ function main()
     local RELEASE_MICRO=1
 
 
-    while getopts adhrs:g:n:x:M:m:u:b:c:R: OPT; do
+    while getopts adhrs:g:n:x:M:m:u:b:c: OPT; do
         case $OPT in
             a)  ASSEMBLY_ONLY=true
                 ;;
@@ -185,17 +184,14 @@ function main()
                 ;;
             c)  COMMIT="$OPTARG"
                 ;;
-            R)  RELEASE="$OPTARG"
-                ;;
             *)  usage
                 ;;
         esac
     done
 
-    if [ -z "$RELEASE" ]; then
-        RELEASE=${RELEASE_MINOR}.${RELEASE_MAJOR}.${RELEASE_MICRO}
-    else
-        RELEASE=${RELEASE}.${RELEASE_MAJOR}.${RELEASE_MICRO}
+    RELEASE=$RELEASE_MAJOR
+    if [ "$RELEASE_MAJOR" = 0 ] ; then
+        RELEASE=${RELEASE_MAJOR}.${RELEASE_MINOR}.${RELEASE_MICRO}
     fi
 
     EXTRA_INFO=$(extraInfo)

@@ -31,7 +31,6 @@ package org.opennms.netmgt.syslogd;
 import static org.junit.Assert.assertEquals;
 import static org.opennms.core.utils.InetAddressUtils.addr;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.DatagramPacket;
@@ -39,6 +38,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -90,7 +90,7 @@ import com.codahale.metrics.MetricRegistry;
         "classpath:/META-INF/opennms/applicationContext-eventUtil.xml",
         "classpath:/META-INF/opennms/mockMessageDispatcherFactory.xml"
 })
-@JUnitConfigurationEnvironment
+@JUnitConfigurationEnvironment(systemProperties = { "io.netty.leakDetectionLevel=PARANOID" })
 @JUnitTemporaryDatabase
 public class SyslogdEventdLoadIT implements InitializingBean {
     private static final Logger LOG = LoggerFactory.getLogger(SyslogdEventdLoadIT.class);
@@ -137,9 +137,6 @@ public class SyslogdEventdLoadIT implements InitializingBean {
         m_syslogSinkConsumer.setSyslogdConfig(m_config);
         m_syslogSinkConsumer.setEventForwarder(m_eventIpcManager);
         m_syslogSinkModule = m_syslogSinkConsumer.getModule();
-        SyslogSinkConsumerTest.grookPatternList = new ArrayList<String>(SyslogSinkConsumerTest.setGrookPatternList(new File(
-                                                                                                                            this.getClass().getResource("/etc/syslogd-configuration.properties").getPath())));
-        m_syslogSinkConsumer.setGrokPatternsList(SyslogSinkConsumerTest.grookPatternList);
 
         m_messageDispatcherFactory.setConsumer(m_syslogSinkConsumer);
     }
@@ -229,7 +226,7 @@ public class SyslogdEventdLoadIT implements InitializingBean {
         InetAddress address = InetAddress.getLocalHost();
 
         // handle an invalid packet
-        byte[] bytes = "<34>1 2010-08-19T22:14:15.000Z localhost - - - - BOMfoo0: load test 0 on tty1\0".getBytes();
+        byte[] bytes = "<34>1 2010-08-19T22:14:15.000Z localhost - - - - \uFEFFfoo0: load test 0 on tty1\0".getBytes(StandardCharsets.UTF_8);
         DatagramPacket pkt = new DatagramPacket(bytes, bytes.length, address, SyslogClient.PORT);
         SyslogMessageLogDTO messageLog = m_syslogSinkModule.toMessageLog(new SyslogConnection(pkt, false));
         m_syslogSinkConsumer.handleMessage(messageLog);
@@ -242,7 +239,7 @@ public class SyslogdEventdLoadIT implements InitializingBean {
 
         m_eventCounter.waitForFinish(120000);
         
-        assertEquals(2, m_eventCounter.getCount());
+        assertEquals(1, m_eventCounter.getCount());
     }
 
     @Test(timeout=120000)

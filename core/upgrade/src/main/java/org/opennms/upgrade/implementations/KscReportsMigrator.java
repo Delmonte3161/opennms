@@ -150,8 +150,8 @@ public class KscReportsMigrator extends AbstractOnmsUpgrade {
                     final String resourceId = graph.getResourceId().orElse(null);
                     if (intf.shouldUpdate(resourceId)) {
                         changed = true;
-                        log("  replacing resource ID %s with %s for %s\n", resourceId, intf.getNewResourceId(), graph.getTitle());
-                        graph.setResourceId(intf.getNewResourceId());
+                        log("  replacing resource ID %s with %s for %s\n", graph.getResourceId(), intf.getNewResourceId(), graph.getTitle());
+                        graph.setResourceId(intf.getNewResourceId().toString());
                     }
                 }
             }

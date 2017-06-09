@@ -52,6 +52,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.opennms.core.xml.JaxbUtils;
+import org.opennms.netmgt.collection.api.AttributeType;
 import org.opennms.test.FileAnticipator;
 import org.xml.sax.SAXException;
 
@@ -59,7 +60,7 @@ public class JdbcDataCollectionConfigTest {
     private FileAnticipator fa;
     
     private JdbcDataCollectionConfig jdcc;
-    
+
     static private class TestOutputResolver extends SchemaOutputResolver {
         private final File m_schemaFile;
         
@@ -97,9 +98,9 @@ public class JdbcDataCollectionConfigTest {
         JdbcColumn column = new JdbcColumn();
         column.setColumnName("eventCount");
         column.setDataSourceName("EventCount");
-        column.setDataType("GAUGE");
+        column.setDataType(AttributeType.GAUGE);
         column.setAlias("eventCount");
-        
+
         JdbcQuery jdbcQuery = new JdbcQuery();
         jdbcQuery.setQueryName("opennmsQuery");
         jdbcQuery.setJdbcStatement(jdbcStatement);

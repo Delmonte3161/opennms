@@ -100,7 +100,7 @@ public class EventBuilder {
         setTime(date);
         setSource(source);
     }
-    
+
     /**
      * <p>Constructor for EventBuilder.</p>
      *

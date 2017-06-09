@@ -32,19 +32,15 @@ import static org.junit.Assert.assertEquals;
 import static org.opennms.core.utils.InetAddressUtils.addr;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opennms.core.ipc.sink.mock.MockMessageDispatcherFactory;
@@ -168,6 +164,7 @@ public class Nms4335IT implements InitializingBean {
     @After
     public void tearDown() throws Exception {
         MockLogAppender.assertNoErrorOrGreater();
+        m_eventIpcManager.getEventAnticipator().reset();
     }
 
     @Test
@@ -177,15 +174,13 @@ public class Nms4335IT implements InitializingBean {
                       "uei.opennms.org/syslog/pam/su/suFailure",
                       "pam_unix(su:auth): authentication failure; logname=jeffg uid=1004 euid=0 tty=pts/1 ruser=jeffg rhost= user=root");
     }
-    
+
     @Test
-    @Ignore("SL 2015-01-30 - Why is this set to ignore?")
     public void testAuthFailureShouldNotLog() throws Exception {
-        doMessageTest("Jan 7 12:42:48 cartman su[25856]: pam_authenticate: Authentication failure",
+        doMessageTest("Jan 7 12:42:48 192.168.0.1 su[25856]: pam_authenticate: Authentication failure",
                       "192.168.0.1",
-                      "uei.opennms.org/blah",
-                      "");
-        
+                      "uei.opennms.org/syslogd/system/Debug",
+                      "pam_authenticate: Authentication failure");
     }
     
     /**
@@ -196,11 +191,11 @@ public class Nms4335IT implements InitializingBean {
      * @param expectedUEI The expected UEI of the resulting event
      * @param expectedLogMsg The expected contents of the logmsg for the resulting event 
      * 
+     * @throws UnknownHostException 
      * @throws InterruptedException 
      * @throws ExecutionException 
-     * @throws IOException 
      */
-    private List<Event> doMessageTest(String testPDU, String expectedHost, String expectedUEI, String expectedLogMsg) throws InterruptedException, ExecutionException, IOException {
+    private List<Event> doMessageTest(String testPDU, String expectedHost, String expectedUEI, String expectedLogMsg) throws UnknownHostException, InterruptedException, ExecutionException {
         SyslogdTestUtils.startSyslogdGracefully(m_syslogd);
         
         final EventBuilder expectedEventBldr = new EventBuilder(expectedUEI, "syslogd");
@@ -214,10 +209,6 @@ public class Nms4335IT implements InitializingBean {
         syslogSinkConsumer.setDistPollerDao(m_distPollerDao);
         syslogSinkConsumer.setSyslogdConfig(m_config);
         syslogSinkConsumer.setEventForwarder(m_eventIpcManager);
-        SyslogSinkConsumerTest.grookPatternList = new ArrayList<String>(SyslogSinkConsumerTest.setGrookPatternList(new File(
-                                                                                                                            this.getClass().getResource("/etc/syslogd-configuration.properties").getPath())));
-        syslogSinkConsumer.setGrokPatternsList(SyslogSinkConsumerTest.grookPatternList);
-
 
         final SyslogSinkModule syslogSinkModule = syslogSinkConsumer.getModule();
 
