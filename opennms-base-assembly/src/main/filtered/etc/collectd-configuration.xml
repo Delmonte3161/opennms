@@ -14,8 +14,8 @@
             <parameter key="friendly-name" value="cassandra"/>
             <parameter key="thresholding-enabled" value="true"/>
             <parameter key="factory" value="PASSWORD-CLEAR"/>
-            <parameter key="username" value="cassandra-username"/>
-            <parameter key="password" value="cassandra-password"/>
+            <parameter key="username" value="cassandra"/>
+            <parameter key="password" value="cassandra"/>
         </service>
         <service name="JMX-Cassandra-Newts" interval="300000" user-defined="false" status="on">
             <parameter key="port" value="7199"/>
@@ -27,8 +27,8 @@
             <parameter key="friendly-name" value="cassandra-newts"/>
             <parameter key="thresholding-enabled" value="true"/>
             <parameter key="factory" value="PASSWORD-CLEAR"/>
-            <parameter key="username" value="cassandra-username"/>
-            <parameter key="password" value="cassandra-password"/>
+            <parameter key="username" value="cassandra"/>
+            <parameter key="password" value="cassandra"/>
         </service>
     </package>
 
