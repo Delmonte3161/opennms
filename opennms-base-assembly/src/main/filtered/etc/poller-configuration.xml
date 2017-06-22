@@ -26,8 +26,8 @@
       <parameter key="ds-name" value="jmx-cassandra"/>
       <parameter key="thresholding-enabled" value="true"/>
       <parameter key="factory" value="PASSWORD-CLEAR"/>
-      <parameter key="username" value="cassandra-username"/>
-      <parameter key="password" value="cassandra-password"/>
+      <parameter key="username" value="cassandra"/>
+      <parameter key="password" value="cassandra"/>
       <parameter key="rrd-repository" value="${install.share.dir}/rrd/response" />
       <parameter key="beans.storage" value="org.apache.cassandra.db:type=StorageService"/>
       <parameter key="tests.operational" value="storage.OperationMode == 'NORMAL'"/>
@@ -44,8 +44,8 @@
       <parameter key="ds-name" value="jmx-cassandra-newts"/>
       <parameter key="thresholding-enabled" value="true"/>
       <parameter key="factory" value="PASSWORD-CLEAR"/>
-      <parameter key="username" value="cassandra-username"/>
-      <parameter key="password" value="cassandra-password"/>
+      <parameter key="username" value="cassandra"/>
+      <parameter key="password" value="cassandra"/>
       <parameter key="rrd-repository" value="${install.share.dir}/rrd/response" />
       <parameter key="beans.samples" value="org.apache.cassandra.db:type=ColumnFamilies,keyspace=newts,columnfamily=samples"/>
       <parameter key="tests.samples" value="samples.ColumnFamilyName == 'samples'"/>
