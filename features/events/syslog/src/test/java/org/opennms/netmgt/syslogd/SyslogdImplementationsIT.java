@@ -28,6 +28,7 @@
 
 package org.opennms.netmgt.syslogd;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -39,7 +40,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,7 +81,7 @@ import com.codahale.metrics.MetricRegistry;
         "classpath:/META-INF/opennms/mockMessageDispatcherFactory.xml",
         "classpath:/applicationContext-syslogImplementations.xml"
 })
-@JUnitConfigurationEnvironment(systemProperties = { "io.netty.leakDetectionLevel=PARANOID" })
+@JUnitConfigurationEnvironment
 @JUnitTemporaryDatabase
 public class SyslogdImplementationsIT implements InitializingBean {
     private static final Logger LOG = LoggerFactory.getLogger(SyslogdImplementationsIT.class);
@@ -122,12 +122,11 @@ public class SyslogdImplementationsIT implements InitializingBean {
         SyslogSinkConsumer consumer = new SyslogSinkConsumer(new MetricRegistry());
         consumer.setSyslogdConfig(m_config);
         consumer.setEventForwarder(m_eventIpcManager);
-        m_messageDispatcherFactory.setConsumer(consumer);
-    }
+        SyslogSinkConsumerTest.grookPatternList = new ArrayList<String>(SyslogSinkConsumerTest.setGrookPatternList(new File(
+                                                                                                                            this.getClass().getResource("/etc/syslogd-configuration.properties").getPath())));
+        consumer.setGrokPatternsList(SyslogSinkConsumerTest.grookPatternList);
 
-    @After
-    public void tearDown() throws Exception {
-        MockLogAppender.assertNoErrorOrGreater();
+        m_messageDispatcherFactory.setConsumer(consumer);
     }
 
     private void loadSyslogConfiguration(final String configuration) throws IOException {
@@ -144,18 +143,8 @@ public class SyslogdImplementationsIT implements InitializingBean {
 
     @Test(timeout=3*60*1000)
     @Transactional
-    public void testCamelNettyReceiver() throws Exception {
-        doTestSyslogd(m_netty);
-    }
-
-    @Test(timeout=3*60*1000)
-    @Transactional
-    public void testJavaNetReceiver() throws Exception {
-        doTestSyslogd(m_java);
-    }
-
-    private void doTestSyslogd(SyslogReceiver receiver) throws Exception {
-        Thread listener = new Thread(receiver);
+    public void testDefaultSyslogd() throws Exception {
+        Thread listener = new Thread(m_java);
         listener.start();
         Thread.sleep(3000);
 

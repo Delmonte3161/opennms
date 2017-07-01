@@ -86,7 +86,7 @@ public class SyslogConnection implements Message {
             );
             return retPacket;
         } catch (UnknownHostException e) {
-            LOG.warn("unable to clone InetAddress object for {}", packet.getAddress());
+            LOG.warn("unable to clone InetAddress object for {}", packet.getAddress(),e);
         }
         return null;
     }

@@ -623,8 +623,32 @@ public class EventToIndex implements AutoCloseable {
 		body.put("host",event.getHost());
 
 		//get params from event
-		for(Parm parm : event.getParmCollection()) {
-			body.put("p_" + parm.getParmName(), parm.getValue().getContent());
+		String trapOidMap = "";
+		for (Parm parm : event.getParmCollection()) {
+				/*
+				 * CTSMONETFB-196: Traps oids and varbinds cause elastic to hit field and field depth
+				 * limit quickly in our environment. We tried increasing the limits to 
+				 * arbitrary values like 10000, 25000 and 100k but that only takes care of it
+				 * for a short time. This should help index events that were not before. 
+				 * 
+				 * We index what was originally field names into field values now, so that, theoretically
+				 * we should never hit those limits.
+				 */
+				if(parm.getParmName().matches("^[\\.\\d]+")){
+					if(trapOidMap.length() > 0){
+						trapOidMap += ", " +  parm.getParmName() + " : " + parm.getValue().getContent();
+					}
+					else {
+						trapOidMap += parm.getParmName() + " : " + parm.getValue().getContent();
+					}
+				}
+				else{
+					body.put("p_" + parm.getParmName(), parm.getValue().getContent());
+				}
+					
+			}
+		if (trapOidMap.length() > 0){
+			body.put("p_trapmap" , trapOidMap);
 		}
 
 		// remove old and new alarm values parms if not needed

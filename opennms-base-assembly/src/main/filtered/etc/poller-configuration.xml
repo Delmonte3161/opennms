@@ -251,7 +251,7 @@
       <parameter key="port" value="1299"/>
       <parameter key="retry" value="2"/>
       <parameter key="timeout" value="3000"/>
-      <parameter key="urlPath" value="/karaf-minion"/>
+      <parameter key="urlPath" value="/jmxrmi"/>
       <parameter key="factory" value="PASSWORD-CLEAR"/>
       <parameter key="username" value="admin"/>
       <parameter key="password" value="admin"/>
