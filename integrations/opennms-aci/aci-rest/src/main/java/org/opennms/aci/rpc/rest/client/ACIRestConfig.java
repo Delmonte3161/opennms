@@ -1,0 +1,257 @@
+/**
+ * 
+ */
+package org.opennms.aci.rpc.rest.client;
+
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import javax.swing.JOptionPane;
+
+import org.apache.commons.codec.binary.Base64;
+
+/**
+ * @author tf016851
+ */
+public class ACIRestConfig {
+    private static byte[] sharedvector = { 0x01, 0x02, 0x03, 0x05, 0x07, 0x0B,
+            0x0D, 0x11 };
+
+    private String clusterName;
+
+    private String aciUrl;
+
+    private String username;
+
+    public String password;
+
+    /**
+     * @return the clusterName
+     */
+    public String getClusterName() {
+        return clusterName;
+    }
+
+    /**
+     * @param clusterName
+     *            the clusterName to set
+     */
+    public void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
+    }
+
+    /**
+     * @return the aciUrl
+     */
+    public String getAciUrl() {
+        return aciUrl;
+    }
+
+    /**
+     * @param aciUrl
+     *            the aciUrl to set
+     */
+    public void setAciUrl(String aciUrl) {
+        this.aciUrl = aciUrl;
+    }
+
+    /**
+     * @return the username
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * @param username
+     *            the username to set
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * @param password
+     *            the password to set
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    /**
+     * @param password
+     */
+    public void setPasswordEncrypt(String password) {
+        this.password = this.encryptText(password);
+    }
+
+    /**
+     * @return
+     */
+    public String getPasswordClearText() {
+        return decryptText(this.password);
+    }
+
+    private String encryptText(String RawText) {
+        String EncText = "";
+        byte[] keyArray = new byte[24];
+        byte[] temporaryKey;
+        String key = this.getClass().getName();
+        byte[] toEncryptArray = null;
+
+        try {
+
+            toEncryptArray = RawText.getBytes("UTF-8");
+            MessageDigest m = MessageDigest.getInstance("MD5");
+            temporaryKey = m.digest(key.getBytes("UTF-8"));
+
+            if (temporaryKey.length < 24) // DESede require 24 byte length key
+            {
+                int index = 0;
+                for (int i = temporaryKey.length; i < 24; i++) {
+                    keyArray[i] = temporaryKey[index];
+                }
+            }
+
+            Cipher c = Cipher.getInstance("DESede/CBC/PKCS5Padding");
+            c.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(keyArray,
+                                                          "DESede"), new IvParameterSpec(sharedvector));
+            byte[] encrypted = c.doFinal(toEncryptArray);
+            EncText = Base64.encodeBase64String(encrypted);
+
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException
+                | NoSuchPaddingException | InvalidKeyException
+                | InvalidAlgorithmParameterException
+                | IllegalBlockSizeException | BadPaddingException NoEx) {
+            JOptionPane.showMessageDialog(null, NoEx);
+        }
+
+        return EncText;
+    }
+
+    private String decryptText(String EncText) {
+
+        String RawText = "";
+        byte[] keyArray = new byte[24];
+        byte[] temporaryKey;
+        String key = this.getClass().getName();
+        // String key = "developersnotedotcom";
+        byte[] toEncryptArray = null;
+
+        try {
+            MessageDigest m = MessageDigest.getInstance("MD5");
+            temporaryKey = m.digest(key.getBytes("UTF-8"));
+
+            if (temporaryKey.length < 24) // DESede require 24 byte length key
+            {
+                int index = 0;
+                for (int i = temporaryKey.length; i < 24; i++) {
+                    keyArray[i] = temporaryKey[index];
+                }
+            }
+
+            Cipher c = Cipher.getInstance("DESede/CBC/PKCS5Padding");
+            c.init(Cipher.DECRYPT_MODE, new SecretKeySpec(keyArray,
+                                                          "DESede"), new IvParameterSpec(sharedvector));
+            byte[] decrypted = c.doFinal(Base64.decodeBase64(EncText));
+
+            RawText = new String(decrypted, "UTF-8");
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException
+                | NoSuchPaddingException | InvalidKeyException
+                | InvalidAlgorithmParameterException
+                | IllegalBlockSizeException | BadPaddingException NoEx) {
+            JOptionPane.showMessageDialog(null, NoEx);
+        }
+
+        return RawText;
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((aciUrl == null) ? 0 : aciUrl.hashCode());
+        result = prime * result
+                + ((clusterName == null) ? 0 : clusterName.hashCode());
+        result = prime * result
+                + ((this.getPasswordClearText() == null) ? 0
+                                                         : this.getPasswordClearText().hashCode());
+        result = prime * result
+                + ((username == null) ? 0 : username.hashCode());
+        return result;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ACIRestConfig other = (ACIRestConfig) obj;
+        if (aciUrl == null) {
+            if (other.aciUrl != null)
+                return false;
+        } else if (!aciUrl.equals(other.aciUrl))
+            return false;
+
+        if (clusterName == null) {
+            if (other.clusterName != null)
+                return false;
+        } else if (!clusterName.equals(other.clusterName))
+            return false;
+
+        if (password == null) {
+            if (other.password != null)
+                return false;
+        } else if (!this.getPasswordClearText().equals(other.getPasswordClearText()))
+            return false;
+
+        if (username == null) {
+            if (other.username != null)
+                return false;
+        } else if (!username.equals(other.username))
+            return false;
+        return true;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "ACIRestConfig [clusterName=" + clusterName + ", aciUrl="
+                + aciUrl + ", username=" + username + ", password="
+                + this.getPasswordClearText() + "]";
+    }
+}

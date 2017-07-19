@@ -46,7 +46,7 @@ public class Tl1dConfigurationTest extends XmlTestNoCastor<Tl1dConfiguration> {
         return Arrays.asList(new Object[][] {
             {
                 getConfig(),
-                "<tl1d-configuration>\n" +
+                "<tl1d-configuration xmlns=\"http://xmlns.opennms.org/xsd/config/southd-configuration\">\n" +
                 "  <tl1-element host=\"127.0.0.1\" \n" +
                 "               port=\"15001\" \n" +
                 "               password=\"opennms\" \n" +
@@ -58,7 +58,7 @@ public class Tl1dConfigurationTest extends XmlTestNoCastor<Tl1dConfiguration> {
             },
             {
                 new Tl1dConfiguration(),
-                "<tl1d-configuration/>"
+                "<tl1d-configuration xmlns=\"http://xmlns.opennms.org/xsd/config/southd-configuration\" />"
             }
         });
     }
