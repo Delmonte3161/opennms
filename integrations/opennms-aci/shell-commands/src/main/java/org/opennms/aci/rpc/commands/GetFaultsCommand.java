@@ -31,19 +31,28 @@ package org.opennms.aci.rpc.commands;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.junit.Assert;
+import org.opennms.aci.rpc.rest.client.ACIRestClient;
+
 
 /**
  * @author tf016851
  */
 @Command(scope = "aci", name = "get-faults", description="Gets faults from ACI")
 public class GetFaultsCommand extends OsgiCommandSupport {
+    
+    @Option(name = "-l", aliases = "--location", description = "Location", required=true, multiValued=false)
+    private String location;
 
-    /**
-     * 
-     */
-    public GetFaultsCommand() {
-        // TODO Auto-generated constructor stub
-    }
+    @Option(name = "-a", aliases = "--aci-url", description = "ACI URL", required=true, multiValued=false)
+    private String aciUrl;
+
+    @Option(name = "-u", aliases = "--username", description = "Username", required=true, multiValued=false)
+    private String username;
+
+    @Option(name = "-p", aliases = "--password", description = "Password", required=true, multiValued=false)
+    public String password;
+
 
     /*
      * (non-Javadoc)
@@ -52,8 +61,22 @@ public class GetFaultsCommand extends OsgiCommandSupport {
      */
     @Override
     protected Object doExecute() throws Exception {
-        // TODO Auto-generated method stub
-        System.out.println("It Works!");
+        try
+        {
+            ACIRestClient client = ACIRestClient.newAciRest( location, aciUrl, username, password );
+            
+            client.getClassInfo(  "faultRecord" );
+//            client.getClassInfo(  "faultRecord", "eventRecord" );
+//            client.getClassInfo( "topSystem" );
+            
+//            client.getHealth( "fvAp", "fvTenant", "fabricNode" );
+//            client.getStats( "fvAp" );
+        }
+        catch ( Exception e )
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return null;
     }
 
