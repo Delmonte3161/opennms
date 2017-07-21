@@ -28,6 +28,9 @@
 
 package org.opennms.aci.rpc.commands;
 
+import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
+
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
@@ -41,6 +44,8 @@ import org.opennms.aci.rpc.rest.client.ACIRestClient;
 @Command(scope = "aci", name = "get-faults", description="Gets faults from ACI")
 public class GetFaultsCommand extends OsgiCommandSupport {
     
+    private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    
     @Option(name = "-l", aliases = "--location", description = "Location", required=true, multiValued=false)
     private String location;
 
@@ -52,6 +57,9 @@ public class GetFaultsCommand extends OsgiCommandSupport {
 
     @Option(name = "-p", aliases = "--password", description = "Password", required=true, multiValued=false)
     public String password;
+    
+    @Option(name = "-d", aliases = "--duration", description = "Fault Polling Duration in minutes.", required=false, multiValued=false)
+    public int pollDuration = 5;
 
 
     /*
@@ -61,10 +69,13 @@ public class GetFaultsCommand extends OsgiCommandSupport {
      */
     @Override
     protected Object doExecute() throws Exception {
+        final java.util.Calendar startCal = GregorianCalendar.getInstance();
+        startCal.add(GregorianCalendar.MINUTE, this.pollDuration * -1);
         try
         {
             ACIRestClient client = ACIRestClient.newAciRest( location, aciUrl, username, password );
             
+//            client.getCurrentFaults(format.format(startCal.getTime()));
             client.getClassInfo(  "faultRecord" );
 //            client.getClassInfo(  "faultRecord", "eventRecord" );
 //            client.getClassInfo( "topSystem" );

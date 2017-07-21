@@ -28,6 +28,10 @@
 
 package org.opennms.aci.rpc.rest.client;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
+
 import org.opennms.aci.rpc.rest.client.ACIRestClient;
 
 /**
@@ -36,6 +40,8 @@ import org.opennms.aci.rpc.rest.client.ACIRestClient;
  */
 public class ACIRestClientTest
 {
+    private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+    
     /**
      * @param args
      */
@@ -47,9 +53,13 @@ public class ACIRestClientTest
 
         try
         {
+            final java.util.Calendar startCal = GregorianCalendar.getInstance();
+            startCal.add(GregorianCalendar.MINUTE, -100);
+            
             ACIRestClient client = ACIRestClient.newAciRest( "LS", url, userName, pw );
             
-            client.getClassInfo(  "faultRecord" );
+            client.getCurrentFaults(format.format(startCal.getTime()));
+            //client.getClassInfo(  "faultRecord" );
 //            client.getClassInfo(  "faultRecord", "eventRecord" );
 //            client.getClassInfo( "topSystem" );
             
