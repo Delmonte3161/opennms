@@ -11,7 +11,7 @@
 		http://aries.apache.org/schemas/blueprint-ext/blueprint-ext-1.1.xsd
 ">
 
-  <bean id="apicService" class=" org.opennms.aci.module.ApicService" init-method="init" destroy-method="close">
+  <bean id="apicService" class=" org.opennms.aci.module.ApicService" init-method="init" destroy-method="destroy">
   </bean>
 
 </blueprint>

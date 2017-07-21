@@ -7,6 +7,7 @@
   </parent>
 
   <!-- LicenceAuthenticator -->
+  <groupId>org.opennms.aci.rpc</groupId>
   <artifactId>opennms-aci.main-module</artifactId>
   <name>OpenNMS :: ACI :: Service</name>
   <description>Main Module for opennms-aci</description>
