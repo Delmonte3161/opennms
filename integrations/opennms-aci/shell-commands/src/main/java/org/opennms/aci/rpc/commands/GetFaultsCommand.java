@@ -34,7 +34,6 @@ import java.util.GregorianCalendar;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.junit.Assert;
 import org.opennms.aci.rpc.rest.client.ACIRestClient;
 
 
@@ -75,8 +74,8 @@ public class GetFaultsCommand extends OsgiCommandSupport {
         {
             ACIRestClient client = ACIRestClient.newAciRest( location, aciUrl, username, password );
             
-//            client.getCurrentFaults(format.format(startCal.getTime()));
-            client.getClassInfo(  "faultRecord" );
+            client.getCurrentFaults(format.format(startCal.getTime()));
+//            client.getClassInfo(  "faultRecord" );
 //            client.getClassInfo(  "faultRecord", "eventRecord" );
 //            client.getClassInfo( "topSystem" );
             

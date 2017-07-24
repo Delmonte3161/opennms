@@ -28,15 +28,8 @@
 
 package org.opennms.aci.module;
 
-import java.text.SimpleDateFormat;
-import java.util.GregorianCalendar;
-
-import org.opennms.aci.rpc.rest.client.ACIRestClient;
-import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
@@ -81,12 +74,12 @@ public class ApicService {
 
     public void destroy() {
 
+        LOG.info("Destorying ApicService ...");
         try {
             if (scheduler != null)
                 scheduler.shutdown(true);
         } catch (SchedulerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.debug("Error shutting down scheduler", e);
         }
 
     }
@@ -109,8 +102,7 @@ public class ApicService {
             scheduler.start();
             scheduler.scheduleJob(job, trigger);
         } catch (SchedulerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error("Error executing job.", e);
         }
 
 
