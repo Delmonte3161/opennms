@@ -766,6 +766,26 @@ public class ACIRestClient {
             }
         }
     }
+    
+    public String getTimeStamp(int secondsFromNow) throws ParseException {
+        String currentTime = getCurrentTime();
+        final java.util.Calendar cal = GregorianCalendar.getInstance();
+        
+        String[] timeparts = currentTime.split("T");
+        String onlydate = timeparts[0];
+        String onlytimewtz = timeparts[1];
+        String onlytime = onlytimewtz.substring(0, onlytimewtz.length()
+                - 6);
+        String onlytz = onlytimewtz.substring(onlytimewtz.length() - 6);
+        String tz = onlytz.replace(":", "");
+
+        cal.setTimeInMillis(format.parse(onlydate + "T" + onlytime
+                + tz).getTime());
+        cal.add(GregorianCalendar.SECOND, secondsFromNow * -1); 
+        String timestamp = this.format.format(cal.getTimeInMillis());
+        
+        return timestamp;
+    }
 
     private String getCurrentTime() {
         // Last, store current datetimestamp to file

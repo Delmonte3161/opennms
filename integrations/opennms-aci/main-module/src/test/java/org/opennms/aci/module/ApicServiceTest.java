@@ -45,12 +45,10 @@ public class ApicServiceTest {
         service.init();
         
         try {
-//            Thread.sleep(420000);
-            Thread.sleep(60000);
+            Thread.sleep(10000); //Sleep long enough for job to start
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
-        } //Sleep for 7 minutes, enough time to run schedule once
+        } 
 
         System.out.println("Destroying ApicService ...");
         service.destroy();
