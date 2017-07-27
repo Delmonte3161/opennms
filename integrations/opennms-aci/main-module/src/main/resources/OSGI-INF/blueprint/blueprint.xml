@@ -11,7 +11,13 @@
 		http://aries.apache.org/schemas/blueprint-ext/blueprint-ext-1.1.xsd
 ">
 
-  <bean id="apicService" class=" org.opennms.aci.module.ApicService" init-method="init" destroy-method="destroy">
+  <reference id="eventForwarder" interface="org.opennms.netmgt.events.api.EventForwarder" availability="mandatory"/>
+  
+  <bean id="apicService" class="org.opennms.aci.module.ApicService" init-method="init" destroy-method="destroy">
+  </bean>
+  
+  <bean id="apicClusterJob" class="org.opennms.aci.module.ApicClusterJob">
+       <property name="eventForwarder" ref="eventForwarder"/>
   </bean>
 
 </blueprint>

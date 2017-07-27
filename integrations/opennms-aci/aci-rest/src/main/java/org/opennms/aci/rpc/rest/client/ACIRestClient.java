@@ -509,10 +509,9 @@ public class ACIRestClient {
         }
     }
 
-    public void getCurrentFaults(String scaleStart) throws Exception {
+    public JSONArray getCurrentFaults(String scaleStart) throws Exception {
 
-        processBigDataRange("faultRecord", scaleStart);
-
+        return this.getBigDataRange("faultRecord", scaleStart);
     }
 
     /**
@@ -698,6 +697,14 @@ public class ACIRestClient {
 
     }
 
+    private JSONArray getBigDataRange(String apicClass, String scaleStart)
+            throws Exception {
+        String queryUrl = "node/class/" + apicClass
+                + ".json?query-target-filter=ge(" + apicClass
+                + ".created,\"" + scaleStart + "\")";
+        return this.getFaults(queryUrl);
+    }
+
     private int processBigDataRange(String apicClass, String scaleStart)
             throws Exception {
         String queryUrl = "node/class/" + apicClass
@@ -734,6 +741,12 @@ public class ACIRestClient {
         printObjectProperties(imdata, apicClass, this.host);
 
         return totalCount;
+    }
+    
+    private JSONArray getFaults(String queryUrl)
+           throws Exception {
+        JSONObject result = (JSONObject) this.get(queryUrl);
+        return (JSONArray) result.get("imdata");
     }
 
     private synchronized void updateFile(String filePath, String timedata)

@@ -28,6 +28,8 @@
 
 package org.opennms.aci.module;
 
+import java.text.SimpleDateFormat;
+
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -46,6 +48,7 @@ public class ApicService {
     
     private static final Logger LOG = LoggerFactory.getLogger(ApicService.class);
 
+    static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     
     final int pollDurationMinutes = 5;
 
@@ -92,6 +95,7 @@ public class ApicService {
                     .usingJobData(APIC_CONFIG_USERNAME_KEY, username)
                     .usingJobData(APIC_CONFIG_PASSWORD_KEY, password)
                     .usingJobData(APIC_CONFIG_POLL_DURATION_KEY, pollDuration)
+                    .storeDurably()
                     .build();
 
         // Trigger the job to run on the next round minute
