@@ -28,8 +28,11 @@
 package org.opennms.aci.module;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.simple.JSONObject;
+import org.opennms.netmgt.model.OnmsSeverity;
 import org.opennms.netmgt.model.events.EventBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +44,19 @@ import org.slf4j.LoggerFactory;
 public class ConvertToEvent {
     
     private static final Logger LOG = LoggerFactory.getLogger(ConvertToEvent.class);
+    
+    private static Map<String, OnmsSeverity> SEVERITY_MAP;
+    
+    static
+    {
+        SEVERITY_MAP = new HashMap<String, OnmsSeverity>();
+        SEVERITY_MAP.put("critical", OnmsSeverity.CRITICAL);
+        SEVERITY_MAP.put("major", OnmsSeverity.MAJOR);
+        SEVERITY_MAP.put("minor", OnmsSeverity.MINOR);
+        SEVERITY_MAP.put("warning", OnmsSeverity.WARNING);
+        SEVERITY_MAP.put("info", OnmsSeverity.NORMAL);
+        SEVERITY_MAP.put("cleared", OnmsSeverity.CLEARED);
+    }
 
     
     public static final EventBuilder toEventBuilder(String location, Date createDate, JSONObject attributes) {
@@ -62,6 +78,8 @@ public class ConvertToEvent {
         bldr.setDescription((String) attributes.get("descr"));
         bldr.setLogMessage((String) attributes.get("rule"));
         bldr.setUei("uei.opennms.org/cisco/aci/" + attributes.get("code") + "/" + attributes.get("severity"));
+        bldr.setSeverity(SEVERITY_MAP.get(attributes.get("severity")).getLabel());
+        bldr.setSource(ApicService.class.getSimpleName());
         
         return bldr;
     }

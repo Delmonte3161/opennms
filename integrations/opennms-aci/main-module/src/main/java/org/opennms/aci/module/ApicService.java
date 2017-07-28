@@ -29,7 +29,10 @@
 package org.opennms.aci.module;
 
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.opennms.netmgt.events.api.EventForwarder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -40,6 +43,7 @@ import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author tf016851
@@ -62,13 +66,30 @@ public class ApicService {
     public final static String APIC_CONFIG_USERNAME_KEY = "Username";
     public final static String APIC_CONFIG_PASSWORD_KEY = "Password";
     public final static String APIC_CONFIG_POLL_DURATION_KEY = "pollDuration";
+    public final static String APIC_CONFIG_EVENT_FORWARDER = "EventForwarder";
+    public final static String APIC_CONFIG_CLUSTER_MAP = "ClusterMap";
+    public final static String APIC_CLUSTER_MAP_LAST_PROCESS_TIME = "lastProcessTime";
+    
+    @Autowired
+    private EventForwarder eventForwarder;
 
-    Scheduler scheduler;
+    private Scheduler scheduler = null;
+    
+    private Map<String, Map<String, Object>> clusterMap;
 
     public void init() {
 
         LOG.info("Initializaing ApicService ...");
-        // JobBuilder.newJob().
+        clusterMap = new HashMap<String, Map<String, Object>>();
+        
+        if (scheduler != null) {
+            try {
+                scheduler.shutdown(true);
+            } catch (SchedulerException e) {
+                LOG.debug("Error stopping scheduler.", e);
+            }
+            scheduler = null;
+        }
 
         // TODO - this needs to be replaced with logic to build job for each
         // configured cluster
@@ -88,8 +109,8 @@ public class ApicService {
     }
 
     public void createAndScheduleJob(String location, String apicUrl, String username, String password, int pollDuration) {
-        JobDetail job = JobBuilder.newJob(ApicClusterJob.class).withIdentity(ApicClusterJob.class.getSimpleName()
-                + location, ApicClusterJob.class.getSimpleName())
+        String jobIdentity = ApicClusterJob.class.getSimpleName() + "-" + location;
+        JobDetail job = JobBuilder.newJob(ApicClusterJob.class).withIdentity(jobIdentity, ApicClusterJob.class.getSimpleName())
                     .usingJobData(APIC_CONFIG_LOCATION_KEY, location)
                     .usingJobData(APIC_CONFIG_URL_KEY, apicUrl)
                     .usingJobData(APIC_CONFIG_USERNAME_KEY, username)
@@ -97,12 +118,24 @@ public class ApicService {
                     .usingJobData(APIC_CONFIG_POLL_DURATION_KEY, pollDuration)
                     .storeDurably()
                     .build();
+        
+        Map<String, Object> clusterJobMap = new HashMap<String, Object>();
+        
+        clusterMap.put(job.getKey().toString(), clusterJobMap);
 
         // Trigger the job to run on the next round minute
-        Trigger trigger = TriggerBuilder.newTrigger().withIdentity(ApicService.class.getSimpleName(), "org.opennms.aci").withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInMinutes(pollDuration).repeatForever()).build();
+        Trigger trigger = TriggerBuilder.newTrigger()
+                            .withIdentity(ApicService.class.getSimpleName(), "org.opennms.aci")
+                            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                            .withIntervalInMinutes(pollDuration)
+                            .withMisfireHandlingInstructionFireNow()
+                            .repeatForever())
+                            .build();
 
         try {
             scheduler = new StdSchedulerFactory().getScheduler();
+            scheduler.getContext().put(APIC_CONFIG_EVENT_FORWARDER, eventForwarder);
+            scheduler.getContext().put(APIC_CONFIG_CLUSTER_MAP, clusterMap);
             scheduler.start();
             scheduler.scheduleJob(job, trigger);
         } catch (SchedulerException e) {
@@ -111,4 +144,19 @@ public class ApicService {
 
 
     }
+    
+    /**
+     * @return the eventForwarder
+     */
+    public EventForwarder getEventForwarder() {
+        return eventForwarder;
+    }
+
+    /**
+     * @param eventForwarder the eventForwarder to set
+     */
+    public void setEventForwarder(EventForwarder eventForwarder) {
+        this.eventForwarder = eventForwarder;
+    }
+
 }

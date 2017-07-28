@@ -29,6 +29,8 @@
 package org.opennms.aci.module;
 
 import java.util.Date;
+import java.util.Map;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.opennms.aci.rpc.rest.client.ACIRestClient;
@@ -40,9 +42,10 @@ import org.opennms.netmgt.xml.event.Log;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.SchedulerContext;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author tf016851
@@ -51,9 +54,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ApicClusterJob implements Job {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApicClusterJob.class);
-    
-    @Autowired
-    private EventForwarder eventForwarder;
     
     private ACIRestClient client;
     
@@ -66,6 +66,9 @@ public class ApicClusterJob implements Job {
     @Override
     public void execute(JobExecutionContext context)
             throws JobExecutionException {
+        
+        LOG.debug("Running execution for Job: " + context.getJobDetail().getKey());
+
         String location = (String) context.getMergedJobDataMap().get(ApicService.APIC_CONFIG_LOCATION_KEY);
         String apicUrl = (String) context.getMergedJobDataMap().get(ApicService.APIC_CONFIG_URL_KEY);
         String username = (String) context.getMergedJobDataMap().get(ApicService.APIC_CONFIG_USERNAME_KEY);
@@ -87,26 +90,54 @@ public class ApicClusterJob implements Job {
         }
 
         if (client == null)
-            throw new JobExecutionException(context.getJobDetail().getDescription()
+            throw new JobExecutionException(context.getJobDetail().getKey()
                     + ": Failed to initialize client.");
+        
+        SchedulerContext schedulerContext = null;
+        try {
+            schedulerContext = context.getScheduler().getContext();
+        } catch (SchedulerException e1) {
+            e1.printStackTrace();
+            throw new JobExecutionException(context.getJobDetail().getKey()
+                    + ": Failed to initialize client.", e1);
+        }
+
+        EventForwarder eventForwarder = (EventForwarder) schedulerContext.get(ApicService.APIC_CONFIG_EVENT_FORWARDER);
 
         // TODO - Need to add logic for determining the last fault process
         // time.
         // For now, just query for the same time interval for testing
         int pollDuration = (int)context.getMergedJobDataMap().get(ApicService.APIC_CONFIG_POLL_DURATION_KEY);
 //        final java.util.Calendar startCal = GregorianCalendar.getInstance();
+        
+        if (schedulerContext.get(ApicService.APIC_CONFIG_CLUSTER_MAP) == null || 
+                ((Map<String,Map<String, Object>>)schedulerContext.get(ApicService.APIC_CONFIG_CLUSTER_MAP)).get(context.getJobDetail().getKey().toString()) == null) {
+            
+            LOG.error(context.getJobDetail().getKey()
+                    + ": Failed to initialize " + ApicService.APIC_CONFIG_CLUSTER_MAP);
+            throw new JobExecutionException(context.getJobDetail().getKey()
+                    + ": Failed to initialize " + ApicService.APIC_CONFIG_CLUSTER_MAP);
+        }
+        
+        Map<String,Object> clusterJobMap = (Map<String, Object>) ((Map<String,Map<String, Object>>)schedulerContext.get(ApicService.APIC_CONFIG_CLUSTER_MAP)).get(context.getJobDetail().getKey().toString());
 
         try {
             // If last execution time is null (first time after restart),
             // then set from last event
-            if (lastProcessTime == null) {
+            if (clusterJobMap.get(ApicService.APIC_CLUSTER_MAP_LAST_PROCESS_TIME) == null) {
                 // TODO - For now just use current system time from APIC,
                 // replace with logic to query last event time.
                 lastProcessTime = client.getTimeStamp(pollDuration * 60);
+                clusterJobMap.put(ApicService.APIC_CLUSTER_MAP_LAST_PROCESS_TIME, lastProcessTime);
+            } else {
+                lastProcessTime = (String) clusterJobMap.get(ApicService.APIC_CLUSTER_MAP_LAST_PROCESS_TIME);
             }
 
             LOG.debug("Querying for faults after: " + lastProcessTime);
             JSONArray results = client.getCurrentFaults(lastProcessTime);
+            
+            if (results == null || results.isEmpty())
+                return;
             
             Date lastProcessDate = null;
             final Log elog = new Log();
@@ -135,8 +166,10 @@ public class ApicClusterJob implements Job {
 
                         Date createDate = ApicService.format.parse(onlydate + "T" + onlytime
                                 + tz);
-                        if (lastProcessDate == null || createDate.after(lastProcessDate))
-                            lastProcessTime = ApicService.format.format(createDate);
+                        if (lastProcessDate == null || createDate.after(lastProcessDate)) {
+                            lastProcessDate = createDate;
+                            lastProcessTime = ApicService.format.format(lastProcessDate);
+                        }
 
                         LOG.debug(created + " --- " + attributes.toJSONString());
                         EventBuilder bldr = ConvertToEvent.toEventBuilder(location, createDate, attributes);
@@ -148,9 +181,11 @@ public class ApicClusterJob implements Job {
                 }
             }
             if (events.getEventCount() > 0) {
+                LOG.debug("Sending " + events.getEventCount() + " event(s)");
                 eventForwarder.sendNowSync(elog);
             }
-            LOG.debug("Last Process Date: " + ApicService.format.format(lastProcessDate));
+            clusterJobMap.put(ApicService.APIC_CLUSTER_MAP_LAST_PROCESS_TIME, lastProcessTime);
+            LOG.debug("Last Process Date: " + lastProcessTime);
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("ApicClusterJob failed for cluster: LS6 at " + lastProcessTime, e);
@@ -159,18 +194,5 @@ public class ApicClusterJob implements Job {
 
     }
 
-    /**
-     * @return the eventForwarder
-     */
-    public EventForwarder getEventForwarder() {
-        return eventForwarder;
-    }
-
-    /**
-     * @param eventForwarder the eventForwarder to set
-     */
-    public void setEventForwarder(EventForwarder eventForwarder) {
-        this.eventForwarder = eventForwarder;
-    }
 
 }
