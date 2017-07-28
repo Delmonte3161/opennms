@@ -26,7 +26,7 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.netmgt.config.southd;
+package org.opennms.netmgt.config.southbound;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ import org.opennms.core.xml.ValidateUsing;
  */
 @XmlRootElement(name = "south-cluster")
 @XmlAccessorType(XmlAccessType.FIELD)
-@ValidateUsing("southd-configuration.xsd")
+@ValidateUsing("southbound-configuration.xsd")
 public class SouthCluster implements Serializable {
     
     private static final long serialVersionUID = 2L;
@@ -53,8 +53,14 @@ public class SouthCluster implements Serializable {
     @XmlElement(name = "cluster-name", required = true)
     private String m_clusterName;
     
-    @XmlElement(name = "cron-schedule", required = true)
+    @XmlElement(name = "cluster-type", required = true)
+    private String m_clusterType;
+    
+    @XmlElement(name = "cron-schedule", required = false)
     private String m_cronSchedule;
+    
+    @XmlElement(name = "poll-duration-minutes", required = false)
+    private int pollDurationMinutes;
    
     @XmlElement(name = "south-element")
     private List<SouthElement> m_elements = new ArrayList<SouthElement>();
@@ -65,6 +71,14 @@ public class SouthCluster implements Serializable {
 
     public void setClusterName(String clusterName) {
         this.m_clusterName = clusterName;
+    }
+
+    public String getClusterType() {
+        return m_clusterType;
+    }
+
+    public void setClusterType(String clusterType) {
+        this.m_clusterType = clusterType;
     }
 
     public List<SouthElement> getElements() {
@@ -91,9 +105,17 @@ public class SouthCluster implements Serializable {
         this.m_cronSchedule = cronSchedule;
     }
 
+    public int getPollDurationMinutes() {
+        return pollDurationMinutes;
+    }
+
+    public void setPollDurationMinutes(int pollDurationMinutes) {
+        this.pollDurationMinutes = pollDurationMinutes;
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(this.m_clusterName, this.m_elements, this.m_cronSchedule);
+        return Objects.hash(this.m_clusterName, this.m_elements, this.m_cronSchedule, this.pollDurationMinutes);
     }
 
     @Override
@@ -105,7 +127,8 @@ public class SouthCluster implements Serializable {
             SouthCluster other = (SouthCluster) obj;
             return Objects.equals(this.m_clusterName, other.m_clusterName)
                     && Objects.equals(this.m_elements, other.m_elements)
-                    && Objects.equals(this.m_cronSchedule, other.m_cronSchedule);
+                    && Objects.equals(this.m_cronSchedule, other.m_cronSchedule)
+                    && Objects.equals(this.pollDurationMinutes, other.pollDurationMinutes);
         }
         return false;
     }

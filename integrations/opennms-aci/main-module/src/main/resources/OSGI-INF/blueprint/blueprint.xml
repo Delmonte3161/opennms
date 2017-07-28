@@ -13,8 +13,14 @@
 
   <reference id="eventForwarder" interface="org.opennms.netmgt.events.api.EventForwarder" availability="mandatory"/>
   
+  <bean id="southboundConfigDao" class="org.opennms.netmgt.dao.jaxb.DefaultSouthboundConfigurationDao">
+    <property name="configResource" value="file:${opennms.home}/etc/Southbound-configuration.xml" />
+    <property name="reloadCheckInterval" value="-1" />
+  </bean>
+  
   <bean id="apicService" class="org.opennms.aci.module.ApicService" init-method="init" destroy-method="destroy">
        <property name="eventForwarder" ref="eventForwarder"/>
+       <property name="southboundConfigDao" ref="southboundConfigDao"/>
   </bean>
   
 </blueprint>

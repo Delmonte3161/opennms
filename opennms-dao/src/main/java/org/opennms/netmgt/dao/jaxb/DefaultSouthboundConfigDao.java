@@ -28,9 +28,11 @@
 
 package org.opennms.netmgt.dao.jaxb;
 
+import java.util.List;
+
 import org.opennms.core.xml.AbstractJaxbConfigDao;
-import org.opennms.netmgt.config.southd.SouthCluster;
-import org.opennms.netmgt.config.southd.SouthdConfiguration;
+import org.opennms.netmgt.config.southbound.SouthCluster;
+import org.opennms.netmgt.config.southbound.SouthboundConfiguration;
 import org.opennms.netmgt.dao.api.SouthboundConfigDao;
 import org.springframework.dao.DataAccessResourceFailureException;
 
@@ -40,20 +42,20 @@ import org.springframework.dao.DataAccessResourceFailureException;
  * @author tf016851
  *
  */
-public class DefaultSouthboundConfigDao extends AbstractJaxbConfigDao<SouthdConfiguration, SouthdConfiguration> implements SouthboundConfigDao {
+public class DefaultSouthboundConfigDao extends AbstractJaxbConfigDao<SouthboundConfiguration, SouthboundConfiguration> implements SouthboundConfigDao {
 
     /**
      * 
      */
     public DefaultSouthboundConfigDao() {
-        super(SouthdConfiguration.class, "Southbound Controlller Config");
+        super(SouthboundConfiguration.class, "Southbound Controlller Config");
     }
 
     /* (non-Javadoc)
      * @see org.opennms.netmgt.dao.api.SouthboundConfigDao#getSouthboundConfig()
      */
     @Override
-    public SouthdConfiguration getSouthboundConfig() {
+    public SouthboundConfiguration getSouthboundConfig() {
         return getContainer().getObject();
     }
 
@@ -61,8 +63,8 @@ public class DefaultSouthboundConfigDao extends AbstractJaxbConfigDao<SouthdConf
      * @see org.opennms.netmgt.dao.api.SouthboundConfigDao#getSouthboundCluster()
      */
     @Override
-    public SouthCluster getSouthboundCluster() {
-        return getContainer().getObject().getSouthCluster();
+    public List<SouthCluster> getSouthboundClusters() {
+        return getContainer().getObject().getSouthClusters();
     }
 
     /* (non-Javadoc)
@@ -75,8 +77,8 @@ public class DefaultSouthboundConfigDao extends AbstractJaxbConfigDao<SouthdConf
     }
 
     @Override
-    protected SouthdConfiguration translateConfig(
-            SouthdConfiguration config) {
+    protected SouthboundConfiguration translateConfig(
+            SouthboundConfiguration config) {
         return config;
     }
 

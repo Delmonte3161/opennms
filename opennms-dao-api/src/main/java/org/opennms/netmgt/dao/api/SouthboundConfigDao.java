@@ -28,8 +28,10 @@
 
 package org.opennms.netmgt.dao.api;
 
-import org.opennms.netmgt.config.southd.SouthCluster;
-import org.opennms.netmgt.config.southd.SouthdConfiguration;
+import java.util.List;
+
+import org.opennms.netmgt.config.southbound.SouthCluster;
+import org.opennms.netmgt.config.southbound.SouthboundConfiguration;
 import org.springframework.dao.DataAccessResourceFailureException;
 
 /**
@@ -42,16 +44,16 @@ public interface SouthboundConfigDao {
     /**
      * <p>getSouthboundConfig</p>
      * 
-     * @return a {@link org.opennms.netmgt.config.southd.SouthdConfiguration} object.
+     * @return a {@link org.opennms.netmgt.config.southbound.SouthboundConfiguration} object.
      */
-    SouthdConfiguration getSouthboundConfig();
+    SouthboundConfiguration getSouthboundConfig();
     
     /**
      * <p>getSouthboundCluster</p>
      * 
-     * @return a {@link org.opennms.netmgt.config.southd.SouthCluster} object.
+     * @return a {@link org.opennms.netmgt.config.southbound.SouthCluster} object.
      */
-    SouthCluster getSouthboundCluster();
+    List<SouthCluster> getSouthboundClusters();
 
     /**
      * The underlying XML-based DAO abstraction in the default implementation doesn't provide access to the container so

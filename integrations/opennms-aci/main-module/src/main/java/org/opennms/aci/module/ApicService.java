@@ -30,8 +30,13 @@ package org.opennms.aci.module;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
+import org.opennms.netmgt.config.southbound.SouthCluster;
+import org.opennms.netmgt.config.southbound.SouthElement;
+import org.opennms.netmgt.dao.api.SouthboundConfigDao;
 import org.opennms.netmgt.events.api.EventForwarder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
@@ -45,6 +50,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import antlr.StringUtils;
+
 /**
  * @author tf016851
  */
@@ -56,10 +63,10 @@ public class ApicService {
     
     final int pollDurationMinutes = 5;
 
-    final String location = "LS6";
-    final String url = "https://7.192.80.10,https://7.192.80.11,https://7.192.80.12";
-    final String userName = "svcOssAci";
-    final String pw = "kf3as=Nx";
+//    final String location = "LS6";
+//    final String url = "https://7.192.80.10,https://7.192.80.11,https://7.192.80.12";
+//    final String userName = "svcOssAci";
+//    final String pw = "kf3as=Nx";
 
     public final static String APIC_CONFIG_LOCATION_KEY = "Location";
     public final static String APIC_CONFIG_URL_KEY = "URL";
@@ -72,6 +79,8 @@ public class ApicService {
     
     @Autowired
     private EventForwarder eventForwarder;
+    
+    private SouthboundConfigDao southboundConfigDao;
 
     private Scheduler scheduler = null;
     
@@ -93,7 +102,24 @@ public class ApicService {
 
         // TODO - this needs to be replaced with logic to build job for each
         // configured cluster
-        this.createAndScheduleJob(location, url, userName, pw, pollDurationMinutes);
+        List<SouthCluster> clusters = this.southboundConfigDao.getSouthboundClusters();
+        for (SouthCluster southCluster : clusters) {
+            if (southCluster.getClusterType().equals("CISCO-ACI")) {
+                String location = southCluster.getClusterName();
+                //Build URL
+                String url = "";
+                String username = "";
+                String password = "";
+                List<SouthElement> elements = southCluster.getElements();
+                for (SouthElement element : elements ){
+                    url += "https://" + element.getHost() + ":"  + element.getPort() + ",";
+                    username = element.getUserid();
+                    password = element.getPassword();
+                }
+                this.createAndScheduleJob(location, org.apache.commons.lang.StringUtils.chomp(url, ","), 
+                        username, password, southCluster.getPollDurationMinutes());
+            }
+        }
     }
 
     public void destroy() {
@@ -157,6 +183,10 @@ public class ApicService {
      */
     public void setEventForwarder(EventForwarder eventForwarder) {
         this.eventForwarder = eventForwarder;
+    }
+
+    public void setSouthboundConfigDao(SouthboundConfigDao southboundConfigDao) {
+        this.southboundConfigDao = southboundConfigDao;
     }
 
 }

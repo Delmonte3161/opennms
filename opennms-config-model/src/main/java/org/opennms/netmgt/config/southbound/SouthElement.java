@@ -26,7 +26,7 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.netmgt.config.southd;
+package org.opennms.netmgt.config.southbound;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -45,7 +45,7 @@ import org.opennms.netmgt.config.utils.ConfigUtils;
  */
 @XmlRootElement(name = "south-element")
 @XmlAccessorType(XmlAccessType.FIELD)
-@ValidateUsing("southd-configuration.xsd")
+@ValidateUsing("southbound-configuration.xsd")
 public class SouthElement implements Serializable {
     
     private static final long serialVersionUID = 2L;

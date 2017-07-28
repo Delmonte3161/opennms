@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema" 
-        targetNamespace="http://xmlns.opennms.org/xsd/config/southd-configuration" 
-        xmlns:this="http://xmlns.opennms.org/xsd/config/southd-configuration" elementFormDefault="qualified">
+        targetNamespace="http://xmlns.opennms.org/xsd/config/southbound-configuration" 
+        xmlns:this="http://xmlns.opennms.org/xsd/config/southbound-configuration" elementFormDefault="qualified">
  
-  <element name="southd-configuration">
+  <element name="southbound-configuration">
     <complexType>
       <sequence>
         <element ref="this:south-cluster" minOccurs="0" maxOccurs="unbounded" />
@@ -32,7 +32,9 @@
     <complexType>
       <sequence>
         <element name="cluster-name" maxOccurs="1" minOccurs="0" type="string"/>
-        <element name="cron-schedule" minOccurs="1" maxOccurs="1" type="string" />
+        <element name="cluster-type" maxOccurs="1" minOccurs="0" type="string"/>
+        <element name="cron-schedule" maxOccurs="1" minOccurs="0" type="string" />
+        <element name="poll-duration-minutes" maxOccurs="1" minOccurs="0" type="integer" />
         <element ref="this:south-element" minOccurs="0" maxOccurs="unbounded" />
       </sequence>
     </complexType>

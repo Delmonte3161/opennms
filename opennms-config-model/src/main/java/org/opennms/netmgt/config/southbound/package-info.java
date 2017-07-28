@@ -27,12 +27,12 @@
  *******************************************************************************/
 
 @XmlSchema(
-           namespace = "http://xmlns.opennms.org/xsd/config/southd-configuration",
+           namespace = "http://xmlns.opennms.org/xsd/config/southbound-configuration",
            elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED,
            xmlns={
-                   @XmlNs(prefix="", namespaceURI="http://xmlns.opennms.org/xsd/config/southd-configuration"),
+                   @XmlNs(prefix="", namespaceURI="http://xmlns.opennms.org/xsd/config/southbound-configuration"),
            }
         )
-package org.opennms.netmgt.config.southd;
+package org.opennms.netmgt.config.southbound;
 import javax.xml.bind.annotation.XmlNs;
 import javax.xml.bind.annotation.XmlSchema;

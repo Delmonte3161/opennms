@@ -26,9 +26,11 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.netmgt.config.southd;
+package org.opennms.netmgt.config.southbound;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -42,22 +44,30 @@ import org.opennms.core.xml.ValidateUsing;
  * @author tf016851
  *
  */
-@XmlRootElement(name = "southd-configuration")
+@XmlRootElement(name = "southbound-configuration")
 @XmlAccessorType(XmlAccessType.FIELD)
-@ValidateUsing("southd-configuration.xsd")
-public class SouthdConfiguration implements Serializable {
+@ValidateUsing("southbound-configuration.xsd")
+public class SouthboundConfiguration implements Serializable {
 
     private static final long serialVersionUID = 2L;
     
     @XmlElement(name = "south-cluster")
-    private SouthCluster m_southCluster;
+    private List<SouthCluster> m_southCluster = new ArrayList<SouthCluster>();
 
-    public SouthCluster getSouthCluster() {
+    public List<SouthCluster> getSouthClusters() {
         return m_southCluster;
     }
 
-    public void setSouthCluster(SouthCluster southCluster) {
+    public void setSouthCluster(List<SouthCluster> southCluster) {
         this.m_southCluster = southCluster;
+    }
+    
+    public void addSouthCluster(SouthCluster southCluster) {
+        this.m_southCluster.add(southCluster);
+    }
+    
+    public void removeSouthCluster(SouthCluster southCluster) {
+        this.m_southCluster.remove(southCluster);
     }
 
     @Override
@@ -70,8 +80,8 @@ public class SouthdConfiguration implements Serializable {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof SouthdConfiguration) {
-            SouthdConfiguration other = (SouthdConfiguration) obj;
+        if (obj instanceof SouthboundConfiguration) {
+            SouthboundConfiguration other = (SouthboundConfiguration) obj;
             return Objects.equals(this.m_southCluster, other.m_southCluster);
         }
         return false;
