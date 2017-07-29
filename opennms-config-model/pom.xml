@@ -79,6 +79,7 @@
               org.opennms.netmgt.config.siteStatusViews.*;version="${project.version}",
               org.opennms.netmgt.config.snmpAsset.adapter.*;version="${project.version}",
               org.opennms.netmgt.config.snmpinterfacepoller.*;version="${project.version}",
+              org.opennms.netmgt.config.southbound.*;version="${project.version}",
               org.opennms.netmgt.config.statsd.*;version="${project.version}",
               org.opennms.netmgt.config.surveillanceViews.*;version="${project.version}",
               org.opennms.netmgt.config.syslogd.*;version="${project.version}",
