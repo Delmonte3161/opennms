@@ -36,6 +36,12 @@
             <bundle>mvn:joda-time/joda-time/${jodaTimeVersion}</bundle>
             <bundle>wrap:mvn:com.swrve/rate-limited-logger/${rateLimitedLoggerVersion}</bundle>
 
+            <!-- opennms config depenencies -->
+            <bundle>mvn:org.opennms/opennms-config-api/${project.version}</bundle>
+            <bundle>mvn:org.opennms/opennms-dao-api/${project.version}</bundle>
+            <bundle>mvn:org.opennms/opennms-dao/${project.version}</bundle>
+            <bundle>mvn:org.opennms/opennms-config-model/${project.version}</bundle>
+
             <!-- opennms-core-ipc-sink-api feature -->
             <bundle>mvn:org.opennms.core.ipc.sink/org.opennms.core.ipc.sink.api/${project.version}</bundle>
             <bundle>mvn:org.opennms.core.ipc.sink/org.opennms.core.ipc.sink.common/${project.version}</bundle>

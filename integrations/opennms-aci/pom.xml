@@ -28,6 +28,7 @@
 
   <modules>
     <module>aci-rest</module>
+    <module>config</module>
     <module>shell-commands</module>
     <module>main-module</module>
     <module>feature</module>
