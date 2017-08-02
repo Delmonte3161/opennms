@@ -28,13 +28,18 @@
 
 package org.opennms.netmgt.dao.jaxb.southbound;
 
+import java.io.File;
 import java.net.MalformedURLException;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.opennms.core.xml.AbstractJaxbConfigDao;
 import org.opennms.netmgt.config.southbound.SouthCluster;
 import org.opennms.netmgt.config.southbound.SouthboundConfiguration;
 import org.opennms.netmgt.dao.southbound.SouthboundConfigDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.dao.DataAccessResourceFailureException;
 
@@ -46,16 +51,22 @@ import org.springframework.dao.DataAccessResourceFailureException;
  */
 public class DefaultSouthboundConfigDao extends AbstractJaxbConfigDao<SouthboundConfiguration, SouthboundConfiguration> implements SouthboundConfigDao {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultSouthboundConfigDao.class);
+    
     /**
+     * @throws MalformedURLException 
      * 
      */
     public DefaultSouthboundConfigDao() {
         super(SouthboundConfiguration.class, "Southbound Controlller Config");
+        Resource configResource = null;
         try {
-            this.setConfigResource(new UrlResource("file:${opennms.home}/etc/southbound-configuration.xml"));
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            configResource = new UrlResource(Paths.get(System.getProperty("opennms.home"), "etc/southbound-configuration.xml").toUri());
+            LOG.debug("Setting configResource: " + configResource.getFilename());
+            this.setConfigResource(configResource);
+            this.afterPropertiesSet();
+        } catch (Exception e) {
+            LOG.warn("Error loading resource: " + configResource.toString(), e);
         }
     }
 
