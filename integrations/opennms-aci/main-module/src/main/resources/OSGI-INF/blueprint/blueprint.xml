@@ -13,8 +13,10 @@
 
   <reference id="eventForwarder" interface="org.opennms.netmgt.events.api.EventForwarder" availability="mandatory"/>
   
-  <bean id="southboundConfigDao" class="org.opennms.netmgt.dao.jaxb.DefaultSouthboundConfigDao">
+  <bean id="southboundConfigDao" class="org.opennms.netmgt.dao.southbound.jaxb.DefaultSouthboundConfigDao">
+  <!--
     <property name="configResource" value="file:${opennms.home}/etc/southbound-configuration.xml" />
+   -->
     <property name="reloadCheckInterval" value="-1" />
   </bean>
   

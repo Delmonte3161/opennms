@@ -26,14 +26,16 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.netmgt.dao.jaxb;
+package org.opennms.netmgt.dao.jaxb.southbound;
 
+import java.net.MalformedURLException;
 import java.util.List;
 
 import org.opennms.core.xml.AbstractJaxbConfigDao;
 import org.opennms.netmgt.config.southbound.SouthCluster;
 import org.opennms.netmgt.config.southbound.SouthboundConfiguration;
-import org.opennms.netmgt.dao.api.SouthboundConfigDao;
+import org.opennms.netmgt.dao.southbound.SouthboundConfigDao;
+import org.springframework.core.io.UrlResource;
 import org.springframework.dao.DataAccessResourceFailureException;
 
 /**
@@ -49,10 +51,16 @@ public class DefaultSouthboundConfigDao extends AbstractJaxbConfigDao<Southbound
      */
     public DefaultSouthboundConfigDao() {
         super(SouthboundConfiguration.class, "Southbound Controlller Config");
+        try {
+            this.setConfigResource(new UrlResource("file:${opennms.home}/etc/southbound-configuration.xml"));
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /* (non-Javadoc)
-     * @see org.opennms.netmgt.dao.api.SouthboundConfigDao#getSouthboundConfig()
+     * @see org.opennms.netmgt.dao.southbound.api.SouthboundConfigDao#getSouthboundConfig()
      */
     @Override
     public SouthboundConfiguration getSouthboundConfig() {
@@ -60,7 +68,7 @@ public class DefaultSouthboundConfigDao extends AbstractJaxbConfigDao<Southbound
     }
 
     /* (non-Javadoc)
-     * @see org.opennms.netmgt.dao.api.SouthboundConfigDao#getSouthboundCluster()
+     * @see org.opennms.netmgt.dao.southbound.api.SouthboundConfigDao#getSouthboundCluster()
      */
     @Override
     public List<SouthCluster> getSouthboundClusters() {
@@ -68,7 +76,7 @@ public class DefaultSouthboundConfigDao extends AbstractJaxbConfigDao<Southbound
     }
 
     /* (non-Javadoc)
-     * @see org.opennms.netmgt.dao.api.SouthboundConfigDao#reloadConfiguration()
+     * @see org.opennms.netmgt.dao.southbound.api.SouthboundConfigDao#reloadConfiguration()
      */
     @Override
     public void reloadConfiguration()

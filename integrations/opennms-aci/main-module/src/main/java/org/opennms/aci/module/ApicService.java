@@ -36,7 +36,7 @@ import java.util.Map;
 
 import org.opennms.netmgt.config.southbound.SouthCluster;
 import org.opennms.netmgt.config.southbound.SouthElement;
-import org.opennms.netmgt.dao.api.SouthboundConfigDao;
+import org.opennms.netmgt.dao.southbound.SouthboundConfigDao;
 import org.opennms.netmgt.events.api.EventForwarder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
