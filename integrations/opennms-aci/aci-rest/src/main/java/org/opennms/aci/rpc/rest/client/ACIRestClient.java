@@ -75,6 +75,8 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Java REST client for ACI API.
@@ -82,6 +84,8 @@ import org.json.simple.parser.JSONParser;
  * @author tf016851
  */
 public class ACIRestClient {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(ACIRestClient.class);
 
     /**
      * An intermediary class for Rest requests that use HTTP GET
@@ -183,7 +187,7 @@ public class ACIRestClient {
                                                       null, null, port);
             JSONObject loginResult;
             loginResult = aciRest.login();
-            System.err.println(loginResult.toJSONString());
+            LOG.debug(loginResult.toJSONString());
             return aciRest;
         }
         // If we made it here, then failed to login
@@ -237,7 +241,7 @@ public class ACIRestClient {
                                                       port);
             JSONObject loginResult;
             loginResult = aciRest.login();
-            System.err.println(loginResult.toJSONString());
+            LOG.debug(loginResult.toJSONString());
             return aciRest;
         }
         // If we made it here, then failed to login
@@ -390,7 +394,8 @@ public class ACIRestClient {
      * @param classes
      * @throws Exception
      */
-    public void getHealth(String... classes) throws Exception {
+    public List<JSONArray> getHealth(String... classes) throws Exception {
+        List<JSONArray> results = new ArrayList<JSONArray>();
         for (String apicClass : classes) {
             String queryUrl = "node/class/" + apicClass + ".json";
             JSONObject result = (JSONObject) this.get(queryUrl);
@@ -417,6 +422,7 @@ public class ACIRestClient {
 
                         JSONObject healthrt = (JSONObject) this.get(hqueryUrl);
                         JSONArray healthdata = (JSONArray) healthrt.get("imdata");
+                        results.add(healthdata);
                         printObjectProperties(healthdata, apicClass, this.host);
                         // printObjectProperties( healthdata, "healthInst",
                         // this.host );
@@ -433,6 +439,7 @@ public class ACIRestClient {
 
                         JSONObject faultrt = (JSONObject) this.get(fqueryUrl);
                         JSONArray faultdata = (JSONArray) faultrt.get("imdata");
+                        results.add(faultdata);
                         // printObjectProperties( faultdata, "faultDelegate",
                         // this.host );
                         printObjectProperties(faultdata, apicClass, this.host);
@@ -443,6 +450,7 @@ public class ACIRestClient {
 
         }
 
+        return results;
     }
 
     /**
@@ -453,7 +461,8 @@ public class ACIRestClient {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    public void getStats(String... classes) throws Exception {
+    public List<JSONArray> getStats(String... classes) throws Exception {
+        List<JSONArray> results = new ArrayList<JSONArray>();
         for (String apicClass : classes) {
             if (!apicClass.equals("fvCEp")) {
                 String queryUrl = "node/class/" + apicClass + ".json";
@@ -471,6 +480,7 @@ public class ACIRestClient {
                                 + ".json?rsp-subtree-include=stats,no-scoped";
                         JSONObject moret = (JSONObject) this.get(moqueryUrl);
                         JSONArray modata = (JSONArray) moret.get("imdata");
+                        results.add(modata);
                         printObjectProperties(modata, apicClass, this.host);
                     }
                 }
@@ -488,6 +498,7 @@ public class ACIRestClient {
                         JSONObject attributes = (JSONObject) ((JSONObject) objectData.get(key)).get("attributes");
                         JSONArray children = (JSONArray) ((JSONObject) objectData.get(key)).get("children");
 
+                        results.add(children);
                         for (Object cobject : children) {
                             JSONObject cobjectData = (JSONObject) cobject;
                             for (Object cobject2 : cobjectData.keySet()) {
@@ -502,11 +513,13 @@ public class ACIRestClient {
                         }
                         attributes.put("apic_host", this.host);
                         attributes.put("component", apicClass);
-                        System.out.println(attributes.toJSONString());
+                        LOG.debug(attributes.toJSONString());
                     }
                 }
             }
         }
+        
+        return results;
     }
 
     public JSONArray getCurrentFaults(String scaleStart) throws Exception {
@@ -521,7 +534,7 @@ public class ACIRestClient {
      * @param classes
      * @throws Exception
      */
-    public void getClassInfo(String... classes) throws Exception {
+    public JSONArray getClassInfo(String... classes) throws Exception {
 
         List<Thread> classThreads = new ArrayList<Thread>();
         for (String apicClass : classes) {
@@ -541,8 +554,9 @@ public class ACIRestClient {
                 JSONObject result = (JSONObject) this.get(queryUrl);
                 int totalCount = Integer.parseInt((String) result.get("totalCount"));
                 printObjectProperties((JSONArray) result.get("imdata"), apicClass, this.host);
-                System.err.println("Found " + totalCount + " " + apicClass
+                LOG.debug("Found " + totalCount + " " + apicClass
                         + " record(s)");
+                return (JSONArray) result.get("imdata");
             }
         }
 
@@ -551,6 +565,7 @@ public class ACIRestClient {
             if (t.isAlive())
                 t.join();
         }
+        return null;
     }
 
     private void getBigDataResult(String apicClass) {
@@ -559,7 +574,7 @@ public class ACIRestClient {
                 + "_LastTransactionTime.txt";
         String filePath = Paths.get(cwd, fileName).toAbsolutePath().normalize().toString();
         BufferedReader reader = null;
-        System.err.println(filePath);
+        LOG.debug(filePath);
 
         try {
             File file = new File(filePath);
@@ -613,7 +628,7 @@ public class ACIRestClient {
 
             int totalCount = this.queryAndPrint(apicClass, queryUrl);
             this.updateFile(filePath, scaleEnd);
-            System.err.println("Finished processing " + totalCount + " "
+            LOG.debug("Finished processing " + totalCount + " "
                     + apicClass + " entrie(s)");
         } else {
             // Since we have more than 99000 results, we have to paginate over
@@ -692,7 +707,7 @@ public class ACIRestClient {
                 start++;
             }
         }
-        System.err.println("Finished processing " + entryCount + " "
+        LOG.debug("Finished processing " + entryCount + " "
                 + apicClass + " entrie(s)");
 
     }
@@ -700,7 +715,7 @@ public class ACIRestClient {
     private JSONArray getBigDataRange(String apicClass, String scaleStart)
             throws Exception {
         String queryUrl = "node/class/" + apicClass
-                + ".json?query-target-filter=ge(" + apicClass
+                + ".json?query-target-filter=gt(" + apicClass
                 + ".created,\"" + scaleStart + "\")";
         return this.getFaults(queryUrl);
     }
@@ -708,11 +723,11 @@ public class ACIRestClient {
     private int processBigDataRange(String apicClass, String scaleStart)
             throws Exception {
         String queryUrl = "node/class/" + apicClass
-                + ".json?query-target-filter=ge(" + apicClass
+                + ".json?query-target-filter=gt(" + apicClass
                 + ".created,\"" + scaleStart + "\")";
 
         int totalCount = this.queryAndPrint(apicClass, queryUrl);
-        System.err.println("Processed " + apicClass + " ( " + scaleStart
+        LOG.debug("Processed " + apicClass + " ( " + scaleStart
                 +  " ) with " + totalCount + " entrie(s)");
 
         return totalCount;
@@ -726,7 +741,7 @@ public class ACIRestClient {
                 + ".created,\"" + scaleEnd + "\"))";
 
         int totalCount = this.queryAndPrint(apicClass, queryUrl);
-        System.err.println("Processed " + apicClass + " ( " + scaleStart
+        LOG.debug("Processed " + apicClass + " ( " + scaleStart
                 + " to " + scaleEnd + " ) with " + totalCount + " entrie(s)");
 
         return totalCount;
