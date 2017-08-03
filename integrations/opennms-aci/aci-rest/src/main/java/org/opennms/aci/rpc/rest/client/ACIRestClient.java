@@ -185,10 +185,14 @@ public class ACIRestClient {
             ACIRestClient aciRest = new ACIRestClient(cluster, uri.getHost(),
                                                       username, password,
                                                       null, null, port);
-            JSONObject loginResult;
-            loginResult = aciRest.login();
-            LOG.debug(loginResult.toJSONString());
-            return aciRest;
+            try {
+                JSONObject loginResult;
+                loginResult = aciRest.login();
+                LOG.trace(loginResult.toJSONString());
+                return aciRest;
+            } catch (Exception e) {
+                LOG.warn("Failed to connect to " + uri.toASCIIString(), e);
+            }
         }
         // If we made it here, then failed to login
         throw new ACIRestException("Could not login to Rest API server. Please check login credentials.");
@@ -239,10 +243,14 @@ public class ACIRestClient {
                                                       trustStorePath,
                                                       trustStorePassword,
                                                       port);
-            JSONObject loginResult;
-            loginResult = aciRest.login();
-            LOG.debug(loginResult.toJSONString());
-            return aciRest;
+            try {
+                JSONObject loginResult;
+                loginResult = aciRest.login();
+                LOG.trace(loginResult.toJSONString());
+                return aciRest;
+            } catch (Exception e) {
+                LOG.warn("Failed to connect to " + uri.toASCIIString(), e);
+            }
         }
         // If we made it here, then failed to login
         throw new ACIRestException("Could not login to Rest API server. Please check login credentials.");
