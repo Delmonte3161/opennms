@@ -36,6 +36,7 @@ import java.util.Map;
 
 import org.opennms.netmgt.config.southbound.SouthCluster;
 import org.opennms.netmgt.config.southbound.SouthElement;
+import org.opennms.netmgt.dao.api.EventDao;
 import org.opennms.netmgt.dao.southbound.SouthboundConfigDao;
 import org.opennms.netmgt.events.api.EventForwarder;
 import org.quartz.JobBuilder;
@@ -74,6 +75,7 @@ public class ApicService {
     public final static String APIC_CONFIG_PASSWORD_KEY = "Password";
     public final static String APIC_CONFIG_POLL_DURATION_KEY = "pollDuration";
     public final static String APIC_CONFIG_EVENT_FORWARDER = "EventForwarder";
+    public final static String APIC_CONFIG_EVENT_DAO = "EventDao";
     public final static String APIC_CONFIG_CLUSTER_MAP = "ClusterMap";
     public final static String APIC_CLUSTER_MAP_LAST_PROCESS_TIME = "lastProcessTime";
     
@@ -81,6 +83,8 @@ public class ApicService {
     private EventForwarder eventForwarder;
     
     private SouthboundConfigDao southboundConfigDao;
+    
+    private EventDao eventDao;
 
     private Scheduler scheduler = null;
     
@@ -161,6 +165,7 @@ public class ApicService {
         try {
             scheduler = new StdSchedulerFactory().getScheduler();
             scheduler.getContext().put(APIC_CONFIG_EVENT_FORWARDER, eventForwarder);
+            scheduler.getContext().put(APIC_CONFIG_EVENT_DAO, eventDao);
             scheduler.getContext().put(APIC_CONFIG_CLUSTER_MAP, clusterMap);
             scheduler.start();
             scheduler.scheduleJob(job, trigger);
@@ -187,6 +192,14 @@ public class ApicService {
 
     public void setSouthboundConfigDao(SouthboundConfigDao southboundConfigDao) {
         this.southboundConfigDao = southboundConfigDao;
+    }
+
+    public EventDao getEventDao() {
+        return eventDao;
+    }
+
+    public void setEventDao(EventDao eventDao) {
+        this.eventDao = eventDao;
     }
 
 }

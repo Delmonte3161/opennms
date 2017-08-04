@@ -29,12 +29,17 @@
 package org.opennms.aci.module;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.opennms.aci.rpc.rest.client.ACIRestClient;
+import org.opennms.core.criteria.Alias.JoinType;
+import org.opennms.core.criteria.CriteriaBuilder;
+import org.opennms.netmgt.dao.api.EventDao;
 import org.opennms.netmgt.events.api.EventForwarder;
+import org.opennms.netmgt.model.OnmsEvent;
 import org.opennms.netmgt.model.events.EventBuilder;
 import org.opennms.netmgt.xml.event.Event;
 import org.opennms.netmgt.xml.event.Events;
@@ -103,6 +108,7 @@ public class ApicClusterJob implements Job {
         }
 
         EventForwarder eventForwarder = (EventForwarder) schedulerContext.get(ApicService.APIC_CONFIG_EVENT_FORWARDER);
+        EventDao eventDao = (EventDao) schedulerContext.get(ApicService.APIC_CONFIG_EVENT_DAO);
 
         // TODO - Need to add logic for determining the last fault process
         // time.
@@ -125,12 +131,31 @@ public class ApicClusterJob implements Job {
             // If last execution time is null (first time after restart),
             // then set from last event
             if (clusterJobMap.get(ApicService.APIC_CLUSTER_MAP_LAST_PROCESS_TIME) == null) {
-                // TODO - For now just use current system time from APIC,
-                // replace with logic to query last event time.
-                lastProcessTime = client.getTimeStamp(pollDuration * 60);
-                clusterJobMap.put(ApicService.APIC_CLUSTER_MAP_LAST_PROCESS_TIME, lastProcessTime);
+                LOG.debug("Querying for last processed event for location: " + location);
+                CriteriaBuilder builder = new CriteriaBuilder(OnmsEvent.class);
+                builder.alias("node", "node", JoinType.LEFT_JOIN);
+                builder.alias("node.snmpInterfaces", "snmpInterface", JoinType.LEFT_JOIN);
+                builder.alias("node.ipInterfaces", "ipInterface", JoinType.LEFT_JOIN);
+                builder.alias("node.location", "location", JoinType.LEFT_JOIN);
+                builder.alias("serviceType", "serviceType", JoinType.LEFT_JOIN);
+                builder.eq("location.id", location);
+                builder.orderBy("eventTime").desc();
+                builder.limit(10);
+                List<OnmsEvent> events = eventDao.findMatching(builder.toCriteria());
+                if (events == null || events.size() < 1) {
+                    LOG.debug("No events found for locatin: " + location);
+                    lastProcessTime = client.getTimeStamp(pollDuration * 60);
+                    clusterJobMap.put(ApicService.APIC_CLUSTER_MAP_LAST_PROCESS_TIME, lastProcessTime);
+                } else {
+                    LOG.debug("Found events, setting last processed time.");
+                    OnmsEvent event = events.get(1);
+                    Date eventTime = event.getEventTime();
+                    lastProcessTime = ApicService.format.format(eventTime);
+                    clusterJobMap.put(ApicService.APIC_CLUSTER_MAP_LAST_PROCESS_TIME, lastProcessTime);
+                }
             } else {
                 lastProcessTime = (String) clusterJobMap.get(ApicService.APIC_CLUSTER_MAP_LAST_PROCESS_TIME);
+                LOG.trace("Setting lastProcessTime = " + lastProcessTime);
             }
 
             LOG.debug("Querying for faults after: " + lastProcessTime);

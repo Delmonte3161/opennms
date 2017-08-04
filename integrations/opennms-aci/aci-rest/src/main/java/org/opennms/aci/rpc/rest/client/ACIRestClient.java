@@ -186,8 +186,7 @@ public class ACIRestClient {
                                                       username, password,
                                                       null, null, port);
             try {
-                JSONObject loginResult;
-                loginResult = aciRest.login();
+                JSONObject loginResult = aciRest.login();
                 LOG.trace(loginResult.toJSONString());
                 return aciRest;
             } catch (Exception e) {
@@ -244,8 +243,7 @@ public class ACIRestClient {
                                                       trustStorePassword,
                                                       port);
             try {
-                JSONObject loginResult;
-                loginResult = aciRest.login();
+                JSONObject loginResult = aciRest.login();
                 LOG.trace(loginResult.toJSONString());
                 return aciRest;
             } catch (Exception e) {
