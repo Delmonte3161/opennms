@@ -40,15 +40,15 @@
             <!-- https://www.datadoghq.com/blog/monitoring-kafka-performance-metrics/ -->
 
             <mbean name="Messages In Per Second" objectname="kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec">
-                <attrib name="Count" alias="msgInPerSec" type="gauge"/>
+                <attrib name="Count" alias="msgInPerSec" type="counter"/>
             </mbean>
 
             <mbean name="Bytes In Per Second" objectname="kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec">
-                <attrib name="Count" alias="bytesInPerSec" type="gauge"/>
+                <attrib name="Count" alias="bytesInPerSec" type="counter"/>
             </mbean>
 
             <mbean name="Bytes Out Per Second" objectname="kafka.server:type=BrokerTopicMetrics,name=BytesOutPerSec">
-                <attrib name="Count" alias="bytesOutPerSec" type="gauge"/>
+                <attrib name="Count" alias="bytesOutPerSec" type="counter"/>
             </mbean>
 
 
@@ -72,12 +72,12 @@
 
             <!-- https://www.datadoghq.com/blog/monitoring-kafka-performance-metrics/ -->
             <mbean name="In-Sync Replica Shrinks Per Second" objectname="kafka.server:type=ReplicaManager,name=IsrShrinksPerSec">
-                <attrib name="Count" alias="isrShrinksPerSec" type="gauge"/>
+                <attrib name="Count" alias="isrShrinksPerSec" type="counter"/>
             </mbean>
 
             <!-- https://www.datadoghq.com/blog/monitoring-kafka-performance-metrics/ -->
             <mbean name="In-Sync Replica Expands Per Second" objectname="kafka.server:type=ReplicaManager,name=IsrExpandsPerSec">
-                <attrib name="Count" alias="isrExpandsPerSec" type="gauge"/>
+                <attrib name="Count" alias="isrExpandsPerSec" type="counter"/>
             </mbean>
 
 
@@ -117,7 +117,7 @@
             </mbean>
 
             <mbean name="Unclean Leader Elections Per Second" objectname="kafka.controller:type=ControllerStats,name=UncleanLeaderElectionsPerSec">
-                <attrib name="Count" alias="uncleanLeaderEps" type="gauge"/>
+                <attrib name="Count" alias="uncleanLeaderEps" type="counter"/>
             </mbean>
 
 
@@ -163,51 +163,51 @@
             <!-- https://www.datadoghq.com/blog/monitoring-kafka-performance-metrics/ -->
 
             <mbean name="Requests Per Second: Produce" objectname="kafka.network:type=RequestMetrics,name=RequestsPerSec,request=Produce">
-                <attrib name="Count" alias="reqSecProduce" type="gauge"/>
+                <attrib name="Count" alias="reqSecProduce" type="counter"/>
             </mbean>
 
             <mbean name="Requests Per Second: FetchConsumer" objectname="kafka.network:type=RequestMetrics,name=RequestsPerSec,request=FetchConsumer">
-                <attrib name="Count" alias="reqSecConsumer" type="gauge"/>
+                <attrib name="Count" alias="reqSecConsumer" type="counter"/>
             </mbean>
 
             <mbean name="Requests Per Second: FetchFollower" objectname="kafka.network:type=RequestMetrics,name=RequestsPerSec,request=FetchFollower">
-                <attrib name="Count" alias="reqSecFollower" type="gauge"/>
+                <attrib name="Count" alias="reqSecFollower" type="counter"/>
             </mbean>
 
             <mbean name="Total Time: Produce" objectname="kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce">
-                <attrib name="Count" alias="totalTimeProduce" type="gauge"/>
+                <attrib name="Count" alias="totalTimeProduce" type="counter"/>
             </mbean>
 
             <mbean name="Total Time: FetchConsumer" objectname="kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchConsumer">
-                <attrib name="Count" alias="totalTimeConsumer" type="gauge"/>
+                <attrib name="Count" alias="totalTimeConsumer" type="counter"/>
             </mbean>
 
             <mbean name="Total Time: FetchFollower" objectname="kafka.network:type=RequestMetrics,name=TotalTimeMs,request=FetchFollower">
-                <attrib name="Count" alias="totalTimeFollower" type="gauge"/>
+                <attrib name="Count" alias="totalTimeFollower" type="counter"/>
             </mbean>
 
             <mbean name="Queue Time: Produce" objectname="kafka.network:type=RequestMetrics,name=RequestQueueTimeMs,request=Produce">
-                <attrib name="Count" alias="queueTimeProduce" type="gauge"/>
+                <attrib name="Count" alias="queueTimeProduce" type="counter"/>
             </mbean>
 
             <mbean name="Queue Time: FetchConsumer" objectname="kafka.network:type=RequestMetrics,name=RequestQueueTimeMs,request=FetchConsumer">
-                <attrib name="Count" alias="queueTimeConsumer" type="gauge"/>
+                <attrib name="Count" alias="queueTimeConsumer" type="counter"/>
             </mbean>
 
             <mbean name="Queue Time: FetchFollower" objectname="kafka.network:type=RequestMetrics,name=RequestQueueTimeMs,request=FetchFollower">
-                <attrib name="Count" alias="queueTimeFollower" type="gauge"/>
+                <attrib name="Count" alias="queueTimeFollower" type="counter"/>
             </mbean>
 
             <mbean name="Local Time: Produce" objectname="kafka.network:type=RequestMetrics,name=LocalTimeMs,request=Produce">
-                <attrib name="Count" alias="localTimeProduce" type="gauge"/>
+                <attrib name="Count" alias="localTimeProduce" type="counter"/>
             </mbean>
 
             <mbean name="Local Time: FetchConsumer" objectname="kafka.network:type=RequestMetrics,name=LocalTimeMs,request=FetchConsumer">
-                <attrib name="Count" alias="localTimeConsumer" type="gauge"/>
+                <attrib name="Count" alias="localTimeConsumer" type="counter"/>
             </mbean>
 
             <mbean name="Local Time: FetchFollower" objectname="kafka.network:type=RequestMetrics,name=LocalTimeMs,request=FetchFollower">
-                <attrib name="Count" alias="localTimeFollower" type="gauge"/>
+                <attrib name="Count" alias="localTimeFollower" type="counter"/>
             </mbean>
 
             <mbean name="Remote Time: Produce" objectname="kafka.network:type=RequestMetrics,name=RemoteTimeMs,request=Produce">
@@ -215,23 +215,23 @@
             </mbean>
 
             <mbean name="Remote Time: FetchConsumer" objectname="kafka.network:type=RequestMetrics,name=RemoteTimeMs,request=FetchConsumer">
-                <attrib name="Count" alias="remoteTimeConsumer" type="gauge"/>
+                <attrib name="Count" alias="remoteTimeConsumer" type="counter"/>
             </mbean>
 
             <mbean name="Remote Time: FetchFollower" objectname="kafka.network:type=RequestMetrics,name=RemoteTimeMs,request=FetchFollower">
-                <attrib name="Count" alias="remoteTimeFollower" type="gauge"/>
+                <attrib name="Count" alias="remoteTimeFollower" type="counter"/>
             </mbean>
 
             <mbean name="Response Send Time: Produce" objectname="kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=Produce">
-                <attrib name="Count" alias="sendTimeProduce" type="gauge"/>
+                <attrib name="Count" alias="sendTimeProduce" type="counter"/>
             </mbean>
 
             <mbean name="Response Send Time: FetchConsumer" objectname="kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchConsumer">
-                <attrib name="Count" alias="sendTimeConsumer" type="gauge"/>
+                <attrib name="Count" alias="sendTimeConsumer" type="counter"/>
             </mbean>
 
             <mbean name="Response Send Time: FetchFollower" objectname="kafka.network:type=RequestMetrics,name=ResponseSendTimeMs,request=FetchFollower">
-                <attrib name="Count" alias="sendTimeFollower" type="gauge"/>
+                <attrib name="Count" alias="sendTimeFollower" type="counter"/>
             </mbean>
 
         </mbeans>

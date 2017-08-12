@@ -107,7 +107,11 @@ public class SharedSegment {
                 && m_designatedBridge.getNode().getId() == designatedBridge.intValue())
             return;
         for (BridgePort port: m_portsOnSegment) {
-            if (port.getNode().getId().intValue() == designatedBridge.intValue()) {
+            if (port == null)
+                continue;
+            if ( port.getNode() != null &&
+                    port.getNode().getId() != null
+                    && port.getNode().getId().intValue() == designatedBridge.intValue()) {
                 m_designatedBridge = port;
                 break;
             }
@@ -135,6 +139,9 @@ public class SharedSegment {
     public List<BridgeBridgeLink> getBridgeBridgeLinks() {
         List<BridgeBridgeLink> links = new ArrayList<BridgeBridgeLink>();
         for (BridgePort port: m_portsOnSegment) {
+            //FIXME port must not be null
+            if (port == null) 
+                continue;
             if (port.equals(m_designatedBridge))
                 continue;
             links.add(getBridgeBridgeLink(port));
@@ -146,7 +153,10 @@ public class SharedSegment {
     	List<BridgeMacLink> maclinks = new ArrayList<BridgeMacLink>();
     	for (String mac: m_macsOnSegment) {
     		for (BridgePort bp: m_portsOnSegment) {
-    			maclinks.add(BridgePort.getBridgeMacLink(bp, mac));
+    	            //FIXME port must not be null
+    		    if (bp == null)
+    		        continue;
+    		    maclinks.add(BridgePort.getBridgeMacLink(bp, mac));
     		}
     	}
         return maclinks;
@@ -176,15 +186,24 @@ public class SharedSegment {
     //    move all the macs and port on shared
     //  ------> topSegment {tmac...}U{smac....} {(tbridge,tport)}U{(sbridge,sport).....}
     public void mergeBridge(SharedSegment shared, Integer bridgeId) {
+        if (bridgeId == null)
+            return;
     	Set<BridgePort> portsOnSegment = new HashSet<BridgePort>();
         for (BridgePort bp: m_portsOnSegment) {
-        	if (bp.getNode().getId().intValue() == bridgeId.intValue())
+            //FIXME port should never be null
+        	if ( bp == null || bp.getNode() == null ||
+        	     bp.getNode().getId() == null ||  
+        	        bp.getNode().getId().intValue() == bridgeId.intValue())
         		continue;
         	portsOnSegment.add(bp);
         }
         for (BridgePort port: shared.getBridgePortsOnSegment()) {
-            if (port.getNode().getId().intValue() == bridgeId.intValue())
+            //FIXME port should never be null
+            if (port == null || port.getNode() == null ||
+                    port.getNode().getId() == null
+                    || port.getNode().getId().intValue() == bridgeId.intValue()) {
                 continue;
+            }
             portsOnSegment.add(port);
         }
         m_portsOnSegment = portsOnSegment;
@@ -206,7 +225,9 @@ public class SharedSegment {
             return;
         Set<BridgePort> updateportsonsegment = new HashSet<BridgePort>();
         for (BridgePort port: m_portsOnSegment) {
-            if (port.getNode().getId().intValue() == bridgeId)
+            if (port != null && port.getNode() != null &&
+                    port.getNode().getId() != null
+                    && port.getNode().getId().intValue() == bridgeId)
                 continue;
             updateportsonsegment.add(port);
         }
@@ -232,7 +253,11 @@ public class SharedSegment {
     public Set<Integer> getBridgeIdsOnSegment() {
         Set<Integer> nodes = new HashSet<Integer>();
         for (BridgePort link: m_portsOnSegment) {
-            nodes.add(link.getNode().getId());
+            //FIXME port should never be null
+            if (link == null || link.getNode() == null)
+                continue;
+            if (link.getNode().getId() != null)
+                nodes.add(link.getNode().getId());
         }
         return nodes;
     }
@@ -249,6 +274,8 @@ public class SharedSegment {
             return false;
         }
         for (BridgePort port: m_portsOnSegment) {
+                if (port == null)
+                    continue;
         	if (port.getNode().getId().intValue() != nodeid.intValue()) {
         		continue;
         	}
@@ -264,7 +291,9 @@ public class SharedSegment {
         if (nodeid == null)
             return null;
         for (BridgePort link: m_portsOnSegment) {
-                if (link.getNode().getId().intValue() == nodeid.intValue() )
+                if (link!= null && link.getNode() != null &&
+                        link.getNode().getId() != null &&
+                        link.getNode().getId().intValue() == nodeid.intValue() )
                     return link;
         }
         return null;        
@@ -274,7 +303,9 @@ public class SharedSegment {
         if (nodeid == null)
             return null;
         for (BridgePort link: m_portsOnSegment) {
-                if (link.getNode().getId().intValue() == nodeid.intValue() )
+                if (link != null && link.getNode() != null 
+                        && link.getNode().getId() != null 
+                        && link.getNode().getId().intValue() == nodeid.intValue() )
                     return link.getBridgePort();
         }
         return null;
@@ -282,19 +313,20 @@ public class SharedSegment {
 
     public String printTopology() {
     	StringBuffer strbfr = new StringBuffer();
-            strbfr.append("segment:[bridges:");
+            strbfr.append("segment ->\nsegment bridges:");
             strbfr.append(getBridgeIdsOnSegment());
             strbfr.append(", designated bridge:[");
             strbfr.append(getDesignatedBridge());
-            strbfr.append("], designated port:");
+            strbfr.append(", designated port:");
             strbfr.append(getDesignatedPort());
-            strbfr.append(", macs:");
-            strbfr.append(getMacsOnSegment());
             strbfr.append("]\n");
-            for (BridgeBridgeLink blink:  getBridgeBridgeLinks())
-            	strbfr.append(blink.printTopology());
-            for (BridgeMacLink mlink: getBridgeMacLinks()) 
-            	strbfr.append(mlink.printTopology());
+            for (BridgePort blink:  m_portsOnSegment)
+                strbfr.append(blink.printTopology());
+            for (String mac: getMacsOnSegment()) {
+                strbfr.append("segment mac:");
+                strbfr.append(mac);
+                strbfr.append("\n");
+            }
             
             return strbfr.toString();    	
     }

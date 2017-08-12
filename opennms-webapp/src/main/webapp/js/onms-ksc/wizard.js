@@ -1,6 +1,6 @@
 /**
 * @author Alejandro Galue <agalue@opennms.org>
-* @copyright 2016 The OpenNMS Group, Inc.
+* @copyright 2016-2017 The OpenNMS Group, Inc.
 */
 
 'use strict';
@@ -126,7 +126,7 @@ angular.module('onms-ksc-wizard', [
   $scope.kscMaxSize = 5;
   $scope.kscTotalItems = 0;
 
-  $scope.actionUrl = 'KSC/formProcMain.htm';
+  $scope.actionUrl = getBaseHref() + 'KSC/formProcMain.htm';
 
   $scope.reloadConfig = function() {
     bootbox.dialog({
@@ -195,7 +195,12 @@ angular.module('onms-ksc-wizard', [
   };
 
   $scope.selectResource = function(resource) {
-    $window.location.href = "KSC/customView.htm?type=node&report=" + resource.name;
+    var baseUrl = getBaseHref() + 'KSC/customView.htm';
+    if (resource.name.indexOf(':') > 0) {
+      $window.location.href = baseUrl + '?type=nodeSource&report=' + resource.name;
+    } else {
+      $window.location.href = baseUrl + '?type=node&report=' + resource.name;
+    }
   };
 
   $scope.updateResources = function() {

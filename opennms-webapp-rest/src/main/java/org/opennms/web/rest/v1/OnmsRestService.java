@@ -140,8 +140,10 @@ public class OnmsRestService {
 			}
 		}
 
-	    final String query = removeParameter(params, "query");
-	    if (query != null) builder.sql(query);
+		if (Boolean.getBoolean("org.opennms.web.rest.enableQuery")) {
+			final String query = removeParameter(params, "query");
+			if (query != null) builder.sql(query);
+		}
 
 		final String matchType;
 		final String match = removeParameter(params, "match");
@@ -177,7 +179,7 @@ public class OnmsRestService {
                     if (type == null) {
                         type = Object.class;
                     }
-                    LOG.warn("comparator = {}, key = {}, propertyType = {}", comparatorParam, key, type);
+                    LOG.debug("comparator = {}, key = {}, propertyType = {}", comparatorParam, key, type);
 
                     if (comparatorParam.equals("contains") || comparatorParam.equals("iplike") || comparatorParam.equals("ilike") || comparatorParam.equals("like")) {
 						value = paramValue;

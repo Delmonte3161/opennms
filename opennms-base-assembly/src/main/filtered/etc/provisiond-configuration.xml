@@ -5,7 +5,7 @@
   foreign-source-dir="${install.dir}/etc/foreign-sources" 
   requistion-dir="${install.dir}/etc/imports"
    
-  importThreads="8" scanThreads="10" rescanThreads="10" writeThreads="8" >
+  importThreads="80" scanThreads="100" rescanThreads="100" writeThreads="80" >
   
   <!--  
     http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger
