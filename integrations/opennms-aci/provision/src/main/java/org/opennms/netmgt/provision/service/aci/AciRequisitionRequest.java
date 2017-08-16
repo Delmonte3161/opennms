@@ -25,24 +25,11 @@
  *     http://www.opennms.org/
  *     http://www.opennms.com/
  *******************************************************************************/
+
 package org.opennms.netmgt.provision.service.aci;
-
-import org.opennms.netmgt.provision.persist.requisition.Requisition;
-
 /*
- * ACI Importer
- * 
  * @author mp050407
  */
-public class AciImporter {
-
-	public AciImporter(AciImportRequest request) {
-		// TODO Auto-generated constructor stub
-	}
-
-	public Requisition getRequisition() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+public class AciRequisitionRequest {
 
 }

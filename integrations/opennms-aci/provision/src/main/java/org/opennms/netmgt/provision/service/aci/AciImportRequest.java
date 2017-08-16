@@ -71,6 +71,10 @@ public class AciImportRequest implements RequisitionRequest {
 		setLocation(parameters.get("location"));
 	}
 
+	public AciImportRequest() {
+		// TODO Auto-generated constructor stub
+	}
+
 	private void setLocation(String location) {
 		this.location = location;
 	}

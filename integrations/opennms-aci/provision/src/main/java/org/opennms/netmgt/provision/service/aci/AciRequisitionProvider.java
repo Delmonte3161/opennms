@@ -58,6 +58,10 @@ public class AciRequisitionProvider extends AbstractRequisitionProvider<AciImpor
 		logger.debug("AciRequisitionProvider::AciRequisitionProvider");
 	}
 
+	public AciRequisitionProvider() {
+		super(AciImportRequest.class);
+	}
+
 	@Override
 	public String getType() {
 		return TYPE_NAME;

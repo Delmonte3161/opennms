@@ -10,7 +10,7 @@
 >
 
     <!-- The 'cisco-aci' provider -->
-    <bean id="aciRequisitionProvider" class="org.opennms.netmgt.provision.service.aci.aciRequisitionProvider" />
+    <bean id="aciRequisitionProvider" class="org.opennms.netmgt.provision.service.aci.AciRequisitionProvider" />
     <service ref="aciRequisitionProvider" interface="org.opennms.netmgt.provision.persist.RequisitionProvider">
       <service-properties>
         <entry key="type" value="aci" />
