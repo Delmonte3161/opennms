@@ -36,7 +36,7 @@ import org.opennms.netmgt.provision.persist.requisition.Requisition;
  */
 public class AciImporter {
 
-	public AciImporter(AciImportRequest request) {
+	public AciImporter(AciRequisitionRequest request) {
 		// TODO Auto-generated constructor stub
 	}
 

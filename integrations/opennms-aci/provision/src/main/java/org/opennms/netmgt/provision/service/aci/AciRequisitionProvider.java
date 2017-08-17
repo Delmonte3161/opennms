@@ -43,7 +43,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * 
  * author mp050407
  */
-public class AciRequisitionProvider extends AbstractRequisitionProvider<AciImportRequest>{
+public class AciRequisitionProvider extends AbstractRequisitionProvider<AciRequisitionRequest>{
 	
 	private static final Logger logger = LoggerFactory.getLogger(AciRequisitionProvider.class);
 	
@@ -53,13 +53,13 @@ public class AciRequisitionProvider extends AbstractRequisitionProvider<AciImpor
     @Qualifier("fileDeployed")
     private ForeignSourceRepository foreignSourceRepository;
 
-	public AciRequisitionProvider(Class<AciImportRequest> clazz) {
+	public AciRequisitionProvider(Class<AciRequisitionRequest> clazz) {
 		super(clazz);
 		logger.debug("AciRequisitionProvider::AciRequisitionProvider");
 	}
 
 	public AciRequisitionProvider() {
-		super(AciImportRequest.class);
+		super(AciRequisitionRequest.class);
 	}
 
 	@Override
@@ -68,9 +68,9 @@ public class AciRequisitionProvider extends AbstractRequisitionProvider<AciImpor
 	}
 
 	@Override
-	public AciImportRequest getRequest(Map<String, String> parameters) {
+	public AciRequisitionRequest getRequest(Map<String, String> parameters) {
 		logger.debug("AciRequisitionProvider::getRequest");
-        final AciImportRequest request = new AciImportRequest(parameters);
+        final AciRequisitionRequest request = new AciRequisitionRequest(parameters);
         final Requisition existingRequisition = getExistingRequisition(request.getForeignSource());
         request.setExistingRequisition(existingRequisition);
         return request;
@@ -86,7 +86,7 @@ public class AciRequisitionProvider extends AbstractRequisitionProvider<AciImpor
 	}
 
 	@Override
-	public Requisition getRequisitionFor(AciImportRequest request) {
+	public Requisition getRequisitionFor(AciRequisitionRequest request) {
 		logger.debug("AciRequisitionProvider::getRequisitionFor");
 		final AciImporter importer = new AciImporter(request);
         return importer.getRequisition();
