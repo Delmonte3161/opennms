@@ -47,7 +47,8 @@ public class ACIRestClientTest
      */
     public static void main( String[] args )
     {
-        final String url = "https://7.192.80.10,https://7.192.80.11,https://7.192.80.12";
+//        final String url = "https://7.192.80.10,https://7.192.80.11,https://7.192.80.12";
+        final String url = "https://7.192.240.10,https://7.192.240.11,https://7.192.240.12";
 //        final String url = "https://bogus,https://bogus,https://7.192.80.12";
         final String userName = "svcOssAci";
         final String pw = "kf3as=Nx";
