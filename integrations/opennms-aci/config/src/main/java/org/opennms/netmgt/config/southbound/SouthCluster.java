@@ -62,6 +62,9 @@ public class SouthCluster implements Serializable {
     @XmlElement(name = "poll-duration-minutes", required = false)
     private int pollDurationMinutes;
    
+    @XmlElement(name = "location", required = false)
+    private String location;
+
     @XmlElement(name = "south-element")
     private List<SouthElement> m_elements = new ArrayList<SouthElement>();
 
@@ -111,6 +114,14 @@ public class SouthCluster implements Serializable {
 
     public void setPollDurationMinutes(int pollDurationMinutes) {
         this.pollDurationMinutes = pollDurationMinutes;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     @Override
