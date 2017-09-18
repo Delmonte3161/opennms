@@ -29,6 +29,7 @@
 package org.opennms.web.rest.v2;
 
 import java.util.Collection;
+import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -37,14 +38,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
 
 import org.opennms.core.config.api.JaxbListWrapper;
 import org.opennms.core.criteria.CriteriaBuilder;
 import org.opennms.netmgt.dao.api.ScanReportDao;
 import org.opennms.netmgt.model.ScanReport;
+import org.opennms.web.rest.support.SearchProperties;
+import org.opennms.web.rest.support.SearchProperty;
 import org.opennms.web.rest.v1.support.ScanReportList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,14 +55,12 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Basic Web Service using REST for {@link ScanReport} entity
  *
- * @author Seth
+ * @author <a href="seth@opennms.org">Seth Leger</a>
  */
 @Component
 @Path("scanreports")
 @Transactional
-public class ScanReportRestService extends AbstractDaoRestService<ScanReport,String> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ScanReportRestService.class);
+public class ScanReportRestService extends AbstractDaoRestService<ScanReport,ScanReport,String,String> {
 
     @Autowired
     private ScanReportDao m_dao;
@@ -75,7 +76,12 @@ public class ScanReportRestService extends AbstractDaoRestService<ScanReport,Str
     }
 
     @Override
-    public CriteriaBuilder getCriteriaBuilder() {
+    protected Class<ScanReport> getQueryBeanClass() {
+        return ScanReport.class;
+    }
+
+    @Override
+    public CriteriaBuilder getCriteriaBuilder(UriInfo uriInfo) {
         final CriteriaBuilder builder = new CriteriaBuilder(ScanReport.class);
 
         // Order by date (descending) by default
@@ -87,6 +93,11 @@ public class ScanReportRestService extends AbstractDaoRestService<ScanReport,Str
     @Override
     protected JaxbListWrapper<ScanReport> createListWrapper(Collection<ScanReport> list) {
         return new ScanReportList(list);
+    }
+
+    @Override
+    protected Set<SearchProperty> getQueryProperties() {
+        return SearchProperties.SCAN_REPORT_SERVICE_PROPERTIES;
     }
 
     @GET
@@ -104,4 +115,19 @@ public class ScanReportRestService extends AbstractDaoRestService<ScanReport,Str
             }
         }
     }
+
+    @Override
+    protected ScanReport doGet(UriInfo uriInfo, String id) {
+        return getDao().get(id);
+    }
+
+    @Override
+    protected Response doUpdate(final SecurityContext securityContext, final UriInfo uriInfo, final String key, ScanReport targetObject) {
+        if (!key.equals(targetObject.getId())) {
+            throw getException(Status.BAD_REQUEST, "The ID of the object doesn't match the ID of the path: {} != {}", targetObject.getId(), key);
+        }
+        getDao().saveOrUpdate(targetObject);
+        return Response.noContent().build();
+    }
+
 }

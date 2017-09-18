@@ -35,6 +35,8 @@ import java.util.Objects;
 import org.opennms.netmgt.events.api.EventHandler;
 import org.opennms.netmgt.events.api.EventProcessor;
 import org.opennms.netmgt.events.api.EventProcessorException;
+import org.opennms.netmgt.dao.api.NodeDao;
+import org.opennms.netmgt.model.OnmsNode;
 import org.opennms.netmgt.xml.event.Event;
 import org.opennms.netmgt.xml.event.Events;
 import org.opennms.netmgt.xml.event.Log;
@@ -72,6 +74,8 @@ public final class DefaultEventHandlerImpl implements InitializingBean, EventHan
     private final Histogram logSizes;
     
     private boolean isWaitingForLoginModule=true;
+
+    private NodeDao m_nodeDao;
 
     /**
      * <p>Constructor for DefaultEventHandlerImpl.</p>
@@ -133,6 +137,21 @@ public final class DefaultEventHandlerImpl implements InitializingBean, EventHan
             }
 
             for (final Event event : events.getEventCollection()) {
+                if (event.getNodeid() == 0) {
+                    final Parm foreignSource = event.getParm("_foreignSource");
+                    if (foreignSource != null && foreignSource.getValue() != null) {
+                        final Parm foreignId = event.getParm("_foreignId");
+                        if (foreignId != null && foreignId.getValue() != null) {
+                            final OnmsNode node = getNodeDao().findByForeignId(foreignSource.getValue().getContent(), foreignId.getValue().getContent());
+                            if (node != null) {
+                                event.setNodeid(node.getId().longValue());
+                            } else {
+                                LOG.warn("Can't find node associated with foreignSource {} and foreignId {}", foreignSource, foreignId);
+                            }
+                        }
+                    }
+                }
+
                 if (LOG.isInfoEnabled() && getLogEventSummaries()) {
                     LOG.info("Received event: UEI={}, src={}, iface={}, svc={}, time={}, parms={}", event.getUei(), event.getSource(), event.getInterface(), event.getService(), event.getTime(), getPrettyParms(event));
                 }
@@ -223,5 +242,13 @@ public final class DefaultEventHandlerImpl implements InitializingBean, EventHan
     
     public void setLogEventSummaries(final boolean logEventSummaries) {
         m_logEventSummaries = logEventSummaries;
+    }
+
+    public void setNodeDao(NodeDao nodeDao) {
+        m_nodeDao = nodeDao;
+    }
+
+    public NodeDao getNodeDao() {
+        return m_nodeDao;
     }
 }

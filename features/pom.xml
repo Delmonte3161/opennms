@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.opennms</groupId>
     <artifactId>opennms</artifactId>
-    <version>20.0.2-SNAPSHOT</version>
+    <version>20.1.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>org.opennms.features</artifactId>
@@ -56,8 +56,8 @@
     <!-- OpenNMS Resource CLI tool -->
     <module>resource-cli</module>
 
-    <!-- OpenNMS rest commons module -->
-    <module>rest-commons</module>
+    <!-- OpenNMS REST -->
+    <module>rest</module>
 
     <!-- OpenNMS OSGI Core -->
     <module>opennms-osgi-core</module>

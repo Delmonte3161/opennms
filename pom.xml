@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opennms</groupId>
   <artifactId>opennms</artifactId>
-  <version>20.0.2-SNAPSHOT</version>
+  <version>20.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>OpenNMS</name>
   <url>http://opennms.org/</url>
@@ -890,7 +890,7 @@
      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.3</version>
+        <version>3.6.2</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
@@ -939,6 +939,7 @@
             <runRtTests>${runRtTests}</runRtTests>
             <runMailTests>${runMailTests}</runMailTests>
             <runPingTests>${runPingTests}</runPingTests>
+            <skipIpv6Tests>${skipIpv6Tests}</skipIpv6Tests>
             <proxy.port>${proxy.port}</proxy.port>
             <opennms.version>${project.version}</opennms.version>
             <!-- <opennms.unit.test>true</opennms.unit.test> -->
@@ -1197,7 +1198,7 @@
     <install.version>${project.version}</install.version>
     <display.version>${install.version}</display.version>
     <opennms.home>${dist.dir}/${dist.name}</opennms.home>
-    <opennms.osgi.version>20.0.2</opennms.osgi.version>
+	<opennms.osgi.version>20.1.0</opennms.osgi.version>
     <maven.metadata.legacy>true</maven.metadata.legacy>
     <root.dir>${project.basedir}</root.dir>
     <dist.dir>${root.dir}/target</dist.dir>
@@ -1287,7 +1288,7 @@
     <commonsValidatorVersion>1.3.1</commonsValidatorVersion>
     <c3p0Version>0.9.5.2</c3p0Version>
     <curatorVersion>3.2.1</curatorVersion>
-    <cxfVersion>3.1.9</cxfVersion>
+    <cxfVersion>3.1.11</cxfVersion>
     <dnsjavaVersion>2.1.3</dnsjavaVersion>
     <dropwizardMetricsVersion>3.1.2</dropwizardMetricsVersion>
     <ecjVersion>4.4.2</ecjVersion>
@@ -1322,7 +1323,8 @@
     <lmaxDisruptorVersion>3.3.2</lmaxDisruptorVersion>
     <log4jVersion>99.99.99-use-log4j2</log4jVersion>
     <log4j2Version>2.8.2</log4j2Version>
-    <minaVersion>2.0.13</minaVersion>
+    <minaVersion>2.0.16</minaVersion>
+    <mapstructVersion>1.2.0.CR1</mapstructVersion>
     <minionKarafVersion>4.0.5</minionKarafVersion>
     <netty4Version>4.0.34.Final</netty4Version>
     <newtsVersion>1.4.3</newtsVersion>
@@ -2140,6 +2142,16 @@
       <dependency>
         <groupId>org.opennms</groupId>
         <artifactId>opennms-alarm-northbounder-jms</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.opennms</groupId>
+        <artifactId>opennms-alarm-northbounder-bsf</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.opennms</groupId>
+        <artifactId>opennms-alarm-northbounder-drools</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
