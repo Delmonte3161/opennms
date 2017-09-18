@@ -107,7 +107,7 @@ public class SyslogSinkConsumerMessageTest {
         final SyslogMessage message =parser.parse(SyslogSinkConsumer.parse(ByteBuffer.wrap(syslogMessageString.getBytes())));
 
         assertEquals(SyslogFacility.KERNEL, message.getFacility());
-        assertEquals(SyslogSeverity.INFO, message.getSeverity());
+        assertEquals(SyslogSeverity.INFORMATIONAL, message.getSeverity());
         assertEquals("test", message.getMessageID());
         assertEquals("127.0.0.1", message.getHostName());
         assertEquals("OpenNMS", message.getProcessName());
@@ -183,7 +183,7 @@ public class SyslogSinkConsumerMessageTest {
         
 
         assertEquals(SyslogFacility.KERNEL, message.getFacility());
-        assertEquals(SyslogSeverity.INFO, message.getSeverity());
+        assertEquals(SyslogSeverity.INFORMATIONAL, message.getSeverity());
         assertEquals("test", message.getMessageID());
         final Calendar cal = Calendar.getInstance();
         cal.set(Calendar.MONTH, Calendar.JANUARY);
@@ -207,7 +207,7 @@ public class SyslogSinkConsumerMessageTest {
         
 
         assertEquals(SyslogFacility.KERNEL, message.getFacility());
-        assertEquals(SyslogSeverity.INFO, message.getSeverity());
+        assertEquals(SyslogSeverity.INFORMATIONAL, message.getSeverity());
         assertEquals("test", message.getMessageID());
         assertEquals("127.0.0.1", message.getHostName());
         assertEquals(null, message.getProcessName());
