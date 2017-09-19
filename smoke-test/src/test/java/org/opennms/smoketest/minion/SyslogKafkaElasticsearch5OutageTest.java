@@ -39,7 +39,6 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.opennms.core.criteria.CriteriaBuilder;
 import org.opennms.netmgt.dao.hibernate.MinionDaoHibernate;
@@ -66,9 +65,9 @@ import com.spotify.docker.client.messages.ContainerInfo;
  * 
  * @author Seth
  */
-public class SyslogKafkaElasticsearch5OutageIT extends AbstractSyslogTestCase {
+public class SyslogKafkaElasticsearch5OutageTest extends AbstractSyslogTestCase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SyslogKafkaElasticsearch5OutageIT.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SyslogKafkaElasticsearch5OutageTest.class);
 
     @Override
     protected TestEnvironmentBuilder getEnvironmentBuilder() {
@@ -80,10 +79,11 @@ public class SyslogKafkaElasticsearch5OutageIT extends AbstractSyslogTestCase {
     @Test
     public void testMinionSyslogsOverKafkaToEsRest() throws Exception {
         Date startOfTest = new Date();
-        int numMessages = 10000;
+        int numMessages = 1;
         int packetsPerSecond = 250;
+        ContainerAlias containerAlias = getMinionAlias();
 
-        InetSocketAddress minionSshAddr = testEnvironment.getServiceAddress(ContainerAlias.MINION, 8201);
+		InetSocketAddress minionSshAddr = testEnvironment.getServiceAddress(containerAlias, 8201);
         InetSocketAddress opennmsSshAddr = testEnvironment.getServiceAddress(ContainerAlias.OPENNMS, 8101);
         InetSocketAddress kafkaAddress = testEnvironment.getServiceAddress(ContainerAlias.KAFKA, 9092);
         InetSocketAddress zookeeperAddress = testEnvironment.getServiceAddress(ContainerAlias.KAFKA, 2181);
@@ -97,7 +97,7 @@ public class SyslogKafkaElasticsearch5OutageIT extends AbstractSyslogTestCase {
         final String sender = testEnvironment.getContainerInfo(ContainerAlias.SNMPD).networkSettings().ipAddress();
 
         // Wait for the minion to show up
-        await().atMost(90, SECONDS).pollInterval(5, SECONDS)
+        await().atMost(300, SECONDS).pollInterval(60, SECONDS)
             .until(DaoUtils.countMatchingCallable(
                  getDaoFactory().getDao(MinionDaoHibernate.class),
                  new CriteriaBuilder(OnmsMinion.class)
@@ -110,9 +110,6 @@ public class SyslogKafkaElasticsearch5OutageIT extends AbstractSyslogTestCase {
 
         LOG.info("Warming up syslog routes by sending 100 packets");
 
-        // Warm up the routes
-        sendMessage(ContainerAlias.MINION, sender, 100);
-
         for (int i = 0; i < 10; i++) {
             LOG.info("Slept for " + i + " seconds");
             Thread.sleep(1000);
@@ -120,14 +117,16 @@ public class SyslogKafkaElasticsearch5OutageIT extends AbstractSyslogTestCase {
 
         LOG.info("Resetting statistics");
         resetRouteStatistics(opennmsSshAddr, minionSshAddr);
+        // Warm up the routes
+       // sendMessage(ContainerAlias.MINION, sender, 100);
 
         for (int i = 0; i < 20; i++) {
             LOG.info("Slept for " + i + " seconds");
-            Thread.sleep(1000);
+            Thread.sleep(2000);
         }
 
         // Make sure that this evenly divides into the numMessages
-        final int chunk = 250;
+        final int chunk = 1;
         // Make sure that this is an even multiple of chunk
         final int logEvery = 1000;
 
@@ -158,7 +157,7 @@ public class SyslogKafkaElasticsearch5OutageIT extends AbstractSyslogTestCase {
         RateLimiter limiter = RateLimiter.create(packetsPerSecond);
         for (int i = 0; i < (numMessages / chunk); i++) {
             limiter.acquire(chunk);
-            sendMessage(ContainerAlias.MINION, sender, chunk);
+            sendMessage(containerAlias, sender, chunk,null);
             count += chunk;
             if (count % logEvery == 0) {
                 long mid = System.currentTimeMillis();
@@ -170,9 +169,22 @@ public class SyslogKafkaElasticsearch5OutageIT extends AbstractSyslogTestCase {
         // Stop restarting Elasticsearch
         restarter.cancel();
 
+        int resendCount = 0;
+        
+        while(pollForElasticsearchEventsUsingJestAndReturnValue(getEs5Address(),numMessages) == 0){
+           resendCount++;
+     	   LOG.info("Resending:"+resendCount);
+     	   sendMessage(containerAlias, sender, chunk,null);
+     	   Thread.sleep(60000);
+     	   if(resendCount>30){
+     		   LOG.info("Timed out :( Test failed! ");
+     		   break;
+	       }
+        }
+        
         // 100 warm-up messages plus ${numMessages} messages
-        pollForElasticsearchEventsUsingJest(this::getEs5Address, 100 + numMessages);
-
+        //pollForElasticsearchEventsUsingJest(this::getEs5Address, 100 + numMessages);
+        assertTrue(resendCount<30);
         assertTrue("Elasticsearch was never restarted", restartCounter.get() > 0);
     }
 

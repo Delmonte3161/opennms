@@ -38,11 +38,9 @@ import org.junit.Test;
 import org.opennms.core.criteria.CriteriaBuilder;
 import org.opennms.netmgt.dao.hibernate.MinionDaoHibernate;
 import org.opennms.netmgt.model.minion.OnmsMinion;
-import org.opennms.smoketest.OpenNMSSeleniumTestCase;
 import org.opennms.smoketest.utils.DaoUtils;
 import org.opennms.test.system.api.AbstractTestEnvironment;
 import org.opennms.test.system.api.NewTestEnvironment.ContainerAlias;
-import org.opennms.test.system.api.TestEnvironment;
 import org.opennms.test.system.api.TestEnvironmentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,46 +61,16 @@ import com.spotify.docker.client.messages.ContainerInfo;
  * 
  * @author Seth
  */
-public class SyslogKafkaElasticsearchBufferingIT extends AbstractSyslogTestCase {
+public class SyslogKafkaElasticsearchBufferingTest extends AbstractSyslogTestCase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SyslogKafkaElasticsearchBufferingIT.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SyslogKafkaElasticsearchBufferingTest.class);
 
     /**
      * Override this method to customize the test environment.
      */
     @Override
     protected TestEnvironmentBuilder getEnvironmentBuilder() {
-        final TestEnvironmentBuilder builder = TestEnvironment.builder().all()
-
-            // Enable Elasticsearch 5
-            .es5()
-
-            // Enable Kafka
-            .kafka();
-        builder.withOpenNMSEnvironment()
-
-            // Add opennms-es-rest to the featuresBoot list
-            .addFile(AbstractSyslogTestCase.class.getResource("/org.apache.karaf.features.cfg"), "etc/org.apache.karaf.features.cfg")
-
-            // Set logging to INFO level
-            .addFile(AbstractSyslogTestCase.class.getResource("/log4j2-info.xml"), "etc/log4j2.xml")
-            .addFile(AbstractSyslogTestCase.class.getResource("/eventconf.xml"), "etc/eventconf.xml")
-            .addFile(AbstractSyslogTestCase.class.getResource("/events/Cisco.syslog.events.xml"), "etc/events/Cisco.syslog.events.xml")
-            // Disable Alarmd, enable Syslogd
-            .addFile(AbstractSyslogTestCase.class.getResource("/service-configuration-disable-alarmd.xml"), "etc/service-configuration.xml")
-            .addFile(AbstractSyslogTestCase.class.getResource("/syslogd-configuration.xml"), "etc/syslogd-configuration.xml")
-            .addFile(AbstractSyslogTestCase.class.getResource("/syslog/Cisco.syslog.xml"), "etc/syslog/Cisco.syslog.xml")
-
-            // Add a 60-second delay to the sink consumer startup to give 
-            // opennms-es-rest time to start up before consuming from Kafka
-            .addFile(AbstractSyslogTestCase.class.getResource("/opennms.properties.d/sink-initial-sleep-time.properties"), "etc/opennms.properties.d/sink-initial-sleep-time.properties")
-
-            // Switch sink impl to Kafka using opennms-properties.d file
-            .addFile(AbstractSyslogTestCase.class.getResource("/opennms.properties.d/kafka-sink.properties"), "etc/opennms.properties.d/kafka-sink.properties");
-        builder.withMinionEnvironment()
-            // Switch sink impl to Kafka using features.boot file
-            .addFile(AbstractSyslogTestCase.class.getResource("/featuresBoot.d/kafka.boot"), "etc/featuresBoot.d/kafka.boot");
-        OpenNMSSeleniumTestCase.configureTestEnvironment(builder);
+        final TestEnvironmentBuilder builder = super.getEnvironmentBuilder();
         return builder;
     }
 
@@ -112,10 +80,13 @@ public class SyslogKafkaElasticsearchBufferingIT extends AbstractSyslogTestCase 
         int numMessages = 1000;
         int packetsPerSecond = 50;
 
-        InetSocketAddress minionSshAddr = testEnvironment.getServiceAddress(ContainerAlias.MINION, 8201);
+        ContainerAlias containerAlias = getMinionAlias();
+
+		InetSocketAddress minionSshAddr = testEnvironment.getServiceAddress(containerAlias, 8201);
         InetSocketAddress opennmsSshAddr = testEnvironment.getServiceAddress(ContainerAlias.OPENNMS, 8101);
         InetSocketAddress kafkaAddress = testEnvironment.getServiceAddress(ContainerAlias.KAFKA, 9092);
         InetSocketAddress zookeeperAddress = testEnvironment.getServiceAddress(ContainerAlias.KAFKA, 2181);
+        InetSocketAddress esRestAddr = testEnvironment.getServiceAddress(ContainerAlias.ELASTICSEARCH_5, 9200);
 
         // Install the Kafka syslog and trap handlers on the Minion system
         installFeaturesOnMinion(minionSshAddr, kafkaAddress);
@@ -144,7 +115,7 @@ public class SyslogKafkaElasticsearchBufferingIT extends AbstractSyslogTestCase 
         LOG.info("Warming up syslog routes by sending 100 packets");
 
         // Warm up the routes
-        sendMessage(ContainerAlias.MINION, sender, 100);
+        sendMessage(containerAlias, sender, 100,null);
 
         for (int i = 0; i < 20; i++) {
             LOG.info("Slept for " + i + " seconds");
@@ -163,7 +134,7 @@ public class SyslogKafkaElasticsearchBufferingIT extends AbstractSyslogTestCase 
         RateLimiter limiter = RateLimiter.create(packetsPerSecond);
         for (int i = 0; i < (numMessages / chunk); i++) {
             limiter.acquire(chunk);
-            sendMessage(ContainerAlias.MINION, sender, chunk);
+            sendMessage(containerAlias, sender, chunk,null);
             count += chunk;
             if (count % logEvery == 0) {
                 long mid = System.currentTimeMillis();
@@ -177,7 +148,20 @@ public class SyslogKafkaElasticsearchBufferingIT extends AbstractSyslogTestCase 
         startContainer(ContainerAlias.OPENNMS);
 
         // 100 warm-up messages plus ${numMessages} messages
-        pollForElasticsearchEventsUsingJest(this::getEs5Address, 100 + numMessages);
+        //pollForElasticsearchEventsUsingJest(this::getEs5Address, 100 + numMessages);
+        
+        int resendCount = 0;
+        while(pollForElasticsearchEventsUsingJestAndReturnValue(esRestAddr,numMessages) == 0){
+           resendCount++;
+     	   LOG.info("Resending Packets:"+resendCount);
+     	   sendMessage(containerAlias, sender, chunk,null);
+     	   Thread.sleep(60000);
+      	   if(resendCount>30){
+        		 LOG.info("Timed out :( Test failed! ");
+        		 break;
+      	   }
+        }
+        
     }
 
     protected InetSocketAddress getEs5Address() {
@@ -202,7 +186,8 @@ public class SyslogKafkaElasticsearchBufferingIT extends AbstractSyslogTestCase 
         final String id = testEnvironment.getContainerInfo(alias).id();
         try {
             LOG.info("Stopping container: {} -> {}", alias, id);
-            docker.stopContainer(id, 60);
+            //docker.stopContainer(id, 60);
+            docker.pauseContainer(id);
             LOG.info("Container stopped: {} -> {}", alias, id);
         } catch (DockerException | InterruptedException e) {
             LOG.warn("Unexpected exception while stopping container {}", id, e);
@@ -214,7 +199,7 @@ public class SyslogKafkaElasticsearchBufferingIT extends AbstractSyslogTestCase 
         final String id = testEnvironment.getContainerInfo(alias).id();
         try {
             LOG.info("Starting container: {} -> {}", alias, id);
-            docker.startContainer(id);
+            docker.unpauseContainer(id);
             LOG.info("Container started: {} -> {}", alias, id);
         } catch (DockerException | InterruptedException e) {
             LOG.warn("Unexpected exception while starting container {}", id, e);

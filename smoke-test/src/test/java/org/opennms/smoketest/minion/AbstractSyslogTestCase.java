@@ -32,6 +32,11 @@ import static com.jayway.awaitility.Awaitility.with;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertTrue;
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestClientFactory;
+import io.searchbox.client.config.HttpClientConfig;
+import io.searchbox.core.Search;
+import io.searchbox.core.SearchResult;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -41,8 +46,10 @@ import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -64,258 +71,518 @@ import org.opennms.test.system.api.utils.SshClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestClientFactory;
-import io.searchbox.client.config.HttpClientConfig;
-import io.searchbox.core.Search;
-import io.searchbox.core.SearchResult;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
 /**
- * Verifies that syslog messages sent to the Minion generate
- * events in OpenNMS.
+ * Verifies that syslog messages sent to the Minion generate events in OpenNMS.
  *
  * @author Seth
  * @author jwhite
  */
 public abstract class AbstractSyslogTestCase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractSyslogTestCase.class);
+	private static final Logger LOG = LoggerFactory
+			.getLogger(AbstractSyslogTestCase.class);
 
-    @Rule
-    public TestEnvironment testEnvironment = getTestEnvironment();
+	@Rule
+	public TestEnvironment testEnvironment = getTestEnvironment();
 
-    @Rule
-    public Timeout timeout = new Timeout(20, TimeUnit.MINUTES);
+	@Rule
+	public Timeout timeout = new Timeout(3000, TimeUnit.MINUTES);
 
-    private HibernateDaoFactory m_daoFactory;
+	private HibernateDaoFactory m_daoFactory;
 
-    private static final AtomicInteger ORDINAL = new AtomicInteger();
+	private static final AtomicInteger ORDINAL = new AtomicInteger();
 
-    public final TestEnvironment getTestEnvironment() {
-        if (!OpenNMSSeleniumTestCase.isDockerEnabled()) {
-            return new NullTestEnvironment();
-        }
+	public final TestEnvironment getTestEnvironment() {
+		if (!OpenNMSSeleniumTestCase.isDockerEnabled()) {
+			return new NullTestEnvironment();
+		}
+		try {
+			return getEnvironmentBuilder().build();
+		} catch (final Throwable t) {
+			throw new RuntimeException(t);
+		}
+	}
+
+	protected HibernateDaoFactory getDaoFactory() {
+		if (m_daoFactory == null) {
+			// Connect to the postgresql container
+			final InetSocketAddress pgsql = testEnvironment.getServiceAddress(
+					ContainerAlias.POSTGRES, 5432);
+			m_daoFactory = new HibernateDaoFactory(pgsql);
+		}
+		return m_daoFactory;
+	}
+
+	/**
+	 * Override this method to customize the test environment.
+	 */
+	protected TestEnvironmentBuilder getEnvironmentBuilder() {
+		final TestEnvironmentBuilder builder = TestEnvironment.builder().all()
+		// Enable Kafka
+				.kafka();
+		builder.withOpenNMSEnvironment()
+				// Set logging to INFO level
+				.addFile(
+						AbstractSyslogTestCase.class
+								.getResource("/log4j2-info.xml"),
+						"etc/log4j2.xml")
+				.addFile(
+						AbstractSyslogTestCase.class
+								.getResource("/eventconf.xml"),
+						"etc/eventconf.xml")
+				.addFile(
+						AbstractSyslogTestCase.class
+								.getResource("/events/Cisco.syslog.events.xml"),
+						"etc/events/Cisco.syslog.events.xml")
+				// Disable Alarmd, enable Syslogd
+				.addFile(
+						AbstractSyslogTestCase.class
+								.getResource("/service-configuration-disable-alarmd.xml"),
+						"etc/service-configuration.xml")
+				.addFile(
+						AbstractSyslogTestCase.class
+								.getResource("/syslogd-configuration.xml"),
+						"etc/syslogd-configuration.xml")
+				.addFile(
+						AbstractSyslogTestCase.class
+								.getResource("/syslog/Cisco.syslog.xml"),
+						"etc/syslog/Cisco.syslog.xml")
+				// Switch sink impl to Kafka using opennms-properties.d file
+				.addFile(
+						AbstractSyslogTestCase.class
+								.getResource("/opennms.properties.d/kafka-sink.properties"),
+						"etc/opennms.properties.d/kafka-sink.properties");
+		builder.withMinionEnvironment()
+				// Switch sink impl to Kafka using features.boot file
+				.addFile(
+						AbstractSyslogTestCase.class
+								.getResource("/featuresBoot.d/kafka.boot"),
+						"etc/featuresBoot.d/kafka.boot");
+		builder.es5();
+
+		OpenNMSSeleniumTestCase.configureTestEnvironment(builder);
+		return builder;
+	}
+
+	@Before
+	public void checkForDocker() {
+		Assume.assumeTrue(OpenNMSSeleniumTestCase.isDockerEnabled());
+	}
+
+	/**
+	 * Install the Kafka features on Minion.
+	 * 
+	 * @param minionSshAddr
+	 * @param kafkaAddress
+	 * @throws Exception
+	 */
+	protected static void installFeaturesOnMinion(
+			InetSocketAddress minionSshAddr, InetSocketAddress kafkaAddress)
+			throws Exception {
+		try (final SshClient sshClient = new SshClient(minionSshAddr, "admin",
+				"admin")) {
+			PrintStream pipe = sshClient.openShell();
+			pipe.println("feature:list -i");
+			pipe.println("list");
+			// Set the log level to INFO
+			pipe.println("log:set INFO");
+			pipe.println("logout");
+			try {
+				await().atMost(2, MINUTES).until(
+						sshClient.isShellClosedCallable());
+			} finally {
+				LOG.info("Karaf output:\n{}", sshClient.getStdout());
+			}
+		}
+	}
+
+	protected static void installFeaturesOnOpenNMS(
+			InetSocketAddress opennmsSshAddr, InetSocketAddress kafkaAddress,
+			InetSocketAddress zookeeperAddress) throws Exception {
+		try (final SshClient sshClient = new SshClient(opennmsSshAddr, "admin",
+				"admin")) {
+			PrintStream pipe = sshClient.openShell();
+
+			// Configure and install the Elasticsearch REST event forwarder
+			pipe.println("config:edit org.opennms.plugin.elasticsearch.rest.forwarder");
+			pipe.println("config:propset logAllEvents true");
+			pipe.println("config:propset batchSize 500");
+			pipe.println("config:propset batchInterval 500");
+			pipe.println("config:propset timeout 5000");
+			// Retry enough times that all events are eventually sent
+			// even if transient ES outages occur
+			pipe.println("config:propset retries 200");
+			pipe.println("config:update");
+			pipe.println("features:install opennms-es-rest");
+
+			pipe.println("features:list -i");
+			// Set the log level to INFO
+			pipe.println("log:set INFO");
+			pipe.println("logout");
+			try {
+				await().atMost(2, MINUTES).until(
+						sshClient.isShellClosedCallable());
+			} finally {
+				LOG.info("Karaf output:\n{}", sshClient.getStdout());
+			}
+		}
+	}
+
+	protected static void resetRouteStatistics(
+			InetSocketAddress opennmsSshAddr, InetSocketAddress minionSshAddr)
+			throws Exception {
+		// Reset route statistics on Minion
+		try (final SshClient sshClient = new SshClient(minionSshAddr, "admin",
+				"admin")) {
+			PrintStream pipe = sshClient.openShell();
+
+			// Syslog listener
+			pipe.println("camel:route-reset-stats syslogListen");
+
+			pipe.println("logout");
+			try {
+				await().atMost(2, MINUTES).until(
+						sshClient.isShellClosedCallable());
+			} finally {
+				LOG.info("Karaf output:\n{}", sshClient.getStdout());
+			}
+		}
+
+		// Reset route statistics on OpenNMS
+		try (final SshClient sshClient = new SshClient(opennmsSshAddr, "admin",
+				"admin")) {
+			PrintStream pipe = sshClient.openShell();
+
+			// Elasticsearch forwarder
+			pipe.println("camel:route-reset-stats alarmsFromOpennms");
+			pipe.println("camel:route-reset-stats enrichAlarmsAndEvents");
+			pipe.println("camel:route-reset-stats eventsFromOpennms");
+			pipe.println("camel:route-reset-stats toElasticsearch");
+			pipe.println("camel:route-reset-stats updateElastisearchTemplateMappingRunOnlyOnce");
+
+			pipe.println("logout");
+			try {
+				await().atMost(2, MINUTES).until(
+						sshClient.isShellClosedCallable());
+			} finally {
+				LOG.info("Karaf output:\n{}", sshClient.getStdout());
+			}
+		}
+	}
+
+	protected static void pollForElasticsearchEventsUsingJest(
+			InetSocketAddress esTransportAddr, int numMessages) {
+		pollForElasticsearchEventsUsingJest(() -> esTransportAddr, numMessages);
+	}
+
+	protected static void pollForElasticsearchEventsUsingJest(Supplier<InetSocketAddress> esTransportAddr, int numMessages) {
+		with().pollInterval(15, SECONDS)
+				.await()
+				.atMost(5, MINUTES)
+				.until(() -> {
+					JestClient client = null;
+					try {
+						JestClientFactory factory = new JestClientFactory();
+						factory.setHttpClientConfig(new HttpClientConfig.Builder(
+								String.format("http://%s:%d", esTransportAddr
+										.get().getHostString(), esTransportAddr
+										.get().getPort())).multiThreaded(true)
+								.build());
+						client = factory.getObject();
+
+						SearchResult response = client.execute(new Search.Builder(
+								new SearchSourceBuilder()
+										.query(QueryBuilders
+												.matchQuery("eventuei",
+														"uei.opennms.org/syslogd/local7/Info"))
+										.toString()).addIndex("opennms*")
+								.build());
+
+						LOG.debug("SEARCH RESPONSE: {}", response.toString());
+
+						// Sometimes, the first warm-up message is successful so
+						// treat both message counts as valid
+						assertTrue("ES search hits was not equal to "
+								+ numMessages + ": " + response.getTotal(),
+								(numMessages == response.getTotal()));
+						// assertEquals("Event UEI did not match",
+						// "uei.opennms.org/vendor/cisco/syslog/SEC-6-IPACCESSLOGP/aclDeniedIPTraffic",
+						// response.getHits().getAt(0).getSource().get("eventuei"));
+						// assertEquals("Event IP address did not match",
+						// "4.2.2.2",
+						// response.getHits().getAt(0).getSource().get("ipaddr"));
+					} catch (Throwable e) {
+						LOG.warn(e.getMessage(), e);
+						return false;
+					} finally {
+						if (client != null) {
+							client.shutdownClient();
+						}
+					}
+					return true;
+				});
+	}
+
+	/**
+	 * @param esTransportAddr
+	 * @param numOfMessages
+	 * @return num of messages received based on uei
+	 */
+	public static Integer pollForElasticsearchEventsUsingJestAndReturnValue(InetSocketAddress esTransportAddr, int numOfMessages) {
+		JestClient client = null;
+		try {
+			JestClientFactory factory = new JestClientFactory();
+			factory.setHttpClientConfig(new HttpClientConfig.Builder(String
+					.format("http://%s:%d", esTransportAddr.getHostString(),
+							esTransportAddr.getPort())).multiThreaded(true)
+					.build());
+			client = factory.getObject();
+
+			SearchResult response = client.execute(new Search.Builder(
+					new SearchSourceBuilder().query(
+							QueryBuilders.matchQuery("eventuei",
+									"uei.opennms.org/syslogd/local7/Info"))
+							.toString()).addIndex("opennms*").build());
+
+			LOG.debug("Count:", response.getTotal());
+			return response.getTotal();
+
+		} catch (Throwable e) {
+			LOG.warn(e.getMessage(), e);
+			return 0;
+		} finally {
+			if (client != null) {
+				client.shutdownClient();
+			}
+		}
+	}
+	
+	
+	
+    /**
+     * @param esTransportAddr
+     * @param paramsMap
+     * @param message
+     * @return
+     * 
+     * This method will take the raw syslog messages and queries on elastic search server and returns the map of json objects
+     */
+    public static Map<String,String> pollForElasticsearchEventsUsingJestAndReturnValue(InetSocketAddress esTransportAddr, Map<String,String> paramsMap, String message) {
+        JestClient client = null;
         try {
-            return getEnvironmentBuilder().build();
-        } catch (final Throwable t) {
-            throw new RuntimeException(t);
-        }
-    }
+            JestClientFactory factory = new JestClientFactory();
+            factory.setHttpClientConfig(new HttpClientConfig.Builder(String.format("http://%s:%d", esTransportAddr.getHostString(), esTransportAddr.getPort()))
+                .multiThreaded(true)
+                .build());
+            client = factory.getObject();
 
-    protected HibernateDaoFactory getDaoFactory() {
-        if (m_daoFactory == null) {
-            // Connect to the postgresql container
-            final InetSocketAddress pgsql = testEnvironment.getServiceAddress(ContainerAlias.POSTGRES, 5432);
-            m_daoFactory = new HibernateDaoFactory(pgsql);
-        }
-        return m_daoFactory;
-    }
-
-    /**
-     * Override this method to customize the test environment.
-     */
-    protected TestEnvironmentBuilder getEnvironmentBuilder() {
-        final TestEnvironmentBuilder builder = TestEnvironment.builder().all()
-                // Enable Kafka
-                .kafka();
-        builder.withOpenNMSEnvironment()
-                // Set logging to INFO level
-                .addFile(AbstractSyslogTestCase.class.getResource("/log4j2-info.xml"), "etc/log4j2.xml")
-                .addFile(AbstractSyslogTestCase.class.getResource("/eventconf.xml"), "etc/eventconf.xml")
-                .addFile(AbstractSyslogTestCase.class.getResource("/events/Cisco.syslog.events.xml"), "etc/events/Cisco.syslog.events.xml")
-                // Disable Alarmd, enable Syslogd
-                .addFile(AbstractSyslogTestCase.class.getResource("/service-configuration-disable-alarmd.xml"), "etc/service-configuration.xml")
-                .addFile(AbstractSyslogTestCase.class.getResource("/syslogd-configuration.xml"), "etc/syslogd-configuration.xml")
-                .addFile(AbstractSyslogTestCase.class.getResource("/syslog/Cisco.syslog.xml"), "etc/syslog/Cisco.syslog.xml")
-                // Switch sink impl to Kafka using opennms-properties.d file
-                .addFile(AbstractSyslogTestCase.class.getResource("/opennms.properties.d/kafka-sink.properties"), "etc/opennms.properties.d/kafka-sink.properties");
-        builder.withMinionEnvironment()
-                // Switch sink impl to Kafka using features.boot file
-                .addFile(AbstractSyslogTestCase.class.getResource("/featuresBoot.d/kafka.boot"), "etc/featuresBoot.d/kafka.boot");
-        OpenNMSSeleniumTestCase.configureTestEnvironment(builder);
-        return builder;
-    }
-
-    @Before
-    public void checkForDocker() {
-        Assume.assumeTrue(OpenNMSSeleniumTestCase.isDockerEnabled());
-    }
-
-    /**
-     * Install the Kafka features on Minion.
-     * 
-     * @param minionSshAddr
-     * @param kafkaAddress
-     * @throws Exception
-     */
-    protected static void installFeaturesOnMinion(InetSocketAddress minionSshAddr, InetSocketAddress kafkaAddress) throws Exception {
-        try (final SshClient sshClient = new SshClient(minionSshAddr, "admin", "admin")) {
-            PrintStream pipe = sshClient.openShell();
-            pipe.println("feature:list -i");
-            pipe.println("list");
-            // Set the log level to INFO
-            pipe.println("log:set INFO");
-            pipe.println("logout");
-            try {
-                await().atMost(2, MINUTES).until(sshClient.isShellClosedCallable());
-            } finally {
-                LOG.info("Karaf output:\n{}", sshClient.getStdout());
+            SearchResult response = client.execute(
+                new Search.Builder(new SearchSourceBuilder()
+                    .query(QueryBuilders.matchQuery("p_rawmessage",message))
+                    .toString()
+                )
+                    .addIndex("opennms*")
+                    .build()
+            );
+            
+            final JsonArray rawHits = response.getJsonObject().getAsJsonObject("hits").getAsJsonArray("hits");  
+            LOG.debug("Search response size:", rawHits.size());
+            
+            
+            Map<String, String> retMap = new HashMap<String, String>();
+            
+            if(rawHits.size()>0){
+	              
+            	final JsonObject hitData = rawHits.get(0).getAsJsonObject();
+	              Set<Entry<String,JsonElement>> jsonset = hitData.entrySet();
+	              
+	              for (Entry<String,JsonElement> s : jsonset) {
+	            	 
+	            	  if(s.getKey().toString().equalsIgnoreCase("_source")){
+	                	  JsonElement js = (JsonElement)s.getValue();
+	                	  retMap = new Gson().fromJson(js.toString(), new TypeToken<HashMap<String, String>>() {}.getType());
+	                	  
+	                	 /* LOG.debug("Map Size:"+retMap.size());
+	                      for (Map.Entry<String, String> objects : retMap.entrySet())
+	                      {
+	                    	  	LOG.debug("Key:"+objects.getKey());
+	                    	  	LOG.debug("Vaule:"+objects.getValue());
+	                      }*/
+	                	  break;
+	            	  }
+	            }
+            }           
+            
+            return retMap;
+            
+            
+        } catch (Throwable e) {
+            LOG.warn(e.getMessage(), e);
+            return null;
+        } finally {
+            if (client != null) {
+                client.shutdownClient();
             }
         }
-    }
+}
 
-    protected static void installFeaturesOnOpenNMS(InetSocketAddress opennmsSshAddr, InetSocketAddress kafkaAddress, InetSocketAddress zookeeperAddress) throws Exception {
-        try (final SshClient sshClient = new SshClient(opennmsSshAddr, "admin", "admin")) {
-            PrintStream pipe = sshClient.openShell();
+	/**
+	 * @param esTransportAddr
+	 * @return returns number of traps received
+	 */
+	public static Integer pollForElasticsearchEventsForTraps(InetSocketAddress esTransportAddr,String uei) {
+		JestClient client = null;
+		try {
+			JestClientFactory factory = new JestClientFactory();
+			factory.setHttpClientConfig(new HttpClientConfig.Builder(String
+					.format("http://%s:%d", esTransportAddr.getHostString(),
+							esTransportAddr.getPort())).multiThreaded(true)
+					.build());
+			client = factory.getObject();
 
-            // Configure and install the Elasticsearch REST event forwarder
-            pipe.println("config:edit org.opennms.plugin.elasticsearch.rest.forwarder");
-            pipe.println("config:propset logAllEvents true");
-            pipe.println("config:propset batchSize 500");
-            pipe.println("config:propset batchInterval 500");
-            pipe.println("config:propset timeout 5000");
-            // Retry enough times that all events are eventually sent
-            // even if transient ES outages occur
-            pipe.println("config:propset retries 200");
-            pipe.println("config:update");
-            pipe.println("features:install opennms-es-rest");
+			SearchResult response = client
+					.execute(new Search.Builder(
+							new SearchSourceBuilder()
+									.query(QueryBuilders
+											.matchQuery("eventuei",uei))
+									.toString()).addIndex("opennms*").build());
 
-            pipe.println("features:list -i");
-            // Set the log level to INFO
-            pipe.println("log:set INFO");
-            pipe.println("logout");
-            try {
-                await().atMost(2, MINUTES).until(sshClient.isShellClosedCallable());
-            } finally {
-                LOG.info("Karaf output:\n{}", sshClient.getStdout());
+			
+            final JsonArray rawHits = response.getJsonObject().getAsJsonObject("hits").getAsJsonArray("hits");  
+           /* if(rawHits.size()>0){
+				final JsonObject hitData = rawHits.get(0).getAsJsonObject();
+				LOG.debug("SEARCH RESPONSE: {}", hitData);
             }
-        }
-    }
+            else{
+            	LOG.debug("No records found with UEI:"+uei);
+            }*/
+        	Map<String, String> retMap = new HashMap<String, String>();
+			
+			int result = 0;
+            for(int i=0;i<rawHits.size() && result == 0;i++){
+	              
+            	final JsonObject hitData = rawHits.get(i).getAsJsonObject();
+	              Set<Entry<String,JsonElement>> jsonset = hitData.entrySet();
+	              
+	              for (Entry<String,JsonElement> s : jsonset) {
+	            	 
+	            	  if(s.getKey().toString().equalsIgnoreCase("_source")){
+	                	  JsonElement js = (JsonElement)s.getValue();
+	                	  retMap = new Gson().fromJson(js.toString(), new TypeToken<HashMap<String, String>>() {}.getType());
+	                	  String ueiInEs = retMap.get("eventuei");
+	                	  if(ueiInEs.equalsIgnoreCase(uei)){
+	                		  LOG.debug("SEARCH RESPONSE: {}", hitData);
+	                		  result = 1;
+	                		  break;
+			                 }
+	                	  }
 
-    protected static void resetRouteStatistics(InetSocketAddress opennmsSshAddr, InetSocketAddress minionSshAddr) throws Exception {
-        // Reset route statistics on Minion
-        try (final SshClient sshClient = new SshClient(minionSshAddr, "admin", "admin")) {
-            PrintStream pipe = sshClient.openShell();
+	            	  }
+	            	  
+                	  if(result == 1){
+                		  break;
+                	  }
+	            }
+                      
+			
+	    LOG.debug("Count:", response.getTotal());
+			
+		
+		return result;
+	
 
-            // Syslog listener
-            pipe.println("camel:route-reset-stats syslogListen");
+		} catch (Throwable e) {
+			LOG.warn(e.getMessage(), e);
+			return 0;
+		} finally {
+			if (client != null) {
+				client.shutdownClient();
+			}
+		}
+	}
 
-            pipe.println("logout");
-            try {
-                await().atMost(2, MINUTES).until(sshClient.isShellClosedCallable());
-            } finally {
-                LOG.info("Karaf output:\n{}", sshClient.getStdout());
-            }
-        }
+	/**
+	 * Use a {@link DatagramChannel} to send a number of syslog messages to the
+	 * Minion host.
+	 * 
+	 * @param host
+	 *            Hostname to inject into the syslog message
+	 * @param eventCount
+	 *            Number of messages to send
+	 * @throws IOException
+	 */
 
-        // Reset route statistics on OpenNMS
-        try (final SshClient sshClient = new SshClient(opennmsSshAddr, "admin", "admin")) {
-            PrintStream pipe = sshClient.openShell();
+	protected void sendMessage(ContainerAlias alias,String host,final int eventCount, String message) throws IOException {
+		final InetSocketAddress syslogAddr = testEnvironment.getServiceAddress(alias, 514, "udp");
 
-            // Elasticsearch forwarder
-            pipe.println("camel:route-reset-stats alarmsFromOpennms");
-            pipe.println("camel:route-reset-stats enrichAlarmsAndEvents");
-            pipe.println("camel:route-reset-stats eventsFromOpennms");
-            pipe.println("camel:route-reset-stats toElasticsearch");
-            pipe.println("camel:route-reset-stats updateElastisearchTemplateMappingRunOnlyOnce");
+		Set<Integer> sendSizes = new HashSet<>();
+		
+		
+		if(message == null || message.isEmpty()){
+			
+			message = "<190>Mar 11 08:35:17 "
+					+ host
+					+ " 30128311: Mar 11 08:35:16.844 CST: %SEC-6-IPACCESSLOGP: list in110 denied tcp 192.168.10.100(63923) -> 192.168.11.128(1521), "
+					+ ORDINAL.getAndIncrement() + " packet\n";
+			
+		}
 
-            pipe.println("logout");
-            try {
-                await().atMost(2, MINUTES).until(sshClient.isShellClosedCallable());
-            } finally {
-                LOG.info("Karaf output:\n{}", sshClient.getStdout());
-            }
-        }
-    }
+		// Test by sending over an IPv4 NIO channel
+		try (final DatagramChannel channel = DatagramChannel
+				.open(StandardProtocolFamily.INET)) {
 
-    protected static void pollForElasticsearchEventsUsingJest(InetSocketAddress esTransportAddr, int numMessages) {
-        pollForElasticsearchEventsUsingJest(() -> esTransportAddr, numMessages);
-    }
+			// Set the socket send buffer to the maximum value allowed by the
+			// kernel
+			channel.setOption(StandardSocketOptions.SO_SNDBUF,
+					Integer.MAX_VALUE);
+			if (LOG.isTraceEnabled()) {
+				LOG.trace("Actual send buffer size: "
+						+ channel.getOption(StandardSocketOptions.SO_SNDBUF));
+			}
+			channel.connect(syslogAddr);
 
-    protected static void pollForElasticsearchEventsUsingJest(Supplier<InetSocketAddress> esTransportAddr, int numMessages) {
-        with().pollInterval(15, SECONDS).await().atMost(5, MINUTES).until(() -> {
-            JestClient client = null;
-            try {
-                JestClientFactory factory = new JestClientFactory();
-                factory.setHttpClientConfig(new HttpClientConfig.Builder(String.format("http://%s:%d", esTransportAddr.get().getHostString(), esTransportAddr.get().getPort()))
-                    .multiThreaded(true)
-                    .build());
-                client = factory.getObject();
+			final ByteBuffer buffer = ByteBuffer.allocate(4096);
+			buffer.clear();
 
-                SearchResult response = client.execute(
-                    new Search.Builder(new SearchSourceBuilder()
-                        .query(QueryBuilders.matchQuery("eventuei", "uei.opennms.org/vendor/cisco/syslog/SEC-6-IPACCESSLOGP/aclDeniedIPTraffic"))
-                        .toString()
-                    )
-                        .addIndex("opennms*")
-                        .build()
-                );
+			for (int i = 0; i < eventCount; i++) {
+				buffer.put(message.getBytes());
+				buffer.flip();
+				final int sent = channel.send(buffer, syslogAddr);
+				sendSizes.add(sent);
+				buffer.clear();
+			}
+		}
 
-                LOG.debug("SEARCH RESPONSE: {}", response.toString());
+		if (LOG.isTraceEnabled()) {
+			LOG.info("sendSizes: " + sendSizes.toString());
+		}
+	}
 
-                // Sometimes, the first warm-up message is successful so treat both message counts as valid
-                assertTrue("ES search hits was not equal to " + numMessages + ": " + response.getTotal(),
-                    (numMessages == response.getTotal())
-                );
-                //assertEquals("Event UEI did not match", "uei.opennms.org/vendor/cisco/syslog/SEC-6-IPACCESSLOGP/aclDeniedIPTraffic", response.getHits().getAt(0).getSource().get("eventuei"));
-                //assertEquals("Event IP address did not match", "4.2.2.2", response.getHits().getAt(0).getSource().get("ipaddr"));
-            } catch (Throwable e) {
-                LOG.warn(e.getMessage(), e);
-                return false;
-            } finally {
-                if (client != null) {
-                    client.shutdownClient();
-                }
-            }
-            return true;
-        });
-    }
+	public ContainerAlias getMinionAlias() {
 
-    /**
-     * Use a {@link DatagramChannel} to send a number of syslog messages to the Minion host.
-     * 
-     * @param host Hostname to inject into the syslog message
-     * @param eventCount Number of messages to send
-     * @throws IOException
-     */
-    protected void sendMessage(ContainerAlias alias, final String host, final int eventCount) throws IOException {
-        final InetSocketAddress syslogAddr = testEnvironment.getServiceAddress(alias, 1514, "udp");
+		ContainerAlias containerAlias = null;
 
-        List<Integer> randomNumbers = new ArrayList<Integer>();
+		ArrayList<ContainerAlias> minionContainerList = new ArrayList<ContainerAlias>();
+		minionContainerList.add(ContainerAlias.MINION);
+		minionContainerList.add(ContainerAlias.MINION_OTHER_LOCATION);
+		minionContainerList.add(ContainerAlias.MINION_SAME_LOCATION);
 
-        for (int i = 0; i < eventCount; i++) {
-            int eventNum = Double.valueOf(Math.random() * 10000).intValue();
-            randomNumbers.add(eventNum);
-        }
+		for (int i = 0; i < 3; i++) {
+			try {
+				testEnvironment.getServiceAddress(
+						(ContainerAlias) minionContainerList.get(i), 8201);
+				containerAlias = (ContainerAlias) minionContainerList.get(i);
+			} catch (Exception e) {
+				continue;
+			}
+		}
 
-        String message = "<190>Mar 11 08:35:17 " + host + " 30128311: Mar 11 08:35:16.844 CST: %SEC-6-IPACCESSLOGP: list in110 denied tcp 192.168.10.100(63923) -> 192.168.11.128(1521), " + ORDINAL.getAndIncrement() + " packet\n";
-
-        Set<Integer> sendSizes = new HashSet<>();
-
-        // Test by sending over an IPv4 NIO channel
-        try (final DatagramChannel channel = DatagramChannel.open(StandardProtocolFamily.INET)) {
-
-            // Set the socket send buffer to the maximum value allowed by the kernel
-            channel.setOption(StandardSocketOptions.SO_SNDBUF, Integer.MAX_VALUE);
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("Actual send buffer size: " + channel.getOption(StandardSocketOptions.SO_SNDBUF));
-            }
-            channel.connect(syslogAddr);
-
-            final ByteBuffer buffer = ByteBuffer.allocate(4096);
-            buffer.clear();
-
-            for (int i = 0; i < eventCount; i++) {
-                buffer.put(message.getBytes());
-                buffer.flip();
-                final int sent = channel.send(buffer, syslogAddr);
-                sendSizes.add(sent);
-                buffer.clear();
-            }
-        }
-
-        if (LOG.isTraceEnabled()) {
-            LOG.info("sendSizes: " + sendSizes.toString());
-        }
-    }
+		return containerAlias;
+	}
 }
