@@ -47,6 +47,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.opennms.smoketest.NullTestEnvironment;
 import org.opennms.smoketest.OpenNMSSeleniumTestCase;
+import org.opennms.smoketest.util.MinionFinderUtil;
 import org.opennms.test.system.api.NewTestEnvironment.ContainerAlias;
 import org.opennms.test.system.api.TestEnvironment;
 import org.opennms.test.system.api.TestEnvironmentBuilder;
@@ -67,11 +68,11 @@ import com.google.common.collect.ImmutableMap;
  * @author jwhite
  * @author chandrag
  */
-public class DetectorsCommandIT {
+public class DetectorsCommandTest {
 
     private static TestEnvironment m_testEnvironment;
 
-    private static final Logger LOG = LoggerFactory.getLogger(DetectorsCommandIT.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DetectorsCommandTest.class);
 
     private ImmutableMap<String, String> expectedDetectors = ImmutableMap.<String, String> builder()
             .put("BGP_Session", "org.opennms.netmgt.provision.detector.snmp.BgpSessionDetector")
@@ -141,7 +142,8 @@ public class DetectorsCommandIT {
 
     @Test
     public void canLoadDetectorsOnMinion() throws Exception {
-        final InetSocketAddress sshAddr = m_testEnvironment.getServiceAddress(ContainerAlias.MINION, 8201);
+    	ContainerAlias containerAlias = new MinionFinderUtil().getMinionAlias();
+        final InetSocketAddress sshAddr = m_testEnvironment.getServiceAddress(containerAlias, 8201);
         await().atMost(3, MINUTES).pollInterval(15, SECONDS).pollDelay(0, SECONDS)
             .until(() -> listAndVerifyDetectors("Minion", sshAddr), hasSize(0));
     }

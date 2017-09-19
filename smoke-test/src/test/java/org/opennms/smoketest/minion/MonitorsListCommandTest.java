@@ -46,6 +46,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.opennms.smoketest.NullTestEnvironment;
 import org.opennms.smoketest.OpenNMSSeleniumTestCase;
+import org.opennms.smoketest.util.MinionFinderUtil;
 import org.opennms.test.system.api.TestEnvironment;
 import org.opennms.test.system.api.TestEnvironmentBuilder;
 import org.opennms.test.system.api.NewTestEnvironment.ContainerAlias;
@@ -55,9 +56,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 
-public class MonitorsListCommandIT {
+public class MonitorsListCommandTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MonitorsListCommandIT.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MonitorsListCommandTest.class);
 
     private static TestEnvironment m_testEnvironment;
 
@@ -142,7 +143,8 @@ public class MonitorsListCommandIT {
 
     @Test
     public void canLoadMonitorsOnMinion() throws Exception {
-        final InetSocketAddress sshAddr = m_testEnvironment.getServiceAddress(ContainerAlias.MINION, 8201);
+    	ContainerAlias containerAlias = new MinionFinderUtil().getMinionAlias();
+        final InetSocketAddress sshAddr = m_testEnvironment.getServiceAddress(containerAlias, 8201);
         await().atMost(3, MINUTES).pollInterval(15, SECONDS).pollDelay(0, SECONDS)
                 .until(() -> listAndVerifyMonitors("Minion", sshAddr), hasSize(0));
     }

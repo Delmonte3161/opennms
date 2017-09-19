@@ -45,7 +45,6 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
 import org.opennms.core.criteria.Criteria;
 import org.opennms.core.criteria.CriteriaBuilder;
@@ -53,12 +52,10 @@ import org.opennms.netmgt.dao.api.EventDao;
 import org.opennms.netmgt.dao.hibernate.EventDaoHibernate;
 import org.opennms.netmgt.events.api.EventConstants;
 import org.opennms.netmgt.model.OnmsEvent;
-import org.opennms.smoketest.NullTestEnvironment;
 import org.opennms.smoketest.OpenNMSSeleniumTestCase;
 import org.opennms.smoketest.utils.DaoUtils;
 import org.opennms.smoketest.utils.HibernateDaoFactory;
 import org.opennms.test.system.api.NewTestEnvironment.ContainerAlias;
-import org.opennms.test.system.api.TestEnvironment;
 import org.opennms.test.system.api.TestEnvironmentBuilder;
 
 /**
@@ -66,24 +63,16 @@ import org.opennms.test.system.api.TestEnvironmentBuilder;
  *
  * @author jwhite
  */
-public class DiscoveryIT {
-    private static TestEnvironment minionSystem;
+public class DiscoveryTest extends MinionHeartbeatOutageTest {
+    //private static TestEnvironment minionSystem;
 
-    @ClassRule
-    public static final TestEnvironment getTestEnvironment() {
-        if (!OpenNMSSeleniumTestCase.isDockerEnabled()) {
-            return new NullTestEnvironment();
-        }
-        try {
-            final TestEnvironmentBuilder builder = TestEnvironment.builder().all();
-            OpenNMSSeleniumTestCase.configureTestEnvironment(builder);
-            minionSystem = builder.build();
-            return minionSystem;
-        } catch (final Throwable t) {
-            throw new RuntimeException(t);
-        }
+    @Override
+    protected TestEnvironmentBuilder getEnvironmentBuilder() {
+        final TestEnvironmentBuilder builder = super.getEnvironmentBuilder();
+        return builder;
     }
-
+    
+    
     @Before
     public void checkForDocker() {
         OpenNMSSeleniumTestCase.assumeDockerEnabled();
@@ -93,9 +82,9 @@ public class DiscoveryIT {
     public void canDiscoverRemoteNodes() throws ClientProtocolException, IOException {
         Date startOfTest = new Date();
  
-        final String tomcatIp = minionSystem.getContainerInfo(ContainerAlias.TOMCAT)
+        final String tomcatIp = testEnvironment.getContainerInfo(ContainerAlias.TOMCAT)
                 .networkSettings().ipAddress();
-        final InetSocketAddress opennmsHttp = minionSystem.getServiceAddress(ContainerAlias.OPENNMS, 8980);
+        final InetSocketAddress opennmsHttp = testEnvironment.getServiceAddress(ContainerAlias.OPENNMS, 8980);
         final HttpHost opennmsHttpHost = new HttpHost(opennmsHttp.getAddress().getHostAddress(), opennmsHttp.getPort());
 
         HttpClient instance = HttpClientBuilder.create()
@@ -134,7 +123,7 @@ public class DiscoveryIT {
                     .add("timeout", "2000")
                     .build())).returnContent();
 
-        InetSocketAddress pgsql = minionSystem.getServiceAddress(ContainerAlias.POSTGRES, 5432);
+        InetSocketAddress pgsql = testEnvironment.getServiceAddress(ContainerAlias.POSTGRES, 5432);
         HibernateDaoFactory daoFactory = new HibernateDaoFactory(pgsql);
         EventDao eventDao = daoFactory.getDao(EventDaoHibernate.class);
 

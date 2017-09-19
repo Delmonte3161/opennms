@@ -28,6 +28,7 @@
 package org.opennms.smoketest.utils;
 
 import java.net.InetSocketAddress;
+import java.util.Properties;
 
 import org.hibernate.SessionFactory;
 import org.opennms.netmgt.dao.hibernate.AbstractDaoHibernate;
@@ -46,18 +47,35 @@ public class HibernateDaoFactory {
 
     private final SessionFactory m_sessionFactory;
     private final HibernateTemplate m_hibernateTemplate;
-
+    
+    
     public HibernateDaoFactory(InetSocketAddress pgsqlAddr) {
+    	this(pgsqlAddr,false);
+    }
+    
+    
+    public HibernateDaoFactory(InetSocketAddress pgsqlAddr,boolean healthCheckEnabled) {
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
         dataSource.setPortNumber(pgsqlAddr.getPort());
         dataSource.setUser("postgres");
-        dataSource.setPassword("postgres");
+        if(healthCheckEnabled){
+        	dataSource.setPassword("");
+        }
+        else{
+        	dataSource.setPassword("postgres");
+        }
+        
         dataSource.setServerName(pgsqlAddr.getAddress().getHostAddress());
         dataSource.setDatabaseName("opennms");
 
         AnnotationSessionFactoryBean sfb = new AnnotationSessionFactoryBean();
         sfb.setDataSource(dataSource);
         sfb.setPackagesToScan("org.opennms.netmgt.model");
+        
+        Properties hibernateProperties = new Properties();
+        hibernateProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        sfb.setHibernateProperties(hibernateProperties);
+        
         try {
             sfb.afterPropertiesSet();
         } catch (Exception e) {
@@ -66,7 +84,7 @@ public class HibernateDaoFactory {
         m_sessionFactory = sfb.getObject();
         m_hibernateTemplate = new HibernateTemplate(m_sessionFactory);
     }
-
+    
     public <T extends AbstractDaoHibernate<?, ?>> T getDao(Class<T> clazz) {
         try {
             T dao = clazz.newInstance();

@@ -28,7 +28,22 @@
 
 package org.opennms.plugins.elasticsearch.rest;
 
+import io.searchbox.action.BulkableAction;
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestResult;
+import io.searchbox.core.Bulk;
+import io.searchbox.core.BulkResult;
+import io.searchbox.core.BulkResult.BulkResultItem;
+import io.searchbox.core.DocumentResult;
+import io.searchbox.core.Index;
+import io.searchbox.core.Update;
+import io.searchbox.indices.CreateIndex;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,6 +51,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
@@ -49,6 +65,7 @@ import javax.xml.bind.DatatypeConverter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.opennms.core.utils.ConfigFileConstants;
 import org.opennms.netmgt.events.api.EventParameterUtils;
 import org.opennms.netmgt.model.OnmsSeverity;
 import org.opennms.netmgt.xml.event.Event;
@@ -56,20 +73,34 @@ import org.opennms.netmgt.xml.event.Parm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.searchbox.action.BulkableAction;
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.Bulk;
-import io.searchbox.core.BulkResult;
-import io.searchbox.core.BulkResult.BulkResultItem;
-import io.searchbox.core.DocumentResult;
-import io.searchbox.core.Index;
-import io.searchbox.core.Update;
-import io.searchbox.indices.CreateIndex;
-
 public class EventToIndex implements AutoCloseable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(EventToIndex.class);
+	
+	private static Map<String,String> customIndices = new HashMap<String,String>();
+	
+	private static Map<String,String> rootIndexMap = new HashMap<String,String>();
+	
+	private static String rootIndexName = "opennms";
+	
+	static{
+	     try {
+	    	 readCustomIndices(ConfigFileConstants.getFile(ConfigFileConstants.ELASTICSEARCH_EVENTINDICES_PROPERTIES),customIndices);
+	     } 
+	     catch (Exception e) {
+	            LOG.debug("Failed to load custom indices."+e);
+	     }
+	     
+	     try{
+	    	 readCustomIndices(ConfigFileConstants.getFile(ConfigFileConstants.ELASTICSEARCH_ROOTINDEX_PROPERTIES),rootIndexMap);
+	    	 if(rootIndexMap.size()>0 && rootIndexMap.containsKey("rootIndexName")){
+	    		 rootIndexName = rootIndexMap.get("rootIndexName");
+	    	 }
+	     }
+	     catch(Exception e){
+	    	 LOG.debug("Failed to load custom rootIndexName."+e);
+	     }
+	}
 
 	public static enum Indices {
 		ALARMS,
@@ -79,9 +110,9 @@ public class EventToIndex implements AutoCloseable {
 
 	@SuppressWarnings("serial")
 	public static final EnumMap<Indices,String> INDEX_NAMES = new EnumMap<Indices,String>(Indices.class) {{
-		this.put(Indices.ALARMS, "opennms-alarms");
-		this.put(Indices.ALARM_EVENTS, "opennms-events-alarmchange");
-		this.put(Indices.EVENTS, "opennms-events-raw");
+		this.put(Indices.ALARMS,rootIndexName + "-alarms");
+		this.put(Indices.ALARM_EVENTS,rootIndexName + "-events-alarmchange");
+		this.put(Indices.EVENTS,rootIndexName + "-events-raw");
 	}};
 
 	@SuppressWarnings("serial")
@@ -139,8 +170,7 @@ public class EventToIndex implements AutoCloseable {
 	public static final String ALARM_CLEAR_TIME="alarmcleartime";
 	public static final String ALARM_CLEAR_DURATION="alarmclearduration"; //duration from alarm raise to clear
 	public static final String ALARM_DELETED_TIME="alarmdeletedtime";
-
-
+	
 	public static final int DEFAULT_NUMBER_OF_THREADS = Runtime.getRuntime().availableProcessors() * 2;
 
 	private boolean logEventDescription=false;
@@ -180,7 +210,24 @@ public class EventToIndex implements AutoCloseable {
 		// Throttle incoming tasks by running them on the caller thread
 		new ThreadPoolExecutor.CallerRunsPolicy()
 	);
+	
 
+	private static void readCustomIndices(File elasticSearchEventIndicesFile, Map<String,String> properitesMap) throws FileNotFoundException {
+		final Properties properties = new Properties();
+		InputStream propertiesFileInputStream = new FileInputStream(elasticSearchEventIndicesFile);
+		try {
+			properties.load(propertiesFileInputStream);
+		}
+		catch (Exception e) { 
+			 LOG.debug("Failed to load custom indices, error reading properties file");
+		}
+         
+        for (String key : properties.stringPropertyNames()) {
+            properitesMap.put(key, properties.getProperty(key));
+        }
+    
+    }
+	
 	private IndexNameFunction indexNameFunction = new IndexNameFunction();
 
 	public IndexNameFunction getIndexNameFunction() {
@@ -276,6 +323,10 @@ public class EventToIndex implements AutoCloseable {
 
 	public void setArchiveNewAlarmValues(boolean archiveNewAlarmValues) {
 		this.archiveNewAlarmValues = archiveNewAlarmValues;
+	}
+	
+	public Map<String,String> getCustomIndices(){
+		return EventToIndex.customIndices;
 	}
 
 
@@ -683,6 +734,10 @@ public class EventToIndex implements AutoCloseable {
 			}
 		}
 
+		if(customIndices.size() > 0 && customIndices.containsKey(event.getInterface())){
+			rootIndexName = rootIndexName + "-" + customIndices.get(event.getInterface());
+		}
+		
 		String completeIndexName=indexNameFunction.apply(rootIndexName, cal.getTime());
 
 		if (LOG.isDebugEnabled()){
