@@ -1,0 +1,166 @@
+2017-07-07 13:37:33.041  INFO 81254 --- [main] com.cerner.cts.oss.aci.rest.ACIRestApp   : Starting ACIRestApp on M1600762 with PID 81254 (/Users/tf016851/git/aci-rest/target/aci-rest-1.4.0-SNAPSHOT.jar started by tf016851 in /Users/tf016851/git/aci-rest)
+2017-07-07 13:37:33.044  INFO 81254 --- [main] com.cerner.cts.oss.aci.rest.ACIRestApp   : No active profile set, falling back to default profiles: default
+2017-07-07 13:37:33.082  INFO 81254 --- [main] s.c.a.AnnotationConfigApplicationContext : Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@48533e64: startup date [Fri Jul 07 13:37:33 CDT 2017]; root of context hierarchy
+2017-07-07 13:37:33.739  INFO 81254 --- [main] o.s.j.e.a.AnnotationMBeanExporter        : Registering beans for JMX exposure on startup
+2017-07-07 13:37:33.754  INFO 81254 --- [main] utoConfigurationReportLoggingInitializer : 
+
+Error starting ApplicationContext. To display the auto-configuration report re-run your application with 'debug' enabled.
+2017-07-07 13:37:33.760 ERROR 81254 --- [main] o.s.boot.SpringApplication               : Application startup failed
+
+java.lang.IllegalStateException: Failed to execute CommandLineRunner
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:803)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:784)
+	at org.springframework.boot.SpringApplication.afterRefresh(SpringApplication.java:771)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:316)
+	at com.cerner.cts.oss.aci.rest.ACIRestApp.main(ACIRestApp.java:31)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.boot.loader.MainMethodRunner.run(MainMethodRunner.java:48)
+	at org.springframework.boot.loader.Launcher.launch(Launcher.java:87)
+	at org.springframework.boot.loader.Launcher.launch(Launcher.java:50)
+	at org.springframework.boot.loader.JarLauncher.main(JarLauncher.java:51)
+Caused by: com.cerner.cts.oss.aci.rest.ACIRestException: Options H | S | C require a cluster name option.
+	at com.cerner.cts.oss.aci.rest.ACIRestRun.run(ACIRestRun.java:136)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:800)
+	... 12 common frames omitted
+
+2017-07-07 13:37:33.761  INFO 81254 --- [main] s.c.a.AnnotationConfigApplicationContext : Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@48533e64: startup date [Fri Jul 07 13:37:33 CDT 2017]; root of context hierarchy
+2017-07-07 13:37:33.762  INFO 81254 --- [main] o.s.j.e.a.AnnotationMBeanExporter        : Unregistering JMX-exposed beans on shutdown
+java.lang.IllegalStateException: Failed to execute CommandLineRunner
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:803)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:784)
+	at org.springframework.boot.SpringApplication.afterRefresh(SpringApplication.java:771)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:316)
+	at com.cerner.cts.oss.aci.rest.ACIRestApp.main(ACIRestApp.java:31)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.boot.loader.MainMethodRunner.run(MainMethodRunner.java:48)
+	at org.springframework.boot.loader.Launcher.launch(Launcher.java:87)
+	at org.springframework.boot.loader.Launcher.launch(Launcher.java:50)
+	at org.springframework.boot.loader.JarLauncher.main(JarLauncher.java:51)
+Caused by: com.cerner.cts.oss.aci.rest.ACIRestException: Options H | S | C require a cluster name option.
+	at com.cerner.cts.oss.aci.rest.ACIRestRun.run(ACIRestRun.java:136)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:800)
+	... 12 more
+2017-07-07 13:40:00.421  INFO 81484 --- [main] com.cerner.cts.oss.aci.rest.ACIRestApp   : Starting ACIRestApp on M1600762 with PID 81484 (/Users/tf016851/git/aci-rest/target/aci-rest-1.4.0-SNAPSHOT.jar started by tf016851 in /Users/tf016851/git/aci-rest)
+2017-07-07 13:40:00.424  INFO 81484 --- [main] com.cerner.cts.oss.aci.rest.ACIRestApp   : No active profile set, falling back to default profiles: default
+2017-07-07 13:40:00.464  INFO 81484 --- [main] s.c.a.AnnotationConfigApplicationContext : Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@48533e64: startup date [Fri Jul 07 13:40:00 CDT 2017]; root of context hierarchy
+2017-07-07 13:40:01.106  INFO 81484 --- [main] o.s.j.e.a.AnnotationMBeanExporter        : Registering beans for JMX exposure on startup
+2017-07-07 13:40:01.121  INFO 81484 --- [main] utoConfigurationReportLoggingInitializer : 
+
+Error starting ApplicationContext. To display the auto-configuration report re-run your application with 'debug' enabled.
+2017-07-07 13:40:01.126 ERROR 81484 --- [main] o.s.boot.SpringApplication               : Application startup failed
+
+java.lang.IllegalStateException: Failed to execute CommandLineRunner
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:803)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:784)
+	at org.springframework.boot.SpringApplication.afterRefresh(SpringApplication.java:771)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:316)
+	at com.cerner.cts.oss.aci.rest.ACIRestApp.main(ACIRestApp.java:31)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.boot.loader.MainMethodRunner.run(MainMethodRunner.java:48)
+	at org.springframework.boot.loader.Launcher.launch(Launcher.java:87)
+	at org.springframework.boot.loader.Launcher.launch(Launcher.java:50)
+	at org.springframework.boot.loader.JarLauncher.main(JarLauncher.java:51)
+Caused by: com.cerner.cts.oss.aci.rest.ACIRestException: Options H | S | C require a cluster name option.
+	at com.cerner.cts.oss.aci.rest.ACIRestRun.run(ACIRestRun.java:136)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:800)
+	... 12 common frames omitted
+
+2017-07-07 13:40:01.128  INFO 81484 --- [main] s.c.a.AnnotationConfigApplicationContext : Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@48533e64: startup date [Fri Jul 07 13:40:00 CDT 2017]; root of context hierarchy
+2017-07-07 13:40:01.128  INFO 81484 --- [main] o.s.j.e.a.AnnotationMBeanExporter        : Unregistering JMX-exposed beans on shutdown
+java.lang.IllegalStateException: Failed to execute CommandLineRunner
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:803)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:784)
+	at org.springframework.boot.SpringApplication.afterRefresh(SpringApplication.java:771)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:316)
+	at com.cerner.cts.oss.aci.rest.ACIRestApp.main(ACIRestApp.java:31)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.boot.loader.MainMethodRunner.run(MainMethodRunner.java:48)
+	at org.springframework.boot.loader.Launcher.launch(Launcher.java:87)
+	at org.springframework.boot.loader.Launcher.launch(Launcher.java:50)
+	at org.springframework.boot.loader.JarLauncher.main(JarLauncher.java:51)
+Caused by: com.cerner.cts.oss.aci.rest.ACIRestException: Options H | S | C require a cluster name option.
+	at com.cerner.cts.oss.aci.rest.ACIRestRun.run(ACIRestRun.java:136)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:800)
+	... 12 more
+2017-07-07 13:57:05.602  INFO 85129 --- [main] com.cerner.cts.oss.aci.rest.ACIRestApp   : Starting ACIRestApp on M1600762 with PID 85129 (/Users/tf016851/git/aci-rest/target/aci-rest-1.4.0-SNAPSHOT.jar started by tf016851 in /Users/tf016851/git/aci-rest)
+2017-07-07 13:57:05.605  INFO 85129 --- [main] com.cerner.cts.oss.aci.rest.ACIRestApp   : No active profile set, falling back to default profiles: default
+2017-07-07 13:57:05.645  INFO 85129 --- [main] s.c.a.AnnotationConfigApplicationContext : Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@48533e64: startup date [Fri Jul 07 13:57:05 CDT 2017]; root of context hierarchy
+2017-07-07 13:57:06.311  INFO 85129 --- [main] o.s.j.e.a.AnnotationMBeanExporter        : Registering beans for JMX exposure on startup
+{"imdata":[{"aaaLogin":{"children":[{"aaaUserDomain":{"children":[{"aaaReadRoles":{"attributes":{}}},{"aaaWriteRoles":{"children":[{"role":{"attributes":{"name":"admin"}}}],"attributes":{}}}],"attributes":{"rolesR":"admin","name":"all","rolesW":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/vmmp-VMware\/dom-LS6-MT6.0","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-mchtx","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-sthjnj","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"comp\/prov-VMware\/ctrlr-[LS6-MT]-LS6-MT","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-cernclrv","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-commfl","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-gsrshpa","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-emhctx","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-lakeoh","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-stdoms","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/vmmp-VMware\/dom-LS6-MT","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"comp\/prov-VMware\/ctrlr-[LS6-F5]-LS6-F5","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/vmmp-VMware\/dom-LS6-Citrix-DVS","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-regltn","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-lrsmnh","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-camcwv","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-semhmo","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-millplus","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"comp\/prov-VMware\/dom-LS6-MT6.0","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-nyphny","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-capema","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-cernccw","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-cookil","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-chsi4tn","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-behsin","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-shelva","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-fairoh","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-hmccfl","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-cernerx","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-chi1co","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"comp\/prov-VMware\/dom-LS6-Citrix-DVS","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-umcnv","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-stjutn","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-infra","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-nrthga","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-kdhdca","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"comp\/prov-VMware\/dom-LS6-Citrix","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-paloca","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-ls6dmz","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-mhsca","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-cerncmw","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-kernca","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-pomoca","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-crdhtx","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-trinmi","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-NightHawk","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-univtn","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-indpa","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-mgmt","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"comp\/prov-VMware\/dom-LS6-F5","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-mcldsc","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-vandtn","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-bhsma","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-chldma","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-cerncomg","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/vmmp-VMware\/dom-LS6-F5","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-stjonj","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-wdcwi","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-chstn","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-vmmdomain","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-cmmcme","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-wchnct","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-mhmctx","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-cptlnh","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-cnwysc","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-scaal","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-clhsco","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"comp\/prov-VMware\/ctrlr-[LS6-Citrix-DVS]-LS6-Citrix-DVS","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-clnyny","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-mfrntx","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-ihcctn","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-bvhaoh","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"comp\/prov-VMware\/ctrlr-[LS6-MT6.0]-LS6-MT6.0","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"comp\/prov-VMware\/ctrlr-[LS6-Citrix]-LS6-Citrix","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-tiftga","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/vmmp-VMware\/dom-LS6-Citrix","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-rwmcne","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-cernedfx","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-chsi2tn","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-maurtn","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-cernlhs","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-usalal","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-chi3co","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-cvhaks","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-common","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-huntal","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-chldwa","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-bhsfl","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-cerncomc","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-cernmh","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-gcshmn","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-chva","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-cernopbr","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-hhcks","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-tdadtx","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-jfkhnj","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"uni\/tn-stluoh","writePrivileges":"admin"}}},{"DnDomainMapEntry":{"attributes":{"readPrivileges":"admin","dn":"comp\/prov-VMware\/dom-LS6-MT","writePrivileges":"admin"}}}],"attributes":{"remoteUser":"true","unixUserId":"23999","lastName":"","creationTime":"1499453830","buildTime":"Wed Apr 06 21:29:23 PDT 2016","sessionId":"g9+2xqM3ReeaIwA9ho9+FQ==","guiIdleTimeoutSeconds":"2400","userName":"svcOssAci","version":"1.2(3c)","restTimeoutSeconds":"90","token":"cK6hZX90agqLXh+8GXHPHmI72HwiRYvgf02fpRLsN62sq1VXSCbCvnC3Nv2ST1M6tXwnqleE1VpAy\/JZfcYVnMzsnJ8LMA753hgbQmR+PDf09tI2OqgM3I5fn2gg990k72DH0NRhxNpzq1izydwpZ2jH0nkCx+bLjqhRm9TfwcA=","firstName":"","node":"topology\/pod-1\/node-1","maximumLifetimeSeconds":"86400","refreshTimeoutSeconds":"1200","firstLoginTime":"1499453830","siteFingerprint":"gi0kBqP21cDlNuUz"}}}],"totalCount":"1"}
+/Users/tf016851/git/aci-rest/LS6_faultRecord_LastTransactionTime.txt
+Processed faultRecord ( 2017-05-08T3:57:04.946-05:00 to 2017-05-09T3:57:04.946-05:00 ) with 3562 entrie(s)
+Processed faultRecord ( 2017-05-09T3:57:04.946-05:00 to 2017-05-10T3:57:04.946-05:00 ) with 3366 entrie(s)
+Processed faultRecord ( 2017-05-10T3:57:04.946-05:00 to 2017-05-11T3:57:04.946-05:00 ) with 4449 entrie(s)
+Processed faultRecord ( 2017-05-11T3:57:04.946-05:00 to 2017-05-12T3:57:04.946-05:00 ) with 3612 entrie(s)
+Processed faultRecord ( 2017-05-12T3:57:04.946-05:00 to 2017-05-13T3:57:04.946-05:00 ) with 4012 entrie(s)
+Processed faultRecord ( 2017-05-13T3:57:04.946-05:00 to 2017-05-14T3:57:04.946-05:00 ) with 4506 entrie(s)
+Processed faultRecord ( 2017-05-14T3:57:04.946-05:00 to 2017-05-15T3:57:04.946-05:00 ) with 2659 entrie(s)
+Processed faultRecord ( 2017-05-15T3:57:04.946-05:00 to 2017-05-16T3:57:04.946-05:00 ) with 3350 entrie(s)
+Processed faultRecord ( 2017-05-16T3:57:04.946-05:00 to 2017-05-17T3:57:04.946-05:00 ) with 4186 entrie(s)
+Processed faultRecord ( 2017-05-17T3:57:04.946-05:00 to 2017-05-18T3:57:04.946-05:00 ) with 22772 entrie(s)
+Processed faultRecord ( 2017-05-18T3:57:04.946-05:00 to 2017-05-19T3:57:04.946-05:00 ) with 4966 entrie(s)
+Processed faultRecord ( 2017-05-19T3:57:04.946-05:00 to 2017-05-20T3:57:04.946-05:00 ) with 19745 entrie(s)
+Processed faultRecord ( 2017-05-20T3:57:04.946-05:00 to 2017-05-21T3:57:04.946-05:00 ) with 18638 entrie(s)
+Processed faultRecord ( 2017-05-21T3:57:04.946-05:00 to 2017-05-22T3:57:04.946-05:00 ) with 19304 entrie(s)
+Processed faultRecord ( 2017-05-22T3:57:04.946-05:00 to 2017-05-23T3:57:04.946-05:00 ) with 17800 entrie(s)
+Processed faultRecord ( 2017-05-23T3:57:04.946-05:00 to 2017-05-24T3:57:04.946-05:00 ) with 16750 entrie(s)
+Processed faultRecord ( 2017-05-24T3:57:04.946-05:00 to 2017-05-25T3:57:04.946-05:00 ) with 16546 entrie(s)
+Processed faultRecord ( 2017-05-25T3:57:04.946-05:00 to 2017-05-26T3:57:04.946-05:00 ) with 15623 entrie(s)
+Processed faultRecord ( 2017-05-26T3:57:04.946-05:00 to 2017-05-27T3:57:04.946-05:00 ) with 6265 entrie(s)
+Processed faultRecord ( 2017-05-27T3:57:04.946-05:00 to 2017-05-28T3:57:04.946-05:00 ) with 1726 entrie(s)
+Processed faultRecord ( 2017-05-28T3:57:04.946-05:00 to 2017-05-29T3:57:04.946-05:00 ) with 1707 entrie(s)
+Processed faultRecord ( 2017-05-29T3:57:04.946-05:00 to 2017-05-30T3:57:04.946-05:00 ) with 2088 entrie(s)
+Processed faultRecord ( 2017-05-30T3:57:04.946-05:00 to 2017-05-31T3:57:04.946-05:00 ) with 3297 entrie(s)
+Processed faultRecord ( 2017-05-31T3:57:04.946-05:00 to 2017-06-01T3:57:04.946-05:00 ) with 2886 entrie(s)
+Processed faultRecord ( 2017-06-01T3:57:04.946-05:00 to 2017-06-02T3:57:04.946-05:00 ) with 2840 entrie(s)
+Processed faultRecord ( 2017-06-02T3:57:04.946-05:00 to 2017-06-03T3:57:04.946-05:00 ) with 2824 entrie(s)
+Processed faultRecord ( 2017-06-03T3:57:04.946-05:00 to 2017-06-04T3:57:04.946-05:00 ) with 1798 entrie(s)
+Processed faultRecord ( 2017-06-04T3:57:04.946-05:00 to 2017-06-05T3:57:04.946-05:00 ) with 1781 entrie(s)
+Processed faultRecord ( 2017-06-05T3:57:04.946-05:00 to 2017-06-06T3:57:04.946-05:00 ) with 2406 entrie(s)
+Processed faultRecord ( 2017-06-06T3:57:04.946-05:00 to 2017-06-07T3:57:04.946-05:00 ) with 2932 entrie(s)
+Processed faultRecord ( 2017-06-07T3:57:04.946-05:00 to 2017-06-08T3:57:04.946-05:00 ) with 1944 entrie(s)
+Processed faultRecord ( 2017-06-08T3:57:04.946-05:00 to 2017-06-09T3:57:04.946-05:00 ) with 4187 entrie(s)
+Processed faultRecord ( 2017-06-09T3:57:04.946-05:00 to 2017-06-10T3:57:04.946-05:00 ) with 4030 entrie(s)
+Processed faultRecord ( 2017-06-10T3:57:04.946-05:00 to 2017-06-11T3:57:04.946-05:00 ) with 2345 entrie(s)
+Processed faultRecord ( 2017-06-11T3:57:04.946-05:00 to 2017-06-12T3:57:04.946-05:00 ) with 2518 entrie(s)
+Processed faultRecord ( 2017-06-12T3:57:04.946-05:00 to 2017-06-13T3:57:04.946-05:00 ) with 4474 entrie(s)
+Processed faultRecord ( 2017-06-13T3:57:04.946-05:00 to 2017-06-14T3:57:04.946-05:00 ) with 3330 entrie(s)
+Processed faultRecord ( 2017-06-14T3:57:04.946-05:00 to 2017-06-15T3:57:04.946-05:00 ) with 3310 entrie(s)
+Processed faultRecord ( 2017-06-15T3:57:04.946-05:00 to 2017-06-16T3:57:04.946-05:00 ) with 4280 entrie(s)
+Processed faultRecord ( 2017-06-16T3:57:04.946-05:00 to 2017-06-17T3:57:04.946-05:00 ) with 4115 entrie(s)
+Processed faultRecord ( 2017-06-17T3:57:04.946-05:00 to 2017-06-18T3:57:04.946-05:00 ) with 4690 entrie(s)
+Processed faultRecord ( 2017-06-18T3:57:04.946-05:00 to 2017-06-19T3:57:04.946-05:00 ) with 5013 entrie(s)
+Processed faultRecord ( 2017-06-19T3:57:04.946-05:00 to 2017-06-20T3:57:04.946-05:00 ) with 5844 entrie(s)
+Processed faultRecord ( 2017-06-20T3:57:04.946-05:00 to 2017-06-21T3:57:04.946-05:00 ) with 4102 entrie(s)
+Processed faultRecord ( 2017-06-21T3:57:04.946-05:00 to 2017-06-22T3:57:04.946-05:00 ) with 7234 entrie(s)
+Processed faultRecord ( 2017-06-22T3:57:04.946-05:00 to 2017-06-23T3:57:04.946-05:00 ) with 5576 entrie(s)
+Processed faultRecord ( 2017-06-23T3:57:04.946-05:00 to 2017-06-24T3:57:04.946-05:00 ) with 3280 entrie(s)
+Processed faultRecord ( 2017-06-24T3:57:04.946-05:00 to 2017-06-25T3:57:04.946-05:00 ) with 2831 entrie(s)
+Processed faultRecord ( 2017-06-25T3:57:04.946-05:00 to 2017-06-26T3:57:04.946-05:00 ) with 2098 entrie(s)
+Processed faultRecord ( 2017-06-26T3:57:04.946-05:00 to 2017-06-27T3:57:04.946-05:00 ) with 4622 entrie(s)
+Processed faultRecord ( 2017-06-27T3:57:04.946-05:00 to 2017-06-28T3:57:04.946-05:00 ) with 5571 entrie(s)
+Processed faultRecord ( 2017-06-28T3:57:04.946-05:00 to 2017-06-29T3:57:04.946-05:00 ) with 5535 entrie(s)
+Processed faultRecord ( 2017-06-29T3:57:04.946-05:00 to 2017-06-30T3:57:04.946-05:00 ) with 3443 entrie(s)
+Processed faultRecord ( 2017-06-30T3:57:04.946-05:00 to 2017-07-01T3:57:04.946-05:00 ) with 2939 entrie(s)
+Processed faultRecord ( 2017-07-01T3:57:04.946-05:00 to 2017-07-02T3:57:04.946-05:00 ) with 3494 entrie(s)
+Processed faultRecord ( 2017-07-02T3:57:04.946-05:00 to 2017-07-03T3:57:04.946-05:00 ) with 2211 entrie(s)
+Processed faultRecord ( 2017-07-03T3:57:04.946-05:00 to 2017-07-04T3:57:04.946-05:00 ) with 2696 entrie(s)
+Processed faultRecord ( 2017-07-04T3:57:04.946-05:00 to 2017-07-05T3:57:04.946-05:00 ) with 2182 entrie(s)
+Processed faultRecord ( 2017-07-05T3:57:04.946-05:00 to 2017-07-06T3:57:04.946-05:00 ) with 2731 entrie(s)
+Processed faultRecord ( 2017-07-06T3:57:04.946-05:00 to 2017-07-07T3:57:04.946-05:00 ) with 2465 entrie(s)
+Finished processing 331486 faultRecord entrie(s)
+2017-07-07 14:29:46.257  INFO 85129 --- [main] com.cerner.cts.oss.aci.rest.ACIRestApp   : Started ACIRestApp in 1961.086 seconds (JVM running for 1963.158)
+2017-07-07 14:29:46.258  INFO 85129 --- [main] s.c.a.AnnotationConfigApplicationContext : Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@48533e64: startup date [Fri Jul 07 13:57:05 CDT 2017]; root of context hierarchy
+2017-07-07 14:29:46.259  INFO 85129 --- [main] o.s.j.e.a.AnnotationMBeanExporter        : Unregistering JMX-exposed beans on shutdown
