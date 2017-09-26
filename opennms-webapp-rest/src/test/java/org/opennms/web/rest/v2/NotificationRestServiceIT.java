@@ -28,8 +28,8 @@
 
 package org.opennms.web.rest.v2;
 
-import javax.servlet.ServletContext;
-
+import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opennms.core.test.MockLogAppender;
@@ -37,6 +37,7 @@ import org.opennms.core.test.OpenNMSJUnit4ClassRunner;
 import org.opennms.core.test.db.annotations.JUnitTemporaryDatabase;
 import org.opennms.core.test.rest.AbstractSpringJerseyRestTestCase;
 import org.opennms.netmgt.dao.DatabasePopulator;
+import org.opennms.netmgt.model.OnmsCategory;
 import org.opennms.test.JUnitConfigurationEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,15 +62,13 @@ import org.springframework.transaction.annotation.Transactional;
 })
 @JUnitConfigurationEnvironment
 @JUnitTemporaryDatabase
+@Transactional
 public class NotificationRestServiceIT extends AbstractSpringJerseyRestTestCase {
     private static final Logger LOG = LoggerFactory.getLogger(NotificationRestServiceIT.class);
-    
+
     public NotificationRestServiceIT() {
         super(CXF_REST_V2_CONTEXT_PATH);
     }
-
-    @Autowired
-    private ServletContext m_context;
 
     @Autowired
     private DatabasePopulator m_databasePopulator;
@@ -80,26 +79,91 @@ public class NotificationRestServiceIT extends AbstractSpringJerseyRestTestCase 
         m_databasePopulator.populateDatabase();
     }
 
-    /**
-     * Test to make sure that all of the orderBy clauses are working via REST.
-     */
     @Test
-    @JUnitTemporaryDatabase
-    @Transactional
-    public void testOrderBy() throws Exception {
-
+    public void testFiql() throws Exception {
         String url = "/notifications";
 
-        LOG.warn(sendRequest(GET, url, parseParamData("orderBy=id"), 200));
-        LOG.warn(sendRequest(GET, url, parseParamData("orderBy=event.id"), 200));
-        LOG.warn(sendRequest(GET, url, parseParamData("orderBy=event.eventSeverity"), 200));
-        LOG.warn(sendRequest(GET, url, parseParamData("orderBy=pageTime"), 200));
-        LOG.warn(sendRequest(GET, url, parseParamData("orderBy=answeredBy"), 200));
-        LOG.warn(sendRequest(GET, url, parseParamData("orderBy=respondTime"), 200));
-        LOG.warn(sendRequest(GET, url, parseParamData("orderBy=node.label"), 200));
-        LOG.warn(sendRequest(GET, url, parseParamData("orderBy=ipAddress"), 200));
-        LOG.warn(sendRequest(GET, url, parseParamData("orderBy=serviceType.name"), 200));
+        LOG.warn(sendRequest(GET, url, parseParamData("_s=notification.answeredBy==\u0000"), 200));
+    }
 
+    @Test
+    public void testRootAliasFiltering() throws Exception {
+        // ID that doesn't exist
+        int id = Integer.MAX_VALUE;
+        executeQueryAndVerify("_s=notification.notifyId==" + id, 0);
+        executeQueryAndVerify("_s=notification.notifyId!=" + id, 1);
+        executeQueryAndVerify("_s=notification.answeredBy==root", 0);
+        executeQueryAndVerify("_s=notification.answeredBy!=root", 1);
+        executeQueryAndVerify("_s=notification.numericMsg==Message", 0);
+        executeQueryAndVerify("_s=notification.numericMsg!=Message", 1);
+        executeQueryAndVerify("_s=notification.pageTime==1970-01-01T00:00:00.000-0000", 1);
+        executeQueryAndVerify("_s=notification.pageTime!=1970-01-01T00:00:00.000-0000", 0);
+        executeQueryAndVerify("_s=notification.queueId==Message", 0);
+        executeQueryAndVerify("_s=notification.queueId!=Message", 1);
+        executeQueryAndVerify("_s=notification.respondTime==1970-01-01T00:00:00.000-0000", 1);
+        executeQueryAndVerify("_s=notification.respondTime!=1970-01-01T00:00:00.000-0000", 0);
+        executeQueryAndVerify("_s=notification.subject==Message", 0);
+        executeQueryAndVerify("_s=notification.subject!=Message", 1);
+        executeQueryAndVerify("_s=notification.textMsg==Message", 0);
+        executeQueryAndVerify("_s=notification.textMsg!=Message", 1);
+
+        // Verify IP address queries including iplike queries
+        executeQueryAndVerify("_s=ipAddress==192.168.1.1", 1);
+        executeQueryAndVerify("_s=ipAddress!=192.168.1.1", 0);
+        executeQueryAndVerify("_s=ipAddress==192.168.1.2", 0);
+        executeQueryAndVerify("_s=ipAddress==192.*.*.1", 1);
+        executeQueryAndVerify("_s=ipAddress==192.*.*.2", 0);
+        executeQueryAndVerify("_s=ipAddress==192.168.1.1-2", 1);
+        executeQueryAndVerify("_s=ipAddress==127.0.0.1", 0);
+        executeQueryAndVerify("_s=ipAddress!=127.0.0.1", 1);
+
+        // Verify IP address queries including iplike queries
+        executeQueryAndVerify("_s=notification.ipAddress==192.168.1.1", 1);
+        executeQueryAndVerify("_s=notification.ipAddress!=192.168.1.1", 0);
+        executeQueryAndVerify("_s=notification.ipAddress==192.168.1.2", 0);
+        executeQueryAndVerify("_s=notification.ipAddress==192.*.*.1", 1);
+        executeQueryAndVerify("_s=notification.ipAddress==192.*.*.2", 0);
+        executeQueryAndVerify("_s=notification.ipAddress==192.168.1.1-2", 1);
+        executeQueryAndVerify("_s=notification.ipAddress==127.0.0.1", 0);
+        executeQueryAndVerify("_s=notification.ipAddress!=127.0.0.1", 1);
+}
+
+    /**
+     * Test filtering for properties of {@link OnmsCategory}. The implementation
+     * for this filtering is different because the node-to-category relationship
+     * is a many-to-many relationship.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testCategoryFiltering() throws Exception {
+        int categoryId;
+        categoryId = m_databasePopulator.getCategoryDao().findByName("Routers").getId();
+        executeQueryAndVerify("_s=category.id==" + categoryId, 1);
+        executeQueryAndVerify("_s=category.id!=" + categoryId, 0);
+
+        // Category that doesn't exist
+        categoryId = Integer.MAX_VALUE;
+        executeQueryAndVerify("_s=category.id==" + categoryId, 0);
+        executeQueryAndVerify("_s=category.id!=" + categoryId, 1);
+
+        executeQueryAndVerify("_s=category.name==Routers", 1);
+        executeQueryAndVerify("_s=category.name!=Routers", 0);
+        executeQueryAndVerify("_s=category.name==Rou*", 1);
+        executeQueryAndVerify("_s=category.name!=Rou*", 0);
+        executeQueryAndVerify("_s=category.name==Ro*ers", 1);
+        executeQueryAndVerify("_s=category.name!=Ro*ers", 0);
+        executeQueryAndVerify("_s=category.name==DoesntExist", 0);
+        executeQueryAndVerify("_s=category.name!=DoesntExist", 1);
+    }
+
+    private void executeQueryAndVerify(String query, int totalCount) throws Exception {
+        if (totalCount == 0) {
+            sendRequest(GET, "/notifications", parseParamData(query), 204);
+        } else {
+            JSONObject object = new JSONObject(sendRequest(GET, "/notifications", parseParamData(query), 200));
+            Assert.assertEquals(totalCount, object.getInt("totalCount"));
+        }
     }
 
 }

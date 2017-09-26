@@ -3,7 +3,7 @@
   <parent>
     <artifactId>opennms</artifactId>
     <groupId>org.opennms</groupId>
-    <version>20.0.3-SNAPSHOT</version>
+    <version>20.1.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>opennms-webapp-rest</artifactId>
@@ -206,6 +206,12 @@
       <version>${project.version}</version>
       <scope>${onmsLibScope}</scope>
     </dependency>
+    <dependency>
+      <groupId>org.opennms.features.rest</groupId>
+      <artifactId>org.opennms.features.rest.mapper</artifactId>
+      <version>${project.version}</version>
+      <scope>${onmsLibScope}</scope>
+    </dependency>
 
     <!-- Discovery -->
     <dependency>
@@ -287,9 +293,20 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.opennms.features.ticketing</groupId>
+      <artifactId>org.opennms.features.ticketing.daemon</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.skyscreamer</groupId>
       <artifactId>jsonassert</artifactId>
       <version>1.2.3</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
