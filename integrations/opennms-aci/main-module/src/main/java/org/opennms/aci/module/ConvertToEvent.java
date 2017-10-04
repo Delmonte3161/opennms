@@ -45,7 +45,9 @@ public class ConvertToEvent {
     
     private static final Logger LOG = LoggerFactory.getLogger(ConvertToEvent.class);
     
-    private static Map<String, OnmsSeverity> SEVERITY_MAP;
+    private static final String ACI_UEI_PART = "uei.opennms.org/cisco/aci/";
+    
+    private static final Map<String, OnmsSeverity> SEVERITY_MAP;
     
     static
     {
@@ -77,7 +79,7 @@ public class ConvertToEvent {
         bldr.setTime(createDate);
         bldr.setDescription((String) attributes.get("descr"));
         bldr.setLogMessage((String) attributes.get("rule"));
-        bldr.setUei("uei.opennms.org/cisco/aci/" + attributes.get("code") + "/" + attributes.get("severity"));
+        bldr.setUei(ACI_UEI_PART + attributes.get("severity"));
         bldr.setSeverity(SEVERITY_MAP.get(attributes.get("severity")).getLabel());
         bldr.setSource(ApicService.class.getSimpleName());
         

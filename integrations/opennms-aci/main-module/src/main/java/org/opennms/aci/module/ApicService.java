@@ -140,6 +140,8 @@ public class ApicService {
 
     public void createAndScheduleJob(String location, String apicUrl, String username, String password, int pollDuration) {
         String jobIdentity = ApicClusterJob.class.getSimpleName() + "-" + location;
+        LOG.info("Creating job: " + jobIdentity);
+        
         JobDetail job = JobBuilder.newJob(ApicClusterJob.class).withIdentity(jobIdentity, ApicClusterJob.class.getSimpleName())
                     .usingJobData(APIC_CONFIG_LOCATION_KEY, location)
                     .usingJobData(APIC_CONFIG_URL_KEY, apicUrl)
@@ -154,8 +156,9 @@ public class ApicService {
         clusterMap.put(job.getKey().toString(), clusterJobMap);
 
         // Trigger the job to run on the next round minute
+        String triggerIdentity = ApicService.class.getSimpleName() + "-Trigger-" + location;
         Trigger trigger = TriggerBuilder.newTrigger()
-                            .withIdentity(ApicService.class.getSimpleName(), "org.opennms.aci")
+                            .withIdentity(triggerIdentity, "org.opennms.aci")
                             .withSchedule(SimpleScheduleBuilder.simpleSchedule()
                             .withIntervalInMinutes(pollDuration)
                             .withMisfireHandlingInstructionFireNow()
@@ -168,6 +171,10 @@ public class ApicService {
             scheduler.getContext().put(APIC_CONFIG_EVENT_DAO, eventDao);
             scheduler.getContext().put(APIC_CONFIG_CLUSTER_MAP, clusterMap);
             scheduler.start();
+            
+            if (scheduler.checkExists(job.getKey()))
+                scheduler.deleteJob(job.getKey());
+            
             scheduler.scheduleJob(job, trigger);
         } catch (SchedulerException e) {
             LOG.error("Error executing job.", e);
