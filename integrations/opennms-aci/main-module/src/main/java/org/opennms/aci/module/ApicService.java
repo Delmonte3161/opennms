@@ -62,6 +62,10 @@ public class ApicService {
 
     static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     
+    public static final String DN_SEP = "/";
+    
+    public static final String FS_SEP = "~";
+    
     final int pollDurationMinutes = 5;
 
 //    final String location = "LS6";

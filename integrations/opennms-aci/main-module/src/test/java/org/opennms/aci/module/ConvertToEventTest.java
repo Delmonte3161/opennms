@@ -94,8 +94,11 @@ public class ConvertToEventTest {
 
         Date createDate = ApicService.format.parse(onlydate + "T" + onlytime
                 + tz);
+
+        NodeCache nodeCache = new NodeCache();
+        nodeCache.init();
         
-        EventBuilder bldr = ConvertToEvent.toEventBuilder("test", createDate, attributes);
+        EventBuilder bldr = ConvertToEvent.toEventBuilder(nodeCache, "test", createDate, attributes);
         
         Event event = bldr.getEvent();
         

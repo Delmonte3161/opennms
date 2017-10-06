@@ -63,6 +63,8 @@ public class ApicClusterJob implements Job {
     private ACIRestClient client;
 
     private String lastProcessTime = null;
+    
+    private NodeCache nodeCache;
 
     public ApicClusterJob() {
         LOG.debug("Initializing ApicClusterJob ...");
@@ -112,6 +114,7 @@ public class ApicClusterJob implements Job {
 
         EventForwarder eventForwarder = (EventForwarder) schedulerContext.get(ApicService.APIC_CONFIG_EVENT_FORWARDER);
         EventDao eventDao = (EventDao) schedulerContext.get(ApicService.APIC_CONFIG_EVENT_DAO);
+        nodeCache = (NodeCache) schedulerContext.get("NodeCache");
 
         int pollDuration = (int) context.getMergedJobDataMap().get(ApicService.APIC_CONFIG_POLL_DURATION_KEY);
 
@@ -224,7 +227,7 @@ public class ApicClusterJob implements Job {
                     }
 
                     LOG.debug(created + " --- " + attributes.toJSONString());
-                    EventBuilder bldr = ConvertToEvent.toEventBuilder(location, createDate, attributes);
+                    EventBuilder bldr = ConvertToEvent.toEventBuilder(this.nodeCache, location, createDate, attributes);
 
                     Event event = bldr.getEvent();
 
