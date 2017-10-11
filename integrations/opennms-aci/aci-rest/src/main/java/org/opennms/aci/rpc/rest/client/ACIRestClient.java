@@ -28,6 +28,8 @@
 
 package org.opennms.aci.rpc.rest.client;
 
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -542,6 +544,18 @@ public class ACIRestClient {
      */
     public JSONArray getClassInfo(String... classes) throws Exception {
 
+        return this.getClassInfo(false, classes);
+    }
+
+    /**
+     * Method to get general information for all the managed objects for given
+     * classes
+     * 
+     * @param classes
+     * @throws Exception
+     */
+    public JSONArray getClassInfo(boolean noPrint, String... classes) throws Exception {
+
         List<Thread> classThreads = new ArrayList<Thread>();
         for (String apicClass : classes) {
             if (apicClass.equals("faultRecord")
@@ -559,7 +573,8 @@ public class ACIRestClient {
                 String queryUrl = "node/class/" + apicClass + ".json";
                 JSONObject result = (JSONObject) this.get(queryUrl);
                 int totalCount = Integer.parseInt((String) result.get("totalCount"));
-                printObjectProperties((JSONArray) result.get("imdata"), apicClass, this.host);
+                if (!noPrint)
+                    printObjectProperties((JSONArray) result.get("imdata"), apicClass, this.host);
                 LOG.debug("Found " + totalCount + " " + apicClass
                         + " record(s)");
                 return (JSONArray) result.get("imdata");

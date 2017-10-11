@@ -78,14 +78,16 @@ public class ConvertToEvent {
         String dn = (String) attributes.get("affected");
         String[] dnParts = dn.split(ApicService.DN_SEP);
         
-//        if (dnParts[0].equals("topology")) {
-//            //Device Fault
-//            Long nodeId = nodeCache.getNodeId(location + ApicService.FS_SEP + dn);
-//            if (nodeId != null)
-//                bldr.setNodeid(nodeId);
-//        } else if (dnParts[0].equals("dbgs")) {
-//            
-//        }
+        if (dnParts[0].equals("topology") && dnParts.length >= 4) {
+            //Device Fault
+            String key = location + ApicService.FS_SEP + dnParts[0] + ApicService.DN_SEP + dnParts[1] 
+                    + ApicService.DN_SEP + dnParts[2] + ApicService.DN_SEP + dnParts[3];
+            Long nodeId = nodeCache.getNodeId(key);
+            if (nodeId != null)
+                bldr.setNodeid(nodeId);
+        } else if (dnParts[0].equals("dbgs")) {
+            
+        }
         
         bldr.setTime(createDate);
         bldr.setDescription((String) attributes.get("descr"));

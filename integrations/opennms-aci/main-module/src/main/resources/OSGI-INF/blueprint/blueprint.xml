@@ -14,6 +14,14 @@
   <reference id="eventForwarder" interface="org.opennms.netmgt.events.api.EventForwarder" availability="mandatory"/>
   
   <reference id="eventDao" interface="org.opennms.netmgt.dao.api.EventDao" availability="mandatory"/>
+
+  <reference id="nodeDao" interface="org.opennms.netmgt.dao.api.NodeDao" availability="mandatory"/>
+  
+  <!-- 
+  <bean id="nodeCache" class="org.opennms.aci.module.NodeCache">
+      <property name="nodeDao" ref="nodeDao" />
+  </bean>
+   -->
   
   <bean id="southboundConfigDao" class="org.opennms.netmgt.dao.jaxb.southbound.DefaultSouthboundConfigDao">
   <!--
@@ -26,6 +34,7 @@
        <property name="eventForwarder" ref="eventForwarder"/>
        <property name="southboundConfigDao" ref="southboundConfigDao"/>
        <property name="eventDao" ref="eventDao"/>
+       <property name="nodeDao" ref="nodeDao"/>
   </bean>
   
 </blueprint>

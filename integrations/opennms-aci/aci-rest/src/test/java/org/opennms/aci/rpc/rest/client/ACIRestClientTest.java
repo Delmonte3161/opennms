@@ -61,9 +61,9 @@ public class ACIRestClientTest
             ACIRestClient client = ACIRestClient.newAciRest( "LS", url, userName, pw );
             
 //            client.getCurrentFaults(format.format(startCal.getTime()));
-            client.getClassInfo(  "faultRecord" );
+//            client.getClassInfo(  "faultRecord" );
 //            client.getClassInfo(  "faultRecord", "eventRecord" );
-//            client.getClassInfo( "topSystem" );
+            client.getClassInfo( "topSystem" );
             
 //            client.getHealth( "fvAp", "fvTenant", "fabricNode" );
 //            client.getStats( "fvAp" );

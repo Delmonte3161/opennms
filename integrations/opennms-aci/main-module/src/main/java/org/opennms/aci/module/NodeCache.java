@@ -100,19 +100,19 @@ public class NodeCache {
                 throw new NodeCacheKeyNotFoundException("ACI Key not found, key=" + key);
             
             String onmsKey = node.getNodeId() + ApicService.FS_SEP;
-            if (dnParts.length > 4) {
-                //We have an interface DN, lookup interface and append to key
-                //TODO - Implement interface lookup
-                Set<OnmsSnmpInterface> interfaces = node.getSnmpInterfaces();
-                for (OnmsSnmpInterface onmsSnmpInterface : interfaces) {
-                    if (onmsSnmpInterface.getIfName().equals(dnParts[4])) {
-                       break; 
-                    }
-                    
-                }
-            }
+//            if (dnParts.length > 4) {
+//                //We have an interface DN, lookup interface and append to key
+//                //TODO - Implement interface lookup
+//                Set<OnmsSnmpInterface> interfaces = node.getSnmpInterfaces();
+//                for (OnmsSnmpInterface onmsSnmpInterface : interfaces) {
+//                    if (onmsSnmpInterface.getIfName().equals(dnParts[4])) {
+//                       break; 
+//                    }
+//                    
+//                }
+//            }
             
-            return onmsKey;
+            return node.getNodeId();
         }
         
         throw new NodeCacheInvalidKeyException("The ACI DN key is not valid, key=" + key);
@@ -143,6 +143,14 @@ public class NodeCache {
         }
         
         return null;
+    }
+
+    public NodeDao getNodeDao() {
+        return nodeDao;
+    }
+
+    public void setNodeDao(NodeDao nodeDao) {
+        this.nodeDao = nodeDao;
     }
     
 }

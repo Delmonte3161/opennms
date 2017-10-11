@@ -34,9 +34,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.config.southbound.SouthCluster;
 import org.opennms.netmgt.config.southbound.SouthElement;
 import org.opennms.netmgt.dao.api.EventDao;
+import org.opennms.netmgt.dao.api.NodeDao;
 import org.opennms.netmgt.dao.southbound.SouthboundConfigDao;
 import org.opennms.netmgt.events.api.EventForwarder;
 import org.quartz.JobBuilder;
@@ -80,7 +82,10 @@ public class ApicService {
     public final static String APIC_CONFIG_POLL_DURATION_KEY = "pollDuration";
     public final static String APIC_CONFIG_EVENT_FORWARDER = "EventForwarder";
     public final static String APIC_CONFIG_EVENT_DAO = "EventDao";
+    public final static String APIC_CONFIG_NODE_CACHE = "NodeCache";
     public final static String APIC_CONFIG_CLUSTER_MAP = "ClusterMap";
+    public final static String APIC_CONFIG_LOCAL_ADDR = "localAddr";
+    
     public final static String APIC_CLUSTER_MAP_LAST_PROCESS_TIME = "lastProcessTime";
     
     @Autowired
@@ -89,14 +94,19 @@ public class ApicService {
     private SouthboundConfigDao southboundConfigDao;
     
     private EventDao eventDao;
-
+    
+    private NodeDao nodeDao;
+    
     private Scheduler scheduler = null;
     
     private Map<String, Map<String, Object>> clusterMap;
+    
+    private String localAddr;
 
     public void init() {
 
         LOG.info("Initializaing ApicService ...");
+        localAddr = InetAddressUtils.getLocalHostName();
         clusterMap = new HashMap<String, Map<String, Object>>();
         
         if (scheduler != null) {
@@ -107,9 +117,7 @@ public class ApicService {
             }
             scheduler = null;
         }
-
-        // TODO - this needs to be replaced with logic to build job for each
-        // configured cluster
+        
         List<SouthCluster> clusters = this.southboundConfigDao.getSouthboundClusters();
         for (SouthCluster southCluster : clusters) {
             if (southCluster.getClusterType().equals("CISCO-ACI")) {
@@ -152,8 +160,13 @@ public class ApicService {
                     .usingJobData(APIC_CONFIG_USERNAME_KEY, username)
                     .usingJobData(APIC_CONFIG_PASSWORD_KEY, password)
                     .usingJobData(APIC_CONFIG_POLL_DURATION_KEY, pollDuration)
+                    .usingJobData(APIC_CONFIG_LOCAL_ADDR, localAddr)
                     .storeDurably()
                     .build();
+        
+        NodeCache nodeCache = new NodeCache();
+        nodeCache.setNodeDao(nodeDao);
+        nodeCache.init();
         
         Map<String, Object> clusterJobMap = new HashMap<String, Object>();
         
@@ -173,6 +186,7 @@ public class ApicService {
             scheduler = new StdSchedulerFactory().getScheduler();
             scheduler.getContext().put(APIC_CONFIG_EVENT_FORWARDER, eventForwarder);
             scheduler.getContext().put(APIC_CONFIG_EVENT_DAO, eventDao);
+            scheduler.getContext().put(APIC_CONFIG_NODE_CACHE, nodeCache);
             scheduler.getContext().put(APIC_CONFIG_CLUSTER_MAP, clusterMap);
             scheduler.start();
             
@@ -183,7 +197,6 @@ public class ApicService {
         } catch (SchedulerException e) {
             LOG.error("Error executing job.", e);
         }
-
 
     }
     
@@ -211,6 +224,14 @@ public class ApicService {
 
     public void setEventDao(EventDao eventDao) {
         this.eventDao = eventDao;
+    }
+
+    public NodeDao getNodeDao() {
+        return nodeDao;
+    }
+
+    public void setNodeDao(NodeDao nodeDao) {
+        this.nodeDao = nodeDao;
     }
 
 }

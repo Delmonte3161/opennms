@@ -28,8 +28,11 @@
 
 package org.opennms.aci.module;
 
+import static org.opennms.core.utils.InetAddressUtils.addr;
+
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +42,7 @@ import org.opennms.aci.rpc.rest.client.ACIRestClient;
 import org.opennms.core.criteria.Alias.JoinType;
 import org.opennms.core.criteria.CriteriaBuilder;
 import org.opennms.netmgt.dao.api.EventDao;
+import org.opennms.netmgt.events.api.EventConstants;
 import org.opennms.netmgt.events.api.EventForwarder;
 import org.opennms.netmgt.model.OnmsEvent;
 import org.opennms.netmgt.model.events.EventBuilder;
@@ -65,6 +69,8 @@ public class ApicClusterJob implements Job {
     private String lastProcessTime = null;
     
     private NodeCache nodeCache;
+    
+    private String localAddr;
 
     public ApicClusterJob() {
         LOG.debug("Initializing ApicClusterJob ...");
@@ -114,7 +120,8 @@ public class ApicClusterJob implements Job {
 
         EventForwarder eventForwarder = (EventForwarder) schedulerContext.get(ApicService.APIC_CONFIG_EVENT_FORWARDER);
         EventDao eventDao = (EventDao) schedulerContext.get(ApicService.APIC_CONFIG_EVENT_DAO);
-        nodeCache = (NodeCache) schedulerContext.get("NodeCache");
+        nodeCache = (NodeCache) schedulerContext.get(ApicService.APIC_CONFIG_NODE_CACHE);
+        localAddr = (String) schedulerContext.get(ApicService.APIC_CONFIG_LOCAL_ADDR);
 
         int pollDuration = (int) context.getMergedJobDataMap().get(ApicService.APIC_CONFIG_POLL_DURATION_KEY);
 
@@ -168,7 +175,14 @@ public class ApicClusterJob implements Job {
             builder.eq("location.id", location);
             builder.orderBy("eventTime").desc();
             builder.limit(10);
-            List<OnmsEvent> events = eventDao.findMatching(builder.toCriteria());
+            List<OnmsEvent> events = null;
+            try {
+                events = eventDao.findMatching(builder.toCriteria());
+            } catch (Exception e) {
+                LOG.warn("Failed to query Events.", e);
+                e.printStackTrace();
+            }
+
             if (events == null || events.size() < 1) {
                 LOG.debug("No events found for location: " + location);
                 lastProcessTime = client.getTimeStamp(pollDuration * 60);
@@ -196,6 +210,7 @@ public class ApicClusterJob implements Job {
         final Events events = new Events();
         elog.setEvents(events);
 
+        Map<String, Event> suspects = new HashMap<String, Event>();
         for (Object object : results) {
             JSONObject objectData = (JSONObject) object;
             if (objectData == null)
@@ -232,14 +247,35 @@ public class ApicClusterJob implements Job {
                     Event event = bldr.getEvent();
 
                     events.addEvent(event);
+                    
+                    //Add one event for the missing Node for generating newSuspectEvents
+                    if (!event.hasNodeid() && !suspects.containsKey(event.getInterface()))
+                        suspects.put(event.getInterface(), event);
                 }
             }
         }
         if (events.getEventCount() > 0) {
             LOG.debug("Sending " + events.getEventCount() + " event(s)");
             eventForwarder.sendNowSync(elog);
+            
+            //Loop on suspects and send newSuspectEvents
+            suspects.values().stream()
+            .filter(e -> !e.hasNodeid() && e.getInterface() != null)
+            .forEach(e -> {
+                LOG.trace("ApicService: Found a new suspect {}", e.getInterface());
+                sendNewSuspectEvent(eventForwarder, localAddr, e.getInterface(), e.getDistPoller());
+            });
         }
         clusterJobMap.put(ApicService.APIC_CLUSTER_MAP_LAST_PROCESS_TIME, lastProcessTime);
         LOG.debug("Last Process Date: " + lastProcessTime);
     }
+    
+    private void sendNewSuspectEvent(EventForwarder eventForwarder, String localAddr, String eventInterface, String distPoller) {
+        EventBuilder bldr = new EventBuilder(EventConstants.NEW_SUSPECT_INTERFACE_EVENT_UEI, "syslogd");
+        bldr.setInterface(addr(eventInterface));
+        bldr.setHost(localAddr);
+//        bldr.setDistPoller(distPoller);
+        eventForwarder.sendNow(bldr.getEvent());
+    }
 }
+
