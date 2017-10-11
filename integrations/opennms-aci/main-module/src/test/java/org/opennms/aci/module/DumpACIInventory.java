@@ -90,7 +90,7 @@ public class DumpACIInventory {
                                                                     username,
                                                                     password);
                     System.out.println(
-                           "foreignSource, Node_Label, IP_Address, MgmtType_SNMP, ID_Key, InterfaceStatus, cat_1, cat_2, svc_1, svc_2, svc_3"
+                           "Node_Label, IP_Address, MgmtType_SNMP, ID_Key, InterfaceStatus, cat_1, cat_2, cat_3, svc_1, svc_2, svc_3"
                                       );
 
                     JSONArray results = client.getClassInfo(true,
@@ -107,12 +107,15 @@ public class DumpACIInventory {
                                 continue;
 
                             String role = (String) attributes.get("role");
-                            String row = location + ", " + 
+                            String dn = (String) attributes.get("dn");
+                            dn = dn.replace("/", "_");
+                            String row = 
                                       (String) attributes.get("name") + ", " + 
                                       (String) attributes.get("oobMgmtAddr") + ", " + 
                                       "P, " + 
-                                      (String) attributes.get("dn") + ", " + 
+                                      dn + ", " + 
                                       "1, " + 
+                                      location + ", " + 
                                       role + ", " +
                                       "ACI, "
                                       ;
