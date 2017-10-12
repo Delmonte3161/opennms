@@ -535,6 +535,15 @@ public class ACIRestClient {
         return this.getBigDataRange("faultRecord", scaleStart);
     }
 
+    public JSONArray getManagedObject(String dn) throws Exception {
+        String queryUrl = "mo/" + dn + ".json";
+        
+        JSONObject result = (JSONObject) this.get(queryUrl);
+        int totalCount = Integer.parseInt((String) result.get("totalCount"));
+        LOG.debug("Found " + totalCount + " " + dn + " record(s)");
+        return (JSONArray) result.get("imdata");
+    }
+
     /**
      * Method to get general information for all the managed objects for given
      * classes

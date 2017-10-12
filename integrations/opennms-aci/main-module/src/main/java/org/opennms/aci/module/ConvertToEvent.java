@@ -80,8 +80,8 @@ public class ConvertToEvent {
         
         if (dnParts[0].equals("topology") && dnParts.length >= 4) {
             //Device Fault
-            String key = location + ApicService.FS_SEP + dnParts[0] + ApicService.DN_SEP + dnParts[1] 
-                    + ApicService.DN_SEP + dnParts[2] + ApicService.DN_SEP + dnParts[3];
+            String key = location + ApicService.FS_SEP + dnParts[0] + "_" + dnParts[1] 
+                    + "_" + dnParts[2] + "_" + dnParts[3];
             Long nodeId = nodeCache.getNodeId(key);
             if (nodeId != null)
                 bldr.setNodeid(nodeId);
@@ -90,10 +90,10 @@ public class ConvertToEvent {
         }
         
         bldr.setTime(createDate);
-        bldr.setDescription((String) attributes.get("descr"));
-        bldr.setLogMessage((String) attributes.get("rule"));
+//        bldr.setDescription((String) attributes.get("descr"));
+//        bldr.setLogMessage((String) attributes.get("rule"));
         bldr.setUei(ACI_UEI_PART + attributes.get("severity"));
-        bldr.setSeverity(SEVERITY_MAP.get(attributes.get("severity")).getLabel());
+//        bldr.setSeverity(SEVERITY_MAP.get(attributes.get("severity")).getLabel());
         bldr.setSource(ApicService.class.getSimpleName());
         
         return bldr;

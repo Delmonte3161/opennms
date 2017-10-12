@@ -47,8 +47,8 @@ public class ACIRestClientTest
      */
     public static void main( String[] args )
     {
-        final String url = "https://7.192.80.10,https://7.192.80.11,https://7.192.80.12";
-//        final String url = "https://7.192.240.10,https://7.192.240.11,https://7.192.240.12";
+//        final String url = "https://7.192.80.10,https://7.192.80.11,https://7.192.80.12";
+        final String url = "https://7.192.240.10,https://7.192.240.11,https://7.192.240.12";
 //        final String url = "https://bogus,https://bogus,https://7.192.80.12";
         final String userName = "svcOssAci";
         final String pw = "kf3as=Nx";
@@ -58,12 +58,15 @@ public class ACIRestClientTest
             final java.util.Calendar startCal = GregorianCalendar.getInstance();
             startCal.add(GregorianCalendar.MINUTE, -100);
             
-            ACIRestClient client = ACIRestClient.newAciRest( "LS", url, userName, pw );
+            ACIRestClient client = ACIRestClient.newAciRest( "kc8apic", url, userName, pw );
             
 //            client.getCurrentFaults(format.format(startCal.getTime()));
 //            client.getClassInfo(  "faultRecord" );
 //            client.getClassInfo(  "faultRecord", "eventRecord" );
-            client.getClassInfo( "topSystem" );
+//            client.getClassInfo( "topSystem" );
+            client.getClassInfo( "ethpmPhysIf" );
+//            client.getManagedObject( "topology/pod-1/node-155/sys/phys-[eth1/18]/phys" );
+//            client.getManagedObject( "topology/pod-1/node-155/sys" );
             
 //            client.getHealth( "fvAp", "fvTenant", "fabricNode" );
 //            client.getStats( "fvAp" );

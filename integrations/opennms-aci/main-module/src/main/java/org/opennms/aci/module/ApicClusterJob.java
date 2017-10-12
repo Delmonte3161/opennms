@@ -41,6 +41,7 @@ import org.json.simple.JSONObject;
 import org.opennms.aci.rpc.rest.client.ACIRestClient;
 import org.opennms.core.criteria.Alias.JoinType;
 import org.opennms.core.criteria.CriteriaBuilder;
+import org.opennms.core.logging.Logging;
 import org.opennms.netmgt.dao.api.EventDao;
 import org.opennms.netmgt.events.api.EventConstants;
 import org.opennms.netmgt.events.api.EventForwarder;
@@ -74,6 +75,7 @@ public class ApicClusterJob implements Job {
 
     public ApicClusterJob() {
         LOG.debug("Initializing ApicClusterJob ...");
+        Logging.putPrefix("aci");
     }
 
     @Override
@@ -188,15 +190,15 @@ public class ApicClusterJob implements Job {
                 lastProcessTime = client.getTimeStamp(pollDuration * 60);
                 clusterJobMap.put(ApicService.APIC_CLUSTER_MAP_LAST_PROCESS_TIME, lastProcessTime);
             } else {
-                LOG.debug("Found events, setting last processed time.");
                 OnmsEvent event = events.get(1);
                 Date eventTime = event.getEventTime();
                 lastProcessTime = ApicService.format.format(eventTime);
+                LOG.debug("Found events, setting lastProcessTime = " + lastProcessTime);
                 clusterJobMap.put(ApicService.APIC_CLUSTER_MAP_LAST_PROCESS_TIME, lastProcessTime);
             }
         } else {
             lastProcessTime = (String) clusterJobMap.get(ApicService.APIC_CLUSTER_MAP_LAST_PROCESS_TIME);
-            LOG.trace("Setting lastProcessTime = " + lastProcessTime);
+            LOG.debug("Setting lastProcessTime = " + lastProcessTime);
         }
 
     }

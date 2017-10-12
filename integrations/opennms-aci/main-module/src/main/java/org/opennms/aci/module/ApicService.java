@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.opennms.core.logging.Logging;
 import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.config.southbound.SouthCluster;
 import org.opennms.netmgt.config.southbound.SouthElement;
@@ -105,6 +106,7 @@ public class ApicService {
 
     public void init() {
 
+        Logging.putPrefix("aci");
         LOG.info("Initializaing ApicService ...");
         localAddr = InetAddressUtils.getLocalHostName();
         clusterMap = new HashMap<String, Map<String, Object>>();

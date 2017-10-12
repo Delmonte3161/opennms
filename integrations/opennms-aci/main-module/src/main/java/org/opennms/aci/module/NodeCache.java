@@ -89,16 +89,18 @@ public class NodeCache {
         }
 
         String foreignSource = keyParts[0];
-        String[] dnParts = keyParts[1].split(ApicService.DN_SEP);
+        String foreignId = keyParts[1];
+//        String[] dnParts = keyParts[1].split(ApicService.DN_SEP);
         
-        if (dnParts.length >= 4) {
+//        if (dnParts.length >= 4) {
             //We have a Node DN, construct foreignId and lookup
-            String foreignId = dnParts[0] + ApicService.DN_SEP + dnParts[1] + ApicService.DN_SEP + dnParts[2] + ApicService.DN_SEP + dnParts[3];
+//            String foreignId = dnParts[0] + ApicService.DN_SEP + dnParts[1] + ApicService.DN_SEP + dnParts[2] + ApicService.DN_SEP + dnParts[3];
             OnmsNode node = nodeDao.findByForeignId(foreignSource, foreignId);
             
             if (node == null)
                 throw new NodeCacheKeyNotFoundException("ACI Key not found, key=" + key);
             
+            LOG.debug("Found Node for key = " + foreignId);
             String onmsKey = node.getNodeId() + ApicService.FS_SEP;
 //            if (dnParts.length > 4) {
 //                //We have an interface DN, lookup interface and append to key
@@ -113,9 +115,9 @@ public class NodeCache {
 //            }
             
             return node.getNodeId();
-        }
+//        }
         
-        throw new NodeCacheInvalidKeyException("The ACI DN key is not valid, key=" + key);
+//        throw new NodeCacheInvalidKeyException("The ACI DN key is not valid, key=" + key);
     }
     
     public Long getNodeId(String key) {
