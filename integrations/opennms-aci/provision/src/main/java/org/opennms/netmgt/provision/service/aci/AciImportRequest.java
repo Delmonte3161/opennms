@@ -33,10 +33,13 @@ import java.util.Objects;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.opennms.netmgt.provision.persist.RequisitionRequest;
 import org.opennms.netmgt.provision.persist.requisition.Requisition;
+import org.opennms.netmgt.provision.service.aci.RequisitionXmlAdapter;
 
 /**
  * @author mp050407
@@ -61,8 +64,9 @@ public class AciImportRequest implements RequisitionRequest {
 	@XmlAttribute(name = "foreign-source")
 	private String foreignSource = null;
 
-	@SuppressWarnings("unused")
-	private Requisition existingRequisition;
+	@XmlElement(name="existing-requisition")
+    @XmlJavaTypeAdapter(RequisitionXmlAdapter.class)
+    private Requisition existingRequisition;
 
 	public AciImportRequest(Map<String, String> parameters) {
 		setHostname(parameters.get("hostname"));

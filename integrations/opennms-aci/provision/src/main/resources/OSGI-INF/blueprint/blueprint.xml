@@ -14,6 +14,7 @@
     <service ref="aciRequisitionProvider" interface="org.opennms.netmgt.provision.persist.RequisitionProvider">
       <service-properties>
         <entry key="type" value="aci" />
+        <entry key="registration.export" value="true" />
       </service-properties>
     </service>
 </blueprint>

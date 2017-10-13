@@ -28,13 +28,17 @@
 
 package org.opennms.netmgt.provision.service.aci;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.opennms.netmgt.provision.persist.RequisitionRequest;
 import org.opennms.netmgt.provision.persist.requisition.Requisition;
@@ -46,6 +50,8 @@ import org.opennms.netmgt.provision.persist.requisition.Requisition;
 @XmlRootElement(name = "aci-requisition-request")
 @XmlAccessorType(XmlAccessType.NONE)
 public class AciRequisitionRequest implements RequisitionRequest {
+
+	private static final List<String> DEFAULT_SERVICES = Arrays.asList("ICMP");
 
 	@XmlAttribute(name = "hostname")
 	private String hostname = null;
@@ -59,10 +65,18 @@ public class AciRequisitionRequest implements RequisitionRequest {
 	@XmlAttribute(name = "location")
 	private String location = null;
 
+	// unique cluster name
 	@XmlAttribute(name = "foreign-source")
 	private String foreignSource = null;
 
-	@SuppressWarnings("unused")
+	@XmlAttribute(name = "apic-url")
+	private String apicUrl = null;
+
+	@XmlElement(name = "service")
+	private List<String> services;
+
+	@XmlElement(name = "existing-requisition")
+	@XmlJavaTypeAdapter(RequisitionXmlAdapter.class)
 	private Requisition existingRequisition;
 
 	public AciRequisitionRequest(Map<String, String> parameters) {
@@ -70,26 +84,37 @@ public class AciRequisitionRequest implements RequisitionRequest {
 		setUsername(parameters.get("username"));
 		setPassword(parameters.get("password"));
 		setLocation(parameters.get("location"));
+		setApicUrl(parameters.get("apic-url"));
+
+	}
+
+	private void setApicUrl(String apicUrl) {
+		this.apicUrl = apicUrl;
 	}
 
 	public AciRequisitionRequest() {
 		// TODO Auto-generated constructor stub
 	}
 
-	private void setLocation(String location) {
+	public void setLocation(String location) {
 		this.location = location;
 	}
 
-	private void setPassword(String password) {
+	public void setPassword(String password) {
 		this.password = password;
 	}
 
-	private void setUsername(String username) {
+	public void setUsername(String username) {
 		this.username = username;
 	}
 
-	private void setHostname(String hostname) {
+	public void setHostname(String hostname) {
 		this.hostname = hostname;
+
+	}
+
+	public void setForeignSource(String foreignSource) {
+		this.foreignSource = foreignSource;
 
 	}
 
@@ -97,8 +122,24 @@ public class AciRequisitionRequest implements RequisitionRequest {
 		return foreignSource;
 	}
 
+	public String getApicUrl() {
+		return apicUrl;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
 	public void setExistingRequisition(Requisition existingRequisition) {
 		this.existingRequisition = existingRequisition;
+	}
+
+	public List<String> getServices() {
+		return services != null ? services : DEFAULT_SERVICES;
 	}
 
 	@Override
@@ -119,4 +160,3 @@ public class AciRequisitionRequest implements RequisitionRequest {
 	}
 
 }
-

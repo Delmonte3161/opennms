@@ -104,6 +104,7 @@ public class AciRequisitionUrlConnection extends URLConnection{
      */
     @Override
     public InputStream getInputStream() throws IOException {
+    	System.out.println("getInputstream of Acireq url");
     	logger.debug("AciRequisitionUrlConnection:getInputStream");
         try {
             final Requisition r = s_provider.getRequisition(m_request);
