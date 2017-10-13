@@ -541,6 +541,17 @@ public class ACIRestClient {
         JSONObject result = (JSONObject) this.get(queryUrl);
         int totalCount = Integer.parseInt((String) result.get("totalCount"));
         LOG.debug("Found " + totalCount + " " + dn + " record(s)");
+        printObjectProperties((JSONArray) result.get("imdata"), dn, this.host);
+        return (JSONArray) result.get("imdata");
+    }
+    
+    public JSONArray getManagedObjectSubtree(String dn, String subClass) throws Exception {
+        String queryUrl = "mo/" + dn  + ".json" + "?query-target=subtree&target-subtree-class=" + subClass;
+        
+        JSONObject result = (JSONObject) this.get(queryUrl);
+        int totalCount = Integer.parseInt((String) result.get("totalCount"));
+        LOG.debug("Found " + totalCount + " " + dn + " record(s)");
+        printObjectProperties((JSONArray) result.get("imdata"), dn, this.host);
         return (JSONArray) result.get("imdata");
     }
 
