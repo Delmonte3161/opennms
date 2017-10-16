@@ -169,7 +169,7 @@ public class MonitorsListCommandTest {
             String shellOutput = sshClient.getStdout();
             shellOutput = StringUtils.substringAfter(shellOutput, "poller:list-monitors");
             LOG.info("Monitors output: {}", shellOutput);
-            Set<String> monitors = new HashSet<String>();
+            Set<String> monitors = new HashSet<>();
             for (String monitor : shellOutput.split("\\r?\\n")) {
                 if (StringUtils.isNotBlank(monitor)) {
                     monitors.add(monitor);

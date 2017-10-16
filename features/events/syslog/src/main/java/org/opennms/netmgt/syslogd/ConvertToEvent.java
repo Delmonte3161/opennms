@@ -200,13 +200,11 @@ public class ConvertToEvent {
         //Updated the code from foundation-2017
         if (hostAddress != null) {
             // Set nodeId
-            InterfaceToNodeCache cache = AbstractInterfaceToNodeCache.getInstance();
-            if (cache != null) {
-                int nodeId = cache.getNodeId(location, hostAddress);
-                if (nodeId > 0) {
-                    bldr.setNodeid(nodeId);
-                }
-            }
+        	   InterfaceToNodeCache cache = AbstractInterfaceToNodeCache.getInstance();
+               if (cache != null) {
+                   cache.getFirstNodeId(location, hostAddress)
+                           .ifPresent(nodeId -> bldr.setNodeid(nodeId));
+               }
 
             bldr.setInterface(hostAddress);
         }

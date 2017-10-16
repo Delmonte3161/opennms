@@ -578,7 +578,7 @@
       <version>20100506</version>
     </dependency>
     <dependency>
-      <groupId>ognl</groupId>
+      <groupId>opensymphony</groupId>
       <artifactId>ognl</artifactId>
     </dependency>
     <dependency>
@@ -608,6 +608,11 @@
       <groupId>org.opennms.dependencies</groupId>
       <artifactId>spring-web-dependencies</artifactId>
       <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>org.opennms.features.status</groupId>
+      <artifactId>org.opennms.features.status.api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opennms.features.geolocation</groupId>

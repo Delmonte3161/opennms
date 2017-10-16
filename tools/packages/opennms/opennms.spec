@@ -95,7 +95,8 @@ Requires:	jicmp6 >= 2.0.0
 Requires(pre):	%{jdk}
 Requires:	%{jdk}
 Obsoletes:	opennms < 1.3.11
-Obsoletes: opennms-plugin-protocol-xml
+Provides:	%{name}-plugin-protocol-xml = %{version}-%{release}
+Obsoletes:	%{name}-plugin-protocol-xml < %{version}
 
 %description core
 The core backend.  This package contains the main daemon responsible
@@ -587,6 +588,7 @@ END
 # Move the docs into %{_docdir}
 rm -rf %{buildroot}%{_docdir}/%{name}-%{version}
 mkdir -p %{buildroot}%{_docdir}
+find %{buildroot}%{instprefix}/docs -xdev -depth -type d -print0 | xargs -0 -r rmdir 2>/dev/null || true
 mv %{buildroot}%{instprefix}/docs %{buildroot}%{_docdir}/%{name}-%{version}
 cp README* %{buildroot}%{instprefix}/etc/
 rm -rf %{buildroot}%{instprefix}/etc/README
@@ -686,7 +688,7 @@ find %{buildroot}%{instprefix}/contrib ! -type d | \
 	sort >> %{_tmppath}/files.main
 find %{buildroot}%{instprefix}/lib ! -type d | \
 	sed -e "s|^%{buildroot}|%attr(755,root,root) |" | \
-	grep -v 'gnu-crypto' | \
+	grep -v 'bcprov-jdk15' | \
 	grep -v 'jdhcp' | \
 	grep -v 'jradius' | \
 	grep -v 'org.opennms.features.ncs.ncs-' | \
@@ -749,6 +751,7 @@ rm -rf %{buildroot}
 
 %files core -f %{_tmppath}/files.main
 %defattr(664 root root 775)
+%exclude %dir %{instprefix}/etc/drools-engine.d/ncs
 %attr(755,root,root)	%{profiledir}/%{name}.sh
 %attr(755,root,root)	%{logdir}
 %attr(640,root,root)	%config(noreplace) %{instprefix}/etc/users.xml
@@ -773,6 +776,7 @@ rm -rf %{buildroot}
 %defattr(644 root root 755)
 %{instprefix}/lib/org.opennms.features.ncs.ncs-*.jar
 %{jettydir}/%{servletdir}/WEB-INF/lib/org.opennms.features.ncs.ncs-*.jar
+%dir %{instprefix}/etc/drools-engine.d/ncs
 %config(noreplace) %{instprefix}/etc/drools-engine.d/ncs/*
 %config(noreplace) %{instprefix}/etc/ncs-northbounder-configuration.xml
 %{sharedir}/xsds/ncs-*.xsd
@@ -871,7 +875,7 @@ rm -rf %{buildroot}
 
 %files plugin-protocol-radius
 %defattr(664 root root 775)
-%{instprefix}/lib/gnu-crypto*.jar
+%{instprefix}/lib/bcprov-jdk15*.jar
 %{instprefix}/lib/jradius-*.jar
 %{instprefix}/lib/org.opennms.protocols.radius*.jar
 
