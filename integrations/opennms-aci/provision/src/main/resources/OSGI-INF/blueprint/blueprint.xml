@@ -10,7 +10,14 @@
 >
 
     <!-- The 'cisco-aci' provider -->
-    <bean id="aciRequisitionProvider" class="org.opennms.netmgt.provision.service.aci.AciRequisitionProvider" />
+    <bean id="southboundConfigDao" class="org.opennms.netmgt.dao.jaxb.southbound.DefaultSouthboundConfigDao">
+    	<property name="reloadCheckInterval" value="-1" />
+    </bean>
+ 
+     <bean id="aciRequisitionProvider" class="org.opennms.netmgt.provision.service.aci.AciRequisitionProvider">
+        <property name="southboundConfigDao" ref="southboundConfigDao"/>
+    </bean>
+    
     <service ref="aciRequisitionProvider" interface="org.opennms.netmgt.provision.persist.RequisitionProvider">
       <service-properties>
         <entry key="type" value="aci" />

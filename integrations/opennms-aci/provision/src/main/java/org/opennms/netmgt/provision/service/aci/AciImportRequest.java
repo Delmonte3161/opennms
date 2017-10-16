@@ -1,7 +1,7 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2017 The OpenNMS Group, Inc.
+ * Copyright (C) 2017-2017 The OpenNMS Group, Inc.
  * OpenNMS(R) is Copyright (C) 1999-2017 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
@@ -27,6 +27,8 @@
  *******************************************************************************/
 package org.opennms.netmgt.provision.service.aci;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -43,82 +45,158 @@ import org.opennms.netmgt.provision.service.aci.RequisitionXmlAdapter;
 
 /**
  * @author mp050407
- *
  */
 @XmlRootElement(name = "aci-requisition-request")
 @XmlAccessorType(XmlAccessType.NONE)
 public class AciImportRequest implements RequisitionRequest {
 
-	@XmlAttribute(name = "hostname")
-	private String hostname = null;
+    public static final List<String> DEFAULT_SERVICES = Arrays.asList("ICMP",
+                                                                       "SSH");
 
-	@XmlAttribute(name = "username")
-	private String username = null;
+    @XmlAttribute(name = "hostname")
+    private String hostname = null;
 
-	@XmlAttribute(name = "password")
-	private String password = null;
+    @XmlAttribute(name = "username")
+    private String username = null;
 
-	@XmlAttribute(name = "location")
-	private String location = null;
+    @XmlAttribute(name = "password")
+    private String password = null;
 
-	@XmlAttribute(name = "foreign-source")
-	private String foreignSource = null;
+    @XmlAttribute(name = "cluster-name")
+    private String clusterName = null;
 
-	@XmlElement(name="existing-requisition")
+    // unique cluster name
+    @XmlAttribute(name = "foreign-source")
+    private String foreignSource = null;
+
+    @XmlAttribute(name = "apic-url")
+    private String apicUrl = null;
+
+    @XmlElement(name = "service")
+    private List<String> services;
+
+    @XmlElement(name = "existing-requisition")
     @XmlJavaTypeAdapter(RequisitionXmlAdapter.class)
     private Requisition existingRequisition;
 
-	public AciImportRequest(Map<String, String> parameters) {
-		setHostname(parameters.get("hostname"));
-		setUsername(parameters.get("username"));
-		setPassword(parameters.get("password"));
-		setLocation(parameters.get("location"));
-	}
+    public AciImportRequest(Map<String, String> parameters) {
+        setHostname(parameters.get("hostname"));
+        setUsername(parameters.get("username"));
+        setPassword(parameters.get("password"));
+        setClusterName(parameters.get("cluster-name"));
+        setApicUrl(parameters.get("apic-url"));
+        
+        String path = parameters.get("path");
+        if (path == null) {
+            throw new IllegalArgumentException("path is required");
+        }
 
-	public AciImportRequest() {
-		// TODO Auto-generated constructor stub
-	}
+        path = path.replaceAll("^/", "");
+        path = path.replaceAll("/$", "");
 
-	private void setLocation(String location) {
-		this.location = location;
-	}
+        setForeignSource(path); //path part of resource should be the apic cluster name, which is our foriegn-source
+//        String[] pathElements = path.split("/");
+//
+//        if (pathElements.length == 1) {
+//            if ("".equals(pathElements[0])) {
+//                setForeignSource("vmware-" + getHostname());
+//            } else {
+//                setForeignSource(pathElements[0]);
+//            }
+//        } else {
+//            throw new IllegalArgumentException("Error processing path element of URL (aci://host[/foreign-source]?keyA=valueA;keyB=valueB;...)");
+//        }
 
-	private void setPassword(String password) {
-		this.password = password;
-	}
+    }
 
-	private void setUsername(String username) {
-		this.username = username;
-	}
+    public AciImportRequest() {
+        // TODO Auto-generated constructor stub
+    }
 
-	private void setHostname(String hostname) {
-		this.hostname = hostname;
+    public void setApicUrl(String apicUrl) {
+        this.apicUrl = apicUrl;
+    }
 
-	}
+    public void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
+    }
 
-	public String getForeignSource() {
-		return foreignSource;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public void setExistingRequisition(Requisition existingRequisition) {
-		this.existingRequisition = existingRequisition;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(hostname, username, password, location, foreignSource, existingRequisition);
-	}
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
 
-	@Override
-	public boolean equals(final Object other) {
-		if (!(other instanceof AciImportRequest)) {
-			return false;
-		}
-		AciImportRequest castOther = (AciImportRequest) other;
-		return Objects.equals(hostname, castOther.hostname) && Objects.equals(username, castOther.username)
-				&& Objects.equals(password, castOther.password) && Objects.equals(location, castOther.location)
-				&& Objects.equals(foreignSource, castOther.foreignSource)
-				&& Objects.equals(existingRequisition, castOther.existingRequisition);
-	}
+    }
 
+    public String getHostname() {
+        return hostname;
+    }
+
+    public String getClusterName() {
+        return clusterName;
+    }
+
+    public void setForeignSource(String foreignSource) {
+        this.foreignSource = foreignSource;
+
+    }
+
+    public String getForeignSource() {
+        return foreignSource;
+    }
+
+    public String getApicUrl() {
+        return apicUrl;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setExistingRequisition(Requisition existingRequisition) {
+        this.existingRequisition = existingRequisition;
+    }
+
+    /**
+     * @return the existingRequisition
+     */
+    public Requisition getExistingRequisition() {
+        return existingRequisition;
+    }
+
+    public List<String> getServices() {
+        return services != null ? services : DEFAULT_SERVICES;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(hostname, username, password, clusterName, apicUrl,
+                            foreignSource, existingRequisition);
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+        if (!(other instanceof AciImportRequest)) {
+            return false;
+        }
+        AciImportRequest castOther = (AciImportRequest) other;
+        return Objects.equals(hostname, castOther.hostname)
+                && Objects.equals(username, castOther.username)
+                && Objects.equals(password, castOther.password)
+                && Objects.equals(clusterName, castOther.clusterName)
+                && Objects.equals(apicUrl, castOther.apicUrl)
+                && Objects.equals(foreignSource, castOther.foreignSource)
+                && Objects.equals(existingRequisition,
+                                  castOther.existingRequisition);
+    }
 }
