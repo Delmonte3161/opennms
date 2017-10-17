@@ -27,6 +27,8 @@
  *******************************************************************************/
 package org.opennms.aci.module;
 
+import java.net.InetAddress;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -84,24 +86,35 @@ public class NodeCache {
             return null;
         
         String[] keyParts = key.split(ApicService.FS_SEP);
-        if (keyParts.length != 2) {
-            throw new NodeCacheInvalidKeyException("Incorrect key format key=" + key);
+        OnmsNode node = null;
+        if (keyParts.length == 2) {
+            String foreignSource = keyParts[0];
+            String foreignId = keyParts[1];
+            // String[] dnParts = keyParts[1].split(ApicService.DN_SEP);
+
+            // if (dnParts.length >= 4) {
+            // We have a Node DN, construct foreignId and lookup
+            // String foreignId = dnParts[0] + ApicService.DN_SEP + dnParts[1]
+            // + ApicService.DN_SEP + dnParts[2] + ApicService.DN_SEP +
+            // dnParts[3];
+            node = nodeDao.findByForeignId(foreignSource, foreignId);
+        } else if (keyParts.length == 1) {
+            InetAddress address = InetAddress.getByName(key);
+            List<OnmsNode> nodes = nodeDao.findByIpAddressAndService(address, "ICMP");
+            if (nodes.size() > 0)
+                node = nodes.get(0);
+        } else {
+            throw new NodeCacheInvalidKeyException("Incorrect key format key="
+                    + key);
         }
 
-        String foreignSource = keyParts[0];
-        String foreignId = keyParts[1];
-//        String[] dnParts = keyParts[1].split(ApicService.DN_SEP);
-        
-//        if (dnParts.length >= 4) {
-            //We have a Node DN, construct foreignId and lookup
-//            String foreignId = dnParts[0] + ApicService.DN_SEP + dnParts[1] + ApicService.DN_SEP + dnParts[2] + ApicService.DN_SEP + dnParts[3];
-            OnmsNode node = nodeDao.findByForeignId(foreignSource, foreignId);
-            
-            if (node == null)
-                throw new NodeCacheKeyNotFoundException("ACI Key not found, key=" + key);
-            
-            LOG.debug("Found Node for key = " + foreignId);
-            String onmsKey = node.getNodeId() + ApicService.FS_SEP;
+        if (node == null)
+            throw new NodeCacheKeyNotFoundException("ACI Key not found, key="
+                    + key);
+
+        LOG.debug("Found Node for key = " + key);
+
+//            String onmsKey = node.getNodeId() + ApicService.FS_SEP;
 //            if (dnParts.length > 4) {
 //                //We have an interface DN, lookup interface and append to key
 //                //TODO - Implement interface lookup
@@ -123,13 +136,17 @@ public class NodeCache {
     public Long getNodeId(String key) {
         try {
             String nodeKey = this.cache.get(key);
-            String[] nodeKeyParts = nodeKey.split(ApicService.FS_SEP);
-            return Long.parseLong(nodeKeyParts[0]);
+            if (nodeKey.contains(ApicService.FS_SEP)) {
+                String[] nodeKeyParts = nodeKey.split(ApicService.FS_SEP);
+                return Long.parseLong(nodeKeyParts[0]);
+            } else {
+                return Long.parseLong(nodeKey);
+            }
         } catch (ExecutionException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
         return null;
     }
     

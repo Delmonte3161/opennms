@@ -124,12 +124,12 @@ public class AciImporter {
     }
 
     private Requisition buildAciRequisition() {
-        URL apicUrl = null;
-        try {
-                apicUrl = new URL(request.getApicUrl());
-        } catch (MalformedURLException e1) {
-                e1.printStackTrace();
-        }
+//        URL apicUrl = null;
+//        try {
+//                apicUrl = new URL(request.getApicUrl());
+//        } catch (MalformedURLException e1) {
+//                e1.printStackTrace();
+//        }
 
         Requisition aciRequisiton = new Requisition(request.getForeignSource());
         ACIRestClient client = null;

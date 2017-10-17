@@ -1075,6 +1075,41 @@ public class ACIRestClient {
         }
     }
 
+    /**
+     * @return the port
+     */
+    public int getPort() {
+        return port;
+    }
+
+    /**
+     * @return the cluster
+     */
+    public String getCluster() {
+        return cluster;
+    }
+
+    /**
+     * @return the host
+     */
+    public String getHost() {
+        return host;
+    }
+
+    /**
+     * @return the username
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * @return the restUrlPrefix
+     */
+    public String getRestUrlPrefix() {
+        return restUrlPrefix;
+    }
+
     // private static class DefaultTrustManager implements X509TrustManager
     // {
     //

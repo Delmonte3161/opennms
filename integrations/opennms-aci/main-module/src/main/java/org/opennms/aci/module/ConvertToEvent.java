@@ -61,7 +61,7 @@ public class ConvertToEvent {
     }
 
     
-    public static final EventBuilder toEventBuilder(NodeCache nodeCache, String location, Date createDate, JSONObject attributes) {
+    public static final EventBuilder toEventBuilder(NodeCache nodeCache, String location, Date createDate, JSONObject attributes, String apicHost) {
         
         if (attributes == null || attributes.size() == 0)
             return null;
@@ -86,6 +86,15 @@ public class ConvertToEvent {
             if (nodeId != null)
                 bldr.setNodeid(nodeId);
         } else if (dnParts[0].equals("dbgs")) {
+            // for path violations, just associate with apic
+            Long nodeId = nodeCache.getNodeId(apicHost);
+            if (nodeId != null)
+                bldr.setNodeid(nodeId);
+        } else {
+            // for all others, just associate with apic
+            Long nodeId = nodeCache.getNodeId(apicHost);
+            if (nodeId != null)
+                bldr.setNodeid(nodeId);
             
         }
         

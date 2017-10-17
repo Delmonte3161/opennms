@@ -80,21 +80,37 @@ public class AciImportRequest implements RequisitionRequest {
     private Requisition existingRequisition;
 
     public AciImportRequest(Map<String, String> parameters) {
-        setHostname(parameters.get("hostname"));
-        setUsername(parameters.get("username"));
-        setPassword(parameters.get("password"));
+        if (parameters.get("hostname") != null)
+            setHostname(parameters.get("hostname"));
+
+        if (parameters.get("username") != null)
+            setUsername(parameters.get("username"));
+
+        if (parameters.get("password") != null)
+            setPassword(parameters.get("password"));
+
+        if (parameters.get("apic-url") != null)
+            setApicUrl(parameters.get("apic-url"));
+
         setClusterName(parameters.get("cluster-name"));
-        setApicUrl(parameters.get("apic-url"));
         
-        String path = parameters.get("path");
-        if (path == null) {
-            throw new IllegalArgumentException("path is required");
+        if (clusterName == null) {
+            throw new IllegalArgumentException("cluster-name is required");
         }
+        
+        //Use the clusterName as the foreign source
+        if (!clusterName.equals(foreignSource))
+            setForeignSource(clusterName);
+        
+//        String path = parameters.get("path");
+//        if (path == null) {
+//            throw new IllegalArgumentException("path is required");
+//        }
 
-        path = path.replaceAll("^/", "");
-        path = path.replaceAll("/$", "");
+//        path = path.replaceAll("^/", "");
+//        path = path.replaceAll("/$", "");
 
-        setForeignSource(path); //path part of resource should be the apic cluster name, which is our foriegn-source
+//        setForeignSource(path); //path part of resource should be the apic cluster name, which is our foriegn-source
 //        String[] pathElements = path.split("/");
 //
 //        if (pathElements.length == 1) {

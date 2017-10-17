@@ -148,7 +148,7 @@ public class ApicClusterJob implements Job {
             if (results == null || results.isEmpty())
                 return;
 
-            this.sendEvents(clusterJobMap, eventForwarder, results, location);
+            this.sendEvents(clusterJobMap, eventForwarder, results, location, client.getHost());
         } catch (Exception e) {
 //            e.printStackTrace();
             String msg = "ApicClusterJob failed for cluster: LS6 at "
@@ -204,7 +204,7 @@ public class ApicClusterJob implements Job {
     }
 
     private void sendEvents(Map<String, Object> clusterJobMap,
-            EventForwarder eventForwarder, JSONArray results, String location)
+            EventForwarder eventForwarder, JSONArray results, String location, String apicHost)
             throws ParseException {
 
         Date lastProcessDate = null;
@@ -244,7 +244,7 @@ public class ApicClusterJob implements Job {
                     }
 
                     LOG.debug(created + " --- " + attributes.toJSONString());
-                    EventBuilder bldr = ConvertToEvent.toEventBuilder(this.nodeCache, location, createDate, attributes);
+                    EventBuilder bldr = ConvertToEvent.toEventBuilder(this.nodeCache, location, createDate, attributes, apicHost);
 
                     Event event = bldr.getEvent();
 

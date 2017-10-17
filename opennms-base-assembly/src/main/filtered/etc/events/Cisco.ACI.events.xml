@@ -1,0 +1,86 @@
+<events xmlns="http://xmlns.opennms.org/xsd/eventconf">
+         <event>
+                <uei>uei.opennms.org/cisco/aci/critical</uei>
+                <event-label>Cisco ACI Critical Event: %parm[descr]%, Affected: %parm[affected]%</event-label>
+                <descr>
+                        Node ID: %nodeid%&lt;br&gt;
+                        Host: %nodelabel%&lt;br&gt;
+                        Interface: %interface% &lt;br&gt;
+			Parms:  %parm[all]%
+                </descr>
+                <logmsg dest='logndisplay'>
+                        OpenNMS received a Cisco ACI Critical Event: %parm[descr]%, Affected: %parm[affected]%
+                </logmsg>
+                <severity>Critical</severity>
+        </event>
+         <event>
+                <uei>uei.opennms.org/cisco/aci/major</uei>
+                <event-label>Cisco ACI Major Event: %parm[descr]%, Affected: %parm[affected]%</event-label>
+                <descr>
+                        Node ID: %nodeid%&lt;br&gt;
+                        Host: %nodelabel%&lt;br&gt;
+                        Interface: %interface% &lt;br&gt;
+			Parms:  %parm[all]%
+                </descr>
+                <logmsg dest='logndisplay'>
+                        OpenNMS received a Cisco ACI Major Event: %parm[descr]% Affected: %parm[affected]%
+                </logmsg>
+                <severity>Major</severity>
+        </event>
+         <event>
+                <uei>uei.opennms.org/cisco/aci/minor</uei>
+                <event-label>Cisco ACI Minor Event: %parm[descr]%, Affected: %parm[affected]%</event-label>
+                <descr>
+                        Node ID: %nodeid%&lt;br&gt;
+                        Host: %nodelabel%&lt;br&gt;
+                        Interface: %interface% &lt;br&gt;
+			Parms:  %parm[all]%
+                </descr>
+                <logmsg dest='logndisplay'>
+                        OpenNMS received a Cisco ACI Minor Event: %parm[descr]%, Affected: %parm[affected]%
+                </logmsg>
+                <severity>Minor</severity>
+        </event>
+         <event>
+                <uei>uei.opennms.org/cisco/aci/warning</uei>
+                <event-label>Cisco ACI Warning Event: %parm[descr]%, Affected: %parm[affected]%</event-label>
+                <descr>
+                        Node ID: %nodeid%&lt;br&gt;
+                        Host: %nodelabel%&lt;br&gt;
+                        Interface: %interface% &lt;br&gt;
+			Parms:  %parm[all]%
+                </descr>
+                <logmsg dest='logndisplay'>
+                        OpenNMS received a Cisco ACI Warning Event: %parm[descr]%, Affected: %parm[affected]%
+                </logmsg>
+                <severity>Warning</severity>
+        </event>
+         <event>
+                <uei>uei.opennms.org/cisco/aci/info</uei>
+                <event-label>Cisco ACI Info Event: %parm[descr]%, Affected: %parm[affected]%</event-label>
+                <descr>
+                        Node ID: %nodeid%&lt;br&gt;
+                        Host: %nodelabel%&lt;br&gt;
+                        Interface: %interface% &lt;br&gt;
+			Parms:  %parm[all]%
+                </descr>
+                <logmsg dest='logndisplay'>
+                        OpenNMS received a Cisco ACI Info Event: %parm[descr]%, Affected: %parm[affected]%
+                </logmsg>
+                <severity>Normal</severity>
+        </event>
+         <event>
+                <uei>uei.opennms.org/cisco/aci/cleared</uei>
+                <event-label>Cisco ACI Cleared Event: %parm[descr]%, Affected: %parm[affected]%</event-label>
+                <descr>
+                        Node ID: %nodeid%&lt;br&gt;
+                        Host: %nodelabel%&lt;br&gt;
+                        Interface: %interface% &lt;br&gt;
+			Parms:  %parm[all]%
+                </descr>
+                <logmsg dest='logndisplay'>
+                        OpenNMS received a Cisco ACI Cleared Event: %parm[descr]%, Affected: %parm[affected]%
+                </logmsg>
+                <severity>Cleared</severity>
+        </event>
+</events>

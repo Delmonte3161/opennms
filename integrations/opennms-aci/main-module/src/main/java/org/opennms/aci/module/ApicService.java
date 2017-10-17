@@ -192,10 +192,10 @@ public class ApicService {
             scheduler.getContext().put(APIC_CONFIG_CLUSTER_MAP, clusterMap);
             scheduler.start();
             
-            if (scheduler.checkExists(job.getKey()))
-                scheduler.deleteJob(job.getKey());
+            if (!scheduler.checkExists(job.getKey()))
+                scheduler.scheduleJob(job, trigger);
+//                scheduler.deleteJob(job.getKey());
             
-            scheduler.scheduleJob(job, trigger);
         } catch (SchedulerException e) {
             LOG.error("Error executing job.", e);
         }

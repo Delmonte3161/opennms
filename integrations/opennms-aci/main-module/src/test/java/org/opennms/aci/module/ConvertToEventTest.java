@@ -98,7 +98,7 @@ public class ConvertToEventTest {
         NodeCache nodeCache = new NodeCache();
         nodeCache.init();
         
-        EventBuilder bldr = ConvertToEvent.toEventBuilder(nodeCache, "test", createDate, attributes);
+        EventBuilder bldr = ConvertToEvent.toEventBuilder(nodeCache, "test", createDate, attributes, "test");
         
         Event event = bldr.getEvent();
         
