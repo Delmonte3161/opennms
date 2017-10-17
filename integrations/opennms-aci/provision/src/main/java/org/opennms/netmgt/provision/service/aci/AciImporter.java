@@ -196,7 +196,11 @@ public class AciImporter {
     private RequisitionNode createRequisitionNode(AciImportRequest request,
             JSONObject aciNode) {
         final RequisitionNode node = new RequisitionNode();
-        node.setBuilding(request.getForeignSource());
+        if (request.getLocation() != null) {
+            node.setBuilding(request.getLocation());
+            node.putCategory(new RequisitionCategory(request.getLocation()));
+        } else
+            node.setBuilding(request.getForeignSource());
         String role = (String) aciNode.get("role");
         String dn = (String) aciNode.get("dn");
         dn = dn.replace("/", "_");

@@ -65,6 +65,9 @@ public class AciImportRequest implements RequisitionRequest {
     @XmlAttribute(name = "cluster-name")
     private String clusterName = null;
 
+    @XmlAttribute(name = "location")
+    private String location = null;
+
     // unique cluster name
     @XmlAttribute(name = "foreign-source")
     private String foreignSource = null;
@@ -91,6 +94,9 @@ public class AciImportRequest implements RequisitionRequest {
 
         if (parameters.get("apic-url") != null)
             setApicUrl(parameters.get("apic-url"));
+
+        if (parameters.get("location") != null)
+            setLocation(parameters.get("location"));
 
         setClusterName(parameters.get("cluster-name"));
         
@@ -214,5 +220,19 @@ public class AciImportRequest implements RequisitionRequest {
                 && Objects.equals(foreignSource, castOther.foreignSource)
                 && Objects.equals(existingRequisition,
                                   castOther.existingRequisition);
+    }
+
+    /**
+     * @return the location
+     */
+    public String getLocation() {
+        return location;
+    }
+
+    /**
+     * @param location the location to set
+     */
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

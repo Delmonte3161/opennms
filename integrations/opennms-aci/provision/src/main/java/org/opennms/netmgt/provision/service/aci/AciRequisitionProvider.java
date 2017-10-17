@@ -93,6 +93,11 @@ public class AciRequisitionProvider extends AbstractRequisitionProvider<AciImpor
 		                String url = "";
 		                String username = "";
 		                String password = "";
+		                String location = southCluster.getLocation();
+		                
+		                if (location != null)
+		                    request.setLocation(location);
+		                
 		                List<SouthElement> elements = southCluster.getElements();
 		                for (SouthElement element : elements ){
 		                    url += "https://" + element.getHost() + ":"  + element.getPort() + ",";
