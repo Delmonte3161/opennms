@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: aci_rest
+  main:
+    banner-mode: "off"
+logging:
+  file: aci-rest-spring.log
