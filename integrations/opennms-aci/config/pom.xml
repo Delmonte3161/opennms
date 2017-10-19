@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.opennms.aci</groupId>
 		<artifactId>opennms-aci.parent</artifactId>
-		<version>20.1.0</version>
+		<version>21.0.0-SNAPSHOT</version>
 	</parent>
 
 	<!-- LicenceAuthenticator -->
