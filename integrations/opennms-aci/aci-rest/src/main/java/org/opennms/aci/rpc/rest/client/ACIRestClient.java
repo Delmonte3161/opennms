@@ -28,8 +28,6 @@
 
 package org.opennms.aci.rpc.rest.client;
 
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
