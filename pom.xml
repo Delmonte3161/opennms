@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opennms</groupId>
   <artifactId>opennms</artifactId>
-  <version>21.0.0-SNAPSHOT</version>
+  <version>21.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>OpenNMS</name>
   <url>http://opennms.org/</url>
@@ -1202,7 +1202,7 @@
     <install.version>${project.version}</install.version>
     <display.version>${install.version}</display.version>
     <opennms.home>${dist.dir}/${dist.name}</opennms.home>
-	<opennms.osgi.version>21.0.0</opennms.osgi.version>
+	<opennms.osgi.version>21.0.1</opennms.osgi.version>
     <maven.metadata.legacy>true</maven.metadata.legacy>
     <root.dir>${project.basedir}</root.dir>
     <dist.dir>${root.dir}/target</dist.dir>
@@ -1326,7 +1326,7 @@
     <jodaTimeVersion>2.1</jodaTimeVersion>
     <jrubyVersion>9.0.4.0</jrubyVersion>
     <jsoupVersion>1.7.2</jsoupVersion>
-    <karafVersion>4.0.8</karafVersion>
+    <karafVersion>4.1.2</karafVersion>
     <felixVersion>3.0.0</felixVersion>
     <liquibaseVersion>2.0.5-ONMS20160524b</liquibaseVersion>
     <lmaxDisruptorVersion>3.3.2</lmaxDisruptorVersion>
@@ -1336,15 +1336,17 @@
     <minaVersion>2.0.16</minaVersion>
     <netty4Version>4.1.9.Final</netty4Version>
     <newtsVersion>1.4.3</newtsVersion>
-    <paxExamVersion>4.9.2</paxExamVersion>
+    <paxExamVersion>4.11.0</paxExamVersion>
     <paxSwissboxVersion>1.8.2</paxSwissboxVersion>
+    <paxWebVersion>4.3.0</paxWebVersion>
     <protobufVersion>2.6.1</protobufVersion>
     <postgresqlVersion>9.4.1211</postgresqlVersion>
     <powermockVersion>1.6.4</powermockVersion>
     <osgiVersion>6.0.0</osgiVersion>
     <osgiCompendiumVersion>5.0.0</osgiCompendiumVersion>
     <osgiEnterpriseVersion>5.0.0</osgiEnterpriseVersion>
-    <owaspEncoderVersion>1.2</owaspEncoderVersion>
+    <owaspEncoderVersion>1.2.1</owaspEncoderVersion>
+    <owaspHtmlSanitizerVersion>20170515.1</owaspHtmlSanitizerVersion>
     <quartzVersion>2.2.3</quartzVersion>
     <rateLimitedLoggerVersion>1.1.0</rateLimitedLoggerVersion>
     <servletApiVersion>3.1.0</servletApiVersion>
@@ -1360,7 +1362,7 @@
     <wsdl4jVersion>1.6.3</wsdl4jVersion>
     <wsmanVersion>1.2.2</wsmanVersion>
 
-    <springVersion>4.2.8.RELEASE_1</springVersion>
+    <springVersion>4.2.9.RELEASE_1</springVersion>
     <!-- ALWAYS change aspectj to match the version referenced in the spring poms -->
     <aspectjVersion>1.8.6</aspectjVersion>
     <springWebFlowVersion>2.3.4.RELEASE</springWebFlowVersion>
@@ -1380,9 +1382,9 @@
     <skipSignJar>true</skipSignJar>
 
     <!-- moved here from opennms-pluginmanger -->
-    <pluginmanagerVersion>1.0.4</pluginmanagerVersion>
-    <licencemanagerVersion>1.0.4</licencemanagerVersion>
-    <featuremanagerVersion>1.0.4</featuremanagerVersion>
+    <pluginmanagerVersion>1.0.5</pluginmanagerVersion>
+    <licencemanagerVersion>1.0.5</licencemanagerVersion>
+    <featuremanagerVersion>1.0.5</featuremanagerVersion>
   </properties>
 
   <profiles>
@@ -2892,7 +2894,7 @@
       </dependency>
       <dependency>
         <groupId>org.opennms.dependencies</groupId>
-        <artifactId>owasp-encoder-dependencies</artifactId>
+        <artifactId>owasp-dependencies</artifactId>
         <version>${project.version}</version>
         <type>pom</type>
       </dependency>
@@ -3759,7 +3761,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.karaf.shell</groupId>
-        <artifactId>org.apache.karaf.shell.console</artifactId>
+        <artifactId>org.apache.karaf.shell.core</artifactId>
         <version>${karafVersion}</version>
       </dependency>
       <dependency>

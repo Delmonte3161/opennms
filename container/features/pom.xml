@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.opennms</groupId>
     <artifactId>org.opennms.container</artifactId>
-    <version>21.0.0-SNAPSHOT</version>
+    <version>21.0.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opennms.karaf</groupId>
@@ -31,6 +31,7 @@
             <value>framework-${karafVersion}</value>
             <value>enterprise-${karafVersion}</value>
             <value>spring-${karafVersion}</value>
+            <value>spring-legacy-${karafVersion}</value>
             <value>standard-${karafVersion}</value>
 
             <!-- Apache CXF -->
@@ -150,7 +151,6 @@
             <feature>framework</feature>
 
             <!-- Karaf standard features -->
-            <feature>aries-annotation</feature>
             <feature>aries-blueprint</feature>
             <feature>aries-proxy</feature>
             <feature>blueprint-web</feature>
@@ -161,14 +161,16 @@
             <feature>eventadmin</feature>
             <feature>feature</feature>
             <feature>framework-security</feature>
+            <feature>httplite</feature>
             <feature>http</feature>
             <feature>http-whiteboard</feature>
             <feature>instance</feature>
             <feature>jaas-boot</feature>
             <feature>jaas</feature>
             <feature>jasypt-encryption</feature>
-            <!-- TODO: Figure out how to import 2 versions of Jetty? -->
-            <feature>jetty</feature>
+            <!-- TODO: Should we import both versions of Jetty? -->
+            <feature>jetty/8.1.14.v20131031</feature>
+            <feature>jetty/9.3.9.v20160517</feature>
             <feature>jolokia</feature>
             <feature>kar</feature>
             <feature>log</feature>
@@ -176,6 +178,8 @@
             <feature>minimal</feature>
             <feature>obr</feature>
             <feature>package</feature>
+            <!-- Replaced by opennms-bridge-http-service -->
+            <!-- <feature>pax-http-service</feature> -->
             <feature>profile</feature>
             <feature>scheduler</feature>
             <feature>scr</feature>
@@ -748,6 +752,13 @@
     <dependency>
       <groupId>org.opennms.core.ipc.rpc</groupId>
       <artifactId>org.opennms.core.ipc.rpc.commands</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opennms.features.telemetry</groupId>
+      <artifactId>org.opennms.features.telemetry.minion</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
       <scope>provided</scope>
