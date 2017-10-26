@@ -55,8 +55,8 @@ public class SouthboundConfigurationTest extends XmlTestNoCastor<SouthboundConfi
                 "    <cluster-name>Test-Cluster</cluster-name>\n" +
                 "    <cluster-type>CISCO-ACI</cluster-type>\n" +
                 "    <cron-schedule>0 0 0 * * ? *</cron-schedule>\n" +
-                "    <poll-duration-minutes>5</poll-duration-minutes>\n" +
                 "    <location>Test</location>\n" +
+                "    <poll-duration-minutes>5</poll-duration-minutes>\n" +
                 "    <south-element host=\"localhost\" \n" +
                 "               port=\"443\" \n" +
                 "               password=\"opennms-test\" \n" +
@@ -69,8 +69,8 @@ public class SouthboundConfigurationTest extends XmlTestNoCastor<SouthboundConfi
                 "    <cluster-name>Test-Cluster2</cluster-name>\n" +
                 "    <cluster-type>CISCO-ACI</cluster-type>\n" +
                 "    <cron-schedule>0 0 0 * * ? *</cron-schedule>\n" +
-                "    <poll-duration-minutes>3</poll-duration-minutes>\n" +
                 "    <location>Test</location>\n" +
+                "    <poll-duration-minutes>3</poll-duration-minutes>\n" +
                 "    <south-element host=\"localhost\" \n" +
                 "               port=\"443\" \n" +
                 "               password=\"opennms-test2\" \n" +
@@ -104,9 +104,9 @@ public class SouthboundConfigurationTest extends XmlTestNoCastor<SouthboundConfi
         SouthCluster southCluster = new SouthCluster();
         southCluster.setClusterName("Test-Cluster");
         southCluster.setClusterType("CISCO-ACI");
+        southCluster.setLocation("Test");
         southCluster.setCronSchedule("0 0 0 * * ? *");
         southCluster.setPollDurationMinutes(5);
-        southCluster.setLocation("Test");
         
         SouthElement southElement = new SouthElement();
         southElement.setHost("localhost");
@@ -125,8 +125,8 @@ public class SouthboundConfigurationTest extends XmlTestNoCastor<SouthboundConfi
         southCluster2.setClusterName("Test-Cluster2");
         southCluster2.setClusterType("CISCO-ACI");
         southCluster2.setCronSchedule("0 0 0 * * ? *");
-        southCluster2.setPollDurationMinutes(3);
         southCluster2.setLocation("Test");
+        southCluster2.setPollDurationMinutes(3);
         
         SouthElement southElement2 = new SouthElement();
         southElement2.setHost("localhost");

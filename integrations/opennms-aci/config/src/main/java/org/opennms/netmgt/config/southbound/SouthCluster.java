@@ -59,12 +59,12 @@ public class SouthCluster implements Serializable {
     @XmlElement(name = "cron-schedule", required = false)
     private String m_cronSchedule;
     
-    @XmlElement(name = "poll-duration-minutes", required = false)
-    private int pollDurationMinutes;
-   
     @XmlElement(name = "location", required = false)
     private String location;
 
+    @XmlElement(name = "poll-duration-minutes", required = false)
+    private int pollDurationMinutes;
+   
     @XmlElement(name = "south-element")
     private List<SouthElement> m_elements = new ArrayList<SouthElement>();
 
