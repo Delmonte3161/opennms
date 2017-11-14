@@ -95,6 +95,9 @@ public class ACIRestClient {
                 final Map<String, String> parameters) throws IOException {
             super(buildUri(path, parameters));
         }
+        public RestHttpGet(final String path) throws IOException {
+            super(buildUri(path));
+        }
     }
 
     /**
@@ -649,14 +652,19 @@ public class ACIRestClient {
                 + apicClass + ".created,\"" + scaleEnd + "\")";
         JSONObject result = (JSONObject) this.get(queryUrl);
         JSONArray imdata = (JSONArray) result.get("imdata");
+        
 
         int count = 0;
         for (Object object : imdata) {
             JSONObject data = (JSONObject) object;
-            for (Object object2 : data.keySet()) {
-                String key = (String) object2;
-                JSONObject attributes = (JSONObject) ((JSONObject) data.get(key)).get("attributes");
-                count = Integer.parseInt((String) attributes.get("count"));
+            if (data.get("error") != null) {
+                printError(imdata, apicClass, this.host);
+            } else {
+                for (Object object2 : data.keySet()) {
+                    String key = (String) object2;
+                    JSONObject attributes = (JSONObject) ((JSONObject) data.get(key)).get("attributes");
+                    count = Integer.parseInt((String) attributes.get("count"));
+                }
             }
         }
 
@@ -797,7 +805,7 @@ public class ACIRestClient {
         return totalCount;
     }
     
-    private JSONArray getFaults(String queryUrl)
+    public JSONArray getFaults(String queryUrl)
            throws Exception {
         JSONObject result = (JSONObject) this.get(queryUrl);
         return (JSONArray) result.get("imdata");
@@ -912,7 +920,7 @@ public class ACIRestClient {
             if (objectData == null)
                 continue;
 
-            System.err.println(objectData.toJSONString());
+            System.err.println("ERROR: " + objectData.toJSONString());
         }
     }
 
@@ -925,7 +933,8 @@ public class ACIRestClient {
      * @throws java.lang.Exception
      */
     public Object get(String path) throws Exception {
-        RestHttpGet restGet = new RestHttpGet(path, parseQuery(path));
+//        RestHttpGet restGet = new RestHttpGet(path, parseQuery(path));
+        RestHttpGet restGet = new RestHttpGet(path);
         return doExecute(restGet);
     }
 
@@ -1067,6 +1076,42 @@ public class ACIRestClient {
                     uriBuilder.addParameter(parameter.getKey(), parameter.getValue());
                 }
             }
+            return uriBuilder.build();
+        } catch (URISyntaxException ex) {
+            throw new IOException(ex);
+        }
+    }
+    
+    private URI buildUri(String path) throws IOException{
+        try {
+            String query = null;
+            if (path.contains("?")) {
+                String[] pathQuery = path.split("\\?");
+                path = pathQuery[0];
+                query = pathQuery[1];
+            }
+
+            final URIBuilder uriBuilder = new URIBuilder();
+            uriBuilder.setScheme(HTTPS_SCHEME).setHost(host).setPort(port);
+            if (path.startsWith(restUrlPrefix)) {
+                uriBuilder.setPath(path);
+            } else {
+                uriBuilder.setPath(restUrlPrefix + path);
+            }
+            
+            if (query != null) {
+                if (query.contains("&")) {
+                    String[] queryParams = query.split("&");
+                    for (String param : queryParams) {
+                        String[] paramParts = param.split("=");
+                        uriBuilder.addParameter(paramParts[0], paramParts[1]);
+                    }
+                } else {
+                    String[] paramParts = query.split("=");
+                    uriBuilder.addParameter(paramParts[0], paramParts[1]);
+                }
+            }
+
             return uriBuilder.build();
         } catch (URISyntaxException ex) {
             throw new IOException(ex);

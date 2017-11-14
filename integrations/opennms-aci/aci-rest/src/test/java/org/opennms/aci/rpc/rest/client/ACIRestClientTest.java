@@ -64,10 +64,31 @@ public class ACIRestClientTest
             
             ACIRestClient client = ACIRestClient.newAciRest( cluster, url, userName, pw );
             
-//            client.getCurrentFaults(format.format(startCal.getTime()));
+            String formattedTime = format.format(startCal.getTime());
+            String[] formattedTimeParts = formattedTime.split("T");
+            String fDate = formattedTimeParts[0];
+            String fTime = formattedTimeParts[1];
+            String[] fTimeParts = fTime.split("-");
+            String justTime = fTimeParts[0];
+            String tz = fTimeParts[1];
+            String tzhours = tz.substring(0, 2);
+            String tzmins = tz.substring(2);
+            
+            String goodtime = fDate + "T" + justTime + "-" + tzhours + ":" + tzmins;
+            
+//            System.out.println("Formatted Time: " + goodtime);
+            
+            String query = "/api/node/class/faultRecord.json?query-target-filter=gt(faultRecord.created, \"" + formattedTime + "\")";
+//            String query = "/api/node/class/faultRecord.json?query-target-filter=gt(faultRecord.created, \"" + fDate + "T" + justTime + "\")";
+//            client.getFaults(query);
+            
+            
+//            client.getFaults("/api/class/faultInst.json?query-target-filter=gt(faultInst.lastTransition, \"" + goodtime + "\")");
+//            client.getFaults("/api/node/class/faultRecord.json?query-target-filter=gt(faultRecord.created, \"" + goodtime + "\")");
+            client.getCurrentFaults(formattedTime);
 //            client.getClassInfo(  "faultRecord" );
 //            client.getClassInfo(  "faultRecord", "eventRecord" );
-            client.getClassInfo( "topSystem" );
+//            client.getClassInfo( "topSystem" );
 //            client.getClassInfo( "ethpmPhysIf" );
 //            client.getManagedObject( "topology/pod-1/node-155/sys/phys-[eth1/18]/phys" );
 //            client.getManagedObject( "topology/pod-1/node-155/sys" );
@@ -77,6 +98,7 @@ public class ACIRestClientTest
             
 //            client.getHealth( "fvAp", "fvTenant", "fabricNode" );
 //            client.getStats( "fvAp" );
+            System.out.println("Completed query: " + query);
         }
         catch ( Exception e )
         {
