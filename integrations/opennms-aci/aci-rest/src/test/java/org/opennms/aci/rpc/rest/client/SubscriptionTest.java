@@ -62,10 +62,13 @@ public class SubscriptionTest {
         //LS6
 //      final String cluster = "ls6apic";
 //      final String url = "https://7.192.80.10,https://7.192.80.11,https://7.192.80.12";
+//      final String url = "https://ls6apic1.cernerasp.com,https://ls6apic2.cernerasp.com,https://ls6apic3.cernerasp.com";
         //KC8
-        final String cluster = "kc8apic";
+//        final String cluster = "kc8apic";
 //        final String url = "https://7.192.240.10,https://7.192.240.11,https://7.192.240.12";
         final String url = "https://kc8apic1.cernerasp.com,https://kc8apic2.cernerasp.com,https://kc8apic3.cernerasp.com";
+        final String cluster = "test";
+//        final String url = "https://ls6apic1.cernerasp.com";
 //        final String url = "https://bogus,https://bogus,https://7.192.80.12";
         final String userName = "svcOssAci";
         final String pw = "kf3as=Nx";
