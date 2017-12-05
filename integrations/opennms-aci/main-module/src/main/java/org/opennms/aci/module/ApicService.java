@@ -71,11 +71,6 @@ public class ApicService {
     
     final int pollDurationMinutes = 5;
 
-//    final String location = "LS6";
-//    final String url = "https://7.192.80.10,https://7.192.80.11,https://7.192.80.12";
-//    final String userName = "svcOssAci";
-//    final String pw = "kf3as=Nx";
-
     public final static String APIC_CONFIG_LOCATION_KEY = "Location";
     public final static String APIC_CONFIG_URL_KEY = "URL";
     public final static String APIC_CONFIG_USERNAME_KEY = "Username";
@@ -194,7 +189,6 @@ public class ApicService {
             
             if (!scheduler.checkExists(job.getKey()))
                 scheduler.scheduleJob(job, trigger);
-//                scheduler.deleteJob(job.getKey());
             
         } catch (SchedulerException e) {
             LOG.error("Error executing job.", e);

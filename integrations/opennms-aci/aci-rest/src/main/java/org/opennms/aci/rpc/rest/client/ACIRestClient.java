@@ -151,6 +151,8 @@ public class ACIRestClient {
     private final String restUrlPrefix;
     private final BasicCookieStore cookieStore;
 
+    private String token;
+
     /**
      * Singleton method for creating new ACIRestClient object and logging into
      * ACI hosts.
@@ -358,7 +360,7 @@ public class ACIRestClient {
         }
         JSONObject aaaLogin = (JSONObject) r2.get("aaaLogin");
         JSONObject attributes = (JSONObject) aaaLogin.get("attributes");
-        String token = (String) attributes.get("token");
+        token = (String) attributes.get("token");
 
         Cookie cookie = new BasicClientCookie("APIC-cookie", token);
         this.cookieStore.addCookie(cookie);
@@ -807,10 +809,20 @@ public class ACIRestClient {
     
     public JSONArray getFaults(String queryUrl)
            throws Exception {
-        JSONObject result = (JSONObject) this.get(queryUrl);
+        JSONObject result = this.runQuery(queryUrl);
         return (JSONArray) result.get("imdata");
     }
 
+    public JSONObject runQuery(String queryUrl)
+            throws Exception {
+         return (JSONObject) this.get(queryUrl);
+     }
+    
+    public JSONObject runQueryNoAuth(String queryUrl)
+            throws Exception {
+         return (JSONObject) this.getNoAuth(queryUrl);
+     }
+    
     private synchronized void updateFile(String filePath, String timedata)
             throws IOException {
 
@@ -938,6 +950,12 @@ public class ACIRestClient {
         return doExecute(restGet);
     }
 
+    public Object getNoAuth(String path) throws Exception {
+//      RestHttpGet restGet = new RestHttpGet(path, parseQuery(path));
+      RestHttpGet restGet = new RestHttpGet(path);
+      return doExecuteNoLogin(restGet);
+    }
+    
     /**
      * Send Http POST request to rest server.
      *
@@ -1033,7 +1051,19 @@ public class ACIRestClient {
         JSONObject r2 = (JSONObject) imdata.get(0);
         JSONObject aaaLogin = (JSONObject) r2.get("aaaLogin");
         JSONObject attributes = (JSONObject) aaaLogin.get("attributes");
-        String token = (String) attributes.get("token");
+        token = (String) attributes.get("token");
+
+        Cookie cookie = new BasicClientCookie("APIC-cookie", token);
+        this.cookieStore.addCookie(cookie);
+
+        final HttpResponse httpResponse = httpClient.execute(request, httpContext);
+        final HttpEntity httpEntity = httpResponse.getEntity();
+        final String data = EntityUtils.toString(httpEntity);
+        return parser.parse(data);
+    }
+
+    private Object doExecuteNoLogin(final HttpRequestBase request) throws Exception {
+        final JSONParser parser = new JSONParser();
 
         Cookie cookie = new BasicClientCookie("APIC-cookie", token);
         this.cookieStore.addCookie(cookie);
@@ -1151,6 +1181,13 @@ public class ACIRestClient {
      */
     public String getRestUrlPrefix() {
         return restUrlPrefix;
+    }
+
+    /**
+     * @return the token
+     */
+    public String getToken() {
+        return token;
     }
 
     // private static class DefaultTrustManager implements X509TrustManager
