@@ -96,6 +96,7 @@ public class ApicService {
     private Map<String, Map<String, Object>> clusterMap;
     
     private List<ApicClusterManager> clusterManagers;
+    private List<Thread> clusterManagerThreads;
     
     private String localAddr;
 
@@ -107,6 +108,7 @@ public class ApicService {
         localAddr = InetAddressUtils.getLocalHostName();
         clusterMap = new HashMap<String, Map<String, Object>>();
         clusterManagers = new ArrayList<ApicClusterManager>();
+        clusterManagerThreads = new ArrayList<Thread>();
         
         if (scheduler != null) {
             try {
@@ -143,11 +145,15 @@ public class ApicService {
                     nodeCache.init();
                     ApicEventForwader apicEventForwarder = new ApicEventForwader(eventForwarder, eventDao, nodeCache);
                     try {
-                        ApicClusterManager clusterManager = new ApicClusterManager(apicEventForwarder, southCluster);
-                        clusterManager.run();
-                        clusterManagers.add(clusterManager);
+                        ApicClusterManager apicClusterManager = new ApicClusterManager(apicEventForwarder, southCluster);
+                        //Create and start thread
+                        Thread cmt = new Thread(apicClusterManager);
+                        cmt.start();
+                        clusterManagerThreads.add(cmt);
+                        clusterManagers.add(apicClusterManager);
                     } catch (Exception e) {
                         LOG.error("Error starting ApicClusterManager for cluster: " + southCluster.getClusterName(), e);
+                        e.printStackTrace();
                     }
                 } else {
                     //Start scheduled data collection.
@@ -174,10 +180,10 @@ public class ApicService {
             e.printStackTrace();
         }
 
-        for (ApicClusterManager apicClusterManager : clusterManagers) {
-            LOG.debug("Stopping clusterManager: " + apicClusterManager.clusterName);
-            System.out.println("ACI: Stopping clusterManager: " + apicClusterManager.clusterName);
-            apicClusterManager.stop();
+        for (ApicClusterManager t : clusterManagers) {
+            LOG.debug("Stopping clusterManager: " + t.clusterName);
+            System.out.println("ACI: Stopping clusterManager: " + t.clusterName);
+            t.stop();
         }
 
         LOG.debug("Service stopped");

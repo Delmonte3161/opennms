@@ -28,7 +28,9 @@
 
 package org.opennms.aci.module;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -36,6 +38,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.websocket.ClientEndpointConfig;
+import javax.websocket.CloseReason;
+import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
@@ -65,6 +69,7 @@ public class ApicClusterManager implements Runnable {
     private final SouthCluster southCluster;
     public final String clusterUrl;
     private final ACIRestClient aciClient;
+    private final ClientManager client;
     public final boolean hostVerficationEnabled;
     public final String clusterName;
     
@@ -72,6 +77,10 @@ public class ApicClusterManager implements Runnable {
     
     private boolean shutdown = false;
     
+    private boolean connectionOpen = false;
+    private String subscriptionId =  null;
+    
+
     /**
      * Default Constructor
      * @param cluster
@@ -90,7 +99,17 @@ public class ApicClusterManager implements Runnable {
     public ApicClusterManager(ApicEventForwader apicEventForwader, SouthCluster cluster, boolean hostVerificationEnabled) throws Exception {
         this.southCluster = cluster;
         this.apicEventForwader = apicEventForwader;
+        this.hostVerficationEnabled = hostVerificationEnabled;
         this.clusterName = cluster.getClusterName();
+        this.client = ClientManager.createClient();
+
+        if (!this.hostVerficationEnabled) {
+            SslEngineConfigurator sslEngineConfigurator = new SslEngineConfigurator(new SslContextConfigurator());
+            sslEngineConfigurator.setHostVerificationEnabled(false);
+            client.getProperties().put(ClientProperties.SSL_ENGINE_CONFIGURATOR,
+                                       sslEngineConfigurator);
+        }
+        
 //        Logging.putPrefix("aci");
         
         List<SouthElement> elements = southCluster.getElements();
@@ -103,7 +122,6 @@ public class ApicClusterManager implements Runnable {
             password = element.getPassword();
         }
         this.clusterUrl = url;
-        this.hostVerficationEnabled = hostVerificationEnabled;
         
         nodeCache = new NodeCache();
         
@@ -116,64 +134,18 @@ public class ApicClusterManager implements Runnable {
      */
     @Override
     public void run() {
-        final ClientEndpointConfig cec = ClientEndpointConfig.Builder.create().build();
+        LOG.debug("Starting ApicClusterManager for: " + clusterName);
+        System.out.println("ACI: Starting ApicClusterManager for: " + clusterName);
 
-        ClientManager client = ClientManager.createClient();
-
-        if (!this.hostVerficationEnabled) {
-            SslEngineConfigurator sslEngineConfigurator = new SslEngineConfigurator(new SslContextConfigurator());
-            sslEngineConfigurator.setHostVerificationEnabled(false);
-            client.getProperties().put(ClientProperties.SSL_ENGINE_CONFIGURATOR,
-                                       sslEngineConfigurator);
-        }
-        
         try {
-            LOG.debug("Starting websocket client for: " + clusterName);
-            System.out.println("ACI: Starting websocket client for: " + clusterName);
-            client.connectToServer(new Endpoint() {
-
-                @Override
-                public void onOpen(Session session, EndpointConfig config) {
-                    try {
-                        session.addMessageHandler(new MessageHandler.Whole<String>() {
-
-                            ExecutorService execService = Executors.newFixedThreadPool(10);
-
-                            @Override
-                            public void onMessage(String message) {
-                                if (message == null)
-                                    return;
-                                System.out.println("Received message: "+message);
-                                Runnable runnableTask = () -> {
-                                    apicEventForwader.sendEvent(clusterName, aciClient.getHost(), message);
-                                };
-                                
-                                execService.execute(runnableTask);
-                            }
-
-                        });
-                        //session.getBasicRemote().sendText(SENT_MESSAGE);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }, cec, new URI("wss://"+ this.aciClient.getHost() + "/socket" + this.aciClient.getToken()));
-            
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-            final java.util.Calendar startCal = GregorianCalendar.getInstance();
-            String formattedTime = format.format(startCal.getTime());
-
-//            String query = "/api/node/class/faultInfo.json?subscription=yes";
-            String query = "/api/node/class/faultRecord.json?query-target-filter=gt(faultRecord.created, \"" + formattedTime + "\")&subscription=yes";
-            LOG.debug("Subscribing to query: " + query);
-            System.out.println("ACI: Subscribing to query: " + query);
             long now = System.currentTimeMillis();
-            JSONObject result = (JSONObject) aciClient.runQueryNoAuth(query);
-            String subscriptionId = (String)result.get("subscriptionId");
             
             while (!shutdown) {
+                if (!this.connectionOpen)
+                    subscriptionId = this.connectAndSubscribeToFaults();
+
                 //Currently both Subscription and Token expire every 60 seconds
-                if ((System.currentTimeMillis() - now) > 30000) {
+                if ((System.currentTimeMillis() - now) > 30000 && this.subscriptionId != null) {
                     //Do refresh on client session
                     aciClient.runQueryNoAuth("/api/aaaRefresh.json");
                     //Do refresh on subscription
@@ -189,6 +161,7 @@ public class ApicClusterManager implements Runnable {
         } catch (Exception e) {
             LOG.error("APIC websocket exception", e);
             e.printStackTrace();
+            this.connectionOpen = false;
         }
     }
     
@@ -198,4 +171,67 @@ public class ApicClusterManager implements Runnable {
         this.shutdown = true;
     }
 
+    private String connectAndSubscribeToFaults() throws Exception {
+        LOG.debug("Starting websocket client for: " + clusterName);
+        System.out.println("ACI: Starting websocket client for: " + clusterName);
+        
+        final ClientEndpointConfig cec = ClientEndpointConfig.Builder.create().build();
+
+        client.connectToServer(new Endpoint() {
+
+            @Override
+            public void onOpen(Session session, EndpointConfig config) {
+                try {
+                    session.addMessageHandler(new MessageHandler.Whole<String>() {
+
+                        ExecutorService execService = Executors.newFixedThreadPool(10);
+
+                        @Override
+                        public void onMessage(String message) {
+                            if (message == null)
+                                return;
+                            System.out.println("Received message: "+message);
+                            Runnable runnableTask = () -> {
+                                apicEventForwader.sendEvent(clusterName, aciClient.getHost(), message);
+                            };
+                            
+                            execService.execute(runnableTask);
+                        }
+
+                    });
+                    connectionOpen = true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            
+            @Override
+            public void onClose(Session session, CloseReason closeReason) {
+                LOG.info("ACI: Websocket connection closed: " + closeReason.getReasonPhrase());
+                System.out.println("ACI: Websocket connection closed: " + closeReason.getReasonPhrase());
+                connectionOpen = false;
+            }
+            
+            @Override
+            public void onError(Session session, Throwable thr) {
+                LOG.error("ACI: Websocket connection error: ", thr);
+                System.out.println("ACI: Websocket connection error: ");
+                thr.printStackTrace();
+                connectionOpen = false;
+            }
+
+        }, cec, new URI("wss://"+ this.aciClient.getHost() + "/socket" + this.aciClient.getToken()));
+        
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        final java.util.Calendar startCal = GregorianCalendar.getInstance();
+        String formattedTime = format.format(startCal.getTime());
+
+//        String query = "/api/node/class/faultInfo.json?subscription=yes";
+        String query = "/api/node/class/faultRecord.json?query-target-filter=gt(faultRecord.created, \"" + formattedTime + "\")&subscription=yes";
+        LOG.debug("Subscribing to query: " + query);
+        System.out.println("ACI: Subscribing to query: " + query);
+        long now = System.currentTimeMillis();
+        JSONObject result = (JSONObject) aciClient.runQueryNoAuth(query);
+        return (String)result.get("subscriptionId");
+    }
 }
