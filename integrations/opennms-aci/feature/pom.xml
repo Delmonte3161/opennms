@@ -30,23 +30,41 @@
             <!-- <bundle>wrap:mvn:org.apache.httpcomponents/httpasyncclient/${httpclientVersion}</bundle> -->
 
             <!-- dropwizard-metrics feature -->
-            <bundle>mvn:io.dropwizard.metrics/metrics-core/3.1.2</bundle>
+            <!-- <bundle>mvn:io.dropwizard.metrics/metrics-core/3.1.2</bundle> -->
 
             <!-- rate-limited-logger feature -->
-            <bundle>mvn:joda-time/joda-time/${jodaTimeVersion}</bundle>
-            <bundle>wrap:mvn:com.swrve/rate-limited-logger/${rateLimitedLoggerVersion}</bundle>
+            <!-- <bundle>mvn:joda-time/joda-time/${jodaTimeVersion}</bundle> -->
+            <!-- <bundle>wrap:mvn:com.swrve/rate-limited-logger/${rateLimitedLoggerVersion}</bundle> -->
 
             <!-- opennms config depenencies -->
+<!--
             <bundle>mvn:org.opennms/opennms-config-api/${project.version}</bundle>
             <bundle>mvn:org.opennms/opennms-dao-api/${project.version}</bundle>
             <bundle>mvn:org.opennms/opennms-dao/${project.version}</bundle>
+-->
             <bundle>mvn:org.opennms/opennms-config-model/${project.version}</bundle>
 
             <!-- opennms-core-ipc-sink-api feature -->
+<!--
             <bundle>mvn:org.opennms.core.ipc.sink/org.opennms.core.ipc.sink.api/${project.version}</bundle>
             <bundle>mvn:org.opennms.core.ipc.sink/org.opennms.core.ipc.sink.common/${project.version}</bundle>
             <bundle>mvn:org.opennms.core.ipc.sink/org.opennms.core.ipc.sink.xml/${project.version}</bundle>
+-->
+
+            <!-- ACI dependencies -->
+            <bundle>wrap:mvn:org.glassfish.tyrus.bundles/tyrus-standalone-client/1.12</bundle>
+
+            <!-- ACI bundles -->
+            <bundle>mvn:org.opennms.aci/opennms-aci-config/${project.version}</bundle>
+            <bundle>mvn:org.opennms.aci/aci-rest/${project.version}</bundle>
+            <bundle>mvn:org.opennms.aci/org.opennms.aci.rpc.commands/${project.version}</bundle>
+            <bundle>mvn:org.opennms.aci/opennms-aci.main-module/${project.version}</bundle>
+            <!--<bundle>mvn:org.opennms.aci/opennms-aci-provision/${project.version}</bundle>-->
+
           </bundles>
+          <features>
+			<feature>opennms-config</feature>
+		  </features>
         </configuration>
       </plugin>
     </plugins>

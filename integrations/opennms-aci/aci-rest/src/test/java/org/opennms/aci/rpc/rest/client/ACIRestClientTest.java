@@ -47,13 +47,25 @@ public class ACIRestClientTest
      */
     public static void main( String[] args )
     {
+        //LS2
+         final String cluster = "ls2apic";
+         final String url = "https://7.192.17.10,https://7.192.17.11,https://7.192.17.12,https://7.192.17.13,https://7.192.17.14";
+
         //LS6
-//        final String cluster = "ls6apic";
-//        final String url = "https://7.192.80.10,https://7.192.80.11,https://7.192.80.12";
+        //  final String cluster = "ls6apic";
+        //  final String url = "https://7.192.80.10,https://7.192.80.11,https://7.192.80.12";
+        
+        //KC1
+//          final String cluster = "kc1apic";
+//          final String url = "https://7.192.129.10,https://7.192.129.11,https://7.192.129.12,https://7.192.129.13,https://7.192.129.14";
+
         //KC8
-        final String cluster = "kc8apic";
-        final String url = "https://7.192.240.10,https://7.192.240.11,https://7.192.240.12";
+//        final String cluster = "kc8apic";
+//        final String url = "https://7.192.240.10,https://7.192.240.11,https://7.192.240.12";
+        
+        //Bogus
 //        final String url = "https://bogus,https://bogus,https://7.192.80.12";
+
         final String userName = "svcOssAci";
         final String pw = "kf3as=Nx";
 
@@ -80,12 +92,12 @@ public class ACIRestClientTest
             
             String query = "/api/node/class/faultRecord.json?query-target-filter=gt(faultRecord.created, \"" + formattedTime + "\")";
 //            String query = "/api/node/class/faultRecord.json?query-target-filter=gt(faultRecord.created, \"" + fDate + "T" + justTime + "\")";
-//            client.getFaults(query);
+            client.getFaults(query);
             
             
 //            client.getFaults("/api/class/faultInst.json?query-target-filter=gt(faultInst.lastTransition, \"" + goodtime + "\")");
 //            client.getFaults("/api/node/class/faultRecord.json?query-target-filter=gt(faultRecord.created, \"" + goodtime + "\")");
-            client.getCurrentFaults(formattedTime);
+//            client.getCurrentFaults(formattedTime);
 //            client.getClassInfo(  "faultRecord" );
 //            client.getClassInfo(  "faultRecord", "eventRecord" );
 //            client.getClassInfo( "topSystem" );
@@ -98,7 +110,7 @@ public class ACIRestClientTest
             
 //            client.getHealth( "fvAp", "fvTenant", "fabricNode" );
 //            client.getStats( "fvAp" );
-            System.out.println("Completed query: " + query);
+//            System.out.println("Completed query: " + query);
         }
         catch ( Exception e )
         {

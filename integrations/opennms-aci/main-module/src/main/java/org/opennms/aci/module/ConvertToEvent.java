@@ -76,6 +76,8 @@ public class ConvertToEvent {
             bldr.addParam(key, value);
         }
         String dn = (String) attributes.get("affected");
+        if (dn == null)
+            dn = (String) attributes.get("dn");
         String[] dnParts = dn.split(ApicService.DN_SEP);
         
         if (dnParts[0].equals("topology") && dnParts.length >= 4) {

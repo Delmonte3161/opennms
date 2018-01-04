@@ -29,8 +29,8 @@
 package org.opennms.aci.module;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -53,8 +53,6 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import antlr.StringUtils;
 
 /**
  * @author tf016851
@@ -97,20 +95,25 @@ public class ApicService {
     
     private Map<String, Map<String, Object>> clusterMap;
     
+    private List<ApicClusterManager> clusterManagers;
+    
     private String localAddr;
 
     public void init() {
 
-        Logging.putPrefix("aci");
+//        Logging.putPrefix("aci");
         LOG.info("Initializaing ApicService ...");
+        System.out.println("ACI: Initializaing ApicService ...");
         localAddr = InetAddressUtils.getLocalHostName();
         clusterMap = new HashMap<String, Map<String, Object>>();
+        clusterManagers = new ArrayList<ApicClusterManager>();
         
         if (scheduler != null) {
             try {
                 scheduler.shutdown(true);
             } catch (SchedulerException e) {
                 LOG.debug("Error stopping scheduler.", e);
+                e.printStackTrace();
             }
             scheduler = null;
         }
@@ -119,6 +122,8 @@ public class ApicService {
         for (SouthCluster southCluster : clusters) {
             if (southCluster.getClusterType().equals("CISCO-ACI")) {
                 String location = southCluster.getClusterName();
+                LOG.debug("Found ACI Cluster configuration for: " + location);
+                System.out.println("ACI: Found ACI Cluster configuration for: " + location);
                 //Build URL
                 String url = "";
                 String username = "";
@@ -129,22 +134,54 @@ public class ApicService {
                     username = element.getUserid();
                     password = element.getPassword();
                 }
-                this.createAndScheduleJob(location, org.apache.commons.lang.StringUtils.chomp(url, ","), 
+                if (southCluster.getPollDurationMinutes() == 0) {
+                    LOG.debug("polldDurationMinutes == 0 ... starting websockets.");
+                    System.out.println("ACI: polldDurationMinutes == 0 ... starting websockets.");
+                    //Start ApicClusterManager for realtime websocket connection
+                    NodeCache nodeCache = new NodeCache();
+                    nodeCache.setNodeDao(nodeDao);
+                    nodeCache.init();
+                    ApicEventForwader apicEventForwarder = new ApicEventForwader(eventForwarder, eventDao, nodeCache);
+                    try {
+                        ApicClusterManager clusterManager = new ApicClusterManager(apicEventForwarder, southCluster);
+                        clusterManager.run();
+                        clusterManagers.add(clusterManager);
+                    } catch (Exception e) {
+                        LOG.error("Error starting ApicClusterManager for cluster: " + southCluster.getClusterName(), e);
+                    }
+                } else {
+                    //Start scheduled data collection.
+                    LOG.debug("pollDurationMinutes == " + southCluster.getPollDurationMinutes() + " ... create and schedule job");
+                    System.out.println("ACI: pollDurationMinutes == " + southCluster.getPollDurationMinutes() + " ... create and schedule job");
+                    this.createAndScheduleJob(location, org.apache.commons.lang.StringUtils.chomp(url, ","), 
                         username, password, southCluster.getPollDurationMinutes());
+                }
             }
         }
+        LOG.debug("ACI: Finished initializing ApicService");
+        System.out.println("ACI: Finished initializing ApicService");
     }
 
     public void destroy() {
 
         LOG.info("Destorying ApicService ...");
+        System.out.println("ACI: Destorying ApicService ...");
         try {
             if (scheduler != null)
                 scheduler.shutdown(true);
         } catch (SchedulerException e) {
             LOG.debug("Error shutting down scheduler", e);
+            e.printStackTrace();
         }
 
+        for (ApicClusterManager apicClusterManager : clusterManagers) {
+            LOG.debug("Stopping clusterManager: " + apicClusterManager.clusterName);
+            System.out.println("ACI: Stopping clusterManager: " + apicClusterManager.clusterName);
+            apicClusterManager.stop();
+        }
+
+        LOG.debug("Service stopped");
+        System.out.println("ACI: Service stopped");
     }
 
     public void createAndScheduleJob(String location, String apicUrl, String username, String password, int pollDuration) {
