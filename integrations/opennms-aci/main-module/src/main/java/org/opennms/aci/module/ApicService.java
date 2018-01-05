@@ -104,7 +104,7 @@ public class ApicService {
 
 //        Logging.putPrefix("aci");
         LOG.info("Initializaing ApicService ...");
-        System.out.println("ACI: Initializaing ApicService ...");
+//        System.out.println("ACI: Initializaing ApicService ...");
         localAddr = InetAddressUtils.getLocalHostName();
         clusterMap = new HashMap<String, Map<String, Object>>();
         clusterManagers = new ArrayList<ApicClusterManager>();
@@ -125,7 +125,7 @@ public class ApicService {
             if (southCluster.getClusterType().equals("CISCO-ACI")) {
                 String location = southCluster.getClusterName();
                 LOG.debug("Found ACI Cluster configuration for: " + location);
-                System.out.println("ACI: Found ACI Cluster configuration for: " + location);
+//                System.out.println("ACI: Found ACI Cluster configuration for: " + location);
                 //Build URL
                 String url = "";
                 String username = "";
@@ -138,7 +138,7 @@ public class ApicService {
                 }
                 if (southCluster.getPollDurationMinutes() == 0) {
                     LOG.debug("polldDurationMinutes == 0 ... starting websockets.");
-                    System.out.println("ACI: polldDurationMinutes == 0 ... starting websockets.");
+//                    System.out.println("ACI: polldDurationMinutes == 0 ... starting websockets.");
                     //Start ApicClusterManager for realtime websocket connection
                     NodeCache nodeCache = new NodeCache();
                     nodeCache.setNodeDao(nodeDao);
@@ -158,20 +158,20 @@ public class ApicService {
                 } else {
                     //Start scheduled data collection.
                     LOG.debug("pollDurationMinutes == " + southCluster.getPollDurationMinutes() + " ... create and schedule job");
-                    System.out.println("ACI: pollDurationMinutes == " + southCluster.getPollDurationMinutes() + " ... create and schedule job");
+//                    System.out.println("ACI: pollDurationMinutes == " + southCluster.getPollDurationMinutes() + " ... create and schedule job");
                     this.createAndScheduleJob(location, org.apache.commons.lang.StringUtils.chomp(url, ","), 
                         username, password, southCluster.getPollDurationMinutes());
                 }
             }
         }
         LOG.debug("ACI: Finished initializing ApicService");
-        System.out.println("ACI: Finished initializing ApicService");
+//        System.out.println("ACI: Finished initializing ApicService");
     }
 
     public void destroy() {
 
         LOG.info("Destorying ApicService ...");
-        System.out.println("ACI: Destorying ApicService ...");
+//        System.out.println("ACI: Destorying ApicService ...");
         try {
             if (scheduler != null)
                 scheduler.shutdown(true);
@@ -182,12 +182,12 @@ public class ApicService {
 
         for (ApicClusterManager t : clusterManagers) {
             LOG.debug("Stopping clusterManager: " + t.clusterName);
-            System.out.println("ACI: Stopping clusterManager: " + t.clusterName);
+//            System.out.println("ACI: Stopping clusterManager: " + t.clusterName);
             t.stop();
         }
 
         LOG.debug("Service stopped");
-        System.out.println("ACI: Service stopped");
+//        System.out.println("ACI: Service stopped");
     }
 
     public void createAndScheduleJob(String location, String apicUrl, String username, String password, int pollDuration) {

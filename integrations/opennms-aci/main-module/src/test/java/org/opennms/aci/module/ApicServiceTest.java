@@ -120,7 +120,7 @@ public class ApicServiceTest {
         m_mockUtils.replayAll();
     }
 
-    @Test
+//    @Test
     public void testService() {
 
         ApicService service = new ApicService();
@@ -149,7 +149,6 @@ public class ApicServiceTest {
                 "    <cluster-name>CTC-KC-VIII</cluster-name>\n" +
                 "    <cluster-type>CISCO-ACI</cluster-type>\n" +
                 "    <poll-duration-minutes>3</poll-duration-minutes>\n" +
-                "    <location>Test</location>\n" +
                 "    <south-element host=\"7.192.240.10\" \n" +
                 "               port=\"443\" \n" +
                 "               reconnect-delay=\"2000\" \n" +

@@ -142,7 +142,7 @@ public class NodeCache {
             } else {
                 return Long.parseLong(nodeKey);
             }
-        } catch (ExecutionException e) {
+        } catch (Throwable e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -156,7 +156,7 @@ public class NodeCache {
             String[] nodeKeyParts = nodeKey.split(ApicService.FS_SEP);
             if (nodeKeyParts.length == 2)
                 return nodeKeyParts[1];
-        } catch (ExecutionException e) {
+        } catch (Throwable e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

@@ -59,7 +59,7 @@
             <bundle>mvn:org.opennms.aci/aci-rest/${project.version}</bundle>
             <bundle>mvn:org.opennms.aci/org.opennms.aci.rpc.commands/${project.version}</bundle>
             <bundle>mvn:org.opennms.aci/opennms-aci.main-module/${project.version}</bundle>
-            <!--<bundle>mvn:org.opennms.aci/opennms-aci-provision/${project.version}</bundle>-->
+            <bundle>mvn:org.opennms.aci/opennms-aci-provision/${project.version}</bundle>
 
           </bundles>
           <features>
