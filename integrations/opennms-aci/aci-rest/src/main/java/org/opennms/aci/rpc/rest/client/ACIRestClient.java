@@ -344,8 +344,6 @@ public class ACIRestClient {
         restPost.addHeader("Authorization", authHeader);
         restPost.setEntity(new StringEntity("{\"aaaUser\": {\"attributes\": {\"name\": \""
                 + username + "\", \"pwd\": \"" + password + "\"}}}"));
-        // restPost.setEntity( new StringEntity( "<aaaUser name='svcOssAci'
-        // pwd='kf3as=Nx'/>" ) );
         final HttpResponse httpResponse = httpClient.execute(restPost, httpContext);
         final HttpEntity httpEntity = httpResponse.getEntity();
         final String data = EntityUtils.toString(httpEntity);

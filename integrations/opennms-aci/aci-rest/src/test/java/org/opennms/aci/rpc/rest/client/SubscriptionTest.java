@@ -86,6 +86,9 @@ public class SubscriptionTest {
      * @param args
      */
     public static void main(String[] args) {
+        final String userName = args[0];
+        final String pw = args[1];
+
         //LS6
 //      final String cluster = "ls6apic";
 //      final String url = "https://7.192.80.10,https://7.192.80.11,https://7.192.80.12";
@@ -97,12 +100,8 @@ public class SubscriptionTest {
         final String cluster = "test";
 //        final String url = "https://ls6apic1.cernerasp.com";
 //        final String url = "https://bogus,https://bogus,https://7.192.80.12";
-        final String userName = "svcOssAci";
-        final String pw = "kf3as=Nx";
 //        String authHeader;
 //        String host;
-//        String username = "svcOssAci";;
-//        String password = "kf3as=Nx";
 //        DefaultHttpClient httpClient;
 //        HttpContext httpContext;
 //        String restUrlPrefix;

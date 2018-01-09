@@ -47,6 +47,9 @@ public class ACIRestClientTest
      */
     public static void main( String[] args )
     {
+        final String userName = args[0];
+        final String pw = args[1];
+
         //LS2
          final String cluster = "ls2apic";
          final String url = "https://7.192.17.10,https://7.192.17.11,https://7.192.17.12,https://7.192.17.13,https://7.192.17.14";
@@ -65,9 +68,6 @@ public class ACIRestClientTest
         
         //Bogus
 //        final String url = "https://bogus,https://bogus,https://7.192.80.12";
-
-        final String userName = "svcOssAci";
-        final String pw = "kf3as=Nx";
 
         try
         {

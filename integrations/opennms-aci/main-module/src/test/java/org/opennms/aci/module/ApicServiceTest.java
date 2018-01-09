@@ -81,8 +81,13 @@ public class ApicServiceTest {
     
     private SouthboundConfigDao m_configDao;
     
+    private String username;
+    private String password;
+    
     @Before
     public void setUp() throws Exception {
+        username = System.getProperty("username");
+        password = System.getProperty("password");
         
         String xml = this.generateConfigXml();
         m_configDao = new DefaultSouthboundConfigDao();
@@ -154,22 +159,22 @@ public class ApicServiceTest {
                 "               reconnect-delay=\"2000\" \n" +
                 "               southbound-api=\"" + SouthElement.DEFAULT_SOUTH_CLIENT_API + "\"\n" +
                 "               southbound-message-parser=\"" + SouthElement.DEFAULT_SOUTH_MESSAGE_PARSER + "\" \n" +
-                "               userid=\"svcOssAci\"\n" +
-                "               password=\"kf3as=Nx\"/>\n" +
+                "               userid=\"" + username + "\"\n" +
+                "               password=\"" + password + "\"/>\n" +
                 "    <south-element host=\"7.192.240.11\" \n" +
                 "               port=\"443\" \n" +
                 "               reconnect-delay=\"2000\" \n" +
                 "               southbound-api=\"" + SouthElement.DEFAULT_SOUTH_CLIENT_API + "\"\n" +
                 "               southbound-message-parser=\"" + SouthElement.DEFAULT_SOUTH_MESSAGE_PARSER + "\" \n" +
-                "               userid=\"svcOssAci\"\n" +
-                "               password=\"kf3as=Nx\"/>\n" +
+                "               userid=\"" + username + "\"\n" +
+                "               password=\"" + password + "\"/>\n" +
                 "    <south-element host=\"7.192.240.12\" \n" +
                 "               port=\"443\" \n" +
                 "               reconnect-delay=\"2000\" \n" +
                 "               southbound-api=\"" + SouthElement.DEFAULT_SOUTH_CLIENT_API + "\"\n" +
                 "               southbound-message-parser=\"" + SouthElement.DEFAULT_SOUTH_MESSAGE_PARSER + "\" \n" +
-                "               userid=\"svcOssAci\"\n" +
-                "               password=\"kf3as=Nx\"/>\n" +
+                "               userid=\"" + username + "\"\n" +
+                "               password=\"" + password + "\"/>\n" +
                 "  </south-cluster>\n" +
                 "</southbound-configuration>";
     }
