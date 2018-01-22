@@ -97,25 +97,31 @@ public class ApicEventForwader {
                     if (attributes == null)
                         continue;
                     
-                    Date createDate;
+                    Date createDate = null;
                     String created = (String) attributes.get("created");
                     if (created != null) {
-                        String[] startTimeparts = created.split("T");
-                        String onlydate = startTimeparts[0];
-                        String onlytimewtz = startTimeparts[1];
-                        String onlytime = onlytimewtz.substring(0,
-                                                                onlytimewtz.length()
-                                                                        - 6);
-                        String onlytz = onlytimewtz.substring(onlytimewtz.length()
-                                - 6);
-                        String tz = onlytz.replace(":",
-                                                   "");
+                        try {
+                            String[] startTimeparts = created.split("T");
+                            String onlydate = startTimeparts[0];
+                            String onlytimewtz = startTimeparts[1];
+                            String onlytime = onlytimewtz.substring(0,
+                                                                    onlytimewtz.length()
+                                                                            - 6);
+                            String onlytz = onlytimewtz.substring(onlytimewtz.length()
+                                    - 6);
+                            String tz = onlytz.replace(":",
+                                                       "");
 
-                        createDate = ApicService.format.parse(onlydate + "T" + onlytime
-                                + tz);
-                    } else {
+                            createDate = ApicService.format.parse(onlydate + "T" + onlytime
+                                    + tz);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         createDate = new Date();
                     }
+                    
+                    if (created == null)
+                        createDate = new Date();
                     
                     EventBuilder bldr = ConvertToEvent.toEventBuilder(nodeCache, clusterName, createDate, attributes, apicHost);
 
