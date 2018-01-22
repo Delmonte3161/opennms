@@ -160,7 +160,7 @@ public class ApicClusterManager implements Runnable {
             client.shutdown();
         } catch (Exception e) {
             LOG.error("APIC websocket exception", e);
-            e.printStackTrace();
+//            e.printStackTrace();
             this.connectionOpen = false;
         }
     }
@@ -190,7 +190,7 @@ public class ApicClusterManager implements Runnable {
                         public void onMessage(String message) {
                             if (message == null)
                                 return;
-                            System.out.println("Received message: "+message);
+//                            System.out.println("Received message: "+message);
                             Runnable runnableTask = () -> {
                                 apicEventForwader.sendEvent(clusterName, aciClient.getHost(), message);
                             };
@@ -201,7 +201,8 @@ public class ApicClusterManager implements Runnable {
                     });
                     connectionOpen = true;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOG.error("Failed to connect to server.", e);
+//                    e.printStackTrace();
                 }
             }
             
@@ -229,7 +230,7 @@ public class ApicClusterManager implements Runnable {
 //        String query = "/api/node/class/faultInfo.json?subscription=yes";
         String query = "/api/node/class/faultRecord.json?query-target-filter=gt(faultRecord.created, \"" + formattedTime + "\")&subscription=yes";
         LOG.debug("Subscribing to query: " + query);
-        System.out.println("ACI: Subscribing to query: " + query);
+//        System.out.println("ACI: Subscribing to query: " + query);
         long now = System.currentTimeMillis();
         JSONObject result = (JSONObject) aciClient.runQueryNoAuth(query);
         return (String)result.get("subscriptionId");
