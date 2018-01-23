@@ -28,9 +28,10 @@
 
 package org.opennms.aci.rpc.commands;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.apache.karaf.shell.api.action.Action;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.opennms.aci.rpc.rest.client.ACIRestClient;
@@ -40,7 +41,8 @@ import org.opennms.aci.rpc.rest.client.ACIRestClient;
  * @author tf016851
  */
 @Command(scope = "aci", name = "get-faults", description="Gets faults from ACI")
-public class GetFaultsCommand extends OsgiCommandSupport {
+@Service
+public class GetFaultsCommand implements Action {
     
     @Option(name = "-l", aliases = "--location", description = "Location", required=true, multiValued=false)
     private String location;
@@ -57,14 +59,13 @@ public class GetFaultsCommand extends OsgiCommandSupport {
     @Option(name = "-d", aliases = "--duration", description = "Fault Polling Duration in minutes.", required=false, multiValued=false)
     public int pollDuration = 5;
 
-
     /*
      * (non-Javadoc)
      * 
      * @see org.apache.karaf.shell.console.AbstractAction#doExecute()
      */
     @Override
-    protected Object doExecute() throws Exception {
+    public Object execute() throws Exception {
         try
         {
             ACIRestClient client = ACIRestClient.newAciRest( location, aciUrl, username, password );

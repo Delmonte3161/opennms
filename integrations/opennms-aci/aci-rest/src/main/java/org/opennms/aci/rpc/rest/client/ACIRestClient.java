@@ -193,8 +193,9 @@ public class ACIRestClient {
             try {
                 JSONObject loginResult = aciRest.login();
                 LOG.trace(loginResult.toJSONString());
+                System.out.println("ACI: Connected to " + singleUrl);
                 return aciRest;
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 LOG.warn("Failed to connect to " + uri.toASCIIString(), e);
             }
         }
@@ -250,8 +251,9 @@ public class ACIRestClient {
             try {
                 JSONObject loginResult = aciRest.login();
                 LOG.trace(loginResult.toJSONString());
+                System.out.println("ACI: Connected to " + singleUrl);
                 return aciRest;
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 LOG.warn("Failed to connect to " + uri.toASCIIString(), e);
             }
         }

@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.security.cert.Certificate;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
 
@@ -89,6 +90,9 @@ public class SubscriptionTest {
         final String userName = args[0];
         final String pw = args[1];
 
+        //LS2
+      final String cluster = "ls2apic";
+      final String url = "https://7.192.17.10,https://7.192.17.11,https://7.192.17.12,https://7.192.17.13,https://7.192.17.14";
         //LS6
 //      final String cluster = "ls6apic";
 //      final String url = "https://7.192.80.10,https://7.192.80.11,https://7.192.80.12";
@@ -96,8 +100,9 @@ public class SubscriptionTest {
         //KC8
 //        final String cluster = "kc8apic";
 //        final String url = "https://7.192.240.10,https://7.192.240.11,https://7.192.240.12";
-        final String url = "https://kc8apic1.cernerasp.com,https://kc8apic2.cernerasp.com,https://kc8apic3.cernerasp.com";
-        final String cluster = "test";
+//        final String url = "https://kc8apic1.cernerasp.com,https://kc8apic2.cernerasp.com,https://kc8apic3.cernerasp.com";
+//        final String cluster = "test";
+
 //        final String url = "https://ls6apic1.cernerasp.com";
 //        final String url = "https://bogus,https://bogus,https://7.192.80.12";
 //        String authHeader;
@@ -112,6 +117,8 @@ public class SubscriptionTest {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         
         final java.util.Calendar startCal = GregorianCalendar.getInstance();
+        
+        startCal.add(Calendar.MINUTE, -60);
         
         String formattedTime = format.format(startCal.getTime());
        

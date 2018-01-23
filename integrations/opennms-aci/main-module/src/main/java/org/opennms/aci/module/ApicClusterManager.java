@@ -80,6 +80,8 @@ public class ApicClusterManager implements Runnable {
     private boolean connectionOpen = false;
     private String subscriptionId =  null;
     
+    private Session session = null;
+    
 
     /**
      * Default Constructor
@@ -141,7 +143,8 @@ public class ApicClusterManager implements Runnable {
             long now = System.currentTimeMillis();
             
             while (!shutdown) {
-                if (!this.connectionOpen)
+                //Check if connection is open, if not reconnect
+                if (session == null || !session.isOpen() || !this.connectionOpen) 
                     subscriptionId = this.connectAndSubscribeToFaults();
 
                 //Currently both Subscription and Token expire every 60 seconds
@@ -158,7 +161,7 @@ public class ApicClusterManager implements Runnable {
             LOG.debug("Stopping websocket client for " + this.clusterName);
             System.out.println("ACI: Stopping websocket client for " + this.clusterName);
             client.shutdown();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             LOG.error("APIC websocket exception", e);
 //            e.printStackTrace();
             this.connectionOpen = false;
@@ -177,7 +180,7 @@ public class ApicClusterManager implements Runnable {
         
         final ClientEndpointConfig cec = ClientEndpointConfig.Builder.create().build();
 
-        client.connectToServer(new Endpoint() {
+        session = client.connectToServer(new Endpoint() {
 
             @Override
             public void onOpen(Session session, EndpointConfig config) {

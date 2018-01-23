@@ -38,10 +38,20 @@
       <artifactId>aci-rest</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
+     <dependency>
       <groupId>org.apache.karaf.shell</groupId>
-      <artifactId>org.apache.karaf.shell.console</artifactId>
-      <version>${karafVersion}</version>
+      <artifactId>org.apache.karaf.shell.core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.aries.blueprint</groupId>
+      <artifactId>org.apache.aries.blueprint.core</artifactId>
+      <version>1.4.4</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -49,5 +59,6 @@
       <artifactId>org.osgi.enterprise</artifactId>
       <scope>provided</scope>
     </dependency>
+    
   </dependencies>
 </project>

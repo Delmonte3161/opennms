@@ -68,6 +68,7 @@ public class ConvertToEvent {
         
         EventBuilder bldr = new EventBuilder();
         
+        Long nodeId = (long) 0;
         LOG.trace("Building Event for " + location + " message: " + attributes.toJSONString());
         //First, let's add all Fault attributes as parameters.
         for (Object obj : attributes.keySet()) { 
@@ -84,20 +85,26 @@ public class ConvertToEvent {
             //Device Fault
             String key = location + ApicService.FS_SEP + dnParts[0] + "_" + dnParts[1] 
                     + "_" + dnParts[2] + "_" + dnParts[3];
-            Long nodeId = nodeCache.getNodeId(key);
+            nodeId = nodeCache.getNodeId(key);
             if (nodeId != null)
                 bldr.setNodeid(nodeId);
         } else if (dnParts[0].equals("dbgs")) {
             // for path violations, just associate with apic
-            Long nodeId = nodeCache.getNodeId(apicHost);
+            nodeId = nodeCache.getNodeId(apicHost);
             if (nodeId != null)
                 bldr.setNodeid(nodeId);
         } else {
             // for all others, just associate with apic
-            Long nodeId = nodeCache.getNodeId(apicHost);
+            nodeId = nodeCache.getNodeId(apicHost);
             if (nodeId != null)
                 bldr.setNodeid(nodeId);
-            
+        }
+        
+        //If we still do not have a nodeId, default to apichost
+        if (nodeId == null || nodeId.longValue() == 0) {
+            nodeId = nodeCache.getNodeId(apicHost);
+            if (nodeId != null)
+                bldr.setNodeid(nodeId);
         }
         
         bldr.setTime(createDate);

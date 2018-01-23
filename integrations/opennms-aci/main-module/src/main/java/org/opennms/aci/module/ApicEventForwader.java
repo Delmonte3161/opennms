@@ -109,15 +109,14 @@ public class ApicEventForwader {
                                                                             - 6);
                             String onlytz = onlytimewtz.substring(onlytimewtz.length()
                                     - 6);
-                            String tz = onlytz.replace(":",
-                                                       "");
+                            String tz = onlytz.replace(":", "");
 
                             createDate = ApicService.format.parse(onlydate + "T" + onlytime
                                     + tz);
                         } catch (Exception e) {
                             e.printStackTrace();
+                            createDate = null;
                         }
-                        createDate = new Date();
                     }
                     
                     if (created == null)
