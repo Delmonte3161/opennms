@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>org.opennms.aci.rpc.commands</artifactId>
-  <name>OpenNMS :: ACI :: RPC :: Shell Commands</name>
+  <name>OpenNMS :: ACI :: Shell Commands</name>
   <packaging>bundle</packaging>
   <build>
     <plugins>
@@ -20,12 +20,7 @@
             <Bundle-RequiredExecutionEnvironment>JavaSE-1.8</Bundle-RequiredExecutionEnvironment>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Bundle-Version>${project.version}</Bundle-Version>
-            <Import-Package>
-              org.apache.felix.service.command;version="[0.6,1)",
-              org.apache.felix.gogo.commands;version="[0.6,1)",
-              org.apache.karaf.shell.console;version="[2.2,5)",
-              *
-            </Import-Package>
+            <Karaf-Commands>*</Karaf-Commands>
           </instructions>
         </configuration>
       </plugin>

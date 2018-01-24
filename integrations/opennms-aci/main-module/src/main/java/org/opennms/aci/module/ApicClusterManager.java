@@ -36,6 +36,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.CloseReason;
@@ -68,11 +69,11 @@ public class ApicClusterManager implements Runnable {
     private final ApicEventForwader apicEventForwader;
     private final SouthCluster southCluster;
     public final String clusterUrl;
-    private final ACIRestClient aciClient;
     private final ClientManager client;
     public final boolean hostVerficationEnabled;
     public final String clusterName;
     
+    private ACIRestClient aciClient;
     private NodeCache nodeCache;
     
     private boolean shutdown = false;
@@ -144,8 +145,21 @@ public class ApicClusterManager implements Runnable {
             
             while (!shutdown) {
                 //Check if connection is open, if not reconnect
-                if (session == null || !session.isOpen() || !this.connectionOpen) 
+                if (session == null || !session.isOpen() || !this.connectionOpen) {
+                    if (subscriptionId != null) {
+                        //If we already have subscriptionid, then this is failure scenario
+                        //and we need to failover
+                        String username = "";
+                        String password = "";
+                        for (SouthElement element : southCluster.getElements() ){
+                            username = element.getUserid();
+                            password = element.getPassword();
+                            break;
+                        }
+                        this.aciClient = ACIRestClient.newAciRest( this.southCluster.getClusterName(), clusterUrl, username, password );
+                    }
                     subscriptionId = this.connectAndSubscribeToFaults();
+                }
 
                 //Currently both Subscription and Token expire every 60 seconds
                 if ((System.currentTimeMillis() - now) > 30000 && this.subscriptionId != null) {
@@ -180,14 +194,14 @@ public class ApicClusterManager implements Runnable {
         
         final ClientEndpointConfig cec = ClientEndpointConfig.Builder.create().build();
 
-        session = client.connectToServer(new Endpoint() {
+        Future<Session> fs = client.asyncConnectToServer(new Endpoint() {
 
             @Override
             public void onOpen(Session session, EndpointConfig config) {
                 try {
                     session.addMessageHandler(new MessageHandler.Whole<String>() {
 
-                        ExecutorService execService = Executors.newFixedThreadPool(10);
+                        ExecutorService execService = Executors.newFixedThreadPool(100);
 
                         @Override
                         public void onMessage(String message) {
@@ -225,6 +239,8 @@ public class ApicClusterManager implements Runnable {
             }
 
         }, cec, new URI("wss://"+ this.aciClient.getHost() + "/socket" + this.aciClient.getToken()));
+        
+        session = fs.get();
         
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         final java.util.Calendar startCal = GregorianCalendar.getInstance();

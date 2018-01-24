@@ -113,14 +113,15 @@ public class ApicEventForwader {
 
                             createDate = ApicService.format.parse(onlydate + "T" + onlytime
                                     + tz);
-                        } catch (Exception e) {
+                        } catch (Throwable e) {
                             e.printStackTrace();
                             createDate = null;
                         }
                     }
                     
-                    if (created == null)
-                        createDate = new Date();
+                    Date today = new Date();
+                    if (createDate == null || createDate.after(today))
+                        createDate = today;
                     
                     EventBuilder bldr = ConvertToEvent.toEventBuilder(nodeCache, clusterName, createDate, attributes, apicHost);
 

@@ -203,7 +203,9 @@ public class AciImporter {
             node.setBuilding(request.getForeignSource());
         String role = (String) aciNode.get("role");
         String dn = (String) aciNode.get("dn");
-        dn = dn.replace("/", "_");
+        String[] dnParts = dn.split("/");
+//        dn = dn.replace("/", "_");
+        dn = dnParts[0] + "_" + dnParts[1] + "_" + dnParts[2];
         node.setForeignId(dn);
         node.setNodeLabel((String) aciNode.get("name"));
         

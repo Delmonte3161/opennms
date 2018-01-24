@@ -81,23 +81,24 @@ public class ConvertToEvent {
             dn = (String) attributes.get("dn");
         String[] dnParts = dn.split(ApicService.DN_SEP);
         
-        if (dnParts[0].equals("topology") && dnParts.length >= 4) {
+        if (dnParts[0].equals("topology") && dnParts.length >= 3) {
             //Device Fault
             String key = location + ApicService.FS_SEP + dnParts[0] + "_" + dnParts[1] 
-                    + "_" + dnParts[2] + "_" + dnParts[3];
+                    + "_" + dnParts[2];
+//                    + "_" + dnParts[2] + "_" + dnParts[3];
             nodeId = nodeCache.getNodeId(key);
             if (nodeId != null)
                 bldr.setNodeid(nodeId);
-        } else if (dnParts[0].equals("dbgs")) {
-            // for path violations, just associate with apic
-            nodeId = nodeCache.getNodeId(apicHost);
-            if (nodeId != null)
-                bldr.setNodeid(nodeId);
-        } else {
-            // for all others, just associate with apic
-            nodeId = nodeCache.getNodeId(apicHost);
-            if (nodeId != null)
-                bldr.setNodeid(nodeId);
+//        } else if (dnParts[0].equals("dbgs")) {
+//            // for path violations, just associate with apic
+//            nodeId = nodeCache.getNodeId(apicHost);
+//            if (nodeId != null)
+//                bldr.setNodeid(nodeId);
+//        } else {
+//            // for all others, just associate with apic
+//            nodeId = nodeCache.getNodeId(apicHost);
+//            if (nodeId != null)
+//                bldr.setNodeid(nodeId);
         }
         
         //If we still do not have a nodeId, default to apichost
