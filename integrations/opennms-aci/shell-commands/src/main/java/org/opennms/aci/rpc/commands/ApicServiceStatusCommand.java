@@ -33,6 +33,7 @@ import java.util.List;
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.opennms.aci.module.ApicClusterManager;
 import org.opennms.aci.module.ApicService;
@@ -41,12 +42,12 @@ import org.opennms.aci.module.ApicService;
  * @author tf016851
  *
  */
-@Command(scope = "aci", name = "cluster-info", description="Displays ACI Cluster configuration information.")
+@Command(scope = "aci", name = "status", description="Displays ACI Service status.")
 @Service
-public class ClusterInfoCommand implements Action {
+public class ApicServiceStatusCommand implements Action {
     
-    @Argument(required=false, name="cluster-name", description="The name of the cluster to show the information for.")
-    private String clusterName = null;
+    @Argument(required=false, name="cluster-name", description="The name of the cluster to show the status for.")
+    private String _clusterName = null;
 
     /* (non-Javadoc)
      * @see org.apache.karaf.shell.api.action.Action#execute()
@@ -54,19 +55,31 @@ public class ClusterInfoCommand implements Action {
     @Override
     public Object execute() throws Exception {
         // TODO Auto-generated method stub
-        System.out.println("ApicService Info:");
-
+        System.out.println("ApicService Status:");
         List<ApicClusterManager> cms = ApicService.getClusterManagers();
+
         if (cms == null || cms.size() < 1)
             System.out.println("\tNo APIC clusters running.");
         else {
             for (ApicClusterManager apicClusterManager : cms) {
-                if ( clusterName == null || clusterName.equals(apicClusterManager.clusterName)) {
-                    apicClusterManager.printConfig();
+                String clusterName = apicClusterManager.clusterName;
+                
+                if (_clusterName == null
+                        || _clusterName.equals(clusterName)) {
+                    String apicHost = apicClusterManager.apicHost();
+                    boolean isRunning = apicClusterManager.isRunning();
+
+                    System.out.println("\t" + clusterName);
+                    if (isRunning)
+                        System.out.println("\t\t- Connected: " + apicHost);
+                    else
+                        System.out.println("\t\t- Not Connected");
+
                     System.out.println();
                 }
             }
         }
+
         return null;
     }
 

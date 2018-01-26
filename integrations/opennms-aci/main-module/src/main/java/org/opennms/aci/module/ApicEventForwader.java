@@ -143,10 +143,12 @@ public class ApicEventForwader {
                     });
                 }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             LOG.error("Failure sending message:\n" + jsonMessage + "\n", e);
-            if (LOG.isDebugEnabled())
+            if (LOG.isDebugEnabled()) {
+                System.out.println(jsonMessage);
                 e.printStackTrace();
+            }
         }
     }
     

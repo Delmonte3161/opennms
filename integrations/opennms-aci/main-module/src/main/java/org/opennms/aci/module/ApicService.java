@@ -95,7 +95,7 @@ public class ApicService {
     
     private Map<String, Map<String, Object>> clusterMap;
     
-    private List<ApicClusterManager> clusterManagers;
+    private static List<ApicClusterManager> clusterManagers;
     private List<Thread> clusterManagerThreads;
     
     private String localAddr;
@@ -271,6 +271,10 @@ public class ApicService {
 
     public void setNodeDao(NodeDao nodeDao) {
         this.nodeDao = nodeDao;
+    }
+
+    public static List<ApicClusterManager> getClusterManagers() {
+        return clusterManagers;
     }
 
 }

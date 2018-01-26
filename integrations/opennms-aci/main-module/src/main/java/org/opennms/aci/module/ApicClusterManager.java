@@ -116,7 +116,7 @@ public class ApicClusterManager implements Runnable {
 //        Logging.putPrefix("aci");
         
         List<SouthElement> elements = southCluster.getElements();
-        String url = "";
+String url = "";
         String username = "";
         String password = "";
         for (SouthElement element : elements ){
@@ -130,6 +130,17 @@ public class ApicClusterManager implements Runnable {
         
         this.aciClient = ACIRestClient.newAciRest( cluster.getClusterName(), clusterUrl, username, password );
 
+    }
+    
+    public boolean isRunning() {
+        return !this.shutdown && this.connectionOpen && this.session != null && this.session.isOpen();
+    }
+
+    public String apicHost() {
+        if (this.aciClient == null)
+            return null;
+
+        return this.aciClient.getHost();
     }
 
     /* (non-Javadoc)
@@ -253,5 +264,26 @@ public class ApicClusterManager implements Runnable {
         long now = System.currentTimeMillis();
         JSONObject result = (JSONObject) aciClient.runQueryNoAuth(query);
         return (String)result.get("subscriptionId");
+    }
+    
+    public void printConfig() {
+        List<SouthElement> elements = southCluster.getElements();
+        String url = "";
+        String username = "";
+        String password = "";
+        for (SouthElement element : elements ){
+            url += "https://" + element.getHost() + ":"  + element.getPort() + ",";
+            username = element.getUserid();
+            password = element.getPassword();
+        }
+        url = url.replaceAll(",$", "");
+        System.out.println("\t" + southCluster.getClusterName());
+        System.out.println("\t--- cluster-type: " + southCluster.getClusterType());
+        System.out.println("\t--- cron-schedule: " + southCluster.getCronSchedule());
+        System.out.println("\t--- poll-duration-minutes: " + southCluster.getPollDurationMinutes());
+        System.out.println("\t--- location: " + southCluster.getLocation());
+        System.out.println("\t--- url: " + url);
+        System.out.println("\t--- username: " + username);
+
     }
 }
