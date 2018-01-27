@@ -1,92 +1,90 @@
 <events xmlns="http://xmlns.opennms.org/xsd/eventconf">
          <event>
                 <uei>uei.opennms.org/cisco/aci/critical</uei>
-                <event-label>Cisco ACI Critical Event: %parm[descr]% for object: %parm[dn]%</event-label>
+                <event-label>Cisco ACI Critical Event: %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</event-label>
                 <descr>
                         Node ID: %nodeid%&lt;br&gt;
                         Host: %nodelabel%&lt;br&gt;
                         Interface: %interface% &lt;br&gt;
-			                  Parms:  %parm[all]%
+			Parms:  %parm[all]%
                 </descr>
-                <logmsg dest='logndisplay'>
-                        OpenNMS received a Cisco ACI Critical Event: %parm[descr]% for object: %parm[dn]%
-                </logmsg>
+                <logmsg dest='logndisplay'>Cisco ACI Critical Event: %parm[code]% - %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</logmsg>
                 <severity>Critical</severity>
-                <alarm-data reduction-key="%nodeid%:%parm[cause]%:%parm[affected]%" alarm-type="3" auto-clean="false"/>
+                <alarm-data reduction-key="%nodeid%:%parm[cause]%:%parm[affected]%" alarm-type="1" auto-clean="false">
+                    <update-field field-name="severity" update-on-reduction="true"/>
+                </alarm-data>
         </event>
          <event>
                 <uei>uei.opennms.org/cisco/aci/major</uei>
-                <event-label>Cisco ACI Major Event: %parm[descr]% for object: %parm[dn]%</event-label>
+                <event-label>Cisco ACI Major Event: %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</event-label>
                 <descr>
                         Node ID: %nodeid%&lt;br&gt;
                         Host: %nodelabel%&lt;br&gt;
                         Interface: %interface% &lt;br&gt;
-			                  Parms:  %parm[all]%
+                        Parms:  %parm[all]%
                 </descr>
-                <logmsg dest='logndisplay'>
-                        OpenNMS received a Cisco ACI Major Event: %parm[descr]% for object: %parm[dn]%
-                </logmsg>
+                <logmsg dest='logndisplay'>Cisco ACI Major Event: %parm[code]% - %parm[descr]% affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</logmsg>
                 <severity>Major</severity>
-                <alarm-data reduction-key="%nodeid%:%parm[cause]%:%parm[affected]%" alarm-type="3" auto-clean="false"/>
+                <alarm-data reduction-key="%nodeid%:%parm[cause]%:%parm[affected]%" alarm-type="1" auto-clean="false">
+                    <update-field field-name="severity" update-on-reduction="true"/>
+                </alarm-data>
         </event>
          <event>
                 <uei>uei.opennms.org/cisco/aci/minor</uei>
-                <event-label>Cisco ACI Minor Event: %parm[descr]% for object: %parm[dn]%</event-label>
+                <event-label>Cisco ACI Minor Event: %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</event-label>
                 <descr>
                         Node ID: %nodeid%&lt;br&gt;
                         Host: %nodelabel%&lt;br&gt;
                         Interface: %interface% &lt;br&gt;
-			                  Parms:  %parm[all]%
+                        Parms:  %parm[all]%
                 </descr>
-                <logmsg dest='logndisplay'>
-                        OpenNMS received a Cisco ACI Minor Event: %parm[descr]% for object: %parm[dn]%
-                </logmsg>
+                <logmsg dest='logndisplay'>Cisco ACI Minor Event: %parm[code]% - %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</logmsg>
                 <severity>Minor</severity>
-                <alarm-data reduction-key="%nodeid%:%parm[cause]%:%parm[affected]%" alarm-type="3" auto-clean="false"/>
+                <alarm-data reduction-key="%nodeid%:%parm[cause]%:%parm[affected]%" alarm-type="1" auto-clean="false">
+                    <update-field field-name="severity" update-on-reduction="true"/>
+                </alarm-data>
         </event>
          <event>
                 <uei>uei.opennms.org/cisco/aci/warning</uei>
-                <event-label>Cisco ACI Warning Event: %parm[descr]% for object: %parm[dn]%</event-label>
+                <event-label>Cisco ACI Warning Event: %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</event-label>
                 <descr>
                         Node ID: %nodeid%&lt;br&gt;
                         Host: %nodelabel%&lt;br&gt;
                         Interface: %interface% &lt;br&gt;
-			                  Parms:  %parm[all]%
+                        Parms:  %parm[all]%
                 </descr>
-                <logmsg dest='logndisplay'>
-                        OpenNMS received a Cisco ACI Warning Event: %parm[descr]% for object: %parm[dn]%
-                </logmsg>
+                <logmsg dest='logndisplay'>Cisco ACI Warning Event: %parm[code]% - %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</logmsg>
                 <severity>Warning</severity>
-                <alarm-data reduction-key="%nodeid%:%parm[cause]%:%parm[affected]%" alarm-type="3" auto-clean="false"/>
+                <alarm-data reduction-key="%nodeid%:%parm[cause]%:%parm[affected]%" alarm-type="1" auto-clean="false">
+                    <update-field field-name="severity" update-on-reduction="true"/>
+                </alarm-data>
         </event>
          <event>
                 <uei>uei.opennms.org/cisco/aci/info</uei>
-                <event-label>Cisco ACI Info Event: %parm[descr]% for object: %parm[dn]%</event-label>
+                <event-label>Cisco ACI Info Event: %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</event-label>
                 <descr>
                         Node ID: %nodeid%&lt;br&gt;
                         Host: %nodelabel%&lt;br&gt;
                         Interface: %interface% &lt;br&gt;
-			                  Parms:  %parm[all]%
+                        Parms:  %parm[all]%
                 </descr>
-                <logmsg dest='logndisplay'>
-                        OpenNMS received a Cisco ACI Info Event: %parm[descr]% for object: %parm[dn]%
-                </logmsg>
+                <logmsg dest='logndisplay'>Cisco ACI Info Event: %parm[code]% - %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</logmsg>
                 <severity>Normal</severity>
-                <alarm-data reduction-key="%nodeid%:%parm[cause]%:%parm[affected]%" alarm-type="3" auto-clean="false"/>
+                <alarm-data reduction-key="%nodeid%:%parm[cause]%:%parm[affected]%" alarm-type="1" auto-clean="false">
+                    <update-field field-name="severity" update-on-reduction="true"/>
+                </alarm-data>
         </event>
          <event>
                 <uei>uei.opennms.org/cisco/aci/cleared</uei>
-                <event-label>Cisco ACI Cleared Event: %parm[descr]% for object: %parm[dn]%</event-label>
+                <event-label>Cisco ACI Cleared Event: %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</event-label>
                 <descr>
                         Node ID: %nodeid%&lt;br&gt;
                         Host: %nodelabel%&lt;br&gt;
                         Interface: %interface% &lt;br&gt;
-			                  Parms:  %parm[all]%
+                        Parms:  %parm[all]%
                 </descr>
-                <logmsg dest='logndisplay'>
-                        OpenNMS received a Cisco ACI Cleared Event: %parm[descr]% for object: %parm[dn]%
-                </logmsg>
-                <severity>Cleared</severity>
-                <alarm-data reduction-key="%uei%:%nodeid%:%parm[dn]%" alarm-type="2" clear-key="%nodeid%:%parm[cause]%:%parm[affected]%" auto-clean="false"/>
+                <logmsg dest='logndisplay'>Cisco ACI Cleared Event: %parm[code]% - %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</logmsg>
+                <severity>Normal</severity>
+                <alarm-data reduction-key="%uei%:%nodeid%:%parm[cause]%:%parm[affected]%" alarm-type="2" clear-key="%nodeid%:%parm[cause]%:%parm[affected]%" auto-clean="false"/>
         </event>
 </events>
