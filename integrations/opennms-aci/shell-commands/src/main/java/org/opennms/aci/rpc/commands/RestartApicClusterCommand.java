@@ -28,53 +28,30 @@
 
 package org.opennms.aci.rpc.commands;
 
-import java.util.List;
-import java.util.Map;
-
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
-import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.opennms.aci.module.ApicClusterManager;
 import org.opennms.aci.module.ApicService;
 
 /**
  * @author tf016851
  *
  */
-@Command(scope = "aci", name = "status", description="Displays ACI Service status.")
+@Command(scope = "aci", name = "restart", description="Restart a sepcific APIC Cluster Job.")
 @Service
-public class ApicServiceStatusCommand implements Action {
-    
-    @Argument(required=false, name="cluster-name", description="The name of the cluster to show the status for.")
-    private String _clusterName = null;
+public class RestartApicClusterCommand implements Action {
+
+    @Argument(required=true, name="cluster-name", description="The name of the cluster to restart.")
+    private String clusterName = null;
 
     /* (non-Javadoc)
      * @see org.apache.karaf.shell.api.action.Action#execute()
      */
     @Override
     public Object execute() throws Exception {
-        System.out.println("ApicService Status:");
-        Map<String, ApicClusterManager> cms = ApicService.getClusterManagers();
-
-        if (cms == null || cms.size() < 1)
-            System.out.println("\tNo APIC clusters running.");
-        else {
-            for (String clusterName : cms.keySet()) {
-                ApicClusterManager apicClusterManager = cms.get(clusterName);
-                if (apicClusterManager != null) {
-                    String apicHost = apicClusterManager.apicHost();
-                    System.out.println("\t" + clusterName);
-                    if (apicClusterManager.isAlive() && apicClusterManager.isRunning())
-                        System.out.println("\t\t- Connected: " + apicHost);
-                    else
-                        System.out.println("\t\t- Not Connected");
-
-                    System.out.println();
-                }
-            }
-        }
+        System.out.println("Stoppig ApicService Cluster: " + clusterName);
+        ApicService.getApicServiceManager().restartClusterManager(clusterName);
 
         return null;
     }

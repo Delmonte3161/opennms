@@ -29,6 +29,7 @@
 package org.opennms.aci.rpc.commands;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Argument;
@@ -53,14 +54,15 @@ public class ClusterInfoCommand implements Action {
      */
     @Override
     public Object execute() throws Exception {
-        // TODO Auto-generated method stub
         System.out.println("ApicService Info:");
 
-        List<ApicClusterManager> cms = ApicService.getClusterManagers();
+        Map<String, ApicClusterManager> cms = ApicService.getClusterManagers();
+
         if (cms == null || cms.size() < 1)
             System.out.println("\tNo APIC clusters running.");
         else {
-            for (ApicClusterManager apicClusterManager : cms) {
+            for (String clusterName : cms.keySet()) {
+                ApicClusterManager apicClusterManager = cms.get(clusterName);
                 if ( clusterName == null || clusterName.equals(apicClusterManager.clusterName)) {
                     apicClusterManager.printConfig();
                     System.out.println();

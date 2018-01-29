@@ -62,7 +62,7 @@ import org.slf4j.LoggerFactory;
  * @author tf016851
  *
  */
-public class ApicClusterManager implements Runnable {
+public class ApicClusterManager extends Thread {
     
     private static final Logger LOG = LoggerFactory.getLogger(ApicClusterManager.class);
     
@@ -116,7 +116,7 @@ public class ApicClusterManager implements Runnable {
 //        Logging.putPrefix("aci");
         
         List<SouthElement> elements = southCluster.getElements();
-String url = "";
+        String url = "";
         String username = "";
         String password = "";
         for (SouthElement element : elements ){
@@ -148,30 +148,14 @@ String url = "";
      */
     @Override
     public void run() {
-        LOG.debug("Starting ApicClusterManager for: " + clusterName);
+        LOG.info("Starting ApicClusterManager for: " + clusterName);
         System.out.println("ACI: Starting ApicClusterManager for: " + clusterName);
 
         try {
             long now = System.currentTimeMillis();
-            
-            while (!shutdown) {
-                //Check if connection is open, if not reconnect
-                if (session == null || !session.isOpen() || !this.connectionOpen) {
-                    if (subscriptionId != null) {
-                        //If we already have subscriptionid, then this is failure scenario
-                        //and we need to failover
-                        String username = "";
-                        String password = "";
-                        for (SouthElement element : southCluster.getElements() ){
-                            username = element.getUserid();
-                            password = element.getPassword();
-                            break;
-                        }
-                        this.aciClient = ACIRestClient.newAciRest( this.southCluster.getClusterName(), clusterUrl, username, password );
-                    }
-                    subscriptionId = this.connectAndSubscribeToFaults();
-                }
+            subscriptionId = this.connectAndSubscribeToFaults();
 
+            while (isRunning()) {
                 //Currently both Subscription and Token expire every 60 seconds
                 if ((System.currentTimeMillis() - now) > 30000 && this.subscriptionId != null) {
                     //Do refresh on client session
@@ -183,7 +167,7 @@ String url = "";
                 Thread.sleep(1000);
             }
             
-            LOG.debug("Stopping websocket client for " + this.clusterName);
+            LOG.info("Stopping websocket client for " + this.clusterName);
             System.out.println("ACI: Stopping websocket client for " + this.clusterName);
             client.shutdown();
         } catch (Throwable e) {
@@ -191,12 +175,22 @@ String url = "";
 //            e.printStackTrace();
             this.connectionOpen = false;
         }
+        LOG.debug("ACI: Exiting thread ApicClusterManager for APIC: " + this.clusterName);
+        System.out.println("ACI: Exiting thread ApicClusterManager for APIC: " + this.clusterName);
     }
     
-    public void stop() {
+    public void shutdown() {
         LOG.debug("Shutting down " + this.clusterName);
         System.out.println("ACI: Shutting down " + this.clusterName);
         this.shutdown = true;
+    }
+    
+    public void setShutdown(boolean shutdown) {
+        this.shutdown = shutdown;
+    }
+    
+    public boolean isShutdown() {
+        return this.shutdown;
     }
 
     private String connectAndSubscribeToFaults() throws Exception {

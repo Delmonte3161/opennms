@@ -29,27 +29,14 @@
 package org.opennms.aci.module;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.opennms.core.logging.Logging;
-import org.opennms.core.utils.InetAddressUtils;
 import org.opennms.netmgt.config.southbound.SouthCluster;
-import org.opennms.netmgt.config.southbound.SouthElement;
 import org.opennms.netmgt.dao.api.EventDao;
 import org.opennms.netmgt.dao.api.NodeDao;
 import org.opennms.netmgt.dao.southbound.SouthboundConfigDao;
 import org.opennms.netmgt.events.api.EventForwarder;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleScheduleBuilder;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,158 +72,62 @@ public class ApicService {
     @Autowired
     private EventForwarder eventForwarder;
     
+    @Autowired
     private SouthboundConfigDao southboundConfigDao;
     
+    @Autowired
     private EventDao eventDao;
     
+    @Autowired
     private NodeDao nodeDao;
     
-    private Scheduler scheduler = null;
-    
-    private Map<String, Map<String, Object>> clusterMap;
-    
-    private static List<ApicClusterManager> clusterManagers;
-    private List<Thread> clusterManagerThreads;
-    
-    private String localAddr;
+    private static ApicServiceManager apicServiceManager;
 
     public void init() {
 
 //        Logging.putPrefix("aci");
         LOG.info("Initializaing ApicService ...");
-//        System.out.println("ACI: Initializaing ApicService ...");
-        localAddr = InetAddressUtils.getLocalHostName();
-        clusterMap = new HashMap<String, Map<String, Object>>();
-        clusterManagers = new ArrayList<ApicClusterManager>();
-        clusterManagerThreads = new ArrayList<Thread>();
-        
-        if (scheduler != null) {
-            try {
-                scheduler.shutdown(true);
-            } catch (SchedulerException e) {
-                LOG.debug("Error stopping scheduler.", e);
-                e.printStackTrace();
-            }
-            scheduler = null;
-        }
-        
+        System.out.println("ACI: Initializaing ApicService ...");
+
         List<SouthCluster> clusters = this.southboundConfigDao.getSouthboundClusters();
-        for (SouthCluster southCluster : clusters) {
-            if (southCluster.getClusterType().equals("CISCO-ACI")) {
-                String location = southCluster.getClusterName();
-                LOG.debug("Found ACI Cluster configuration for: " + location);
-//                System.out.println("ACI: Found ACI Cluster configuration for: " + location);
-                //Build URL
-                String url = "";
-                String username = "";
-                String password = "";
-                List<SouthElement> elements = southCluster.getElements();
-                for (SouthElement element : elements ){
-                    url += "https://" + element.getHost() + ":"  + element.getPort() + ",";
-                    username = element.getUserid();
-                    password = element.getPassword();
-                }
-                if (southCluster.getPollDurationMinutes() == 0) {
-                    LOG.debug("polldDurationMinutes == 0 ... starting websockets.");
-//                    System.out.println("ACI: polldDurationMinutes == 0 ... starting websockets.");
-                    //Start ApicClusterManager for realtime websocket connection
-                    NodeCache nodeCache = new NodeCache();
-                    nodeCache.setNodeDao(nodeDao);
-                    nodeCache.init();
-                    ApicEventForwader apicEventForwarder = new ApicEventForwader(eventForwarder, eventDao, nodeCache);
-                    try {
-                        ApicClusterManager apicClusterManager = new ApicClusterManager(apicEventForwarder, southCluster);
-                        //Create and start thread
-                        Thread cmt = new Thread(apicClusterManager);
-                        cmt.start();
-                        clusterManagerThreads.add(cmt);
-                        clusterManagers.add(apicClusterManager);
-                    } catch (Exception e) {
-                        LOG.error("Error starting ApicClusterManager for cluster: " + southCluster.getClusterName(), e);
-                        e.printStackTrace();
-                    }
-                } else {
-                    //Start scheduled data collection.
-                    LOG.debug("pollDurationMinutes == " + southCluster.getPollDurationMinutes() + " ... create and schedule job");
-//                    System.out.println("ACI: pollDurationMinutes == " + southCluster.getPollDurationMinutes() + " ... create and schedule job");
-                    this.createAndScheduleJob(location, org.apache.commons.lang.StringUtils.chomp(url, ","), 
-                        username, password, southCluster.getPollDurationMinutes());
-                }
-            }
-        }
-        LOG.debug("ACI: Finished initializing ApicService");
-//        System.out.println("ACI: Finished initializing ApicService");
+        apicServiceManager = new ApicServiceManager(eventForwarder, eventDao, nodeDao, clusters);
+        apicServiceManager.start();
+        
+        LOG.info("ACI: Finished initializing ApicService");
+        System.out.println("ACI: Finished initializing ApicService");
     }
 
     public void destroy() {
 
         LOG.info("Destorying ApicService ...");
-//        System.out.println("ACI: Destorying ApicService ...");
-        try {
-            if (scheduler != null)
-                scheduler.shutdown(true);
-        } catch (SchedulerException e) {
-            LOG.debug("Error shutting down scheduler", e);
-            e.printStackTrace();
+        System.out.println("ACI: Destorying ApicService ...");
+
+        if (apicServiceManager != null)
+            apicServiceManager.shutdown();
+        
+        long waitStart = System.currentTimeMillis();
+        while(apicServiceManager.isAlive()) {
+            LOG.info("ACI: Gracefully shutting down ...");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
+            if ((System.currentTimeMillis() - waitStart) >= 30000) {
+                //If still running after 30 seconds, forcefully stop
+                System.out.println("ACI: Forcefully stopping ApicServiceManager");
+                apicServiceManager.interrupt();
+            }
         }
 
-        for (ApicClusterManager t : clusterManagers) {
-            LOG.debug("Stopping clusterManager: " + t.clusterName);
-//            System.out.println("ACI: Stopping clusterManager: " + t.clusterName);
-            t.stop();
-        }
-
-        LOG.debug("Service stopped");
-//        System.out.println("ACI: Service stopped");
+        LOG.info("Service stopped");
+        System.out.println("ACI: Service stopped");
     }
-
-    public void createAndScheduleJob(String location, String apicUrl, String username, String password, int pollDuration) {
-        String jobIdentity = ApicClusterJob.class.getSimpleName() + "-" + location;
-        LOG.info("Creating job: " + jobIdentity);
-        
-        JobDetail job = JobBuilder.newJob(ApicClusterJob.class).withIdentity(jobIdentity, ApicClusterJob.class.getSimpleName())
-                    .usingJobData(APIC_CONFIG_LOCATION_KEY, location)
-                    .usingJobData(APIC_CONFIG_URL_KEY, apicUrl)
-                    .usingJobData(APIC_CONFIG_USERNAME_KEY, username)
-                    .usingJobData(APIC_CONFIG_PASSWORD_KEY, password)
-                    .usingJobData(APIC_CONFIG_POLL_DURATION_KEY, pollDuration)
-                    .usingJobData(APIC_CONFIG_LOCAL_ADDR, localAddr)
-                    .storeDurably()
-                    .build();
-        
-        NodeCache nodeCache = new NodeCache();
-        nodeCache.setNodeDao(nodeDao);
-        nodeCache.init();
-        
-        Map<String, Object> clusterJobMap = new HashMap<String, Object>();
-        
-        clusterMap.put(job.getKey().toString(), clusterJobMap);
-
-        // Trigger the job to run on the next round minute
-        String triggerIdentity = ApicService.class.getSimpleName() + "-Trigger-" + location;
-        Trigger trigger = TriggerBuilder.newTrigger()
-                            .withIdentity(triggerIdentity, "org.opennms.aci")
-                            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                            .withIntervalInMinutes(pollDuration)
-                            .withMisfireHandlingInstructionFireNow()
-                            .repeatForever())
-                            .build();
-
-        try {
-            scheduler = new StdSchedulerFactory().getScheduler();
-            scheduler.getContext().put(APIC_CONFIG_EVENT_FORWARDER, eventForwarder);
-            scheduler.getContext().put(APIC_CONFIG_EVENT_DAO, eventDao);
-            scheduler.getContext().put(APIC_CONFIG_NODE_CACHE, nodeCache);
-            scheduler.getContext().put(APIC_CONFIG_CLUSTER_MAP, clusterMap);
-            scheduler.start();
-            
-            if (!scheduler.checkExists(job.getKey()))
-                scheduler.scheduleJob(job, trigger);
-            
-        } catch (SchedulerException e) {
-            LOG.error("Error executing job.", e);
-        }
-
+    
+    public static Map<String, ApicClusterManager> getClusterManagers() {
+        return ApicServiceManager.clusterManagers;
     }
     
     /**
@@ -273,8 +164,11 @@ public class ApicService {
         this.nodeDao = nodeDao;
     }
 
-    public static List<ApicClusterManager> getClusterManagers() {
-        return clusterManagers;
+    /**
+     * @return the apicServiceManager
+     */
+    public static ApicServiceManager getApicServiceManager() {
+        return apicServiceManager;
     }
 
 }
