@@ -199,7 +199,7 @@ public class ApicClusterManager extends Thread {
         
         final ClientEndpointConfig cec = ClientEndpointConfig.Builder.create().build();
 
-        Future<Session> fs = client.asyncConnectToServer(new Endpoint() {
+        session = client.connectToServer(new Endpoint() {
 
             @Override
             public void onOpen(Session session, EndpointConfig config) {
@@ -233,6 +233,8 @@ public class ApicClusterManager extends Thread {
                 LOG.info("ACI: Websocket connection closed: " + closeReason.getReasonPhrase());
                 System.out.println("ACI: Websocket connection closed: " + closeReason.getReasonPhrase());
                 connectionOpen = false;
+                subscriptionId = null;
+                Thread.currentThread().interrupt();
             }
             
             @Override
@@ -241,11 +243,13 @@ public class ApicClusterManager extends Thread {
                 System.out.println("ACI: Websocket connection error: ");
                 thr.printStackTrace();
                 connectionOpen = false;
+                subscriptionId = null;
+                Thread.currentThread().interrupt();
             }
 
         }, cec, new URI("wss://"+ this.aciClient.getHost() + "/socket" + this.aciClient.getToken()));
         
-        session = fs.get();
+//        session = fs.get();
         
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         final java.util.Calendar startCal = GregorianCalendar.getInstance();
