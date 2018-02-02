@@ -115,6 +115,7 @@ public class ConvertToEvent {
 //        bldr.setSeverity(SEVERITY_MAP.get(attributes.get("severity")).getLabel());
         bldr.setSource(ApicService.class.getSimpleName());
         
+        bldr.addParam("apicHost", apicHost);
         return bldr;
     }
             

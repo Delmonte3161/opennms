@@ -64,12 +64,8 @@ public class ApicServiceStatusCommand implements Action {
             for (String clusterName : cms.keySet()) {
                 ApicClusterManager apicClusterManager = cms.get(clusterName);
                 if (apicClusterManager != null) {
-                    String apicHost = apicClusterManager.apicHost();
-                    System.out.println("\t" + clusterName);
                     if (apicClusterManager.isAlive() && apicClusterManager.isRunning())
-                        System.out.println("\t\t- Connected: " + apicHost);
-                    else
-                        System.out.println("\t\t- Not Connected");
+                        apicClusterManager.printStatus();
 
                     System.out.println();
                 }

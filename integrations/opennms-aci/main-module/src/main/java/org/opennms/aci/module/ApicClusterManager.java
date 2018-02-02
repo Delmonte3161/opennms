@@ -28,19 +28,17 @@
 
 package org.opennms.aci.module;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.CloseReason;
-import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
@@ -52,7 +50,6 @@ import org.glassfish.tyrus.client.SslContextConfigurator;
 import org.glassfish.tyrus.client.SslEngineConfigurator;
 import org.json.simple.JSONObject;
 import org.opennms.aci.rpc.rest.client.ACIRestClient;
-import org.opennms.core.logging.Logging;
 import org.opennms.netmgt.config.southbound.SouthCluster;
 import org.opennms.netmgt.config.southbound.SouthElement;
 import org.slf4j.Logger;
@@ -82,6 +79,8 @@ public class ApicClusterManager extends Thread {
     private String subscriptionId =  null;
     
     private Session session = null;
+    
+    private Date connectionStart = null;
     
 
     /**
@@ -253,17 +252,36 @@ public class ApicClusterManager extends Thread {
         
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         final java.util.Calendar startCal = GregorianCalendar.getInstance();
+        startCal.add(Calendar.SECOND, -30);
         String formattedTime = format.format(startCal.getTime());
 
 //        String query = "/api/node/class/faultInfo.json?subscription=yes";
         String query = "/api/node/class/faultRecord.json?query-target-filter=gt(faultRecord.created, \"" + formattedTime + "\")&subscription=yes";
         LOG.debug("Subscribing to query: " + query);
 //        System.out.println("ACI: Subscribing to query: " + query);
-        long now = System.currentTimeMillis();
         JSONObject result = (JSONObject) aciClient.runQueryNoAuth(query);
+        this.connectionStart = startCal.getTime();
         return (String)result.get("subscriptionId");
     }
     
+    public void printStatus() {
+        System.out.println("\t" + this.southCluster.getClusterName());
+        System.out.println("\t--- subscriptionId: " + this.subscriptionId);
+        System.out.println("\t--- threadAlive: " + this.isAlive());
+
+        if (this.isAlive())
+            System.out.println("\t--- isRunning: " + this.isRunning());
+        else
+            System.out.println("\t--- isRunning: " + this.isAlive());
+
+        if (this.isRunning()) {
+            System.out.println("\t--- apicHost: " + this.apicHost());
+            System.out.println("\t--- Running Since: " + this.connectionStart);
+        } else {
+            System.out.println("\t--- Not connected to apic: " + this.clusterUrl);
+        }
+    }
+
     public void printConfig() {
         List<SouthElement> elements = southCluster.getElements();
         String url = "";

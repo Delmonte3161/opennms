@@ -94,6 +94,8 @@ public class ApicServiceManager extends Thread {
             return;
         }
 
+        long start = System.currentTimeMillis();
+        
         //Initialize service
         init();
 
@@ -103,9 +105,21 @@ public class ApicServiceManager extends Thread {
                 if (southCluster.getPollDurationMinutes() == 0) {
                     // Websocket, check thread
                     this.checkClusterManager(southCluster);
+                    if (System.currentTimeMillis() - start >= 86370000) {
+                        // every 23 hours 59 minutes and 30 seconds, restart
+                        // service
+                        try {
+                            LOG.info("ACI: Restarting Cluster Mangaer for APIC: " + southCluster.getClusterName());
+                            this.restartClusterManager(southCluster.getClusterName());
+                        } catch (ApicClusterNotFoundException e) {
+                            LOG.info("ACI: No Cluster Mangaer found for APIC: " + southCluster.getClusterName());
+                        }
+                        start = System.currentTimeMillis();
+                    }
+
                 }
             }
-
+            
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
