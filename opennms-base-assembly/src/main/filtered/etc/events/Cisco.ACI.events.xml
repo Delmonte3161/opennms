@@ -8,7 +8,7 @@
                         Interface: %interface% &lt;br&gt;
 			Parms:  %parm[all]%
                 </descr>
-                <logmsg dest='logndisplay'>Cisco ACI Critical Event: %parm[code]% - %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</logmsg>
+                <logmsg dest='logndisplay'>Cisco ACI Critical Event: %parm[code]% - %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]% &lt;a href=&quot;http://%parm[apicHost]%/#c:a.1|%parm[affected]%&quot; onClick=&quot;function doit(){window.open(&apos;http://%parm[apicHost]%/#c:a.1|%parm[affected]%&apos;, &apos;%parm[apicHost]%&apos;);};doit();&quot;>Link&lt;/a></logmsg>
                 <severity>Critical</severity>
                 <alarm-data reduction-key="%nodeid%:%parm[cause]%:%parm[affected]%" alarm-type="1" auto-clean="false">
                     <update-field field-name="severity" update-on-reduction="true"/>
@@ -23,7 +23,7 @@
                         Interface: %interface% &lt;br&gt;
                         Parms:  %parm[all]%
                 </descr>
-                <logmsg dest='logndisplay'>Cisco ACI Major Event: %parm[code]% - %parm[descr]% affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</logmsg>
+                <logmsg dest='logndisplay'>Cisco ACI Major Event: %parm[code]% - %parm[descr]% affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]% &lt;a href=&quot;http://%parm[apicHost]%/#c:a.1|%parm[affected]%&quot; onClick=&quot;function doit(){window.open(&apos;http://%parm[apicHost]%/#c:a.1|%parm[affected]%&apos;, &apos;%parm[apicHost]%&apos;);};doit();&quot;>Link&lt;/a></logmsg>
                 <severity>Major</severity>
                 <alarm-data reduction-key="%nodeid%:%parm[cause]%:%parm[affected]%" alarm-type="1" auto-clean="false">
                     <update-field field-name="severity" update-on-reduction="true"/>
@@ -38,7 +38,7 @@
                         Interface: %interface% &lt;br&gt;
                         Parms:  %parm[all]%
                 </descr>
-                <logmsg dest='logndisplay'>Cisco ACI Minor Event: %parm[code]% - %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</logmsg>
+                <logmsg dest='logndisplay'>Cisco ACI Minor Event: %parm[code]% - %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]% &lt;a href=&quot;http://%parm[apicHost]%/#c:a.1|%parm[affected]%&quot; onClick=&quot;function doit(){window.open(&apos;http://%parm[apicHost]%/#c:a.1|%parm[affected]%&apos;, &apos;%parm[apicHost]%&apos;);};doit();&quot;>Link&lt;/a></logmsg>
                 <severity>Minor</severity>
                 <alarm-data reduction-key="%nodeid%:%parm[cause]%:%parm[affected]%" alarm-type="1" auto-clean="false">
                     <update-field field-name="severity" update-on-reduction="true"/>
@@ -53,7 +53,7 @@
                         Interface: %interface% &lt;br&gt;
                         Parms:  %parm[all]%
                 </descr>
-                <logmsg dest='logndisplay'>Cisco ACI Warning Event: %parm[code]% - %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</logmsg>
+                <logmsg dest='logndisplay'>Cisco ACI Warning Event: %parm[code]% - %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]% &lt;a href=&quot;http://%parm[apicHost]%/#c:a.1|%parm[affected]%&quot; onClick=&quot;function doit(){window.open(&apos;http://%parm[apicHost]%/#c:a.1|%parm[affected]%&apos;, &apos;%parm[apicHost]%&apos;);};doit();&quot;>Link&lt;/a></logmsg>
                 <severity>Warning</severity>
                 <alarm-data reduction-key="%nodeid%:%parm[cause]%:%parm[affected]%" alarm-type="1" auto-clean="false">
                     <update-field field-name="severity" update-on-reduction="true"/>
@@ -68,7 +68,7 @@
                         Interface: %interface% &lt;br&gt;
                         Parms:  %parm[all]%
                 </descr>
-                <logmsg dest='logndisplay'>Cisco ACI Info Event: %parm[code]% - %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</logmsg>
+                <logmsg dest='logndisplay'>Cisco ACI Info Event: %parm[code]% - %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]% &lt;a href=&quot;http://%parm[apicHost]%/#c:a.1|%parm[affected]%&quot; onClick=&quot;function doit(){window.open(&apos;http://%parm[apicHost]%/#c:a.1|%parm[affected]%&apos;, &apos;%parm[apicHost]%&apos;);};doit();&quot;>Link&lt;/a></logmsg>
                 <severity>Normal</severity>
                 <alarm-data reduction-key="%nodeid%:%parm[cause]%:%parm[affected]%" alarm-type="1" auto-clean="false">
                     <update-field field-name="severity" update-on-reduction="true"/>
@@ -83,7 +83,7 @@
                         Interface: %interface% &lt;br&gt;
                         Parms:  %parm[all]%
                 </descr>
-                <logmsg dest='logndisplay'>Cisco ACI Cleared Event: %parm[code]% - %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]%</logmsg>
+                <logmsg dest='logndisplay'>Cisco ACI Cleared Event: %parm[code]% - %parm[descr]% for affected: %parm[affected]% cause: %parm[cause]% - LC: %parm[lc]% &lt;a href=&quot;http://%parm[apicHost]%/#c:a.1|%parm[affected]%&quot; onClick=&quot;function doit(){window.open(&apos;http://%parm[apicHost]%/#c:a.1|%parm[affected]%&apos;, &apos;%parm[apicHost]%&apos;);};doit();&quot;>Link&lt;/a></logmsg>
                 <severity>Normal</severity>
                 <alarm-data reduction-key="%uei%:%nodeid%:%parm[cause]%:%parm[affected]%" alarm-type="2" clear-key="%nodeid%:%parm[cause]%:%parm[affected]%" auto-clean="false"/>
         </event>
