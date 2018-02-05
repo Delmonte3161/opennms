@@ -59,16 +59,21 @@ public class ApicServiceStatusCommand implements Action {
         Map<String, ApicClusterManager> cms = ApicService.getClusterManagers();
 
         if (cms == null || cms.size() < 1)
-            System.out.println("\tNo APIC clusters running.");
+            System.out.println("\tACI: No APIC clusters running.");
         else {
             for (String clusterName : cms.keySet()) {
                 ApicClusterManager apicClusterManager = cms.get(clusterName);
-                if (apicClusterManager != null) {
-                    if (apicClusterManager.isAlive() && apicClusterManager.isRunning())
+                if ( apicClusterManager != null && 
+                        ( _clusterName == null || clusterName.equals(_clusterName) ) ) {
+                    if ( apicClusterManager.isAlive() && apicClusterManager.isRunning() )
                         apicClusterManager.printStatus();
+                    else
+                        System.out.println("\tACI: " + clusterName + ": Not running");
 
-                    System.out.println();
+                } else {
+                    System.out.println("\tACI: " + clusterName + ": No manager found!");
                 }
+                System.out.println();
             }
         }
 

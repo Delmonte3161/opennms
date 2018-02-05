@@ -111,8 +111,11 @@ public class ConvertToEvent {
         bldr.setTime(createDate);
 //        bldr.setDescription((String) attributes.get("descr"));
 //        bldr.setLogMessage((String) attributes.get("rule"));
-        bldr.setUei(ACI_UEI_PART + attributes.get("severity"));
-//        bldr.setSeverity(SEVERITY_MAP.get(attributes.get("severity")).getLabel());
+        if ("cleared".equals(attributes.get("severity")))
+            bldr.setUei(ACI_UEI_PART + attributes.get("severity"));
+        else
+            bldr.setUei(ACI_UEI_PART + attributes.get("code"));
+        bldr.setSeverity(SEVERITY_MAP.get(attributes.get("severity")).getLabel());
         bldr.setSource(ApicService.class.getSimpleName());
         
         bldr.addParam("apicHost", apicHost);

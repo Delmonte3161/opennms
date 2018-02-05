@@ -192,6 +192,7 @@ public class ACIRestClient {
                                                       null, null, port);
             try {
                 JSONObject loginResult = aciRest.login();
+                LOG.info("ACI: Connected to " + singleUrl);
                 LOG.trace(loginResult.toJSONString());
                 System.out.println("ACI: Connected to " + singleUrl);
                 return aciRest;
