@@ -135,7 +135,9 @@ public class NodeCacheImpl implements NodeCache {
         body.put("foreignsource", node.getForeignSource());
         body.put("foreignid", node.getForeignId());
         body.put("operatingsystem", node.getOperatingSystem());
-        final StringBuilder categories=new StringBuilder();
+        //Implementation as per CTSMONETFB-272 by adding location parameter for syslogs and traps.
+        body.put("location", node.getLocation().getLocationName());
+        StringBuilder categories=new StringBuilder();
         for (Iterator<OnmsCategory> i=node.getCategories().iterator();i.hasNext();) {
             categories.append(((OnmsCategory)i.next()).getName());
             if(i.hasNext()) {

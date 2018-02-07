@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.opennms.features.minion</groupId>
         <artifactId>core-parent</artifactId>
-        <version>21.0.1-SNAPSHOT</version>
+        <version>21.0.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>core-repository</artifactId>
@@ -37,6 +37,7 @@
                             <features>
                                 <!-- Minion Core Features -->
                                 <feature>minion-core</feature>
+                                <feature>minion-jms</feature>
                                 <feature>minion-core-shell</feature>
                             </features>
                             <repository>${project.build.directory}/maven-repo</repository>

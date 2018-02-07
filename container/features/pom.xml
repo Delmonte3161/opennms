@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.opennms</groupId>
     <artifactId>org.opennms.container</artifactId>
-    <version>21.0.1-SNAPSHOT</version>
+    <version>21.0.2-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opennms.karaf</groupId>
@@ -235,6 +235,7 @@
             <feature>opennms-activemq-event-forwarder</feature>
             <feature>opennms-activemq-event-receiver</feature>
             -->
+            <feature>opennms-bundle-refresher</feature>
             <feature>opennms-collection-api</feature>
             <feature>opennms-collection-commands</feature>
             <feature>opennms-collection-persistence-rrd</feature>
@@ -761,6 +762,12 @@
       <artifactId>org.opennms.features.telemetry.minion</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opennms.features.vaadin-components</groupId>
+      <artifactId>bundle-refresher</artifactId>
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

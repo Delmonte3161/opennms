@@ -6,7 +6,7 @@
     <parent>
         <artifactId>org.opennms.features</artifactId>
         <groupId>org.opennms</groupId>
-        <version>21.0.1-SNAPSHOT</version>
+        <version>21.0.2-SNAPSHOT</version>
     </parent>
     <groupId>org.opennms.features</groupId>
     <artifactId>jmxconfiggenerator</artifactId>
@@ -15,7 +15,6 @@
     <url>http://www.opennms.org</url>
 
     <properties>
-        <jmxremote.optional.version>1.0_01-ea</jmxremote.optional.version>
         <velocity.version>1.7</velocity.version>
     </properties>
 

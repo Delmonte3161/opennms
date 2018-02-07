@@ -22,7 +22,7 @@
 
   <properties>
     <property name="prefix">uncategorized</property>
-    <property name="logdir">/Users/tf016851/git/opennms-aci/target/opennms-21.0.1-SNAPSHOT/logs</property>
+    <property name="logdir">${basedir}/target/opennms-21.0.1-SNAPSHOT/logs</property>
   </properties>
 
   <!--

@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.opennms.aci</groupId>
 		<artifactId>opennms-aci.parent</artifactId>
-		<version>21.0.1-SNAPSHOT</version>
+		<version>21.0.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>opennms-aci-provision</artifactId>
 	<name>OpenNMS :: ACI :: PROVISION</name>

@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opennms</groupId>
   <artifactId>smoke-test</artifactId>
-  <version>21.0.1-SNAPSHOT</version>
+  <version>21.0.2-SNAPSHOT</version>
   <name>OpenNMS Smoke Test</name>
   <properties>
     <skipITs>true</skipITs>
@@ -353,6 +353,11 @@
       <groupId>io.searchbox</groupId>
       <artifactId>jest-complete-osgi</artifactId>
       <version>2.0.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opennms.features.telemetry.adapters</groupId>
+      <artifactId>org.opennms.features.telemetry.adapters.jti</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opennms.features.telemetry.adapters</groupId>
