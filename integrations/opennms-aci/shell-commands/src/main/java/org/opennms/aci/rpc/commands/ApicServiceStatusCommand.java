@@ -70,10 +70,11 @@ public class ApicServiceStatusCommand implements Action {
                     else
                         System.out.println("\tACI: " + clusterName + ": Not running");
 
-                } else {
+                    System.out.println();
+                } else if (_clusterName == null) {
                     System.out.println("\tACI: " + clusterName + ": No manager found!");
+                    System.out.println();
                 }
-                System.out.println();
             }
         }
 

@@ -57,7 +57,7 @@ public class ApicServiceManager extends Thread {
     
     private static final Logger LOG = LoggerFactory.getLogger(ApicServiceManager.class);
     
-    private static final int restartDuration = 86370000;
+    private static final int restartDuration = 14400000; // 6 hours in millis
     
     private final EventForwarder eventForwarder;
     
@@ -107,8 +107,6 @@ public class ApicServiceManager extends Thread {
             for (SouthCluster southCluster : clusters) {
                 if (southCluster.getPollDurationMinutes() == 0) {
                     if (System.currentTimeMillis() - start >= restartDuration) {
-                        // every 23 hours 59 minutes and 30 seconds, restart
-                        // service
                         restarted = true;
                         try {
                             LOG.info("ACI: Restarting Cluster Mangaer for APIC: " + southCluster.getClusterName());
@@ -201,51 +199,17 @@ public class ApicServiceManager extends Thread {
     public void restartClusterManager(String clusterName) throws ApicClusterNotFoundException {
         if (clusterName == null)
             return;
-        
-        ApicClusterManager clusterManagerThread = clusterManagers.get(clusterName);
-        
-        if (clusterManagerThread == null) {
-            throw new ApicClusterNotFoundException("ACI: APIC cluster manageer thread not found for: " + clusterName);
+       
+        this.stopClusterManager(clusterName);
+        //Sleep for 5 seconds to give everything time to shutdown
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            // DOn't care
         }
         
-        LOG.info("ACI: Stopping clusterManager: " + clusterName);
-        System.out.println("ACI: Stopping clusterManager: " + clusterName);
-        clusterManagerThread.shutdown();
-        
-        Long waitStart = System.currentTimeMillis();
-        while(clusterManagerThread.isAlive() && clusterManagerThread.isRunning()) {
-            try {
-                Thread.sleep(250);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            
-            if ((System.currentTimeMillis() - waitStart) >= 10000) {
-                clusterManagerThread.interrupt();
-                break;
-            }
-        }
-        
-        SouthCluster southCluster = null;
-        for (SouthCluster sc : clusters) {
-            if (clusterName.equals(sc.getClusterName())) {
-                southCluster = sc;
-                break;
-            }
-        }
-        
-        if (southCluster == null)
-            throw new ApicClusterNotFoundException("ACI: APIC cluster configuration not found for: " + clusterName);
-        
-        LOG.info("ACI: Starting clusterManager: " + clusterName);
-        System.out.println("ACI: Starting clusterManager: " + clusterName);
-        ApicClusterManager apicClusterManager = clusterManagers.get(clusterName);
-        
-        //We may have an instance that was shutdown, so re-enable it
-        if (apicClusterManager != null)
-            apicClusterManager.setShutdown(false);
-        
-        this.checkClusterManager(southCluster);
+        //Check and start
+        this.startClusterManager(clusterName);
     }
     
     private void checkClusterManager(SouthCluster southCluster) {

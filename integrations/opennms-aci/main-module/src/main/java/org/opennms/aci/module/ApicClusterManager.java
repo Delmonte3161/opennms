@@ -28,6 +28,7 @@
 
 package org.opennms.aci.module;
 
+import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -231,6 +232,11 @@ public class ApicClusterManager extends Thread {
             public void onClose(Session session, CloseReason closeReason) {
                 LOG.info("ACI: Websocket connection closed: " + closeReason.getReasonPhrase());
                 System.out.println("ACI: Websocket connection closed: " + closeReason.getReasonPhrase());
+                try {
+                    session.close();
+                } catch (IOException e) {
+                    //Don't care we are forcibly restarting
+                }
                 connectionOpen = false;
                 subscriptionId = null;
                 Thread.currentThread().interrupt();
@@ -241,6 +247,11 @@ public class ApicClusterManager extends Thread {
                 LOG.error("ACI: Websocket connection error: ", thr);
                 System.out.println("ACI: Websocket connection error: ");
                 thr.printStackTrace();
+                try {
+                    session.close();
+                } catch (IOException e) {
+                    //Don't care we are forcibly restarting
+                }
                 connectionOpen = false;
                 subscriptionId = null;
                 Thread.currentThread().interrupt();
